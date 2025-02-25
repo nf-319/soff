@@ -57,6 +57,7 @@ const DraggableIcon = ({ style, ...props }: { style?: React.CSSProperties }) => 
   const handleSingleClick = async () => {
     if (router.pathname !== '/c-panel' || user?.role.join(', ') !== 'student') {
       dispatch(toggleModal(true))
+      
     }
   }
 

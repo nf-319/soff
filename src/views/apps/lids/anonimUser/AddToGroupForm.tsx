@@ -11,14 +11,16 @@ import toast, { Toaster } from 'react-hot-toast'
 
 type Props = {
   item: any
-  reRender: any
+  reRender?: any
   groups: any[]
-  setLoading: any
-  loading: any
+  setLoading?: any
+  loading?: any
   is_amocrm?: boolean
+  open?: boolean
+  setOpen?: (status: boolean) => void
 }
 
-export default function AddToGroupForm({ is_amocrm, item, reRender, groups }: Props) {
+export default function AddToGroupForm({ setOpen, is_amocrm, item, reRender, groups }: Props) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const validationSchema = Yup.object({
@@ -46,10 +48,11 @@ export default function AddToGroupForm({ is_amocrm, item, reRender, groups }: Pr
         })
         toast.success(`${resp.data?.msg || "Guruhga qo'shildi"}`)
         setLoading(false)
+        if (setOpen) {
+          setOpen(false)
+        }
         reRender(false)
       } catch (err: any) {
-        console.log(err)
-
         formik.setErrors(err.response.data)
         setLoading(false)
         toast.error(JSON.stringify(err.response.data.msg || 'serverda hatolik bor'), { position: 'top-center' })
@@ -81,7 +84,6 @@ export default function AddToGroupForm({ is_amocrm, item, reRender, groups }: Pr
     >
       <FormControl fullWidth>
         <Toaster
-          
           position='top-center'
           containerStyle={{
             zIndex: 9999
