@@ -86,9 +86,9 @@ const StaticsModal = () => {
         Hurmatli {user?.currentRole == 'admin' ? 'admin' : ''} {user?.fullName}
         <img
           src={
-            soffBotStatus === -1
+            soffBotText?.robot_mood === -1
               ? '/images/avatars/sadbot.png'
-              : soffBotStatus === 0
+              : soffBotText?.robot_mood === 0
               ? '/images/avatars/normalbot.png'
               : '/images/avatars/happybot.png'
           }

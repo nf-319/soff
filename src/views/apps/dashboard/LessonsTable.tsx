@@ -10,7 +10,7 @@ import EmptyContent from 'src/@core/components/empty-content'
 import { useTranslation } from 'react-i18next'
 
 const LessonsTable = () => {
-  const { events = [], workTime = [], isLessonLoading } = useAppSelector(state => state.dashboard)
+  const { events = [], workTime = [], isLessonLoading, interval } = useAppSelector(state => state.dashboard)
   const { push } = useRouter()
   const { t } = useTranslation()
 
@@ -78,7 +78,10 @@ const LessonsTable = () => {
                           onClick={() => push(`/groups/view/security?id=${item.id}&month=${getMonthName(null)}`)}
                           key={item.id}
                           sx={{
-                            width: `${(timeSlots.length - 1) * 50}px`,
+                            width:
+                              interval == '15'
+                                ? `${(timeSlots.length - 1) * 50}px`
+                                : `${(timeSlots.length - 1) * 25}px`,
                             height: '45px',
                             position: 'absolute',
                             padding: '5px',
@@ -89,7 +92,7 @@ const LessonsTable = () => {
                             sx={{
                               boxShadow: 'rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px',
                               borderRadius: '8px',
-                              backgroundColor: item.color,
+                              backgroundColor: item.color.split(',')[0] ? item.color.split(',')[0] : 'white',
                               width: '100%',
                               height: '100%',
                               cursor: 'pointer',
@@ -97,10 +100,22 @@ const LessonsTable = () => {
                               overflow: 'hidden'
                             }}
                           >
-                            <Typography sx={{ color: 'black', fontSize: '10px' }}>
+                            <Typography
+                              sx={{
+                                color: item.color.split(',')[1] ? item.color.split(',')[1] : 'black',
+                                fontSize: '10px'
+                              }}
+                            >
                               {hourFormatter(item.start_at)} - {hourFormatter(item.end_at)} / {item.name}
                             </Typography>
-                            <Typography sx={{ color: 'black', fontSize: '10px' }}>{item.teacher_name}</Typography>
+                            <Typography
+                              sx={{
+                                color: item.color.split(',')[1] ? item.color.split(',')[1] : 'black',
+                                fontSize: '10px'
+                              }}
+                            >
+                              {item.teacher_name}
+                            </Typography>
                           </Box>
                         </Box>
                       )

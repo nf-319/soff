@@ -12,8 +12,10 @@ const DraggableIcon = ({ style, ...props }: { style?: React.CSSProperties }) => 
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ bottom: 0, right: 0 })
   const dispatch = useDispatch()
-  const { soffBotStatus, isModalOpen: isBotModalOpen } = useAppSelector(state => state.page)
+  const { isModalOpen: isBotModalOpen } = useAppSelector(state => state.page)
   const { isMobile } = useResponsive()
+  const yesterdayDate = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0]
+
   const router = useRouter()
   const { user } = useContext(AuthContext)
   const handleStart = (e: React.MouseEvent<HTMLImageElement> | React.TouchEvent<HTMLImageElement>) => {
@@ -55,8 +57,31 @@ const DraggableIcon = ({ style, ...props }: { style?: React.CSSProperties }) => 
   }
 
   const handleSingleClick = async () => {
-    if (router.pathname !== '/c-panel' || user?.role.join(', ') !== 'student') {
-      dispatch(toggleModal(true))
+    try {
+      const res = await api.get('auth/analytics/', { params: { date: yesterdayDate } })
+      dispatch(
+        setSoffBotText({
+          missed_attendance: res.data.missed_attendance,
+          groups: res.data.detail,
+          absent_students: res.data.absent_students,
+          income: res.data.income,
+          new_leads: res.data.new_leads,
+          robot_mood: res.data.robot_mood,
+          sms_limit: res.data.sms_limit,
+          unconnected_leads: res.data.unconnected_leads,
+          summary: res.data?.summary,
+          role: res?.data?.role,
+          added_students: res.data?.added_students,
+          left_students: res.data?.left_students,
+          not_using_platform: res.data.not_using_platform
+        })
+      )
+    } catch (error) {
+      console.error(error)
+    } finally {
+      if (router.pathname !== '/c-panel' || user?.role.join(', ') !== 'student') {
+        dispatch(toggleModal(true))
+      }
     }
   }
 

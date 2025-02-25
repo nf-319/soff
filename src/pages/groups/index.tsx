@@ -10,11 +10,9 @@ import {
   FormControl,
   FormHelperText,
   IconButton,
-  InputLabel,
   MenuItem,
   Pagination,
   Select,
-  TablePagination,
   Typography
 } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
@@ -26,13 +24,12 @@ import {
   getDashboardLessons,
   getMetaData,
   handleOpenAddModal,
-  resetGroupParams,
   setRoomsData,
   setTeacherData,
   updateParams
 } from 'src/store/apps/groups'
 import { useRouter } from 'next/router'
-import { videoUrls } from 'src/@core/components/video-header/video-header'
+import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
 import { GroupsFilter } from 'src/views/apps/groups/GroupsFilter'
 import getLessonDays from 'src/@core/utils/getLessonDays'
 import dynamic from 'next/dynamic'
@@ -49,14 +46,12 @@ import { Icon } from '@iconify/react'
 import Excel from 'src/@core/components/excelButton/Excel'
 import OnlineLessonModal from 'src/views/apps/groups/view/GroupViewLeft/OnlineLessonModal'
 import { studentsUpdateParams } from 'src/store/apps/groupDetails'
-import { status } from 'nprogress'
 import DataTable from 'src/@core/components/table'
 
 const IconifyIcon = dynamic(() => import('src/@core/components/icon'))
 const RowOptions = dynamic(() => import('src/views/apps/groups/RowOptions'))
 const EditGroupModal = dynamic(() => import('src/views/apps/groups/EditGroupModal'))
 const AddGroupModal = dynamic(() => import('src/views/apps/groups/AddGroupModal'))
-const VideoHeader = dynamic(() => import('src/@core/components/video-header/video-header'))
 
 export interface customTableProps {
   xs: number
@@ -249,7 +244,7 @@ export default function GroupsPage() {
         setUpdateStatusModal(false)
         setLoading(false)
       } else {
-        toast('Xatolik')
+        toast.error('Xatolik')
       }
       setLoading(false)
     }
@@ -269,7 +264,7 @@ export default function GroupsPage() {
       .get('common/room-check-list/')
       .then(data => dispatch(setRoomsData(data.data)))
       .catch(error => {
-        console.log(error)
+        console.error(error)
       })
   }
   useEffect(() => {
@@ -308,6 +303,7 @@ export default function GroupsPage() {
   return (
     <div>
       <VideoHeader item={videoUrls.groups} />
+
       <Box
         className='groups-page-header'
         sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0' }}
@@ -341,7 +337,9 @@ export default function GroupsPage() {
       )}
 
       {!isMobile && <GroupsFilter isMobile={isMobile} />}
-      <DataTable columns={columns} loading={isLoading} data={groups || []} rowClick={rowClick} color text_color />
+
+      <DataTable columns={columns} loading={isLoading} data={groups || []} rowClick={rowClick}  />
+
       {Math.ceil(groupCount / 10) > 1 && !isLoading && (
         <div className='d-flex'>
           <Pagination
@@ -422,6 +420,7 @@ export default function GroupsPage() {
               </Select>
               <FormHelperText error>{!!formik.errors.status ? `${formik.errors.status}` : ''}</FormHelperText>
             </FormControl>
+
             <DialogActions>
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
                 <Button

@@ -4,23 +4,29 @@ import { useFormik } from 'formik'
 import { FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
-import { useAppSelector } from 'src/store'
+import { useAppDispatch, useAppSelector } from 'src/store'
 import { today } from 'src/@core/components/card-statistics/kanban-item'
 import api from 'src/@core/utils/api'
 import toast, { Toaster } from 'react-hot-toast'
+import { setDragonLoading, setLeadItems } from 'src/store/apps/leads'
 
 type Props = {
   item: any
-  reRender: any
+  reRender?: any
   groups: any[]
-  setLoading: any
-  loading: any
+  setLoading?: any
+  loading?: any
   is_amocrm?: boolean
+  open?: boolean
+  setOpenParent?: (status: boolean) => void
+  setOpen?: (status: boolean) => void
 }
 
-export default function AddToGroupForm({ is_amocrm, item, reRender, groups }: Props) {
+export default function AddToGroupForm({ setOpenParent, setOpen, is_amocrm, item, reRender, groups }: Props) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
+  const dispatch = useAppDispatch()
+
   const validationSchema = Yup.object({
     group: Yup.string().required('Guruhni tanlang'),
     added_at: Yup.string().required("Qo'shilish sanasini tanlang")
@@ -32,6 +38,21 @@ export default function AddToGroupForm({ is_amocrm, item, reRender, groups }: Pr
   } = {
     group: '',
     added_at: today
+  }
+  const query = window.location?.search?.split('?slug=')[1]
+
+  async function handleGetLealdItems() {
+    if (!query) return
+    dispatch(setDragonLoading(true))
+
+    try {
+      const res = await api.get(`leads/department/${query}`)
+      dispatch(setLeadItems(res.data))
+    } catch (err) {
+      console.error('Error fetching leads:', err)
+    } finally {
+      dispatch(setDragonLoading(false))
+    }
   }
 
   const formik: any = useFormik({
@@ -46,14 +67,18 @@ export default function AddToGroupForm({ is_amocrm, item, reRender, groups }: Pr
         })
         toast.success(`${resp.data?.msg || "Guruhga qo'shildi"}`)
         setLoading(false)
+        if (setOpen) {
+          setOpen(false)
+        }
+        if (setOpenParent) {
+          setOpenParent(false)
+          handleGetLealdItems()
+        }
         reRender(false)
       } catch (err: any) {
-        console.log(err)
-
         formik.setErrors(err.response.data)
         setLoading(false)
         toast.error(JSON.stringify(err.response.data.msg || 'serverda hatolik bor'), { position: 'top-center' })
-        // showResponseError(err.response.data, setError)
       }
     }
   })
@@ -81,7 +106,6 @@ export default function AddToGroupForm({ is_amocrm, item, reRender, groups }: Pr
     >
       <FormControl fullWidth>
         <Toaster
-          
           position='top-center'
           containerStyle={{
             zIndex: 9999

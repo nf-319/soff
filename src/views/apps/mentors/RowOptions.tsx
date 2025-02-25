@@ -1,4 +1,5 @@
-//@ts-nocheck
+'use client'
+
 import { IconButton, Menu, Typography } from '@mui/material'
 import { MouseEvent, useState } from 'react'
 import IconifyIcon from 'src/@core/components/icon'
@@ -48,6 +49,7 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
     if (resp.meta.requestStatus === 'rejected') {
       toast.error(`${resp.payload?.msg}`, { position: 'top-center' })
     } else {
+      // @ts-ignore
       const queryString = new URLSearchParams({ ...queryParams, status: 'active' }).toString()
       await dispatch(fetchTeachersList(queryString))
       toast.success(`${t("O'qituvchilar ro'yxatidan o'chirildi")}`, { position: 'top-center' })
@@ -81,7 +83,6 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
     handleRowOptionsClose()
     await dispatch(fetchTeacherdetail(id))
   }
-  
 
   return (
     <>
