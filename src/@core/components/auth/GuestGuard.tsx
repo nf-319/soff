@@ -21,17 +21,22 @@ const GuestGuard = (props: GuestGuardProps) => {
     return <>{children}</>
   }
 
+  const handleUserCheck = () => {
+    if (window.localStorage.getItem('userData')) {
+      router.replace('/')
+    }
+  }
   useEffect(() => {
     if (!router.isReady) {
       return
     }
 
-    if (window.localStorage.getItem('userData')) {
-      router.replace('/')
-    }
+    handleUserCheck()
   }, [router.route])
 
-  if (auth.loading || (!auth.loading && auth.user !== null)) {
+  handleUserCheck()
+
+  if (auth.loading) {
     return fallback
   }
 

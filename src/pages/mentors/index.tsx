@@ -5,7 +5,7 @@ import IconifyIcon from 'src/@core/components/icon'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { fetchTeachersList, updateParams ,setOpenEdit, setOpenSms} from 'src/store/apps/mentors'
+import { fetchTeachersList, updateParams, setOpenEdit, setOpenSms } from 'src/store/apps/mentors'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { videoUrls } from 'src/@core/components/video-header/video-header'
 import dynamic from 'next/dynamic'
@@ -15,8 +15,8 @@ import { toast } from 'react-hot-toast'
 import useSMS from 'src/hooks/useSMS'
 import { ModalTypes, SendSMSModal } from 'src/views/apps/students/view/UserViewLeft'
 import { fetchSmsList } from 'src/store/apps/settings'
+import RowOptions from 'src/views/apps/mentors/RowOptions'
 
-const RowOptions = dynamic(() => import('src/views/apps/mentors/RowOptions'))
 const TeacherAvatar = dynamic(() => import('src/views/apps/mentors/AddMentorsModal').then(mod => mod.TeacherAvatar))
 const TeacherEditDialog = dynamic(() => import('src/views/apps/mentors/TeacherEditDialog'))
 const TeacherCreateDialog = dynamic(() => import('src/views/apps/mentors/TeacherCreateDialog'))
@@ -36,12 +36,12 @@ export default function GroupsPage() {
   const dispatch = useAppDispatch()
   const { isMobile } = useResponsive()
   const { user } = useContext(AuthContext)
-    const [error, setError] = useState<any>({})
+  const [error, setError] = useState<any>({})
   const router = useRouter()
   const { smsTemps, getSMSTemps } = useSMS()
-  const { teachers, teachersCount, queryParams, isLoading,openSms } = useAppSelector(state => state.mentors)
+  const { teachers, teachersCount, queryParams, isLoading, openSms } = useAppSelector(state => state.mentors)
   const studentIds = teachers.map(student => student.id)
- const handleEditClickOpen = (value: ModalTypes) => {
+  const handleEditClickOpen = (value: ModalTypes) => {
     dispatch(setOpenSms(value))
   }
   const handleEditClose = () => {
@@ -113,15 +113,13 @@ export default function GroupsPage() {
       dataIndex: 'id',
       title: '',
       // title: <Button onClick={() => push("/employee-attendance")} variant='outlined'>{t("Davomat")}</Button>,
-      render: (actions) => <RowOptions id={actions} status={queryParams?.status}  />
+      render: actions => <RowOptions id={actions} status={queryParams?.status} />
     }
   ]
 
   const rowClick = (id: any) => {
-    
     push(`/mentors/view/security?id=${id}`)
   }
-
 
   useEffect(() => {
     if (
@@ -156,7 +154,7 @@ export default function GroupsPage() {
     const queryString = new URLSearchParams({ status: checked ? 'archive' : 'active', page: '1' }).toString()
     await dispatch(fetchTeachersList(queryString))
   }
-  
+
   useEffect(() => {
     dispatch(fetchSmsList())
   }, [])
@@ -164,16 +162,16 @@ export default function GroupsPage() {
   return (
     <div>
       <VideoHeader item={videoUrls.teachers} />
+
       <Box
         className='groups-page-header'
         sx={{
           display: 'flex',
-          flexWrap:'wrap',
-          // flexDirection: isMobile ? 'column' : 'row',
+          flexWrap: 'wrap',
           alignItems: isMobile ? 'start' : 'center',
           justifyContent: 'space-between',
           margin: '10px 0',
-          gap: '10px',
+          gap: '10px'
         }}
         py={2}
       >
@@ -182,7 +180,7 @@ export default function GroupsPage() {
             display: 'flex',
             alignItems: 'center',
             // flexDirection: isMobile ? 'column' : 'row',
-            gap: isMobile ? '5px' : '10px',
+            gap: isMobile ? '5px' : '10px'
           }}
         >
           <Typography variant={isMobile ? 'h6' : 'h5'}>{t('Mentorlar')}</Typography>
@@ -196,16 +194,16 @@ export default function GroupsPage() {
         </Box>
         <Box
           sx={{
-            width:isMobile ? '100%':'auto',
+            width: isMobile ? '100%' : 'auto',
             display: 'flex',
             gap: isMobile ? '10px' : '20px',
-            flexDirection: isMobile ? 'column' : 'row',
+            flexDirection: isMobile ? 'column' : 'row'
           }}
         >
           <Button
             onClick={() => {
-              getSMSTemps();
-              handleEditClickOpen('sms');
+              getSMSTemps()
+              handleEditClickOpen('sms')
             }}
             variant='outlined'
             color='warning'
@@ -226,7 +224,9 @@ export default function GroupsPage() {
           </Button>
         </Box>
       </Box>
+
       <DataTable loading={isLoading} columns={columns} data={teachers} rowClick={rowClick} />
+
       {Math.ceil(teachersCount / 10) > 1 && !isLoading && (
         <Pagination
           defaultPage={Number(queryParams.page)}
@@ -237,7 +237,7 @@ export default function GroupsPage() {
           sx={{
             display: 'flex',
             justifyContent: 'center',
-            mt: 2,
+            mt: 2
           }}
         />
       )}

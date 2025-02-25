@@ -11,7 +11,7 @@ import { AuthValuesType, RegisterParams, LoginParams, ErrCallbackType, UserDataT
 import api from 'src/@core/utils/api'
 import { setCompanyInfo, setRoles } from 'src/store/apps/user'
 import { useTranslation } from 'react-i18next'
-import { useAppDispatch, useAppSelector } from 'src/store'
+import { useAppDispatch } from 'src/store'
 
 const defaultProvider: AuthValuesType = {
   user: null,
@@ -118,16 +118,8 @@ const AuthProvider = ({ children }: Props) => {
       .post(authConfig.loginEndpoint, params)
       .then(async response => {
         if (!params.rememberMe) {
-          Cookie.set('token', response.data.tokens.access, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none'
-          })
-          Cookie.set('roles', JSON.stringify(response.data.roles), {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none'
-          })
+          Cookie.set('token', response.data.tokens.access)
+          Cookie.set('roles', JSON.stringify(response.data.roles))
           window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.tokens.access)
           window.localStorage.setItem('userData', JSON.stringify({ ...response.data, role: 'admin', tokens: null }))
         }
