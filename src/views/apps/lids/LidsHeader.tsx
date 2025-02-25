@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import IconifyIcon from 'src/@core/components/icon'
+import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import useDebounce from 'src/hooks/useDebounce'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -60,30 +61,34 @@ export default function LidsHeader({}: Props) {
         <Button variant='outlined' onClick={() => push('/lids/stats')}>
           {t('Hisobot')}
         </Button>
-
       </form>
-      {isMobile ? (
-        <Button
-          fullWidth
-          onClick={() => dispatch(setOpen('add-department'))}
-          sx={{ minWidth: '300px',my:4 }}
-          size='small'
-          variant='contained'
-          startIcon={<IconifyIcon icon={'material-symbols:add'} />}
-        >
-          {t("Bo'lim yaratish")}
-        </Button>
-      ) : (
-        <Button
-          onClick={() => dispatch(setOpen('add-department'))}
-          sx={{ minWidth: '300px' }}
-          size='small'
-          variant='contained'
-          startIcon={<IconifyIcon icon={'material-symbols:add'} />}
-        >
-          {t("Bo'lim yaratish")}
-        </Button>
-      )}
+
+      <Box display='flex' flexDirection='row-reverse' alignItems='center' justifyContent='center' gap={4}>
+        {isMobile ? (
+          <Button
+            fullWidth
+            onClick={() => dispatch(setOpen('add-department'))}
+            sx={{ minWidth: '300px', my: 4 }}
+            size='small'
+            variant='contained'
+            startIcon={<IconifyIcon icon={'material-symbols:add'} />}
+          >
+            {t("Bo'lim yaratish")}
+          </Button>
+        ) : (
+          <Button
+            onClick={() => dispatch(setOpen('add-department'))}
+            sx={{ minWidth: '300px' }}
+            size='medium'
+            variant='contained'
+            startIcon={<IconifyIcon icon={'material-symbols:add'} />}
+          >
+            {t("Bo'lim yaratish")}
+          </Button>
+        )}
+
+        <VideoHeader item={videoUrls.leads} />
+      </Box>
     </Box>
   )
 }
