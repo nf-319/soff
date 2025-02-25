@@ -1,4 +1,5 @@
-import React from 'react'
+'use client'
+
 import { Box, IconButton, Typography, styled } from '@mui/material'
 import MuiDrawer, { DrawerProps } from '@mui/material/Drawer'
 import IconifyIcon from 'src/@core/components/icon'
@@ -31,34 +32,33 @@ export default function TeacherCreateDialog() {
   }
 
   return (
-    <>
-      <Drawer open={openEdit === 'create'} anchor='right' variant='persistent' onClose={onClose}>
-        <Box
-          className='customizer-header'
+    <Drawer open={openEdit === 'create'} anchor='right' variant='persistent' onClose={onClose}>
+      <Box
+        className='customizer-header'
+        sx={{
+          position: 'relative',
+          p: theme => theme.spacing(3.5, 5),
+          borderBottom: theme => `1px solid ${theme.palette.divider}`
+        }}
+      >
+        <Typography variant='h6' sx={{ fontWeight: 600 }}>
+          {t("O'qituvchi qo'shish")}
+        </Typography>
+
+        <IconButton
+          onClick={onClose}
           sx={{
-            position: 'relative',
-            p: theme => theme.spacing(3.5, 5),
-            borderBottom: theme => `1px solid ${theme.palette.divider}`
+            right: 20,
+            top: '50%',
+            position: 'absolute',
+            color: 'text.secondary',
+            transform: 'translateY(-50%)'
           }}
         >
-          <Typography variant='h6' sx={{ fontWeight: 600 }}>
-            {t("O'qituvchi qo'shish")}
-          </Typography>
-          <IconButton
-            onClick={onClose}
-            sx={{
-              right: 20,
-              top: '50%',
-              position: 'absolute',
-              color: 'text.secondary',
-              transform: 'translateY(-50%)'
-            }}
-          >
-            <IconifyIcon icon='mdi:close' fontSize={20} />
-          </IconButton>
-        </Box>
-        {openEdit && <AddMentorsModal />}
-      </Drawer>
-    </>
+          <IconifyIcon icon='mdi:close' fontSize={20} />
+        </IconButton>
+      </Box>
+      {openEdit && <AddMentorsModal />}
+    </Drawer>
   )
 }

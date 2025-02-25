@@ -235,26 +235,24 @@ export default function AddMentorsModal() {
             {!!formik.errors.activated_at && formik.touched.activated_at && formik.errors.activated_at}
           </FormHelperText>
         </FormControl>
-        {/* <FormControlLabel
-                    name="is_fixed_salary"
-                    checked={formik.values.is_fixed_salary}
-                    onChange={handleCheckboxChange}
-                    onBlur={formik.handleBlur}
-                    control={<Checkbox />}
-                    label={t("O'zgarmas oylik sifatida")}
-                /> */}
+
         <Box sx={{ display: 'flex', gap: '20px' }}>
           <FormControl sx={{ width: '100%' }}>
             <TextField
               type='number'
               label={t('Foiz ulushi')}
               name='percentage'
-              // disabled={formik.values.is_fixed_salary}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.percentage}
               error={!!formik.errors.percentage && formik.touched.percentage}
               defaultValue={today}
+              InputProps={{
+                inputProps: {
+                  max: 100,
+                  min: 10
+                }
+              }}
             />
             <FormHelperText error>
               {!!formik.errors.percentage && formik.touched.percentage && formik.errors.percentage}

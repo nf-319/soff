@@ -16,10 +16,10 @@ import useSMS from 'src/hooks/useSMS'
 import { ModalTypes, SendSMSModal } from 'src/views/apps/students/view/UserViewLeft'
 import { fetchSmsList } from 'src/store/apps/settings'
 import RowOptions from 'src/views/apps/mentors/RowOptions'
+import TeacherCreateDialog from 'src/views/apps/mentors/TeacherCreateDialog'
 
 const TeacherAvatar = dynamic(() => import('src/views/apps/mentors/AddMentorsModal').then(mod => mod.TeacherAvatar))
 const TeacherEditDialog = dynamic(() => import('src/views/apps/mentors/TeacherEditDialog'))
-const TeacherCreateDialog = dynamic(() => import('src/views/apps/mentors/TeacherCreateDialog'))
 const VideoHeader = dynamic(() => import('src/@core/components/video-header/video-header'))
 const DataTable = dynamic(() => import('src/@core/components/table'))
 
@@ -242,7 +242,9 @@ export default function GroupsPage() {
         />
       )}
       <TeacherCreateDialog />
+
       <TeacherEditDialog />
+
       <SendSMSModal
         handleEditClose={handleEditClose}
         openEdit={openSms}

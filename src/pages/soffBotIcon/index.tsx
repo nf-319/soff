@@ -55,8 +55,31 @@ const DraggableIcon = ({ style, ...props }: { style?: React.CSSProperties }) => 
   }
 
   const handleSingleClick = async () => {
-    if (router.pathname !== '/c-panel' || user?.role.join(', ') !== 'student') {
-      dispatch(toggleModal(true))
+    try {
+      const res = await api.get('auth/analytics/')
+      dispatch(
+        setSoffBotText({
+          missed_attendance: res.data.missed_attendance,
+          groups: res.data.detail,
+          absent_students: res.data.absent_students,
+          income: res.data.income,
+          new_leads: res.data.new_leads,
+          robot_mood: res.data.robot_mood,
+          sms_limit: res.data.sms_limit,
+          unconnected_leads: res.data.unconnected_leads,
+          summary: res.data?.summary,
+          role: res?.data?.role,
+          added_students: res.data?.added_students,
+          left_students: res.data?.left_students,
+          not_using_platform: res.data.not_using_platform
+        })
+      )
+    } catch (error) {
+      console.error(error)
+    } finally {
+      if (router.pathname !== '/c-panel' || user?.role.join(', ') !== 'student') {
+        dispatch(toggleModal(true))
+      }
     }
   }
 
