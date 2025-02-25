@@ -242,22 +242,25 @@ export default function AddMentorsModal() {
               type='number'
               label={t('Foiz ulushi')}
               name='percentage'
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.percentage}
-              error={!!formik.errors.percentage && formik.touched.percentage}
-              defaultValue={today}
-              InputProps={{
-                inputProps: {
-                  max: 100,
-                  min: 10
-                }
+              onChange={e => {
+                let value = e.target.value
+                if (!/^\d*$/.test(value)) return
+                if (value.length > 3) return
+                if (Number(value) > 100) return
+
+                formik.setFieldValue('percentage', value)
               }}
+              onBlur={formik.handleBlur}
+              value={formik.values.percentage === '' ? '' : String(formik.values.percentage)}
+              error={!!formik.errors.percentage && formik.touched.percentage}
+              inputProps={{ min: 0, max: 100 }}
             />
+
             <FormHelperText error>
               {!!formik.errors.percentage && formik.touched.percentage && formik.errors.percentage}
             </FormHelperText>
           </FormControl>
+
           <FormControl sx={{ width: '100%' }}>
             <AmountInput
               // type='number'
