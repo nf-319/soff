@@ -143,9 +143,13 @@ const AuthProvider = ({ children }: Props) => {
           const returnUrl = router.query.returnUrl
 
           const redirectURL = isMarketolog ? '/lids' : returnUrl && returnUrl !== '/' ? returnUrl : '/'
-          router.replace(redirectURL as string)
+          if (redirectURL) {
+            await router.replace(redirectURL as string)
+          } else {
+            console.error('Redirect URL is undefined or invalid:', redirectURL)
+          }
         } else {
-          router.replace('/crm-payments')
+          await router.replace('/crm-payments')
         }
 
         dispatch(setRoles(userRoles))
