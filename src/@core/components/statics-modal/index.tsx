@@ -55,9 +55,6 @@ const StaticsModal = () => {
     }
   }
 
-  useEffect(() => {
-    fetchAnalytics(yesterdayDate)
-  }, [])
 
   useEffect(() => {
     if (triggerConfetti) {

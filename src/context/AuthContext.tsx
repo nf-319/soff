@@ -118,8 +118,16 @@ const AuthProvider = ({ children }: Props) => {
       .post(authConfig.loginEndpoint, params)
       .then(async response => {
         if (!params.rememberMe) {
-          Cookie.set('token', response.data.tokens.access)
-          Cookie.set('roles', JSON.stringify(response.data.roles))
+          Cookie.set('token', response.data.tokens.access, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none'
+          })
+          Cookie.set('roles', JSON.stringify(response.data.roles), {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none'
+          })
           window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.tokens.access)
           window.localStorage.setItem('userData', JSON.stringify({ ...response.data, role: 'admin', tokens: null }))
         }

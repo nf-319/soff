@@ -8,12 +8,10 @@ import { setOpenCreateSms } from 'src/store/apps/settings'
 
 import CreateCourseForm from './CreateCourseForm'
 
-type Props = {}
-
-export default function CreateCourseDialog({}: Props) {
+export default function CreateCourseDialog() {
   const { t } = useTranslation()
   const { openCreateSms } = useAppSelector(state => state.settings)
-  
+
   const dispatch = useAppDispatch()
 
   const setOpenAddGroup = () => {
@@ -45,6 +43,7 @@ export default function CreateCourseDialog({}: Props) {
         >
           <IconifyIcon icon='mdi:close' fontSize={20} />
         </IconButton>
+        sole
       </Box>
 
       {openCreateSms && <CreateCourseForm />}

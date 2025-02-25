@@ -1,28 +1,16 @@
-// ** React Import
 import { useRef, useState } from 'react'
-
-// ** MUI Import
 import List from '@mui/material/List'
 import Box, { BoxProps } from '@mui/material/Box'
 import { styled, useTheme } from '@mui/material/styles'
-
-// ** Third Party Components
 import PerfectScrollbar from 'react-perfect-scrollbar'
-
-// ** Type Import
 import { LayoutProps } from 'src/@core/layouts/types'
-
 import themeConfig from 'src/configs/themeConfig'
-
-// ** Component Imports
 import Drawer from './Drawer'
 import VerticalNavItems from './VerticalNavItems'
 import VerticalNavHeader from './VerticalNavHeader'
-
-// ** Util Import
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 
-interface Props {
+type Props = {
   navWidth: number
   navVisible: boolean
   collapsedNavWidth: number
@@ -59,25 +47,15 @@ const StyledBoxForShadow = styled(Box)<BoxProps>(({ theme }) => ({
 }))
 
 const Navigation = (props: Props) => {
-  // ** Props
   const { hidden, settings, afterNavMenuContent, beforeNavMenuContent, navMenuContent: userNavMenuContent } = props
-
-  // ** States
   const [navHover, setNavHover] = useState<boolean>(false)
   const [groupActive, setGroupActive] = useState<string[]>([])
   const [currentActiveGroup, setCurrentActiveGroup] = useState<string[]>([])
-
-  // ** Ref
   const shadowRef = useRef(null)
-
-  // ** Hooks
   const theme = useTheme()
   const { mode } = settings
-
-  // ** Var
   const { afterVerticalNavMenuContentPosition, beforeVerticalNavMenuContentPosition } = themeConfig
 
-  // ** Fixes Navigation InfiniteScroll
   const handleInfiniteScroll = (ref: HTMLElement) => {
     if (ref) {
       // @ts-ignore
@@ -92,7 +70,6 @@ const Navigation = (props: Props) => {
     }
   }
 
-  // ** Scroll Menu
   const scrollMenu = (container: any) => {
     if (beforeVerticalNavMenuContentPosition === 'static' || !beforeNavMenuContent) {
       container = hidden ? container.target : container
@@ -143,14 +120,14 @@ const Navigation = (props: Props) => {
         <ScrollWrapper
           {...(hidden
             ? {
-              onScroll: (container: any) => scrollMenu(container),
-              sx: { height: '100%', overflowY: 'auto', overflowX: 'hidden' }
-            }
+                onScroll: (container: any) => scrollMenu(container),
+                sx: { height: '100%', overflowY: 'auto', overflowX: 'hidden' }
+              }
             : {
-              options: { wheelPropagation: false },
-              onScrollY: (container: any) => scrollMenu(container),
-              containerRef: (ref: any) => handleInfiniteScroll(ref)
-            })}
+                options: { wheelPropagation: false },
+                onScrollY: (container: any) => scrollMenu(container),
+                containerRef: (ref: any) => handleInfiniteScroll(ref)
+              })}
         >
           {beforeNavMenuContent && beforeVerticalNavMenuContentPosition === 'static'
             ? beforeNavMenuContent(props)
@@ -172,7 +149,6 @@ const Navigation = (props: Props) => {
           {afterNavMenuContent && afterVerticalNavMenuContentPosition === 'static' ? afterNavMenuContent(props) : null}
         </ScrollWrapper>
       </Box>
-          {/* <StaticsModal/> */}
       {afterNavMenuContent && afterVerticalNavMenuContentPosition === 'fixed' ? afterNavMenuContent(props) : null}
     </Drawer>
   )

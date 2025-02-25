@@ -11,7 +11,7 @@ import CreateSchoolDialog from 'src/views/apps/settings/schools/CreateSchoolDial
 import EditSchoolDialog from 'src/views/apps/settings/schools/EditSchoolDialog'
 import SchoolsRowOptions from 'src/views/apps/settings/schools/SchoolsRowOption'
 
-export interface customTableProps {
+export type customTableProps = {
   xs: number
   title: string
   dataIndex?: string | ReactNode
@@ -79,7 +79,7 @@ export default function SchoolsPage() {
         />
       )}
       <CreateSchoolDialog openModal={openSchoolModal} setOpenModal={setOpenSchoolModal} />
-      
+
       <EditSchoolDialog />
     </div>
   )
