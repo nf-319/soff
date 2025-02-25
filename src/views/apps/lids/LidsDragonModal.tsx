@@ -34,10 +34,12 @@ import AddNoteAnonimUser from './anonimUser/AddNoteAnonimUser'
 import { useTranslation } from 'react-i18next'
 import { setOpen } from 'src/store/apps/leads'
 import SendSmsAnonimUserForm from './anonimUser/SendSmsAnonimUserForm'
-import { useAppSelector } from 'src/store'
-import { HelpOutline, QuestionAnswer, QuestionAnswerOutlined } from '@mui/icons-material'
+import { useAppDispatch, useAppSelector } from 'src/store'
+import { Add, HelpOutline, QuestionAnswer, QuestionAnswerOutlined } from '@mui/icons-material'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'
+import AddToGroupForm from './anonimUser/AddToGroupForm'
+import { fetchGroupChecklist } from 'src/store/apps/groups'
 
 type InfoItemProps = {
   icon: React.ReactNode
@@ -68,13 +70,19 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
   const [value, setValue] = useState<'lead-user-description' | 'anonim-user' | 'sms-history'>('anonim-user')
   const [leadDetail, setLeadDetail] = useState<any>(null)
   const { sms_list } = useAppSelector(state => state.settings)
+  const { groupChecklist } = useAppSelector(state => state.groups)
+
+  console.log(selectedLead);
+  
+
   const [smsModal, setSmsModalOpen] = useState(false)
+  const [addGroupModal, setAddGroupModal] = useState(false)
   const [detailLoading, setDetailLoading] = useState(false)
   const { settings } = useSettings()
   const { isMobile } = useResponsive()
   const [nodeModal, setNodeModal] = useState(false)
   const { t } = useTranslation()
-
+  const dispatch = useAppDispatch()
   const handleGetUserDetails = async (value: string, id: number) => {
     setDetailLoading(true)
     try {
@@ -102,6 +110,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
 
   useEffect(() => {
     if (openModal) {
+      dispatch(fetchGroupChecklist())
       handleGetUserDetails(value, selectedLead?.id)
     }
   }, [selectedLead?.id])
@@ -145,17 +154,22 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
           <div className='col-12'>
             <InfoItem icon={<Phone />} label='Telefon raqami' value={selectedLead?.phone} />
           </div>
+          <div className='col-12'>
+            <Button onClick={() => setAddGroupModal(true)} variant='contained' fullWidth startIcon={<Add />}>
+              Guruhga qo'shish
+            </Button>
+          </div>
         </div>
         <Box sx={{ width: '100%', marginTop: 2 }}>
           <Tabs
-            variant={isMobile ? 'scrollable' : 'fullWidth'} // Scrollable for small screens
-            scrollButtons={isMobile ? 'auto' : false} // Show scroll buttons if needed
+            variant={isMobile ? 'scrollable' : 'fullWidth'}
+            scrollButtons={isMobile ? 'auto' : false}
             value={value}
             onChange={handleChange}
             aria-label='user tabs'
             sx={{
               '& .MuiTabs-flexContainer': {
-                flexDirection: isMobile ? 'column' : 'row' // Stack tabs vertically on small screens
+                flexDirection: isMobile ? 'column' : 'row'
               }
             }}
           >
@@ -373,6 +387,23 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
             user={selectedLead?.id}
             closeModal={() => setSmsModalOpen(false)}
             reRender={() => handleGetUserDetails('sms-history', selectedLead?.id)}
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog open={addGroupModal} onClose={() => setAddGroupModal(false)}>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography>{t("Guruhga qo'shish")}</Typography>
+          <IconifyIcon icon={'material-symbols:close'} onClick={() => setAddGroupModal(false)} />
+        </DialogTitle>
+        <DialogContent>
+          <AddToGroupForm
+            open={addGroupModal}
+            setOpen={setAddGroupModal}
+            item={selectedLead}
+            groups={groupChecklist || []}
+            // loading={loading}
+            // setLoading={setLoading}
+            // is_amocrm={is_amocrm}
           />
         </DialogContent>
       </Dialog>

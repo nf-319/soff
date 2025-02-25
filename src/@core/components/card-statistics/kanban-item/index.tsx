@@ -79,6 +79,7 @@ const KanbanItem = (props: KanbarItemProps) => {
   const [activeTab, setActiveTab] = useState<string>('tab-2')
   const [leadDetail, setLeadDetail] = useState([])
 
+
   const { total } = useAppSelector(state => state.user)
   const { queryParams, groups } = useAppSelector(state => state.leads)
   const { smsTemps, getSMSTemps } = useSMS()
@@ -469,7 +470,13 @@ const KanbanItem = (props: KanbarItemProps) => {
         setOpen={setOpen}
       />
 
-      <EditAnonimDialogDialog department={id} open={open} setOpen={setOpen} item={props} reRender={() => reRender(false)} />
+      <EditAnonimDialogDialog
+        department={id}
+        open={open}
+        setOpen={setOpen}
+        item={props}
+        reRender={() => reRender(false)}
+      />
 
       <Dialog open={open === 'add-group'} onClose={() => setOpen(null)}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -490,11 +497,17 @@ const KanbanItem = (props: KanbarItemProps) => {
 
       <Dialog open={open === 'merge-to' || open === 'merge-to-amo'} onClose={() => setOpen(null)}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography>{t(open == "merge-to" ? "Boshqa bo'limga o'tkazish":"Soff crmga o'tkazish")}</Typography>
+          <Typography>{t(open == 'merge-to' ? "Boshqa bo'limga o'tkazish" : "Soff crmga o'tkazish")}</Typography>
           <IconifyIcon icon={'material-symbols:close'} onClick={() => setOpen(null)} />
         </DialogTitle>
         <DialogContent>
-          <MergeToDepartment setOpen={setOpen} open={open} is_amocrm={is_amocrm} item={props} reRender={() => reRender(false)} />
+          <MergeToDepartment
+            setOpen={setOpen}
+            open={open}
+            is_amocrm={is_amocrm}
+            item={props}
+            reRender={() => reRender(false)}
+          />
         </DialogContent>
       </Dialog>
 

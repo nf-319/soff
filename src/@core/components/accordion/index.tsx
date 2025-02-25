@@ -34,12 +34,12 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 const DepartmentSendSmsForm = dynamic(() => import('src/views/apps/lids/departmentItem/DepartmentSendSmsForm'), {
-  ssr: false // Disable server-side rendering if required
+  ssr: false 
 })
 
 // Dynamic import for EditDepartmentItemForm
 const EditDepartmentItemForm = dynamic(() => import('src/views/apps/lids/departmentItem/EditDepartmentItemForm'), {
-  ssr: false // Disable server-side rendering if required
+  ssr: false 
 })
 
 interface AccordionProps {
