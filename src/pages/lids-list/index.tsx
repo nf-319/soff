@@ -160,10 +160,10 @@ const Kanban = () => {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Box display='flex' justifyContent='space-between' marginY={5} alignItems='center'>
-        {leadTitle == 'undefined' ? (
+        {dragonLoading ? (
           <Skeleton width={200} height={70} />
         ) : (
-          <Typography variant='h5'>{leadTitle}</Typography>
+          <Typography variant='h5'>{leadTitle||"Leads"}</Typography>
         )}
         <Button variant='contained' onClick={() => dispatch(setOpenItem(query))} startIcon={<PlusIcon />}>
           Yangi bo'lim qo'shish
