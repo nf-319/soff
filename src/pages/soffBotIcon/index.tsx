@@ -12,8 +12,10 @@ const DraggableIcon = ({ style, ...props }: { style?: React.CSSProperties }) => 
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ bottom: 0, right: 0 })
   const dispatch = useDispatch()
-  const { soffBotStatus, isModalOpen: isBotModalOpen } = useAppSelector(state => state.page)
+  const { isModalOpen: isBotModalOpen } = useAppSelector(state => state.page)
   const { isMobile } = useResponsive()
+  const yesterdayDate = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0]
+
   const router = useRouter()
   const { user } = useContext(AuthContext)
   const handleStart = (e: React.MouseEvent<HTMLImageElement> | React.TouchEvent<HTMLImageElement>) => {
@@ -56,7 +58,7 @@ const DraggableIcon = ({ style, ...props }: { style?: React.CSSProperties }) => 
 
   const handleSingleClick = async () => {
     try {
-      const res = await api.get('auth/analytics/')
+      const res = await api.get('auth/analytics/', { params: { date: yesterdayDate } })
       dispatch(
         setSoffBotText({
           missed_attendance: res.data.missed_attendance,

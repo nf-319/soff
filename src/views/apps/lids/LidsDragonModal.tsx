@@ -72,9 +72,6 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
   const { sms_list } = useAppSelector(state => state.settings)
   const { groupChecklist } = useAppSelector(state => state.groups)
 
-  console.log(selectedLead);
-  
-
   const [smsModal, setSmsModalOpen] = useState(false)
   const [addGroupModal, setAddGroupModal] = useState(false)
   const [detailLoading, setDetailLoading] = useState(false)
@@ -397,13 +394,11 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
         </DialogTitle>
         <DialogContent>
           <AddToGroupForm
+            setOpenParent={handleClose}
             open={addGroupModal}
             setOpen={setAddGroupModal}
             item={selectedLead}
             groups={groupChecklist || []}
-            // loading={loading}
-            // setLoading={setLoading}
-            // is_amocrm={is_amocrm}
           />
         </DialogContent>
       </Dialog>

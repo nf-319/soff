@@ -338,7 +338,7 @@ export default function GroupsPage() {
 
       {!isMobile && <GroupsFilter isMobile={isMobile} />}
 
-      <DataTable columns={columns} loading={isLoading} data={groups || []} rowClick={rowClick} color text_color />
+      <DataTable columns={columns} loading={isLoading} data={groups || []} rowClick={rowClick}  />
 
       {Math.ceil(groupCount / 10) > 1 && !isLoading && (
         <div className='d-flex'>
