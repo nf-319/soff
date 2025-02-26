@@ -19,8 +19,6 @@ import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from 'src/store'
 import api from 'src/@core/utils/api'
 import {
-  editAmoCrmData,
-  editDepartment,
   fetchAmoCrmPipelines,
   fetchDepartmentList,
   fetchSources,
@@ -41,27 +39,17 @@ import { useTranslation } from 'react-i18next'
 import { PersonAddAlt } from '@mui/icons-material'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import CreateDepartmentItemDialog from 'src/views/apps/lids/departmentItem/Dialog'
-import EditDepartmentItemForm from 'src/views/apps/lids/departmentItem/EditDepartmentItemForm'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import { useRouter } from 'next/router'
 import CreateDepartmentDialog from 'src/views/apps/lids/department/create-dialog'
 import LidsHeader from 'src/views/apps/lids/LidsHeader'
 import EditDepartmentDialog from 'src/views/apps/lids/department/edit-dialog'
-import toast from 'react-hot-toast'
-import { LoadingButton } from '@mui/lab'
+import { LidsDeleteModal } from 'src/entities/lids/DeleteModal'
+import { LidsEditModal } from 'src/entities/lids/EditModal'
 
 const Lids = () => {
   const [selectedLead, setSelectedLead] = useState<any | null>(null)
-  const {
-    leadItems,
-    leadData,
-    openLid,
-    openActionModal: open,
-    pipelines,
-    dragonLoading,
-    actionId,
-    queryParams
-  } = useSelector((state: RootState) => state.leads)
+  const { leadItems, leadData, openLid, dragonLoading, queryParams } = useSelector((state: RootState) => state.leads)
   const [data, setData] = useState(leadItems)
   const [source, setSource] = useState<any>(null)
   const [studentModalOpen, setStudentModalOpen] = useState(false)
@@ -75,7 +63,9 @@ const Lids = () => {
   const { isMobile } = useResponsive()
   const [leadTitle, setLeadTitle] = useState('')
   const [selectedTab, setSelectedTab] = useState<number>(0)
-  const [openDialog, setOpenDialog] = useState<'sms' | 'edit' | 'delete' | 'recover' | 'merge' | null>(null)
+  const [kanbanTitle, setKanbanTitle] = useState<string>('')
+  const [kanbanId, setKanbanId] = useState<number>(0)
+  const [openDialog, setOpenDialog] = useState<'edit' | 'recover' | null>(null)
 
   async function handleGetLealdItems(departmentId: string | null) {
     if (!departmentId && leadData && leadData.length > 0) {
@@ -96,8 +86,6 @@ const Lids = () => {
       dispatch(setDragonLoading(false))
     }
   }
-
-  const newPipelines = pipelines.find(value => value.name.toLowerCase() === leadTitle.toLowerCase())
 
   useEffect(() => {
     setData(leadItems)
@@ -206,29 +194,8 @@ const Lids = () => {
     setStudentModalOpen(false)
   }
 
-  const setOpen = (value: 'delete' | 'edit' | null) => {
-    if (!value) {
-      dispatch(setOpenActionModal({ open: null, id: null }))
-      return
-    }
-
+  const setOpen = (value: 'delete' | 'edit') => {
     dispatch(setOpenActionModal({ open: value, id: Number(query) }))
-  }
-
-  const deleteDepartmentItem = async () => {
-    await dispatch(editDepartment({ is_active: false, id: query }))
-    setOpen(null)
-    toast.success("Muvaffaqiyatli o'chirildi")
-    await dispatch(fetchDepartmentList())
-  }
-
-  const deleteAmoCrmData = async () => {
-    await dispatch(editAmoCrmData({ data_id: query, is_delete: true, condition: 'pipeline' }))
-    setOpen(null)
-    toast.success("Muvaffaqiyatli o'chirildi", {
-      position: 'top-center'
-    })
-    await dispatch(fetchAmoCrmPipelines(queryParams))
   }
 
   const currentDepartmentId = query || (leadData && leadData.length > 0 ? String(leadData[0].id) : null)
@@ -236,7 +203,6 @@ const Lids = () => {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <LidsHeader />
-
       <Box display='flex' justifyContent='space-between' marginY={5} alignItems='center'>
         {leadData && leadData.length > 0 ? (
           <Tabs value={selectedTab} onChange={handleTabChange} variant='scrollable' scrollButtons='auto'>
@@ -285,7 +251,6 @@ const Lids = () => {
           )}
         </Box>
       </Box>
-
       <div
         className='kanban'
         style={{
@@ -343,11 +308,12 @@ const Lids = () => {
                       {section.name}
                       <Chip color='primary' variant='outlined' label={section.leads.length} />
                     </div>
+
                     <IconButton onClick={() => setItem(section)} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
                       <IconifyIcon
                         icon={'fluent:text-bullet-list-square-edit-20-filled'}
                         color='orange'
-                        onClick={() => setOpenDialog('edit')}
+                        onClick={() => setOpenDialog('recover')}
                       />
                     </IconButton>
                   </Box>
@@ -360,7 +326,7 @@ const Lids = () => {
                       <Draggable key={lead?.id} draggableId={String(lead?.id)} index={index}>
                         {(provided, snapshot) => (
                           <div
-                            className={`shadow-sm p-3 ${settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'}   rounded`}
+                            className={`shadow-sm p-3 ${settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'} rounded`}
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
@@ -422,34 +388,9 @@ const Lids = () => {
       </div>
 
       <EditDepartmentDialog id={Number(query)} name={leadTitle} />
-
       <CreateDepartmentDialog />
-
-      <Dialog open={open === 'delete' && actionId === Number(query)}>
-        <DialogContent sx={{ width: '320px', padding: '20px 0' }}>
-          <Typography sx={{ fontSize: '24px', textAlign: 'center' }}>
-            {t("Bo'limni rostdan ham o'chirmoqchimisiz?")}
-          </Typography>
-        </DialogContent>
-
-        <Box sx={{ padding: '0 0 20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-          <Button color='primary' variant='outlined' onClick={() => setOpen(null)}>
-            {t('Bekor qilish')}
-          </Button>
-
-          <LoadingButton
-            color='error'
-            loading={loading}
-            variant='contained'
-            onClick={leadData ? deleteAmoCrmData : deleteDepartmentItem}
-          >
-            {t("O'chirish")}
-          </LoadingButton>
-        </Box>
-      </Dialog>
-
       <LidsDragonModal handleClose={handleClose} openModal={studentModalOpen} selectedLead={selectedLead} />
-
+      <LidsDeleteModal loading={loading} id={parseInt(query)} />
       <Dialog onClose={closeCreateLid} open={openLid !== null}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant='h6' component='span'>
@@ -463,25 +404,13 @@ const Lids = () => {
           <CreateAnonimUserForm source={source ? source : null} />
         </DialogContent>
       </Dialog>
-
       <CreateDepartmentItemDialog />
-
-      <Dialog open={openDialog === 'edit'} onClose={() => setOpenDialog(null)}>
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography>{t('Tahrirlash')}</Typography>
-          <IconifyIcon onClick={() => setOpenDialog(null)} icon={'material-symbols:close'} />
-        </DialogTitle>
-
-        <DialogContent sx={{ minWidth: '300px' }}>
-          <EditDepartmentItemForm
-            loading={loading}
-            setLoading={setLoading}
-            id={item?.id}
-            setOpenDialog={setOpenDialog}
-            defaultName={item?.name}
-          />
-        </DialogContent>
-      </Dialog>
+      <LidsEditModal
+        title={openDialog === 'edit' ? leadTitle : item?.name}
+        id={openDialog === 'edit' ? parseInt(query) : item?.id}
+        open={openDialog}
+        setOpen={setOpenDialog}
+      />
     </DragDropContext>
   )
 }
