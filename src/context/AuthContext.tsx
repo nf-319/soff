@@ -39,6 +39,26 @@ const AuthProvider = ({ children }: Props) => {
 
   const dispatch = useAppDispatch()
 
+  const reloadProfile = async () => {
+    await api.get('auth/profile/').then(async response => {
+      setUser({
+        phone: response.data?.gpa,
+        gpa: response.data?.gpa,
+        id: response.data.id,
+        fullName: response.data.first_name,
+        username: response.data.phone,
+        password: 'null',
+        avatar: response.data.image,
+        payment_page: response.data.payment_page,
+        role: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()),
+        balance: response.data?.balance || 0,
+        branches: response.data.branches.filter((item: any) => item.exists === true),
+        active_branch: response.data.active_branch,
+        qr_code: response.data.qr_code
+      })
+    })
+  }
+
   const initAuth = async (): Promise<void> => {
     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)!
     if (storedToken) {
@@ -59,6 +79,7 @@ const AuthProvider = ({ children }: Props) => {
               setRoles(response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()))
             )
           }
+
           setUser({
             phone: response.data.phone,
             last_login: response.data?.last_login,
@@ -156,7 +177,7 @@ const AuthProvider = ({ children }: Props) => {
         setUser({
           last_login: response.data?.last_login,
           phone: response.data.phone,
-          gpa: response.data.gpa,
+          gpa: response.data?.gpa,
           id: response.data.id,
           fullName: response.data.first_name,
           username: response.data.phone,
@@ -168,6 +189,7 @@ const AuthProvider = ({ children }: Props) => {
           branches: response.data.branches.filter((item: any) => item.exists === true),
           active_branch: response.data.active_branch
         })
+        reloadProfile()
       })
       .catch(err => {
         if (errorCallback) errorCallback(err)

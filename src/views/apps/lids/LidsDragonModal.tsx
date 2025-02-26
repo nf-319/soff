@@ -394,13 +394,11 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
         </DialogTitle>
         <DialogContent>
           <AddToGroupForm
+            setOpenParent={handleClose}
             open={addGroupModal}
             setOpen={setAddGroupModal}
             item={selectedLead}
             groups={groupChecklist || []}
-            // loading={loading}
-            // setLoading={setLoading}
-            // is_amocrm={is_amocrm}
           />
         </DialogContent>
       </Dialog>

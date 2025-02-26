@@ -52,8 +52,16 @@ import { LoadingButton } from '@mui/lab'
 
 const Lids = () => {
   const [selectedLead, setSelectedLead] = useState<any | null>(null)
-  const { leadItems, leadData, openLid, openActionModal: open, pipelines, dragonLoading, actionId, queryParams } =
-    useSelector((state: RootState) => state.leads)
+  const {
+    leadItems,
+    leadData,
+    openLid,
+    openActionModal: open,
+    pipelines,
+    dragonLoading,
+    actionId,
+    queryParams
+  } = useSelector((state: RootState) => state.leads)
   const [data, setData] = useState(leadItems)
   const [source, setSource] = useState<any>(null)
   const [studentModalOpen, setStudentModalOpen] = useState(false)
@@ -371,6 +379,7 @@ const Lids = () => {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                                 <User width={20} height={20} color='blue' />
+
                                 {lead.first_name}
                               </div>
 
