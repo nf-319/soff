@@ -63,8 +63,6 @@ const Lids = () => {
   const { isMobile } = useResponsive()
   const [leadTitle, setLeadTitle] = useState('')
   const [selectedTab, setSelectedTab] = useState<number>(0)
-  const [kanbanTitle, setKanbanTitle] = useState<string>('')
-  const [kanbanId, setKanbanId] = useState<number>(0)
   const [openDialog, setOpenDialog] = useState<'edit' | 'recover' | null>(null)
 
   async function handleGetLealdItems(departmentId: string | null) {
@@ -200,9 +198,12 @@ const Lids = () => {
 
   const currentDepartmentId = query || (leadData && leadData.length > 0 ? String(leadData[0].id) : null)
 
+  console.log(leadData)
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <LidsHeader />
+
       <Box display='flex' justifyContent='space-between' marginY={5} alignItems='center'>
         {leadData && leadData.length > 0 ? (
           <Tabs value={selectedTab} onChange={handleTabChange} variant='scrollable' scrollButtons='auto'>
@@ -254,11 +255,11 @@ const Lids = () => {
       <div
         className='kanban'
         style={{
-          paddingBottom: 20,
           display: 'flex',
           overflow: 'auto',
           flexDirection: isMobile ? 'column' : 'row',
           alignItems: 'start',
+          height: "calc(100vh - 360px)",
           gap: 20
         }}
       >

@@ -1,3 +1,5 @@
+'use client'
+
 import { Box, Button, Switch, TextField } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -9,9 +11,7 @@ import useDebounce from 'src/hooks/useDebounce'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchDepartmentList, setOpen, updateLeadParams } from 'src/store/apps/leads'
 
-type Props = {}
-
-export default function LidsHeader({}: Props) {
+export default function LidsHeader() {
   const { queryParams } = useAppSelector(state => state.leads)
   const dispatch = useAppDispatch()
   const { push } = useRouter()
@@ -44,7 +44,6 @@ export default function LidsHeader({}: Props) {
     >
       <form style={{ display: 'flex', alignItems: 'center', gap: '5px' }} onSubmit={e => e.preventDefault()}>
         <TextField
-          defaultValue={''}
           autoComplete='off'
           size='small'
           sx={{ maxWidth: '300px', width: '100%' }}
