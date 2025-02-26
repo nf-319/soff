@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, ReactNode, useContext } from 'react'
+import { FC, PropsWithChildren, ReactNode, useContext, useEffect } from 'react'
 import { Theme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Layout from 'src/@core/layouts/Layout'
@@ -18,7 +18,7 @@ type Props = {
 
 const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed }) => {
   const { settings, saveSettings } = useSettings()
-  const { user } = useContext(AuthContext)
+  const { user, setUser } = useContext(AuthContext)
   const { t } = useTranslation()
 
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
@@ -64,7 +64,7 @@ const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed
             navItems:
               router.pathname.split('/')?.[1] === 'c-panel'
                 ? CPanelNavigation(t)
-                : user?.currentRole === 'teacher'
+                : user?.currentRole === 'teacher' || user?.role.length === 1 && user?.role.includes('teacher')
                 ? TeacherNavigation(t)
                 : user?.role.includes('student')
                 ? StudentNavigation(t)
