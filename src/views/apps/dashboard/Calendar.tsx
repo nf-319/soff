@@ -11,10 +11,10 @@ import LessonsTable from './LessonsTable'
 import WeekDaysDialog from './WeekDaysDialog'
 import { fetchLessons, updateWeeks } from 'src/store/apps/dashboard'
 import Skeleton from '@mui/material/Skeleton'
+import { Divider } from '@mui/material'
 
-export default function Calendar() {
+const Calendar = () => {
   const dispatch = useAppDispatch()
-
   const { settings } = useSettings()
   const { skin } = settings
   const mdAbove = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'))
@@ -31,6 +31,8 @@ export default function Calendar() {
       className='app-calendar'
       sx={{
         boxShadow: skin === 'bordered' ? 0 : 6,
+        borderRadius: '10px',
+        background: 'white',
         ...(skin === 'bordered' && { border: theme => `1px solid ${theme.palette.divider}` })
       }}
     >
@@ -38,13 +40,17 @@ export default function Calendar() {
         sx={{
           flexGrow: 1,
           borderRadius: 1,
+          p: 4,
+          display: 'grid',
           boxShadow: 'none',
-          backgroundColor: 'background.paper',
           ...(mdAbove ? { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } : {}),
           maxWidth: '100%'
         }}
       >
         <CalendarTabs handleUpdateWeekDays={handleUpdateWeekDays} />
+
+        <Divider style={{ marginTop: '0rem' }} sx={{ background: '#d3d3d3' }} />
+
         {isLessonLoading ? (
           <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '11px' }}>
             {[1, 2, 3, 4].map((el, i) => (
@@ -62,7 +68,10 @@ export default function Calendar() {
           <LessonsTable />
         )}
       </Box>
+
       <WeekDaysDialog handleUpdateWeekDays={handleUpdateWeekDays} />
     </CalendarWrapper>
   )
 }
+
+export default Calendar

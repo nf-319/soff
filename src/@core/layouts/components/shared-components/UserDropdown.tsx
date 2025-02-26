@@ -178,7 +178,7 @@ const UserDropdown = (props: Props) => {
       <Badge
         overlap='circular'
         onClick={handleDropdownOpen}
-        sx={{ ml: 2, cursor: 'pointer' }}
+        sx={{ ml: 2, cursor: 'pointer', border: '1px solid #d3d3d3', borderRadius: '100%' }}
         badgeContent={<BadgeContentSpan />}
         anchorOrigin={{
           vertical: 'bottom',
@@ -192,7 +192,7 @@ const UserDropdown = (props: Props) => {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={() => handleDropdownClose()}
-        sx={{ '& .MuiMenu-paper': { width: 230, mt: 4 } }}
+        sx={{ '& .MuiMenu-paper': { width: 300, mt: 4 } }}
         anchorOrigin={{ vertical: 'bottom', horizontal: direction === 'ltr' ? 'right' : 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: direction === 'ltr' ? 'right' : 'left' }}
       >
@@ -202,6 +202,7 @@ const UserDropdown = (props: Props) => {
               <Badge
                 overlap='circular'
                 badgeContent={<BadgeContentSpan />}
+                sx={{ border: '1px solid #d3d3d3', borderRadius: '100%' }}
                 anchorOrigin={{
                   vertical: 'bottom',
                   horizontal: 'right'

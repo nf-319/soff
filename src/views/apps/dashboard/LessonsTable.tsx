@@ -15,30 +15,29 @@ const LessonsTable = () => {
   const { t } = useTranslation()
 
   return (
-    <Box sx={{ padding: '0 15px 15px 15px', maxWidth: '100%', overflowX: 'auto' }}>
+    <Box sx={{ padding: '0 15px 15px 15px', maxWidth: '100%', overflowY: 'auto' }}>
       <table border={0} style={{ width: '100%' }}>
         <tbody>
           <tr>
             <td style={{ minWidth: '100px', fontSize: '12px' }}>{t('Xonalar / Soat')}</td>
-            <td>
-              <Box sx={{ display: 'flex' }}>
-                {workTime?.map((el: string) => (
-                  <Box
-                    key={el}
-                    sx={{
-                      width: '50px',
-                      height: '40px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '12px'
-                    }}
-                  >
-                    {el}
-                  </Box>
-                ))}
-              </Box>
-            </td>
+
+            <Box component='td' sx={{ display: 'flex' }}>
+              {workTime?.map((el: string) => (
+                <Box
+                  key={el}
+                  sx={{
+                    width: '50px',
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '12px'
+                  }}
+                >
+                  {el}
+                </Box>
+              ))}
+            </Box>
           </tr>
 
           {isLessonLoading ? (
