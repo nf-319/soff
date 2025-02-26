@@ -78,7 +78,7 @@ const initialState: IStudentState = {
   studentData: null,
   isGettingStudentsGroups: false,
   isLoading: false,
-  queryParams: { status: 'active', is_debtor: '', group_status: '', offset: '0', teacher: '' },
+  queryParams: { status: 'active', is_debtor: '', group_status: '', offset: '0', teacher: '', limit: '10' },
   payments: [],
   global_pay: false,
   openLeadModal: null

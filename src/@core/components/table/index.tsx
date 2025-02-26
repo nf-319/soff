@@ -103,7 +103,7 @@ export default function DataTable({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
-                backgroundColor: colors ? colors[0] : 'white',
+                backgroundColor: colors ? colors[0] : '',
                 color: colors ? colors[1] : '',
                 width: '100%',
                 maxWidth: maxWidth || null,
