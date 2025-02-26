@@ -69,7 +69,7 @@ const Calendar = () => {
             ))}
           </Box>
         ) : (
-          <LessonsTable workTime={data?.work_time} events={data?.room_list} />
+          <LessonsTable isLoading={isLoading} workTime={data?.work_time} events={data?.room_list} />
         )}
       </Box>
 
