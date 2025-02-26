@@ -50,8 +50,6 @@ export default function GroupsPage() {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const queryString = new URLSearchParams({ ...queryParams } as Record<string, string>).toString()
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-
   const columns: customTableProps[] = [
     {
       xs: 0.2,
@@ -172,20 +170,6 @@ export default function GroupsPage() {
     }
   ]
 
-  const handleClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click()
-    }
-  }
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      console.log('Tanlangan fayl:', file)
-      // Fayl yuklash funksiyasini shu yerda ishlatish mumkin
-    }
-  }
-
   const handleRowsPerPageChange = async (value: number) => {
     setRowsPerPage(value)
 
@@ -212,36 +196,15 @@ export default function GroupsPage() {
         return
       }
 
-      const initialParams = {
-        ...queryParams,
-        offset: '0',
-        limit: String(rowsPerPage)
-      }
-
-      dispatch(updateStudentParams({ offset: 0, limit: rowsPerPage }))
-      await dispatch(fetchStudentsList(initialParams))
+      // dispatch(updateStudentParams({ offset: 0,limit:10 }))
+      await dispatch(fetchStudentsList({ ...queryParams }))
     }
 
     initialize()
 
     return () => {
+      dispatch(setOpenEdit(null))
       dispatch(resetStudentsState())
-      dispatch(updateStudentParams({ offset: 0 }))
-      dispatch(setOpenEdit(null))
-    }
-  }, [])
-
-  useEffect(() => {
-    const resetPagination = async () => {
-      dispatch(updateStudentParams({ offset: 0 }))
-      await dispatch(fetchStudentsList({ ...queryParams, limit: String(rowsPerPage), offset: '0' }))
-    }
-
-    resetPagination()
-
-    return () => {
-      dispatch(updateStudentParams({ offset: 0 }))
-      dispatch(setOpenEdit(null))
     }
   }, [])
 

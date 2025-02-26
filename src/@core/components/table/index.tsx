@@ -27,15 +27,7 @@ type DataTableProps = {
   loading?: boolean
 }
 
-export default function DataTable({
-  color,
-  columns,
-  loading = false,
-  data,
-  minWidth,
-  maxWidth,
-  rowClick
-}: DataTableProps) {
+export default function DataTable({ columns, loading = false, data, minWidth, maxWidth, rowClick }: DataTableProps) {
   const { query } = useRouter()
   function extractColors(str: string) {
     if (str) {
@@ -103,7 +95,7 @@ export default function DataTable({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
-                backgroundColor: colors ? colors[0] : 'white',
+                backgroundColor: colors ? colors[0] : '',
                 color: colors ? colors[1] : '',
                 width: '100%',
                 maxWidth: maxWidth || null,
@@ -129,6 +121,7 @@ export default function DataTable({
                   </Box>
                 </Box>
               ))}
+
               {rowClick && (
                 <Box
                   sx={{ width: '55%', zIndex: 1, height: '36px', position: 'absolute' }}

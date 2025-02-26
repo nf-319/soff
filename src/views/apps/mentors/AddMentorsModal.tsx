@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client'
 
 import {
@@ -57,41 +56,48 @@ export default function AddMentorsModal() {
   const [loading, setLoading] = useState<boolean>(false)
 
   const validationSchema = () => {
-    return Yup.object().shape(
-      {
-        first_name: Yup.string().required('Ismingizni kiriting'),
-        phone: Yup.string().required('Telefon raqam kiriting'),
-        birth_date: Yup.string(),
-        activated_at: Yup.string().required('Ishga olingan sanani kiriting'),
-        gender: Yup.string().required('Jinsini tanlang'),
-        password: Yup.string().required('Parol kiritish majburiy'),
-        amount: Yup.string().when('percentage', {
-          is: (kpiPercentage: string) => !kpiPercentage || kpiPercentage.trim() === '',
-          then: Yup.string().required("To'ldiring(Foiz kiritilmasa).")
-        }),
-        percentage: Yup.string().when('amount', {
-          is: (fixedSalary: string) => !fixedSalary || fixedSalary.trim() === '',
-          then: Yup.string().required("To'ldiring(O'zgarmas oylik kiritilmasa)")
-        })
-      },
-      ['amount', 'percentage']
-    )
+    return Yup.object().shape({
+      first_name: Yup.string().required('Ismingizni kiriting'),
+      phone: Yup.string().required('Telefon raqam kiriting'),
+      birth_date: Yup.string(),
+      activated_at: Yup.string().required('Ishga olingan sanani kiriting'),
+      gender: Yup.string().required('Jinsini tanlang'),
+      password: Yup.string().required('Parol kiritish majburiy'),
+
+      amount: Yup.string().test(
+        'amount-or-percentage',
+        "To'ldiring (Foiz yoki O'zgarmas oylik majburiy)",
+        function (value) {
+          const { percentage } = this.parent
+          return !!value || !!percentage
+        }
+      ),
+
+      percentage: Yup.string().test(
+        'percentage-or-amount',
+        "To'ldiring (Foiz yoki O'zgarmas oylik majburiy)",
+        function (value) {
+          const { amount } = this.parent
+          return !!value || !!amount
+        }
+      )
+    })
   }
 
   const initialValues: CreateTeacherDto = {
     first_name: '',
-    lesson_amount: '',
+    lesson_amount: 0,
     phone: '',
     birth_date: today,
     activated_at: today,
     gender: 'male',
     is_fixed_salary: false,
     password: '',
-    percentage: null,
-    amount: null
+    percentage: 0,
+    amount: 0
   }
 
-  const formik: any = useFormik({
+  const formik = useFormik({
     initialValues,
     validationSchema,
     onSubmit: async (values: CreateTeacherDto) => {
@@ -126,10 +132,15 @@ export default function AddMentorsModal() {
     }
   })
 
-  const handleCheckboxChange = (event: React.SyntheticEvent, checked: boolean) => {
-    formik.setFieldValue('is_fixed_salary', checked)
-    formik.setFieldValue('amount', 0)
-    formik.setFieldValue('percentage', 0)
+  const handleCheckboxChange = (key: string, value: any) => {
+    if (key === 'amount') {
+      formik.setFieldValue('is_fixed_salary', true)
+      formik.setFieldValue('percentage', 0)
+    } else if (key == 'percentage') {
+      formik.setFieldValue('amount', 0)
+      formik.setFieldValue('is_fixed_salary', false)
+    }
+    formik.setFieldValue(key, String(value))
   }
 
   useEffect(() => {
@@ -248,10 +259,11 @@ export default function AddMentorsModal() {
                 if (value.length > 3) return
                 if (Number(value) > 100) return
 
-                formik.setFieldValue('percentage', value)
+                handleCheckboxChange('percentage', value)
               }}
+              disabled={Boolean(formik.values.amount)}
               onBlur={formik.handleBlur}
-              value={formik.values.percentage === '' ? '' : String(formik.values.percentage)}
+              value={formik.values.percentage}
               error={!!formik.errors.percentage && formik.touched.percentage}
               inputProps={{ min: 0, max: 100 }}
             />
@@ -263,12 +275,12 @@ export default function AddMentorsModal() {
 
           <FormControl sx={{ width: '100%' }}>
             <AmountInput
-              // type='number'
+              type='number'
               label={t('Oylik ish haqi')}
               name='amount'
-              onChange={formik.handleChange}
+              onChange={e => handleCheckboxChange('amount', e.target.value)}
               onBlur={formik.handleBlur}
-              // disabled={!formik.values.is_fixed_salary}
+              disabled={Boolean(formik.values.percentage)}
               value={formik.values.amount}
               error={!!formik.errors.amount && formik.touched.amount}
             />
@@ -281,7 +293,7 @@ export default function AddMentorsModal() {
               // type='number'
               label={t('Darslar soni')}
               name='lesson_amount'
-              onChange={formik.handleChange}
+              onChange={e => handleCheckboxChange('lesson_amount', e.target.value)}
               onBlur={formik.handleBlur}
               // disabled={!formik.values.is_fixed_salary}
               value={formik.values.lesson_amount}

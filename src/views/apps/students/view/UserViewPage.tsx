@@ -1,7 +1,7 @@
 // ** MUI Imports
 import Grid from '@mui/material/Grid'
 import { useRouter } from 'next/router'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useMemo } from 'react'
 import { toast } from 'react-hot-toast'
 import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
 import api from 'src/@core/utils/api'
@@ -35,18 +35,17 @@ const UserView = ({ tab, student }: any) => {
     }
   }, [studentData?.id])
 
+  const studentDetailParam = useMemo(() => student || studentId, [student, studentId])
+
   useEffect(() => {
-    if (
-      !user?.role.includes('ceo') &&
-      !user?.role.includes('admin') &&
-      !user?.role.includes('watcher') &&
-      !user?.role.includes('marketolog')
-    ) {
+    if (!user?.role?.some((role: string) => ['ceo', 'admin', 'watcher', 'marketolog'].includes(role))) {
       router.push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
+      return
     }
-    dispatch(fetchStudentDetail(student || studentId))
-  }, [studentId, student])
+
+    dispatch(fetchStudentDetail(studentDetailParam))
+  }, [studentDetailParam])
 
   return (
     <div>
