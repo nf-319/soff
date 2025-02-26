@@ -5,6 +5,8 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import { handleTabValue, handleOpen, fetchLessons, updateInterval } from 'src/store/apps/dashboard'
 import { useTranslation } from 'react-i18next'
 import { Box, Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material'
+import { useGet } from 'src/hooks/useApi'
+import { useState } from 'react'
 
 interface ICalendarTabsProps {
   handleUpdateWeekDays: (item: string[]) => void
@@ -14,10 +16,13 @@ const CalendarTabs = ({ handleUpdateWeekDays }: ICalendarTabsProps) => {
   const dispatch = useAppDispatch()
   const { tabValue, weeks } = useAppSelector(state => state.dashboard)
   const { t } = useTranslation()
-
+  const [queryParams, setQueryParams] = useState<{ day_of_week: string[] | string; interval: string }>({
+    day_of_week: [],
+    interval: ''
+  })
   async function handleChangeInterval(interval: string) {
     dispatch(updateInterval(interval))
-    await dispatch(fetchLessons({ queryWeeks: weeks, interval: interval }))
+    // await dispatch(fetchLessons({ queryWeeks: weeks, interval: interval }))
   }
 
   return (

@@ -53,6 +53,7 @@ const AppCalendar = () => {
       : ['tuesday', 'thursday', 'saturday']
   )
 
+
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const startTime = companyInfo?.work_start_time
   const endTime = companyInfo?.work_end_time

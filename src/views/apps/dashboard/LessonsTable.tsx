@@ -8,9 +8,10 @@ import { useRouter } from 'next/router'
 import { Typography } from '@mui/material'
 import EmptyContent from 'src/@core/components/empty-content'
 import { useTranslation } from 'react-i18next'
+import { ILessonResponse } from 'src/types/apps/dashboardTypes'
 
-const LessonsTable = () => {
-  const { events = [], workTime = [], isLessonLoading, interval } = useAppSelector(state => state.dashboard)
+const LessonsTable = ({workTime,events}:{workTime:string[],events:ILessonResponse[]}) => {
+  const { isLessonLoading, interval } = useAppSelector(state => state.dashboard)
   const { push } = useRouter()
   const { t } = useTranslation()
 
@@ -47,8 +48,8 @@ const LessonsTable = () => {
                 <SubLoader />
               </td>
             </tr>
-          ) : events.length > 0 ? (
-            events.map(lesson => (
+          ) : events?.length > 0 ? (
+            events?.map(lesson => (
               <tr style={{ borderBottom: '1px solid #c3cccc65' }} key={lesson.room_id}>
                 <td style={{ minWidth: '100px', fontSize: '12px' }}>{lesson.room_name}</td>
                 <td>
@@ -126,7 +127,7 @@ const LessonsTable = () => {
             ))
           ) : (
             <tr>
-              <td colSpan={workTime.length + 1}>
+              <td colSpan={workTime?.length + 1}>
                 <EmptyContent />
               </td>
             </tr>

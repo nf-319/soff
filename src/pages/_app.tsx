@@ -33,6 +33,7 @@ import 'react-perfect-scrollbar/dist/css/styles.css'
 import 'src/iconify-bundle/icons-bundle-react'
 
 import './globals.css'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -67,7 +68,14 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
   const authGuard = Component.authGuard ?? true
   const guestGuard = Component.guestGuard ?? false
   const aclAbilities = Component.acl ?? defaultACLObj
-
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 5,
+        refetchOnWindowFocus: false,
+      },
+    },
+  })
   function MyHead() {
     const { companyInfo } = useAppSelector(state => state.user)
 
@@ -81,35 +89,37 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
   }
 
   return (
-    <Provider store={store}>
-      <CacheProvider value={emotionCache}>
-        <MyHead />
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <CacheProvider value={emotionCache}>
+          <MyHead />
 
-        <AuthProvider>
-          <DisabledProvider>
-            <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
-              <SettingsConsumer>
-                {({ settings }) => (
-                  <ThemeComponent settings={settings}>
-                    <WindowWrapper>
-                      <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                        <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
-                          {getLayout(<Component {...pageProps} />)}
-                        </AclGuard>
-                      </Guard>
-                    </WindowWrapper>
+          <AuthProvider>
+            <DisabledProvider>
+              <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
+                <SettingsConsumer>
+                  {({ settings }) => (
+                    <ThemeComponent settings={settings}>
+                      <WindowWrapper>
+                        <Guard authGuard={authGuard} guestGuard={guestGuard}>
+                          <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
+                            {getLayout(<Component {...pageProps} />)}
+                          </AclGuard>
+                        </Guard>
+                      </WindowWrapper>
 
-                    <ReactHotToast>
-                      <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
-                    </ReactHotToast>
-                  </ThemeComponent>
-                )}
-              </SettingsConsumer>
-            </SettingsProvider>
-          </DisabledProvider>
-        </AuthProvider>
-      </CacheProvider>
-    </Provider>
+                      <ReactHotToast>
+                        <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
+                      </ReactHotToast>
+                    </ThemeComponent>
+                  )}
+                </SettingsConsumer>
+              </SettingsProvider>
+            </DisabledProvider>
+          </AuthProvider>
+        </CacheProvider>
+      </Provider>
+    </QueryClientProvider>
   )
 }
 

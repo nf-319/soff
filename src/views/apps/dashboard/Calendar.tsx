@@ -11,19 +11,22 @@ import LessonsTable from './LessonsTable'
 import WeekDaysDialog from './WeekDaysDialog'
 import { fetchLessons, updateWeeks } from 'src/store/apps/dashboard'
 import Skeleton from '@mui/material/Skeleton'
+import { useGet } from 'src/hooks/useApi'
+import { useState } from 'react'
 
 export default function Calendar() {
   const dispatch = useAppDispatch()
-
+  const { isLessonLoading, interval, weeks } = useAppSelector(state => state.dashboard)
+  const [queryParams, setQueryParams] = useState<string>(String(weeks))
   const { settings } = useSettings()
   const { skin } = settings
   const mdAbove = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'))
-
-  const { isLessonLoading, interval } = useAppSelector(state => state.dashboard)
-
+  const { data,isLoading } = useGet('common/dashboard/', {
+    params:{day_of_week:queryParams, interval},
+  })
   const handleUpdateWeekDays = async (weekDays: string[]) => {
-    await dispatch(fetchLessons({ queryWeeks: weekDays, interval: interval }))
     dispatch(updateWeeks(weekDays))
+    setQueryParams(weekDays.toString())
   }
 
   return (
@@ -45,7 +48,7 @@ export default function Calendar() {
         }}
       >
         <CalendarTabs handleUpdateWeekDays={handleUpdateWeekDays} />
-        {isLessonLoading ? (
+        {isLoading ? (
           <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '11px' }}>
             {[1, 2, 3, 4].map((el, i) => (
               <Skeleton
@@ -59,7 +62,7 @@ export default function Calendar() {
             ))}
           </Box>
         ) : (
-          <LessonsTable />
+          <LessonsTable workTime={data?.work_time} events={data?.room_list} />
         )}
       </Box>
       <WeekDaysDialog handleUpdateWeekDays={handleUpdateWeekDays} />

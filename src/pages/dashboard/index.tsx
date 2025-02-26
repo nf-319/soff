@@ -26,7 +26,7 @@ const AppCalendar = () => {
       router.push('/')
       toast.error('Sahifaga kirish huquqingiz yoq!')
     }
-    await Promise.all([dispatch(fetchStatistics()), dispatch(fetchLessons({ queryWeeks: weeks, interval: interval }))])
+    // await Promise.all([dispatch(fetchStatistics()), dispatch(fetchLessons({ queryWeeks: weeks, interval: interval }))])
   }
 
   useEffect(() => {
