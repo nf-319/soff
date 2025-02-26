@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { HorizontalNavItemsType } from 'src/@core/layouts/types'
 import { AuthContext } from 'src/context/AuthContext'
 
@@ -242,7 +242,7 @@ const Navigation = (t: any): HorizontalNavItemsType => {
 
   const watcherItems = items.filter(el => el.slug !== 'settings')
 
-  return user?.currentRole === 'ceo'
+  return user?.currentRole === 'ceo' || (!user?.currentRole && user?.role.includes('ceo'))
     ? items
     : user?.currentRole === 'casher'
     ? items.filter(el => el.path === '/finance')

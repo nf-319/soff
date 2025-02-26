@@ -29,6 +29,11 @@ type DataTableProps = {
 
 export default function DataTable({ columns, loading = false, data, minWidth, maxWidth, rowClick }: DataTableProps) {
   const { query } = useRouter()
+  function extractColors(str: string) {
+    if (str) {
+      return str?.split(',').map(color => color.trim())
+    }
+  }
 
   const handleClick = (id: any) => {
     rowClick?.(id)
@@ -77,6 +82,7 @@ export default function DataTable({ columns, loading = false, data, minWidth, ma
         </Box>
       ) : data?.length > 0 ? (
         data?.map((item, index) => {
+          const colors = extractColors(item.color)
           return (
             <Box
               minWidth={minWidth || '1200px'}
@@ -89,6 +95,8 @@ export default function DataTable({ columns, loading = false, data, minWidth, ma
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
+                backgroundColor: colors ? colors[0] : '',
+                color: colors ? colors[1] : '',
                 width: '100%',
                 maxWidth: maxWidth || null,
                 cursor: 'pointer'
@@ -113,6 +121,7 @@ export default function DataTable({ columns, loading = false, data, minWidth, ma
                   </Box>
                 </Box>
               ))}
+
               {rowClick && (
                 <Box
                   sx={{ width: '55%', zIndex: 1, height: '36px', position: 'absolute' }}

@@ -41,7 +41,7 @@ export default function HeadingFilter() {
   const { user } = useContext(AuthContext)
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
-  const [date, setDate] = useState<any>('')
+  const [date, setDate] = useState<[Date, Date] | null>()
   const [activeBranch, setActiveBranch] = useState<any>(user?.active_branch)
 
   const monthItems2 = [
@@ -117,7 +117,7 @@ export default function HeadingFilter() {
 
   const handleYearDate = async (value: any, t: 'm' | 'y') => {
     dispatch(updateNumberParams({ start_date: '', end_date: '' }))
-    setDate('')
+    setDate(null)
     if (!value) {
       if (t === 'm') {
         dispatch(updateNumberParams({ date_month: '' }))

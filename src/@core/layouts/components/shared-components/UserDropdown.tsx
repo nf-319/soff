@@ -45,6 +45,25 @@ const BadgeContentSpan = styled('span')(({ theme }) => ({
   boxShadow: `0 0 0 2px ${theme.palette.background.paper}`
 }))
 
+// Rollarni rang bo'yicha ketma-ketligi
+const roleHierarchy = ['student', 'teacher', 'marketolog', 'watcher', 'casher', 'admin', 'ceo']
+
+// Eng katta roleni aniqlash uchun funksiya
+const getHighestRole = (roles: string[]): string => {
+  let highestRoleIndex = -1
+  let highestRole = ''
+
+  roles.forEach(role => {
+    const index = roleHierarchy.indexOf(role)
+    if (index > highestRoleIndex) {
+      highestRoleIndex = index
+      highestRole = role
+    }
+  })
+
+  return highestRole
+}
+
 const UserDropdown = (props: Props) => {
   const [imageSrc, setImageSrc] = useState('')
 
@@ -110,25 +129,48 @@ const UserDropdown = (props: Props) => {
     document.body.removeChild(anchor)
   }
 
+  // Kirish vaqtida bir marta eng katta roleni o'rnatish
+  useEffect(() => {
+    // LocalStorage'da role saqlangan bo'lsa, o'sha ishlatiladi
+    // Aks holda user rollaridan eng kattasi aniqlanadi
+    const savedRole = localStorage.getItem('currentRole')
+
+    if (!savedRole && user?.role && user.role.length > 0) {
+      const highestRole = getHighestRole(user.role)
+      setRole(highestRole)
+      localStorage.setItem('currentRole', highestRole)
+    } else if (savedRole) {
+      setRole(savedRole)
+    }
+  }, [user?.role])
+
   useEffect(() => {
     setUser((prevUser: UserDataType) => ({
       ...prevUser,
-      currentRole: localStorage.getItem('currentRole') || role || prevUser.role[0]
+      currentRole:
+        localStorage.getItem('currentRole') ||
+        role ||
+        (prevUser.role && prevUser.role.length > 0 ? getHighestRole(prevUser.role) : '')
     }))
-  }, [role])
+  }, [role, setUser])
 
-  const handleLogout = () => {
-    logout()
-    dispatch(setRoles([]))
-    handleDropdownClose()
-  }
+  // Roleni o'zgartirish va tegishli sahifaga yo'naltirish
   const handleRole = (role: string) => {
     setRole(role)
     if (role == 'teacher') {
       router.push('dashboard')
     }
+    if (role == 'casher') {
+      router.push('finance')
+    }
     localStorage.setItem('currentRole', role)
     setAnchorEl(null)
+  }
+
+  const handleLogout = () => {
+    logout()
+    dispatch(setRoles([]))
+    handleDropdownClose()
   }
 
   return (
@@ -136,7 +178,7 @@ const UserDropdown = (props: Props) => {
       <Badge
         overlap='circular'
         onClick={handleDropdownOpen}
-        sx={{ ml: 2, cursor: 'pointer' }}
+        sx={{ ml: 2, cursor: 'pointer', border: '1px solid #d3d3d3', borderRadius: '100%' }}
         badgeContent={<BadgeContentSpan />}
         anchorOrigin={{
           vertical: 'bottom',
@@ -150,7 +192,7 @@ const UserDropdown = (props: Props) => {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={() => handleDropdownClose()}
-        sx={{ '& .MuiMenu-paper': { width: 230, mt: 4 } }}
+        sx={{ '& .MuiMenu-paper': { width: 300, mt: 4 } }}
         anchorOrigin={{ vertical: 'bottom', horizontal: direction === 'ltr' ? 'right' : 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: direction === 'ltr' ? 'right' : 'left' }}
       >
@@ -160,6 +202,7 @@ const UserDropdown = (props: Props) => {
               <Badge
                 overlap='circular'
                 badgeContent={<BadgeContentSpan />}
+                sx={{ border: '1px solid #d3d3d3', borderRadius: '100%' }}
                 anchorOrigin={{
                   vertical: 'bottom',
                   horizontal: 'right'

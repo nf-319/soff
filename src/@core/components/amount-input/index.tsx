@@ -1,40 +1,30 @@
-import { TextField, TextFieldProps } from '@mui/material';
-import { ChangeEvent, useState } from 'react';
+import { TextField, TextFieldProps } from '@mui/material'
+import { ChangeEvent, useState } from 'react'
 
-// Helper function to format numbers
-export const formatAmount = (value: string) => {
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-};
-
-// Helper function to unformat numbers
-export const revereAmount = (value: string) => {
-    return `${value}`.replace(/\s+/g, '');
-};
 export const convertToNegative = (value: string) => {
-    const numberWithoutSpaces = `${value}`.replace(/\s+/g, '');
-    return `-${numberWithoutSpaces.replace(/^-/, '')}`;
-};
+  const numberWithoutSpaces = `${value}`.replace(/\s+/g, '')
+  return `-${numberWithoutSpaces.replace(/^-/, '')}`
+}
+export const formatAmount = (value: string) => {
+  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+}
 
-export default function AmountInput(props: TextFieldProps) {
-    const [value, setValue] = useState<string>(`${Number(props?.value) >= 0 ? props?.value : ""}`);
+export const revereAmount = (value: string) => {
+  return `${value}`.replace(/\s+/g, '')
+}
 
-    function handleChange(event: ChangeEvent<HTMLInputElement>) {
-        const rawValue = event.target.value;
+export default function AmountInput({ onChange, value, ...props }: TextFieldProps) {
+  const [inputValue, setInputValue] = useState<string>(formatAmount(`${value || ''}`))
 
-        // Remove any non-numeric characters
-        const numericValue = rawValue.replace(/[^0-9]/g, '');
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
+    const rawValue = event.target.value.replace(/\D/g, '') // Faqat raqamlarni qoldiramiz
+    setInputValue(formatAmount(rawValue))
 
-        setValue(numericValue);
+    // onChange orqali formikga toza raqam sifatida yuboramiz
+    onChange?.({
+      target: { name: props.name, value: rawValue }
+    } as ChangeEvent<HTMLInputElement>)
+  }
 
-        props.onChange?.(event);
-    }
-
-    return (
-        <TextField
-            {...props}
-            onChange={handleChange}
-            value={formatAmount(value)}
-            autoComplete='off'
-        />
-    );
+  return <TextField {...props} onChange={handleChange} value={inputValue} autoComplete='off' />
 }

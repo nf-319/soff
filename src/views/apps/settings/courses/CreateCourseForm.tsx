@@ -1,5 +1,5 @@
 import LoadingButton from '@mui/lab/LoadingButton'
-import { FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from '@mui/material'
+import { FormControl, FormHelperText, TextField } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -10,12 +10,8 @@ import useBranches from 'src/hooks/useBranch'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
 import AmountInput, { revereAmount } from 'src/@core/components/amount-input'
-import Router from 'next/router'
-import IconifyIcon from 'src/@core/components/icon'
 
-type Props = {}
-
-export default function CreateCourseForm({}: Props) {
+export default function CreateCourseForm() {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const { getBranches } = useBranches()
@@ -51,7 +47,12 @@ export default function CreateCourseForm({}: Props) {
       setLoading(true)
       dispatch(disablePage(true))
       const resp = await dispatch(
-        createGroup({ ...values, price: revereAmount(values.price), color: `${values.color},${values.text_color}`,text_color:`${values.text_color}` })
+        createGroup({
+          ...values,
+          price: revereAmount(values.price),
+          color: `${values.color},${values.text_color}`,
+          text_color: `${values.text_color}`
+        })
       )
       if (resp.meta.requestStatus === 'rejected') {
         formik.setErrors(resp.payload)
@@ -76,6 +77,8 @@ export default function CreateCourseForm({}: Props) {
       formik.resetForm()
     }
   }, [])
+
+  console.log(values.price, typeof values.price)
 
   return (
     <form

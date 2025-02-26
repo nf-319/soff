@@ -25,6 +25,7 @@ import { reversePhone } from 'src/@core/components/phone-input/format-phone-numb
 import api from 'src/@core/utils/api'
 import { setPublicSettings, toggleModal } from 'src/store/apps/page'
 import { useAppDispatch } from 'src/store'
+import { useRouter } from 'next/router'
 
 const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   padding: theme.spacing(20),
@@ -62,6 +63,7 @@ const LoginPage = () => {
   const [data, setData] = useState<any>(null)
   const dispatch = useAppDispatch()
   const auth = useAuth()
+  const router = useRouter()
   const { isMobile } = useResponsive()
   const { t } = useTranslation()
 

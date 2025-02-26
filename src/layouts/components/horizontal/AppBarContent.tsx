@@ -21,7 +21,6 @@ import { updateQueryParams } from 'src/store/apps/settings'
 import { toggleQrCodeModal } from 'src/store/apps/page'
 import ceoConfigs from 'src/configs/ceo'
 import useDebounce from 'src/hooks/useDebounce'
-import QRCodeScanner from 'src/@core/components/qrCodeScanner'
 
 interface Props {
   hidden: boolean
@@ -62,10 +61,6 @@ const AppBarContent = (props: Props) => {
   }
 
   async function handleSearch(query: string) {
-    if (search) {
-      setSearchLoading(true)
-    }
-
     if (!query) {
       setEmployees([])
       setSearchLoading(false)
@@ -83,6 +78,11 @@ const AppBarContent = (props: Props) => {
     }
   }
 
+  useEffect(() => {
+    if (search) {
+      setSearchLoading(true)
+    }
+  }, [search])
   useEffect(() => {
     handleSearch(debouncedSearch)
   }, [debouncedSearch])
@@ -178,7 +178,6 @@ const AppBarContent = (props: Props) => {
       <NotificationDropdown settings={settings} />
       <UserDropdown settings={settings} />
       <GlobalPaymentModal />
-      <QRCodeScanner />
     </Box>
   )
 }

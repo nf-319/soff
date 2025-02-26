@@ -19,13 +19,6 @@ export const pageSlice = createSlice({
   initialState,
   reducers: {
     disablePage: (state, action) => {
-      // if (action.payload) {
-      //   const overlay: any = document.getElementById('full-page-overlay')
-      //   overlay.style.display = 'block'
-      // } else {
-      //   const overlay: any = document.getElementById('full-page-overlay')
-      //   overlay.style.display = 'none'
-      // }
       state.isPageDisabled = action.payload
     },
     setPublicSettings: (state, action) => {

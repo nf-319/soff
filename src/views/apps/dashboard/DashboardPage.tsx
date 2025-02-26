@@ -48,7 +48,10 @@ export default function DashboardPage() {
 
       <Calendar />
 
-      {(user?.currentRole === 'ceo' || user?.currentRole === 'watcher') && <DashboardNumbers />}
+      {(user?.currentRole === 'ceo' ||
+        (!user?.currentRole && user?.role.includes('ceo')) ||
+        user?.currentRole === 'watcher' ||
+        user?.role.includes('watcher')) && <DashboardNumbers />}
     </>
   )
 }

@@ -12,7 +12,7 @@ import {
   DialogTitle,
   IconButton
 } from '@mui/material'
-import { ReactNode, useContext, useEffect, useState } from 'react'
+import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import DataTable from 'src/@core/components/table'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
@@ -46,9 +46,7 @@ export default function GroupsPage() {
   const { user } = useContext(AuthContext)
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
-  const { students, isLoading, studentsCount, queryParams, total_debts } = useAppSelector(
-    state => state.students
-  )
+  const { students, isLoading, studentsCount, queryParams, total_debts } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const queryString = new URLSearchParams({ ...queryParams } as Record<string, string>).toString()
 
@@ -198,36 +196,15 @@ export default function GroupsPage() {
         return
       }
 
-      const initialParams = {
-        ...queryParams,
-        offset: '0',
-        limit: String(rowsPerPage)
-      }
-
-      dispatch(updateStudentParams({ offset: 0, limit: rowsPerPage }))
-      await dispatch(fetchStudentsList(initialParams))
+      // dispatch(updateStudentParams({ offset: 0,limit:10 }))
+      await dispatch(fetchStudentsList({ ...queryParams }))
     }
 
     initialize()
 
     return () => {
+      dispatch(setOpenEdit(null))
       dispatch(resetStudentsState())
-      dispatch(updateStudentParams({ offset: 0 }))
-      dispatch(setOpenEdit(null))
-    }
-  }, [])
-
-  useEffect(() => {
-    const resetPagination = async () => {
-      dispatch(updateStudentParams({ offset: 0 }))
-      await dispatch(fetchStudentsList({ ...queryParams, limit: String(rowsPerPage), offset: '0' }))
-    }
-
-    resetPagination()
-
-    return () => {
-      dispatch(updateStudentParams({ offset: 0 }))
-      dispatch(setOpenEdit(null))
     }
   }, [])
 
@@ -246,14 +223,22 @@ export default function GroupsPage() {
             <Chip label={`${formatCurrency(total_debts)}` + " so'm"} variant='outlined' color='error' />
           )}
         </Box>
-        <Button
-          onClick={() => dispatch(setOpenEdit('create'))}
-          variant='contained'
-          size='small'
-          startIcon={<IconifyIcon icon='ic:baseline-plus' />}
-        >
-          {t("Yangi qo'shish")}
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          {/* <>
+            <input type='file' ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
+            <Button onClick={handleClick} variant='outlined' size='small'>
+              {t("O'quvchilarni import qilish")}
+            </Button>
+          </> */}
+          <Button
+            onClick={() => dispatch(setOpenEdit('create'))}
+            variant='contained'
+            size='small'
+            startIcon={<IconifyIcon icon='ic:baseline-plus' />}
+          >
+            {t("Yangi qo'shish")}
+          </Button>
+        </Box>
       </Box>
 
       {isMobile && (

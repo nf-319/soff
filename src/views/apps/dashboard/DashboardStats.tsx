@@ -11,13 +11,16 @@ import { useTranslation } from 'react-i18next'
 import { Skeleton, Tooltip } from '@mui/material'
 import { updateStudentParams } from 'src/store/apps/students'
 import { formatCurrency } from 'src/@core/utils/format-currency'
+import { useGet } from 'src/hooks/useApi'
 
-export default function DashboardStats() {
-  const { stats, statsData, isStatsLoading } = useAppSelector(state => state.dashboard)
+const DashboardStats = () => {
+  const { statsData, isStatsLoading } = useAppSelector(state => state.dashboard)
+
   const dispatch = useAppDispatch()
   const { isMobile, isTablet } = useResponsive()
   const { push } = useRouter()
   const { t } = useTranslation()
+  const { data: stats, isLoading } = useGet('common/dashboard/statistic-list/')
 
   function click(link: string) {
     if (link === 'debtors_amount') {
@@ -70,7 +73,7 @@ export default function DashboardStats() {
         gridTemplateColumns: `repeat(${isMobile ? 3 : isTablet ? 4 : 9}, 1fr)`
       }}
     >
-      {isStatsLoading
+      {isLoading
         ? statsData.map((_, index) => (
             <Box key={`${_.key}-${index}`} className='' sx={{ cursor: 'pointer' }} onClick={() => click(_.link)}>
               <Skeleton
@@ -85,7 +88,7 @@ export default function DashboardStats() {
           ))
         : ''}
 
-      {stats && !isStatsLoading
+      {stats && !isLoading
         ? stats?.payment_approaching
           ? statsData.map((_, index) => (
               <Tooltip key={`${_.key}-${index}`} arrow title={tooltip[_.key]}>
@@ -119,3 +122,5 @@ export default function DashboardStats() {
     </Box>
   )
 }
+
+export default DashboardStats

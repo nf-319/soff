@@ -34,12 +34,12 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 const DepartmentSendSmsForm = dynamic(() => import('src/views/apps/lids/departmentItem/DepartmentSendSmsForm'), {
-  ssr: false // Disable server-side rendering if required
+  ssr: false 
 })
 
 // Dynamic import for EditDepartmentItemForm
 const EditDepartmentItemForm = dynamic(() => import('src/views/apps/lids/departmentItem/EditDepartmentItemForm'), {
-  ssr: false // Disable server-side rendering if required
+  ssr: false 
 })
 
 interface AccordionProps {
@@ -113,7 +113,6 @@ export default function AccordionCustom({ onView, parentId, item, is_amocrm, stu
           formik.resetForm()
         })
         .catch((err: any) => {
-          console.log(err)
           formik.setErrors(err.response.data)
           toast.error(err.response.data.msg)
         })
@@ -142,7 +141,6 @@ export default function AccordionCustom({ onView, parentId, item, is_amocrm, stu
       setCount(resp.data.length)
       setLoading(false)
     } catch (err) {
-      console.log(err)
       setLoading(false)
     }
   }

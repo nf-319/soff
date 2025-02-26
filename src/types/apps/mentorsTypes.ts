@@ -21,10 +21,11 @@ export interface IMentorsState {
 
 export interface CreateTeacherDto extends TacherItemType {
   password: string | null
-  image: string | null
+  image?: string | null
+  lesson_amount:string | number,
   is_fixed_salary: boolean
-  percentage: string | null
-  amount: string | null
+  percentage: string | number | null
+  amount: string | number | null
 }
 
 export interface TeacherDetailType {

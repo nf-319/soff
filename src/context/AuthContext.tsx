@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, useEffect, useState, ReactNode, useLayoutEffect } from 'react'
 
 import { useRouter } from 'next/router'
 
@@ -11,7 +11,7 @@ import { AuthValuesType, RegisterParams, LoginParams, ErrCallbackType, UserDataT
 import api from 'src/@core/utils/api'
 import { setCompanyInfo, setRoles } from 'src/store/apps/user'
 import { useTranslation } from 'react-i18next'
-import { useAppDispatch, useAppSelector } from 'src/store'
+import { useAppDispatch } from 'src/store'
 
 const defaultProvider: AuthValuesType = {
   user: null,
@@ -39,6 +39,26 @@ const AuthProvider = ({ children }: Props) => {
 
   const dispatch = useAppDispatch()
 
+  const reloadProfile = async () => {
+    await api.get('auth/profile/').then(async response => {
+      setUser({
+        phone: response.data?.gpa,
+        gpa: response.data?.gpa,
+        id: response.data.id,
+        fullName: response.data.first_name,
+        username: response.data.phone,
+        password: 'null',
+        avatar: response.data.image,
+        payment_page: response.data.payment_page,
+        role: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()),
+        balance: response.data?.balance || 0,
+        branches: response.data.branches.filter((item: any) => item.exists === true),
+        active_branch: response.data.active_branch,
+        qr_code: response.data.qr_code
+      })
+    })
+  }
+
   const initAuth = async (): Promise<void> => {
     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)!
     if (storedToken) {
@@ -46,7 +66,6 @@ const AuthProvider = ({ children }: Props) => {
       i18n.changeLanguage(JSON.parse(settings)?.locale || 'uz')
 
       setLoading(true)
-
       await api
         .get(authConfig.meEndpoint, {
           headers: {
@@ -60,6 +79,7 @@ const AuthProvider = ({ children }: Props) => {
               setRoles(response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()))
             )
           }
+
           setUser({
             phone: response.data.phone,
             last_login: response.data?.last_login,
@@ -68,7 +88,7 @@ const AuthProvider = ({ children }: Props) => {
             fullName: response.data.first_name,
             username: response.data.phone,
             password: 'null',
-            currentRole: response.data.roles[0],
+            currentRole: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase())[0],
             avatar: response.data.image,
             payment_page: response.data.payment_page,
             role: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()),
@@ -78,7 +98,8 @@ const AuthProvider = ({ children }: Props) => {
             qr_code: response.data.qr_code
           })
         })
-        .catch(() => {
+        .catch(error => {
+          console.error('Auth Error:', error)
           localStorage.clear()
           setUser(null)
           setLoading(false)
@@ -102,7 +123,11 @@ const AuthProvider = ({ children }: Props) => {
   }
 
   useEffect(() => {
-    initAuth()
+    const fetchAuth = async () => {
+      await initAuth()
+    }
+
+    fetchAuth()
   }, [])
 
   useEffect(() => {
@@ -117,7 +142,7 @@ const AuthProvider = ({ children }: Props) => {
           Cookie.set('token', response.data.tokens.access)
           Cookie.set('roles', JSON.stringify(response.data.roles))
           window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.tokens.access)
-          window.localStorage.setItem('userData', JSON.stringify({ ...response.data, role: 'admin', tokens: null }))
+          window.localStorage.setItem('userData', JSON.stringify({ ...response.data }))
         }
 
         const settings: any = window.localStorage.getItem('settings')
@@ -138,21 +163,21 @@ const AuthProvider = ({ children }: Props) => {
 
           const returnUrl = router.query.returnUrl
 
-          const redirectURL = isMarketolog
-            ? '/lids'
-            : returnUrl && returnUrl !== '/dashboard'
-            ? returnUrl
-            : '/dashboard'
-          router.replace(redirectURL as string)
+          const redirectURL = isMarketolog ? '/lids' : returnUrl && returnUrl !== '/' ? returnUrl : '/'
+          if (redirectURL) {
+            await router.replace(redirectURL as string)
+          } else {
+            console.error('Redirect URL is undefined or invalid:', redirectURL)
+          }
         } else {
-          router.replace('/crm-payments')
+          await router.replace('/crm-payments')
         }
 
         dispatch(setRoles(userRoles))
         setUser({
           last_login: response.data?.last_login,
           phone: response.data.phone,
-          gpa: response.data.gpa,
+          gpa: response.data?.gpa,
           id: response.data.id,
           fullName: response.data.first_name,
           username: response.data.phone,
@@ -164,6 +189,7 @@ const AuthProvider = ({ children }: Props) => {
           branches: response.data.branches.filter((item: any) => item.exists === true),
           active_branch: response.data.active_branch
         })
+        reloadProfile()
       })
       .catch(err => {
         if (errorCallback) errorCallback(err)
