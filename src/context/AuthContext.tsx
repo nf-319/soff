@@ -88,7 +88,7 @@ const AuthProvider = ({ children }: Props) => {
             fullName: response.data.first_name,
             username: response.data.phone,
             password: 'null',
-            currentRole: response.data.roles[0],
+            currentRole: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase())[0],
             avatar: response.data.image,
             payment_page: response.data.payment_page,
             role: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()),
@@ -142,7 +142,7 @@ const AuthProvider = ({ children }: Props) => {
           Cookie.set('token', response.data.tokens.access)
           Cookie.set('roles', JSON.stringify(response.data.roles))
           window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.tokens.access)
-          window.localStorage.setItem('userData', JSON.stringify({ ...response.data, role: 'admin', tokens: null }))
+          window.localStorage.setItem('userData', JSON.stringify({ ...response.data }))
         }
 
         const settings: any = window.localStorage.getItem('settings')
