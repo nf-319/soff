@@ -45,6 +45,25 @@ const BadgeContentSpan = styled('span')(({ theme }) => ({
   boxShadow: `0 0 0 2px ${theme.palette.background.paper}`
 }))
 
+// Rollarni rang bo'yicha ketma-ketligi
+const roleHierarchy = ['student', 'teacher', 'marketolog', 'watcher', 'casher', 'admin', 'ceo']
+
+// Eng katta roleni aniqlash uchun funksiya
+const getHighestRole = (roles: string[]): string => {
+  let highestRoleIndex = -1
+  let highestRole = ''
+
+  roles.forEach(role => {
+    const index = roleHierarchy.indexOf(role)
+    if (index > highestRoleIndex) {
+      highestRoleIndex = index
+      highestRole = role
+    }
+  })
+
+  return highestRole
+}
+
 const UserDropdown = (props: Props) => {
   const [imageSrc, setImageSrc] = useState('')
 
@@ -110,18 +129,32 @@ const UserDropdown = (props: Props) => {
     document.body.removeChild(anchor)
   }
 
+  // Kirish vaqtida bir marta eng katta roleni o'rnatish
+  useEffect(() => {
+    // LocalStorage'da role saqlangan bo'lsa, o'sha ishlatiladi
+    // Aks holda user rollaridan eng kattasi aniqlanadi
+    const savedRole = localStorage.getItem('currentRole')
+
+    if (!savedRole && user?.role && user.role.length > 0) {
+      const highestRole = getHighestRole(user.role)
+      setRole(highestRole)
+      localStorage.setItem('currentRole', highestRole)
+    } else if (savedRole) {
+      setRole(savedRole)
+    }
+  }, [user?.role])
+
   useEffect(() => {
     setUser((prevUser: UserDataType) => ({
       ...prevUser,
-      currentRole: localStorage.getItem('currentRole') || role || prevUser.role[0]
+      currentRole:
+        localStorage.getItem('currentRole') ||
+        role ||
+        (prevUser.role && prevUser.role.length > 0 ? getHighestRole(prevUser.role) : '')
     }))
-  }, [role])
+  }, [role, setUser])
 
-  const handleLogout = () => {
-    logout()
-    dispatch(setRoles([]))
-    handleDropdownClose()
-  }
+  // Roleni o'zgartirish va tegishli sahifaga yo'naltirish
   const handleRole = (role: string) => {
     setRole(role)
     if (role == 'teacher') {
@@ -132,6 +165,12 @@ const UserDropdown = (props: Props) => {
     }
     localStorage.setItem('currentRole', role)
     setAnchorEl(null)
+  }
+
+  const handleLogout = () => {
+    logout()
+    dispatch(setRoles([]))
+    handleDropdownClose()
   }
 
   return (
