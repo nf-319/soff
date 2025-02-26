@@ -322,6 +322,7 @@ export default function GroupsPage() {
           {t("Yangi qo'shish")}
         </Button>
       </Box>
+
       {isMobile && (
         <>
           <Button
@@ -338,7 +339,7 @@ export default function GroupsPage() {
 
       {!isMobile && <GroupsFilter isMobile={isMobile} />}
 
-      <DataTable columns={columns} loading={isLoading} data={groups || []} rowClick={rowClick}  />
+      <DataTable columns={columns} loading={isLoading} data={groups || []} rowClick={rowClick} />
 
       {Math.ceil(groupCount / 10) > 1 && !isLoading && (
         <div className='d-flex'>
@@ -388,6 +389,7 @@ export default function GroupsPage() {
           <Button onClick={() => setOpen(false)}>{t('Davom etish')}</Button>
         </DialogActions>
       </Dialog>
+
       <Dialog open={updateStatusModal} onClose={() => setUpdateStatusModal(false)}>
         <form onSubmit={formik.handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
           <DialogContent sx={{ maxWidth: '350px' }}>
@@ -396,9 +398,6 @@ export default function GroupsPage() {
             </Typography>
 
             <FormControl sx={{ maxWidth: '100%', marginBottom: 3 }} fullWidth>
-              {/* <InputLabel size='small' id='demo-simple-select-outlined-label'>
-                Status (holati)
-              </InputLabel> */}
               <Select
                 size='small'
                 placeholder='Status (holati)'
@@ -410,8 +409,6 @@ export default function GroupsPage() {
                 name='status'
                 error={!!formik.errors.status && !!formik.touched.status}
               >
-                {/* <MenuItem value={'active'}>Aktiv</MenuItem>
-                <MenuItem value={'frozen'}>Muzlatish</MenuItem> */}
                 {groupChoices?.map(el => (
                   <MenuItem value={el} key={el}>
                     {t(el)}

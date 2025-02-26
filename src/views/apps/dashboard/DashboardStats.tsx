@@ -13,8 +13,9 @@ import { updateStudentParams } from 'src/store/apps/students'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { useGet } from 'src/hooks/useApi'
 
-export default function DashboardStats() {
+const DashboardStats = () => {
   const { statsData, isStatsLoading } = useAppSelector(state => state.dashboard)
+
   const dispatch = useAppDispatch()
   const { isMobile, isTablet } = useResponsive()
   const { push } = useRouter()
@@ -121,3 +122,5 @@ export default function DashboardStats() {
     </Box>
   )
 }
+
+export default DashboardStats

@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from 'react'
+import { ReactNode } from 'react'
 import Head from 'next/head'
 import { Router } from 'next/router'
 import type { NextPage } from 'next'
@@ -24,13 +24,13 @@ import { SettingsConsumer, SettingsProvider } from 'src/@core/context/settingsCo
 import ReactHotToast from 'src/@core/styles/libs/react-hot-toast'
 import { createEmotionCache } from 'src/@core/utils/create-emotion-cache'
 import DisabledProvider from 'src/@core/layouts/DisabledProvider'
+import { disableCache } from '@iconify/react'
 
 import 'prismjs'
 import 'prismjs/themes/prism-tomorrow.css'
 import 'prismjs/components/prism-jsx'
 import 'prismjs/components/prism-tsx'
 import 'react-perfect-scrollbar/dist/css/styles.css'
-import 'src/iconify-bundle/icons-bundle-react'
 
 import './globals.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -60,6 +60,8 @@ const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
   return <>{children}</>
 }
 
+disableCache('all')
+
 const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: ExtendedAppProps) => {
   const contentHeightFixed = Component.contentHeightFixed ?? false
   const getLayout =
@@ -68,6 +70,7 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
   const authGuard = Component.authGuard ?? true
   const guestGuard = Component.guestGuard ?? false
   const aclAbilities = Component.acl ?? defaultACLObj
+
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -76,6 +79,7 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
       },
     },
   })
+
   function MyHead() {
     const { companyInfo } = useAppSelector(state => state.user)
 
@@ -119,6 +123,8 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
           </AuthProvider>
         </CacheProvider>
       </Provider>
+
+      
     </QueryClientProvider>
   )
 }
