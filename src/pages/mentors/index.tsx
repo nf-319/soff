@@ -49,12 +49,8 @@ export default function GroupsPage() {
   }
   const queryClient = useQueryClient()
 
+  const { data, isLoading, refetch } = useGet(ceoConfigs.teachers, { params: queryParams, deps: ['mentors'] })
 
-  
-
-  const { data, isLoading, refetch } = useGet(ceoConfigs.teachers, { params: queryParams ,deps:['mentors']})
-  
-  
   const handleEditClose = () => {
     setError({})
     dispatch(setOpenSms(null))
@@ -142,7 +138,6 @@ export default function GroupsPage() {
       toast.error('Sahifaga kirish huquqingiz yoq!')
     }
 
-
     return () => {
       dispatch(setOpenEdit(null))
     }
@@ -153,10 +148,9 @@ export default function GroupsPage() {
   }
 
   const handleChangeStatus = async (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-    dispatch(updateParams({ status: checked  ? 'archive' : 'active', page: 1 }))
-    // queryClient.refetchQueries({ queryKey:['mentors'] })
+    dispatch(updateParams({ status: checked ? 'archive' : 'active', page: 1 }))
+    // queryClient.invalidateQueries({ queryKey: ['mentors'] })
     await refetch()
-
   }
 
   useEffect(() => {

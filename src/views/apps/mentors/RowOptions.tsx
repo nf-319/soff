@@ -32,7 +32,6 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
   const { mutate: editMutate, isPending: editPending } = usePatch()
   const queryClient = useQueryClient()
   const { mutate, isPending } = useDelete()
-
   const handleEditClose = () => {
     setOpenSms(null)
   }
@@ -54,7 +53,7 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
     dispatch(disablePage(true))
     // const resp = await dispatch(deleteTeacher(id))
     mutate(ceoConfigs.employee_delete + id, {
-      onSuccess: () => {
+      onSuccess: async () => {
         toast.success(`${t("O'qituvchilar ro'yxatidan o'chirildi")}`, { position: 'top-center' })
         queryClient.refetchQueries({ queryKey: ['mentors'] })
         dispatch(updateParams({ page: '1', status: 'active' }))
@@ -75,7 +74,7 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
       {
         onSuccess: async data => {
           queryClient.refetchQueries({ queryKey: ['mentors'] })
-
+          // await refetch()
           dispatch(updateParams({ page: '1', status: 'active' }))
 
           toast.success("O'qituvchi qaytarildi")
