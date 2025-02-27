@@ -14,9 +14,13 @@ import { disablePage } from 'src/store/apps/page'
 import { editEmployeeStatus } from 'src/store/apps/settings'
 import { SendSMSModal } from '../students/view/UserViewLeft'
 import useSMS from 'src/hooks/useSMS'
+import { useDelete, useGet, usePatch } from 'src/hooks/useApi'
+import ceoConfigs from 'src/configs/ceo'
+import { useQueryClient } from '@tanstack/react-query'
 
 const RowOptions = ({ id, status }: { id: number | string; status: string }) => {
   const { t } = useTranslation()
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
   const { queryParams } = useAppSelector(state => state.mentors)
@@ -25,6 +29,9 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
   const [loading, setLoading] = useState<boolean>(false)
   const rowOptionsOpen = Boolean(anchorEl)
   const { smsTemps, getSMSTemps } = useSMS()
+  const { mutate: editMutate, isPending: editPending } = usePatch()
+  const queryClient = useQueryClient()
+  const { mutate, isPending } = useDelete()
 
   const handleEditClose = () => {
     setOpenSms(null)
@@ -45,35 +52,39 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
   const handleDeleteTeacher = async (id: string | number) => {
     setLoading(true)
     dispatch(disablePage(true))
-    const resp = await dispatch(deleteTeacher(id))
-    if (resp.meta.requestStatus === 'rejected') {
-      toast.error(`${resp.payload?.msg}`, { position: 'top-center' })
-    } else {
-      // @ts-ignore
-      const queryString = new URLSearchParams({ ...queryParams, status: 'active' }).toString()
-      await dispatch(fetchTeachersList(queryString))
-      toast.success(`${t("O'qituvchilar ro'yxatidan o'chirildi")}`, { position: 'top-center' })
-    }
+    // const resp = await dispatch(deleteTeacher(id))
+    mutate(ceoConfigs.employee_delete + id, {
+      onSuccess: () => {
+        toast.success(`${t("O'qituvchilar ro'yxatidan o'chirildi")}`, { position: 'top-center' })
+        queryClient.refetchQueries({ queryKey: ['mentors'] })
+        dispatch(updateParams({ page: '1', status: 'active' }))
+      },
+      onError: error => {
+        toast.error(`${error?.response.data.msg}`, { position: 'top-center' })
+      }
+    })
+
     setLoading(false)
     dispatch(disablePage(false))
   }
   const handleChange = async (id: string | number) => {
     setLoading(true)
-    const resp = await dispatch(
-      editEmployeeStatus({
-        data: { status: 'active' },
-        id: id
-      })
-    )
+    editMutate(
+      ceoConfigs.update_employee_status + id,
+      { status: 'active' },
+      {
+        onSuccess: async data => {
+          queryClient.refetchQueries({ queryKey: ['mentors'] })
 
-    if (resp.meta.requestStatus === 'rejected') {
-      toast.error("Tiklab bo'lmadi")
-    } else {
-      dispatch(updateParams({ page: '1', status: 'active' }))
-      const queryString = new URLSearchParams({ ...queryParams, page: '1', status: 'active' }).toString()
-      await dispatch(fetchTeachersList(queryString))
-      toast.success("O'qituvchi qaytarildi")
-    }
+          dispatch(updateParams({ page: '1', status: 'active' }))
+
+          toast.success("O'qituvchi qaytarildi")
+        },
+        onError: () => {
+          toast.error("Tiklab bo'lmadi")
+        }
+      }
+    )
     setLoading(false)
     dispatch(disablePage(false))
   }
@@ -142,7 +153,7 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
         )}
       </Menu>
       <UserSuspendDialog
-        loading={loading}
+        loading={isPending}
         handleOk={() => handleDeleteTeacher(id)}
         open={suspendDialogOpen}
         setOpen={setSuspendDialogOpen}

@@ -28,21 +28,8 @@ type ICustomUseInfiniteQueryOptions<TQueryFnData, TError, TData> = Partial<
 type ICustomUseMutationOptions<D, E, P> = Partial<UseMutationOptions<D, E, P>>
 
 
-export const getRequest = (url: string, config?: AxiosRequestConfig) => {
-    const params = new URLSearchParams();
-  
-    if (config?.params) {
-      Object.entries(config.params).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          params.append(key, value.join(',')); 
-        } else {
-          params.append(key, value as string);
-        }
-      });
-    }
-  
-    return api.get(`${url}?${params.toString()}`, config).then((res) => res.data);
-  };
+export const getRequest = (url: string, config?: AxiosRequestConfig) =>
+    api.get(url, config).then((res) => res.data);
   
 
 export const postRequest = <T>(
@@ -68,7 +55,7 @@ export const patchRequest = <T>(
     url: string,
     payload: T,
     config?: AxiosRequestConfig,
-) => api.patch(`/${url}/`, payload, config).then((res) => res.data)
+) => api.patch(`/${url}`, payload, config).then((res) => res.data)
 
 export const deleteRequest = (url: string, config?: AxiosRequestConfig) =>
     api.delete(`/${url}/`, config).then((res) => res.data)

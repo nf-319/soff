@@ -17,7 +17,7 @@ import { useState } from 'react'
 
 const Calendar = () => {
   const dispatch = useAppDispatch()
-  const { isLessonLoading, interval, weeks } = useAppSelector(state => state.dashboard)
+  const {interval, weeks } = useAppSelector(state => state.dashboard)
   const [queryParams, setQueryParams] = useState<string>(String(weeks))
   const { settings } = useSettings()
   const { skin } = settings

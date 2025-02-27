@@ -17,6 +17,9 @@ import { ModalTypes, SendSMSModal } from 'src/views/apps/students/view/UserViewL
 import { fetchSmsList } from 'src/store/apps/settings'
 import RowOptions from 'src/views/apps/mentors/RowOptions'
 import TeacherCreateDialog from 'src/views/apps/mentors/TeacherCreateDialog'
+import { useGet } from 'src/hooks/useApi'
+import ceoConfigs from 'src/configs/ceo'
+import { useQueryClient } from '@tanstack/react-query'
 
 const TeacherAvatar = dynamic(() => import('src/views/apps/mentors/AddMentorsModal').then(mod => mod.TeacherAvatar))
 const TeacherEditDialog = dynamic(() => import('src/views/apps/mentors/TeacherEditDialog'))
@@ -39,16 +42,23 @@ export default function GroupsPage() {
   const [error, setError] = useState<any>({})
   const router = useRouter()
   const { smsTemps, getSMSTemps } = useSMS()
-  const { teachers, teachersCount, queryParams, isLoading, openSms } = useAppSelector(state => state.mentors)
+  const { teachers, teachersCount, queryParams, openSms } = useAppSelector(state => state.mentors)
   const studentIds = teachers.map(student => student.id)
   const handleEditClickOpen = (value: ModalTypes) => {
     dispatch(setOpenSms(value))
   }
+  const queryClient = useQueryClient()
+
+
+  
+
+  const { data, isLoading, refetch } = useGet(ceoConfigs.teachers, { params: queryParams ,deps:['mentors']})
+  
+  
   const handleEditClose = () => {
     setError({})
     dispatch(setOpenSms(null))
   }
-  const date = new Date().toLocaleDateString()
 
   const columns: customTableProps[] = [
     {
@@ -131,12 +141,7 @@ export default function GroupsPage() {
       router.push('/')
       toast.error('Sahifaga kirish huquqingiz yoq!')
     }
-    const queryString = new URLSearchParams({
-      ...queryParams,
-      page: String(queryParams.page),
-      status: String(queryParams.status)
-    }).toString()
-    dispatch(fetchTeachersList(queryString))
+
 
     return () => {
       dispatch(setOpenEdit(null))
@@ -145,14 +150,13 @@ export default function GroupsPage() {
 
   const handlePagination = async (page: number) => {
     dispatch(updateParams({ page }))
-    const queryString = new URLSearchParams({ ...queryParams, page: String(page) }).toString()
-    await dispatch(fetchTeachersList(queryString))
   }
 
   const handleChangeStatus = async (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-    dispatch(updateParams({ status: checked ? 'archive' : 'active', page: 1 }))
-    const queryString = new URLSearchParams({ status: checked ? 'archive' : 'active', page: '1' }).toString()
-    await dispatch(fetchTeachersList(queryString))
+    dispatch(updateParams({ status: checked  ? 'archive' : 'active', page: 1 }))
+    // queryClient.refetchQueries({ queryKey:['mentors'] })
+    await refetch()
+
   }
 
   useEffect(() => {
@@ -187,7 +191,7 @@ export default function GroupsPage() {
           <Chip label={`${teachersCount || 0}`} variant='outlined' color='primary' size='medium' />
           <FormControlLabel
             control={<Switch onChange={handleChangeStatus} />}
-            checked={queryParams.status === 'archive'}
+            checked={queryParams.status == 'archive'}
             label={t('archive')}
             sx={{ marginLeft: isMobile ? '0' : '10px' }}
           />
@@ -225,12 +229,12 @@ export default function GroupsPage() {
         </Box>
       </Box>
 
-      <DataTable loading={isLoading} columns={columns} data={teachers} rowClick={rowClick} />
+      <DataTable loading={isLoading} columns={columns} data={data?.results} rowClick={rowClick} />
 
-      {Math.ceil(teachersCount / 10) > 1 && !isLoading && (
+      {Math.ceil(data?.count / 10) > 1 && !isLoading && (
         <Pagination
           defaultPage={Number(queryParams.page)}
-          count={Math.ceil(teachersCount / 10)}
+          count={Math.ceil(data?.count / 10)}
           variant='outlined'
           shape='rounded'
           onChange={(e: any, page) => handlePagination(page)}
