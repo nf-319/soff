@@ -29,10 +29,9 @@ import dynamic from 'next/dynamic'
 import { AuthContext } from 'src/context/AuthContext'
 import { toast } from 'react-hot-toast'
 import SourceStatsVertical from 'src/@core/components/card-statistics/card-source-vertical'
+import { EmptyContent } from 'src/@core/components/empty-content'
 
 // Dynamically import components
-const CardStatsVertical = dynamic(() => import('src/@core/components/card-statistics/card-stats-vertical'))
-const EmptyContent = dynamic(() => import('src/@core/components/empty-content'))
 const CustomeDrawer = dynamic(() => import('../settings/office/courses').then(mod => mod.CustomeDrawer))
 
 const steps = [

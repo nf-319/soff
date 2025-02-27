@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
 import SubLoader from 'src/views/apps/loaders/SubLoader'
-import EmptyContent from '../empty-content'
+import { EmptyContent } from '../empty-content'
 
 export interface customTableDataProps {
   xs: number

@@ -74,8 +74,8 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 1000 * 60 * 5,
-        refetchOnWindowFocus: false,
+        // staleTime: 1000 * 60 * 5,
+        // refetchOnWindowFocus: false,
       },
     },
   })
@@ -124,7 +124,7 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
         </CacheProvider>
       </Provider>
 
-      
+
     </QueryClientProvider>
   )
 }

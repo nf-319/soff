@@ -1,35 +1,33 @@
 'use client'
 
 import { Box, Button, Switch, TextField } from '@mui/material'
+import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
 import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import useDebounce from 'src/hooks/useDebounce'
-import { useAppDispatch, useAppSelector } from 'src/store'
-import { fetchDepartmentList, setOpen, updateLeadParams } from 'src/store/apps/leads'
 
-export default function LidsHeader() {
-  const { queryParams } = useAppSelector(state => state.leads)
-  const dispatch = useAppDispatch()
-  const { push } = useRouter()
+export const LidsHeader = () => {
+  const { push, query } = useRouter()
   const { t } = useTranslation()
   const { isMobile } = useResponsive()
 
-  const [search, setSearch] = useState<string>('')
+  const searchQuery = Array.isArray(query.search) ? query.search[0] : query.search || ''
+  const isActiveQuery = Array.isArray(query.is_active) ? query.is_active[0] : query.is_active
+
+  const [search, setSearch] = useState<string>(searchQuery)
+  const [isActive, setIsActive] = useState<boolean>(isActiveQuery !== 'false')
   const searchVal = useDebounce(search, 800)
 
-  const viewArchive = (is_active: boolean) => {
-    dispatch(updateLeadParams({ is_active }))
-    dispatch(fetchDepartmentList({ ...queryParams, is_active }))
-  }
-
   useEffect(() => {
-    dispatch(updateLeadParams({ search }))
-    dispatch(fetchDepartmentList({ ...queryParams, search }))
-  }, [searchVal])
+    const params = new URLSearchParams()
+    if (searchVal) params.set('search', searchVal)
+    if (!isActive) params.set('is_active', 'false')
+
+    push({ pathname: '/lids', query: Object.fromEntries(params) })
+  }, [searchVal, isActive])
 
   return (
     <Box
@@ -49,12 +47,11 @@ export default function LidsHeader() {
           sx={{ maxWidth: '300px', width: '100%' }}
           color='primary'
           placeholder={`${t('Qidirish')}...`}
-          onChange={e => {
-            setSearch(e.target.value)
-          }}
+          value={search}
+          onChange={e => setSearch(e.target.value)}
         />
         <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Switch checked={!queryParams.is_active} onChange={(e, v) => viewArchive(!v)} />
+          <Switch checked={!isActive} onChange={() => setIsActive(prev => !prev)} />
           {t('Arxiv')}
         </label>
         <Button variant='outlined' onClick={() => push('/lids/stats')}>
@@ -66,21 +63,21 @@ export default function LidsHeader() {
         {isMobile ? (
           <Button
             fullWidth
-            onClick={() => dispatch(setOpen('add-department'))}
+            onClick={() => push('/lids/add-department')}
             sx={{ minWidth: '300px', my: 4 }}
             size='small'
             variant='contained'
-            startIcon={<IconifyIcon icon={'material-symbols:add'} />}
+            startIcon={<Plus />}
           >
             {t("Bo'lim yaratish")}
           </Button>
         ) : (
           <Button
-            onClick={() => dispatch(setOpen('add-department'))}
+            onClick={() => push('/lids/add-department')}
             sx={{ minWidth: '300px' }}
             size='medium'
             variant='contained'
-            startIcon={<IconifyIcon icon={'material-symbols:add'} />}
+            startIcon={<Plus />}
           >
             {t("Bo'lim yaratish")}
           </Button>
@@ -91,3 +88,5 @@ export default function LidsHeader() {
     </Box>
   )
 }
+
+LidsHeader.displayName = 'LidsHeader'

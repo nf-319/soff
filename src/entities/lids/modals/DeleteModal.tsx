@@ -16,10 +16,9 @@ import {
 type Props = {
   id: number
   isAmmo?: boolean
-  loading: boolean
 }
 
-export const LidsDeleteModal: FC<Props> = ({ id, isAmmo, loading }) => {
+export const LidsDeleteModal: FC<Props> = ({ id, isAmmo }) => {
   const { openActionModal, actionId, queryParams } = useSelector((state: RootState) => state.leads)
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
@@ -62,14 +61,9 @@ export const LidsDeleteModal: FC<Props> = ({ id, isAmmo, loading }) => {
           {t('Bekor qilish')}
         </Button>
 
-        <LoadingButton
-          color='error'
-          loading={loading}
-          variant='contained'
-          onClick={isAmmo ? deleteAmoCrmData : deleteDepartmentItem}
-        >
+        <Button color='error' variant='contained' onClick={isAmmo ? deleteAmoCrmData : deleteDepartmentItem}>
           {t("O'chirish")}
-        </LoadingButton>
+        </Button>
       </Box>
     </Dialog>
   )
