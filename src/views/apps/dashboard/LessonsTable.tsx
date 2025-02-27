@@ -8,47 +8,47 @@ import { useRouter } from 'next/router'
 import { Typography } from '@mui/material'
 import EmptyContent from 'src/@core/components/empty-content'
 import { useTranslation } from 'react-i18next'
+import { ILessonResponse } from 'src/types/apps/dashboardTypes'
 
-const LessonsTable = () => {
-  const { events = [], workTime = [], isLessonLoading, interval } = useAppSelector(state => state.dashboard)
+const LessonsTable = ({workTime,events,isLoading}:{workTime:string[],events:ILessonResponse[],isLoading?:boolean}) => {
+  const { interval } = useAppSelector(state => state.dashboard)
   const { push } = useRouter()
   const { t } = useTranslation()
 
   return (
-    <Box sx={{ padding: '0 15px 15px 15px', maxWidth: '100%', overflowX: 'auto' }}>
+    <Box sx={{ padding: '0 15px 15px 15px', maxWidth: '100%', overflowY: 'auto' }}>
       <table border={0} style={{ width: '100%' }}>
         <tbody>
           <tr>
             <td style={{ minWidth: '100px', fontSize: '12px' }}>{t('Xonalar / Soat')}</td>
-            <td>
-              <Box sx={{ display: 'flex' }}>
-                {workTime?.map((el: string) => (
-                  <Box
-                    key={el}
-                    sx={{
-                      width: '50px',
-                      height: '40px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '12px'
-                    }}
-                  >
-                    {el}
-                  </Box>
-                ))}
-              </Box>
-            </td>
+
+            <Box component='td' sx={{ display: 'flex' }}>
+              {workTime?.map((el: string) => (
+                <Box
+                  key={el}
+                  sx={{
+                    width: '50px',
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '12px'
+                  }}
+                >
+                  {el}
+                </Box>
+              ))}
+            </Box>
           </tr>
 
-          {isLessonLoading ? (
+          {isLoading ? (
             <tr>
               <td colSpan={workTime.length + 1}>
                 <SubLoader />
               </td>
             </tr>
-          ) : events.length > 0 ? (
-            events.map(lesson => (
+          ) : events?.length > 0 ? (
+            events?.map(lesson => (
               <tr style={{ borderBottom: '1px solid #c3cccc65' }} key={lesson.room_id}>
                 <td style={{ minWidth: '100px', fontSize: '12px' }}>{lesson.room_name}</td>
                 <td>
@@ -126,7 +126,7 @@ const LessonsTable = () => {
             ))
           ) : (
             <tr>
-              <td colSpan={workTime.length + 1}>
+              <td colSpan={workTime?.length + 1}>
                 <EmptyContent />
               </td>
             </tr>

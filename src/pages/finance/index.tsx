@@ -197,7 +197,7 @@ const CardStatistics = () => {
     try {
       await api.post(`finance/budget-category/create/`, { name: nameVal, status: 'expense' })
       setOpen(null)
-      dispatch(getExpenseCategories({...allNumbersParams}))
+      dispatch(getExpenseCategories({ ...allNumbersParams }))
     } catch (err) {
       console.log(err)
     } finally {
@@ -209,7 +209,7 @@ const CardStatistics = () => {
     try {
       await api.post(`finance/budget-category/create/`, { name: nameVal, status: 'income' })
       setOpen(null)
-      dispatch(getIncomeCategories({...allNumbersParams}))
+      dispatch(getIncomeCategories({ ...allNumbersParams }))
     } catch (err) {
       console.log(err)
     } finally {
@@ -283,6 +283,7 @@ const CardStatistics = () => {
           <Grid item xs={12} sm={12} md={4}>
             <StatsPaymentMethods />
           </Grid>
+
           <Grid item xs={12} md={8} mb={10}>
             <CardStatisticsLiveVisitors />
             {numbersLoad ? (
@@ -290,10 +291,10 @@ const CardStatistics = () => {
             ) : (
               all_numbers && (
                 <Box width='100%' mx='auto' pt={5}>
-                  <Paper elevation={3} sx={{ p: 3, borderRadius: 1 }}>
+                  <Paper elevation={3} sx={{ p: 4, borderRadius: 1 }}>
                     {all_numbers.month ? (
                       <Typography variant='h6' align='center' gutterBottom>
-                        {all_numbers.year} - {month[all_numbers.month]}  oyidagi natijalar
+                        {all_numbers.year} - {month[all_numbers.month]} oyidagi natijalar
                       </Typography>
                     ) : (
                       <Typography variant='h6' align='center' gutterBottom>
@@ -342,10 +343,7 @@ const CardStatistics = () => {
                             mt={2}
                           >
                             Qarzdorlik summasi:
-                            <br /> {formatNumber(
-                              all_numbers.plans?.debt_amount || 0
-                            )}{' '}
-                            so'm
+                            <br /> {formatNumber(all_numbers.plans?.debt_amount || 0)} so'm
                           </Typography>
                           <Typography color={all_numbers.plans.percentage >= 65 ? 'white' : 'black'} textAlign={'end'}>
                             {100 % -all_numbers.plans.percentage.toFixed(1) || 0}%
