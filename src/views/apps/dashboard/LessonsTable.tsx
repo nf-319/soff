@@ -10,8 +10,8 @@ import EmptyContent from 'src/@core/components/empty-content'
 import { useTranslation } from 'react-i18next'
 import { ILessonResponse } from 'src/types/apps/dashboardTypes'
 
-const LessonsTable = ({workTime,events}:{workTime:string[],events:ILessonResponse[]}) => {
-  const { isLessonLoading, interval } = useAppSelector(state => state.dashboard)
+const LessonsTable = ({workTime,events,isLoading}:{workTime:string[],events:ILessonResponse[],isLoading?:boolean}) => {
+  const { interval } = useAppSelector(state => state.dashboard)
   const { push } = useRouter()
   const { t } = useTranslation()
 
@@ -41,7 +41,7 @@ const LessonsTable = ({workTime,events}:{workTime:string[],events:ILessonRespons
             </Box>
           </tr>
 
-          {isLessonLoading ? (
+          {isLoading ? (
             <tr>
               <td colSpan={workTime.length + 1}>
                 <SubLoader />
