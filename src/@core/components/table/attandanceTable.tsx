@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { Box, Collapse } from '@mui/material'
 import { useRouter } from 'next/router'
 import { Placeholder } from 'react-bootstrap'
-import EmptyContent from '../empty-content'
+import { EmptyContent } from '../empty-content'
 
-export interface customTableDataProps {
+export type customTableDataProps = {
   xs: number
   title: string | React.ReactNode
   dataIndex?: string | React.ReactNode
@@ -217,10 +217,9 @@ export default function DataTable({
                             {student.first_name}
                           </Box>
                           <Box
-                            
                             key={`desc-${idx}`}
                             sx={{
-                              fontSize:13,
+                              fontSize: 13,
                               padding: '5px',
                               borderBottom: '1px solid #ddd',
                               cursor: 'pointer'

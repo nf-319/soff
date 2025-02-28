@@ -99,6 +99,8 @@ export const videoUrls: {
 export default function VideoHeader({ item }: { item: VideoType }) {
   const dispatch = useAppDispatch()
   const { isMobile } = useResponsive()
+  const { t } = useTranslation()
+
   const clickBtn = () => {
     dispatch(
       openVideoModal({
@@ -107,14 +109,13 @@ export default function VideoHeader({ item }: { item: VideoType }) {
       })
     )
   }
-  const { t } = useTranslation()
 
   return (
-    <Box sx={{ marginBottom: '10px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Button
         fullWidth={isMobile}
         onClick={clickBtn}
-        size='small'
+        size='medium'
         variant='outlined'
         sx={{ textTransform: 'unset', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '3px' }}
       >

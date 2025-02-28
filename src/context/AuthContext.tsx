@@ -52,7 +52,9 @@ const AuthProvider = ({ children }: Props) => {
         payment_page: response.data.payment_page,
         role: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()),
         balance: response.data?.balance || 0,
-        branches: response.data.branches.filter((item: any) => item.exists === true),
+        branches: response.data.branches
+          .filter((item: any) => item.exists === true)
+          .map((el: any) => el.name?.toLowerCase()),
         active_branch: response.data.active_branch,
         qr_code: response.data.qr_code
       })
@@ -93,7 +95,9 @@ const AuthProvider = ({ children }: Props) => {
             payment_page: response.data.payment_page,
             role: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()),
             balance: response.data?.balance || 0,
-            branches: response.data.branches.filter((item: any) => item.exists === true),
+            branches: response.data.branches
+              .filter((item: any) => item.exists === true)
+              .map((el: any) => el.name?.toLowerCase()),
             active_branch: response.data.active_branch,
             qr_code: response.data.qr_code
           })
@@ -186,7 +190,9 @@ const AuthProvider = ({ children }: Props) => {
           payment_page: response.data.payment_page,
           role: userRoles,
           balance: response.data?.balance || 0,
-          branches: response.data.branches.filter((item: any) => item.exists === true),
+          branches: response.data.branches
+            .filter((item: any) => item.exists === true)
+            .map((el: any) => el.name?.toLowerCase()),
           active_branch: response.data.active_branch
         })
         reloadProfile()
