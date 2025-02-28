@@ -19,6 +19,7 @@ import RowOptions from 'src/views/apps/mentors/RowOptions'
 import TeacherCreateDialog from 'src/views/apps/mentors/TeacherCreateDialog'
 import { useGet } from 'src/hooks/useApi'
 import ceoConfigs from 'src/configs/ceo'
+import { useQueryClient } from '@tanstack/react-query'
 
 const TeacherAvatar = dynamic(() => import('src/views/apps/mentors/AddMentorsModal').then(mod => mod.TeacherAvatar))
 const TeacherEditDialog = dynamic(() => import('src/views/apps/mentors/TeacherEditDialog'))
@@ -40,6 +41,7 @@ export default function GroupsPage() {
   const { user } = useContext(AuthContext)
   const [error, setError] = useState<any>({})
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { smsTemps, getSMSTemps } = useSMS()
   const { teachers, teachersCount, queryParams, openSms } = useAppSelector(state => state.mentors)
   const studentIds = teachers.map(student => student.id)
@@ -53,6 +55,10 @@ export default function GroupsPage() {
     setError({})
     dispatch(setOpenSms(null))
   }
+
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })
+  }, [user?.active_branch])
 
   const columns: customTableProps[] = [
     {
@@ -178,7 +184,7 @@ export default function GroupsPage() {
           }}
         >
           <Typography variant={isMobile ? 'h6' : 'h5'}>{t('Mentorlar')}</Typography>
-          <Chip label={`${teachersCount || 0}`} variant='outlined' color='primary' size='medium' />
+          <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' size='medium' />
           <FormControlLabel
             control={<Switch onChange={handleChangeStatus} />}
             checked={queryParams.status == 'archive'}

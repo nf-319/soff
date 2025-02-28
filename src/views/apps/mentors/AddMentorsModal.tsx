@@ -29,6 +29,8 @@ import { reversePhone } from 'src/@core/components/phone-input/format-phone-numb
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
 import AmountInput, { revereAmount } from 'src/@core/components/amount-input'
+import { useQueryClient } from '@tanstack/react-query'
+import ceoConfigs from 'src/configs/ceo'
 
 export const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -54,6 +56,7 @@ export default function AddMentorsModal() {
   const dispatch = useAppDispatch()
   const profilePhoto: any = useRef(null)
   const [loading, setLoading] = useState<boolean>(false)
+  const queryClient = useQueryClient()
 
   const validationSchema = () => {
     return Yup.object().shape({
@@ -122,7 +125,7 @@ export default function AddMentorsModal() {
       if (resp.meta.requestStatus === 'rejected') {
         formik.setErrors(resp.payload)
       } else {
-        await dispatch(fetchTeachersList(''))
+        queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })
         formik.resetForm()
         setImage(null)
         toast.success("O'qituvchi muvaffaqiyatli yaratildi")
