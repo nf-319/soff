@@ -144,6 +144,7 @@ export default function GroupsPage() {
 
     return () => {
       dispatch(setOpenEdit(null))
+      dispatch(updateParams({ page: 1 }))
     }
   }, [])
 

@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { useAppDispatch } from 'src/store'
-import { createTeacher, fetchTeachersList } from 'src/store/apps/mentors'
+import { createTeacher, fetchTeachersList, setOpenEdit } from 'src/store/apps/mentors'
 import { CreateTeacherDto } from 'src/types/apps/mentorsTypes'
 import { useEffect, useRef, useState } from 'react'
 import CustomAvatar from 'src/@core/components/mui/avatar'
@@ -31,6 +31,7 @@ import toast from 'react-hot-toast'
 import AmountInput, { revereAmount } from 'src/@core/components/amount-input'
 import { useQueryClient } from '@tanstack/react-query'
 import ceoConfigs from 'src/configs/ceo'
+import { usePost } from 'src/hooks/useApi'
 
 export const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -55,9 +56,8 @@ export default function AddMentorsModal() {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const profilePhoto: any = useRef(null)
-  const [loading, setLoading] = useState<boolean>(false)
   const queryClient = useQueryClient()
-
+  const { mutate, isPending } = usePost()
   const validationSchema = () => {
     return Yup.object().shape({
       first_name: Yup.string().required('Ismingizni kiriting'),
@@ -104,7 +104,6 @@ export default function AddMentorsModal() {
     initialValues,
     validationSchema,
     onSubmit: async (values: CreateTeacherDto) => {
-      setLoading(true)
       dispatch(disablePage(true))
       const newValues = new FormData()
 
@@ -120,18 +119,31 @@ export default function AddMentorsModal() {
         newValues.append('image', image)
       }
 
-      const resp = await dispatch(createTeacher(newValues))
-
-      if (resp.meta.requestStatus === 'rejected') {
-        formik.setErrors(resp.payload)
-      } else {
-        queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })
-        formik.resetForm()
-        setImage(null)
-        toast.success("O'qituvchi muvaffaqiyatli yaratildi")
-      }
-      setLoading(false)
+      mutate(ceoConfigs.create_teacher, newValues, {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })
+          formik.resetForm()
+          setImage(null)
+          dispatch(setOpenEdit(null))
+          toast.success("O'qituvchi muvaffaqiyatli yaratildi")
+          
+        },
+        onError: err => {
+          formik.setErrors(err?.response?.data)
+        }
+      })
       dispatch(disablePage(false))
+      // const resp = await dispatch(createTeacher(newValues))
+
+      // if (resp.meta.requestStatus === 'rejected') {
+      //   formik.setErrors(resp.payload)
+      // } else {
+      //   queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })
+      //   formik.resetForm()
+      //   setImage(null)
+      //   toast.success("O'qituvchi muvaffaqiyatli yaratildi")
+      // }
+      // dispatch(disablePage(false))
     }
   })
 
@@ -217,7 +229,10 @@ export default function AddMentorsModal() {
             value={formik.values.phone}
             error={!!formik.errors.phone && formik.touched.phone}
           />
-          <FormHelperText error>{!!formik.errors.phone && formik.touched.phone && formik.errors.phone}</FormHelperText>
+          <FormHelperText error>
+            {' '}
+            {!!formik.errors.phone && formik.touched.phone && t(formik.errors.phone)}
+          </FormHelperText>
         </FormControl>
 
         <FormControl sx={{ width: '100%' }}>
@@ -337,7 +352,7 @@ export default function AddMentorsModal() {
           )}
         </FormControl>
 
-        <LoadingButton loading={loading} variant='contained' type='submit' fullWidth>
+        <LoadingButton loading={isPending} variant='contained' type='submit' fullWidth>
           {t('Saqlash')}
         </LoadingButton>
       </form>
