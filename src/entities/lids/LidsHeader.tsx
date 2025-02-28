@@ -13,6 +13,7 @@ export const LidsHeader = () => {
   const { push, query } = useRouter()
   const { t } = useTranslation()
   const { isMobile } = useResponsive()
+  const params = new URLSearchParams(window.location.search)
 
   const searchQuery = Array.isArray(query.search) ? query.search[0] : query.search || ''
   const isActiveQuery = Array.isArray(query.is_active) ? query.is_active[0] : query.is_active
@@ -22,11 +23,26 @@ export const LidsHeader = () => {
   const searchVal = useDebounce(search, 800)
 
   useEffect(() => {
-    const params = new URLSearchParams()
-    if (searchVal) params.set('search', searchVal)
-    if (!isActive) params.set('is_active', 'false')
+    const updatedQuery = { ...query }
 
-    push({ pathname: '/lids', query: Object.fromEntries(params) })
+    if (searchVal && searchVal.trim().length > 0) {
+      updatedQuery.search = searchVal
+    } else {
+      delete updatedQuery.search
+    }
+
+    if (!isActive) {
+      updatedQuery.is_active = 'false'
+      delete updatedQuery.id
+      params.delete('id')
+    } else {
+      delete updatedQuery.is_active
+    }
+
+    push({
+      pathname: '/lids',
+      query: updatedQuery
+    })
   }, [searchVal, isActive])
 
   return (

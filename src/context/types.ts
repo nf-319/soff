@@ -25,7 +25,7 @@ export type UserDataType = {
   avatar?: string
   payment_page?: boolean
   balance?: number
-  branches?: string[]
+  branches?: any[]
   active_branch?: any
   qr_code?: string
 }

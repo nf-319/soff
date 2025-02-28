@@ -27,6 +27,7 @@ const Lids = () => {
   const { queryParams } = useSelector((state: RootState) => state.leads)
   const dispatch = useAppDispatch()
   const router = useRouter()
+  const params = new URLSearchParams(window.location.search)
   const { id, is_active } = router.query
   const [selectedTab, setSelectedTab] = useState<number>(0)
   const [currentData, setCurrentData] = useState<DepartmentsResultType | undefined>()
@@ -42,10 +43,17 @@ const Lids = () => {
     if (!leadData || leadData.results.length === 0) return
 
     if (id) {
-      const currentDept = leadData.results.find(item => String(item.id) === String(id))
-      setCurrentData(currentDept)
-    } else if (leadData.results.length > 0) {
+      const index = leadData.results.findIndex(item => String(item.id) === String(id))
+      if (index !== -1) {
+        setCurrentData(leadData.results[index])
+        setSelectedTab(index)
+      }
+    } else {
+      const firstDept = leadData.results[0]
+      setCurrentData(firstDept)
       setSelectedTab(0)
+
+      // Don't update the URL with ID when loading without ID
     }
   }, [leadData, id])
 
@@ -55,17 +63,13 @@ const Lids = () => {
     const selectedDept = leadData.results[newValue]
     setSelectedTab(newValue)
     setCurrentData(selectedDept)
-
-    const updatedQuery = { ...router.query, id: String(selectedDept.id) }
-
-    router.push({ pathname: router.pathname, query: updatedQuery }, undefined, { scroll: false })
   }
 
   const setOpen = (value: 'delete' | 'edit') => {
-    dispatch(setOpenActionModal({ open: value, id: Number(id) }))
+    dispatch(setOpenActionModal({ open: value, id: Number(currentData?.id) }))
   }
 
-  const currentDepartmentId = id || (leadData && leadData.results.length > 0 ? String(leadData.results[0].id) : null)
+  const currentDepartmentId = currentData?.id ? String(currentData.id) : null
 
   return (
     <div>
@@ -128,11 +132,11 @@ const Lids = () => {
         </Box>
       </Box>
 
-      <LeadsKaban />
+      <LeadsKaban defaultId={currentData?.id} />
 
       <EditDepartmentDialog id={Number(currentDepartmentId)} name={''} />
       <CreateDepartmentDialog />
-      <LidsDeleteModal id={parseInt(currentDepartmentId as string)} />
+      <LidsDeleteModal id={currentData?.id as number} />
 
       <CreateDepartmentItemDialog />
 
