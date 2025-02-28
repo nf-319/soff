@@ -521,10 +521,6 @@ export default function UserViewStudentsList() {
             </DialogContent>
           </form>
         </Dialog>
-
-        {/* <Box sx={{ paddingX: '50px' }}>
-          <EmptyContent />
-        </Box> */}
       </Box>
     </Box>
   )

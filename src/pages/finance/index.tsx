@@ -1,10 +1,5 @@
-// ** MUI Imports
 import Grid from '@mui/material/Grid'
-
-// ** Demo Components Imports
 import CardStatisticsLiveVisitors from 'src/views/ui/cards/statistics/CardStatisticsLiveVisitors'
-
-// ** Styled Component Import
 import KeenSliderWrapper from 'src/@core/styles/libs/keen-slider'
 import ApexChartWrapper from 'src/@core/styles/libs/react-apexcharts'
 import {
@@ -20,8 +15,6 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import GroupFinanceTable from 'src/views/apps/finance/GroupTable'
-import IconifyIcon from 'src/@core/components/icon'
 import 'react-datepicker/dist/react-datepicker.css'
 import 'rsuite/DateRangePicker/styles/index.css'
 import { useContext, useEffect, useState } from 'react'
@@ -32,7 +25,6 @@ import api from 'src/@core/utils/api'
 import LoadingButton from '@mui/lab/LoadingButton'
 import FinanceCategories from 'src/views/apps/finance/FinanceCategories'
 import { formatCurrency } from 'src/@core/utils/format-currency'
-import EmptyContent from 'src/@core/components/empty-content'
 import { getMonthFullName } from 'src/@core/utils/gwt-month-name'
 import Router, { useRouter } from 'next/router'
 import StatsPaymentMethods from 'src/views/apps/finance/StatsPaymentMethods'
@@ -41,28 +33,23 @@ import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-
 import HeadingFilter from 'src/views/apps/finance/HeadingFilter'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { getExpenseCategories, getIncomeCategories } from 'src/store/apps/finance'
-import getMonthName from 'src/@core/utils/getMonthName'
 import { AuthContext } from 'src/context/AuthContext'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { toast } from 'react-hot-toast'
+import { EmptyContent } from 'src/@core/components/empty-content'
+import { Close } from '@mui/icons-material'
 
 export function formatDateString(date: Date) {
   const day = String(date.getDate()).padStart(2, '0')
-  const month = String(date.getMonth() + 1).padStart(2, '0') // getMonth() is zero-based
+  const month = String(date.getMonth() + 1).padStart(2, '0')
   const year = date.getFullYear()
 
   return `${year}-${month}-${day}`
 }
-interface Plan {
+type Plan = {
   done_amount: number
   percentage: number
   planned_amount: number
-}
-
-interface FinancialData {
-  all_numbers: {
-    plans: Plan
-  }
 }
 
 const CardStatistics = () => {
@@ -371,6 +358,7 @@ const CardStatistics = () => {
               </Button>
             </Box>
           </Grid>
+
           <div id='chiqimlar'></div>
 
           <Grid item xs={12} md={12}>
@@ -415,9 +403,6 @@ const CardStatistics = () => {
           <Grid item xs={12} md={12}>
             <Box sx={{ display: 'flex', gap: '10px', flexGrow: 1 }}>
               <Typography sx={{ fontSize: '20px', flexGrow: 1 }}>{t('Oyliklar hisoboti')}</Typography>
-              {/* <Link href='/finance/salary-confirm' >
-                                <Button variant='contained'>{t("Oylik ishlash")}</Button>
-                            </Link> */}
             </Box>
 
             <DataTable
@@ -435,8 +420,9 @@ const CardStatistics = () => {
       <Dialog open={open === 'create'} onClose={() => setOpen(null)}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', minWidth: '300px', justifyContent: 'space-between' }}>
           <Typography>{t("Xarajatlar bo'limini yaratish")}</Typography>
-          <IconifyIcon icon={'mdi:close'} onClick={() => setOpen(null)} />
+          <Close onClick={() => setOpen(null)} />
         </DialogTitle>
+
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <TextField
             required
@@ -454,8 +440,10 @@ const CardStatistics = () => {
       <Dialog open={open === 'income'} onClose={() => setOpen(null)}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', minWidth: '300px', justifyContent: 'space-between' }}>
           <Typography>{t("Kirimlar bo'limini yaratish")}</Typography>
-          <IconifyIcon icon={'mdi:close'} onClick={() => setOpen(null)} />
+
+          <Close onClick={() => setOpen(null)} />
         </DialogTitle>
+
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <TextField
             required
@@ -465,6 +453,7 @@ const CardStatistics = () => {
             fullWidth
             onChange={e => setNameVal(e.target.value)}
           />
+
           <LoadingButton loading={loading} onClick={() => createIncomeCategroy()} variant='contained'>
             {t('Saqlash')}
           </LoadingButton>

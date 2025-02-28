@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import { useRouter } from 'next/router'
 import { ReactNode, useEffect } from 'react'
 import SubLoader from 'src/views/apps/loaders/SubLoader'
-import EmptyContent from '../empty-content'
+import { EmptyContent } from '../empty-content'
 import { fetchDepartmentList } from 'src/store/apps/leads'
 import { useAppDispatch } from 'src/store'
 
@@ -43,7 +43,7 @@ export default function StudentsDataTable({
   }
     useEffect(() => {
         dispatch(fetchDepartmentList())
-      
+
     }, [])
 
   return (

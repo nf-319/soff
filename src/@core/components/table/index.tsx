@@ -4,7 +4,7 @@ import { Box, Skeleton } from '@mui/material'
 import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
 import { Placeholder } from 'react-bootstrap'
-import EmptyContent from '../empty-content'
+import { EmptyContent } from '../empty-content'
 
 export type customTableDataProps = {
   xs: number

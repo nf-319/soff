@@ -62,6 +62,11 @@ const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
 
 disableCache('all')
 
+const QUERY_RETRY_COUNT = 1
+const SECONDS_IN_MS = 1000
+const STALE_TIME_SECONDS = 5
+const STALE_TIME_MS = STALE_TIME_SECONDS * SECONDS_IN_MS
+
 const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: ExtendedAppProps) => {
   const contentHeightFixed = Component.contentHeightFixed ?? false
   const getLayout =
@@ -74,10 +79,13 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 1000 * 60 * 5,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
         refetchOnWindowFocus: false,
-      },
-    },
+        retry: QUERY_RETRY_COUNT,
+        staleTime: STALE_TIME_MS
+      }
+    }
   })
 
   function MyHead() {
@@ -123,8 +131,6 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
           </AuthProvider>
         </CacheProvider>
       </Provider>
-
-      
     </QueryClientProvider>
   )
 }
