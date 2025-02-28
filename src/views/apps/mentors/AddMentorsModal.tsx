@@ -126,7 +126,7 @@ const AddMentorsModal = () => {
           setImage(null)
           dispatch(setOpenEdit(null))
           toast.success("O'qituvchi muvaffaqiyatli yaratildi")
-          
+
         },
         onError: err => {
           formik.setErrors(err?.response?.data)
