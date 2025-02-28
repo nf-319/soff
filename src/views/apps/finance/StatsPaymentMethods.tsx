@@ -1,7 +1,7 @@
 import { Box, Chip, Grid, Skeleton, Typography } from '@mui/material'
 import { Briefcase, Wallet } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import EmptyContent from 'src/@core/components/empty-content'
+import { EmptyContent } from 'src/@core/components/empty-content'
 import ReactApexcharts from 'src/@core/components/react-apexcharts'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'

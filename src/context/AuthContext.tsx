@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState, ReactNode, useLayoutEffect } from 'react'
+import {createContext, useEffect, useState, FC, PropsWithChildren} from 'react'
 
 import { useRouter } from 'next/router'
 
@@ -26,11 +26,7 @@ const defaultProvider: AuthValuesType = {
 
 const AuthContext = createContext(defaultProvider)
 
-type Props = {
-  children: ReactNode
-}
-
-const AuthProvider = ({ children }: Props) => {
+const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
   const { i18n } = useTranslation()
@@ -52,7 +48,7 @@ const AuthProvider = ({ children }: Props) => {
         payment_page: response.data.payment_page,
         role: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()),
         balance: response.data?.balance || 0,
-        branches: response.data.branches.filter((item: any) => item.exists === true),
+        branches: response.data.branches,
         active_branch: response.data.active_branch,
         qr_code: response.data.qr_code
       })
@@ -93,7 +89,7 @@ const AuthProvider = ({ children }: Props) => {
             payment_page: response.data.payment_page,
             role: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()),
             balance: response.data?.balance || 0,
-            branches: response.data.branches.filter((item: any) => item.exists === true),
+            branches: response.data.branches,
             active_branch: response.data.active_branch,
             qr_code: response.data.qr_code
           })
@@ -186,7 +182,7 @@ const AuthProvider = ({ children }: Props) => {
           payment_page: response.data.payment_page,
           role: userRoles,
           balance: response.data?.balance || 0,
-          branches: response.data.branches.filter((item: any) => item.exists === true),
+          branches: response.data?.branches,
           active_branch: response.data.active_branch
         })
         reloadProfile()

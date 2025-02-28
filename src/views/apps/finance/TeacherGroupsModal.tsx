@@ -13,7 +13,7 @@ import {
   Typography,
   Skeleton
 } from '@mui/material'
-import EmptyContent from 'src/@core/components/empty-content'
+import { EmptyContent } from 'src/@core/components/empty-content'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setCalculatedSalary } from 'src/store/apps/finance'
@@ -183,7 +183,7 @@ export default function TeacherGroupsModal() {
                                   <TableCell>Id</TableCell>
                                   <TableCell>FIO</TableCell>
                                   <TableCell>Darslar</TableCell>
-                                  <TableCell>Chegirma</TableCell>
+                                  <TableCell>Jarima</TableCell>
                                   <TableCell>To'langan summa</TableCell>
                                   <TableCell>O'qituvchi ulushi</TableCell>
                                   <TableCell>O'chirish</TableCell>

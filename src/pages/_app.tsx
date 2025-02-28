@@ -1,10 +1,7 @@
 import { ReactNode } from 'react'
-import Head from 'next/head'
 import { Router } from 'next/router'
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
-import { store, useAppSelector } from 'src/store'
-import { Provider } from 'react-redux'
 import NProgress from 'nprogress'
 import { CacheProvider } from '@emotion/react'
 import type { EmotionCache } from '@emotion/cache'
@@ -33,7 +30,8 @@ import 'prismjs/components/prism-tsx'
 import 'react-perfect-scrollbar/dist/css/styles.css'
 
 import './globals.css'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Providers } from 'src/providers'
+import { MyHead } from 'src/@core/components/Head'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -71,61 +69,36 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
   const guestGuard = Component.guestGuard ?? false
   const aclAbilities = Component.acl ?? defaultACLObj
 
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 1000 * 60 * 5,
-        refetchOnWindowFocus: false,
-      },
-    },
-  })
-
-  function MyHead() {
-    const { companyInfo } = useAppSelector(state => state.user)
-
-    return (
-      <Head>
-        <meta name='robots' content='noindex, nofollow' />
-        <title>{`${companyInfo.training_center_name} - Taʼlim tizimini nazorat qilish platformasi`}</title>
-        <link rel='shortcut icon' href={companyInfo.logo} />
-      </Head>
-    )
-  }
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <Provider store={store}>
-        <CacheProvider value={emotionCache}>
-          <MyHead />
+    <Providers>
+      <CacheProvider value={emotionCache}>
+        <MyHead />
 
-          <AuthProvider>
-            <DisabledProvider>
-              <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
-                <SettingsConsumer>
-                  {({ settings }) => (
-                    <ThemeComponent settings={settings}>
-                      <WindowWrapper>
-                        <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                          <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
-                            {getLayout(<Component {...pageProps} />)}
-                          </AclGuard>
-                        </Guard>
-                      </WindowWrapper>
+        <AuthProvider>
+          <DisabledProvider>
+            <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
+              <SettingsConsumer>
+                {({ settings }) => (
+                  <ThemeComponent settings={settings}>
+                    <WindowWrapper>
+                      <Guard authGuard={authGuard} guestGuard={guestGuard}>
+                        <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
+                          {getLayout(<Component {...pageProps} />)}
+                        </AclGuard>
+                      </Guard>
+                    </WindowWrapper>
 
-                      <ReactHotToast>
-                        <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
-                      </ReactHotToast>
-                    </ThemeComponent>
-                  )}
-                </SettingsConsumer>
-              </SettingsProvider>
-            </DisabledProvider>
-          </AuthProvider>
-        </CacheProvider>
-      </Provider>
-
-      
-    </QueryClientProvider>
+                    <ReactHotToast>
+                      <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
+                    </ReactHotToast>
+                  </ThemeComponent>
+                )}
+              </SettingsConsumer>
+            </SettingsProvider>
+          </DisabledProvider>
+        </AuthProvider>
+      </CacheProvider>
+    </Providers>
   )
 }
 

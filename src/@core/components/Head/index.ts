@@ -1,0 +1,1 @@
+export { MyHead } from './Head'

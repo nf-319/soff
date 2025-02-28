@@ -1,14 +1,14 @@
 'use client'
+
 import { Box, Button, Chip, FormControlLabel, Pagination, Switch, Typography } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import IconifyIcon from 'src/@core/components/icon'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { fetchTeachersList, updateParams, setOpenEdit, setOpenSms } from 'src/store/apps/mentors'
+import { updateParams, setOpenEdit, setOpenSms } from 'src/store/apps/mentors'
 import { formatCurrency } from 'src/@core/utils/format-currency'
-import { videoUrls } from 'src/@core/components/video-header/video-header'
-import dynamic from 'next/dynamic'
+import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { AuthContext } from 'src/context/AuthContext'
 import { toast } from 'react-hot-toast'
@@ -17,13 +17,15 @@ import { ModalTypes, SendSMSModal } from 'src/views/apps/students/view/UserViewL
 import { fetchSmsList } from 'src/store/apps/settings'
 import RowOptions from 'src/views/apps/mentors/RowOptions'
 import TeacherCreateDialog from 'src/views/apps/mentors/TeacherCreateDialog'
+import { useGet } from 'src/hooks/useApi'
+import ceoConfigs from 'src/configs/ceo'
+import { useQueryClient } from '@tanstack/react-query'
 
-const TeacherAvatar = dynamic(() => import('src/views/apps/mentors/AddMentorsModal').then(mod => mod.TeacherAvatar))
-const TeacherEditDialog = dynamic(() => import('src/views/apps/mentors/TeacherEditDialog'))
-const VideoHeader = dynamic(() => import('src/@core/components/video-header/video-header'))
-const DataTable = dynamic(() => import('src/@core/components/table'))
+import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
+import TeacherEditDialog from 'src/views/apps/mentors/TeacherEditDialog'
+import DataTable from 'src/@core/components/table'
 
-export interface customTableProps {
+export type customTableProps = {
   xs: number
   title: string
   dataIndex?: string | ReactNode
@@ -36,19 +38,25 @@ export default function GroupsPage() {
   const dispatch = useAppDispatch()
   const { isMobile } = useResponsive()
   const { user } = useContext(AuthContext)
-  const [error, setError] = useState<any>({})
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { smsTemps, getSMSTemps } = useSMS()
-  const { teachers, teachersCount, queryParams, isLoading, openSms } = useAppSelector(state => state.mentors)
+  const { teachers, queryParams, openSms } = useAppSelector(state => state.mentors)
   const studentIds = teachers.map(student => student.id)
+
   const handleEditClickOpen = (value: ModalTypes) => {
     dispatch(setOpenSms(value))
   }
+
+  const { data, isLoading } = useGet(ceoConfigs.teachers, { params: queryParams, deps: ['mentors'] })
+
   const handleEditClose = () => {
-    setError({})
     dispatch(setOpenSms(null))
   }
-  const date = new Date().toLocaleDateString()
+
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })
+  }, [user?.active_branch])
 
   const columns: customTableProps[] = [
     {
@@ -84,13 +92,7 @@ export default function GroupsPage() {
       xs: 1.7,
       title: t('Doimiy oylik'),
       dataIndex: 'amount',
-      render: amount => {
-        if (!isNaN(Number(amount))) {
-          return `${formatCurrency(amount)} UZS`
-        } else {
-          return '*****'
-        }
-      }
+      render: amount => (!isNaN(Number(amount)) ? `${formatCurrency(amount)} UZS` : '*****')
     },
     {
       xs: 1.7,
@@ -112,7 +114,6 @@ export default function GroupsPage() {
       xs: 1,
       dataIndex: 'id',
       title: '',
-      // title: <Button onClick={() => push("/employee-attendance")} variant='outlined'>{t("Davomat")}</Button>,
       render: actions => <RowOptions id={actions} status={queryParams?.status} />
     }
   ]
@@ -131,28 +132,19 @@ export default function GroupsPage() {
       router.push('/')
       toast.error('Sahifaga kirish huquqingiz yoq!')
     }
-    const queryString = new URLSearchParams({
-      ...queryParams,
-      page: String(queryParams.page),
-      status: String(queryParams.status)
-    }).toString()
-    dispatch(fetchTeachersList(queryString))
 
     return () => {
       dispatch(setOpenEdit(null))
+      dispatch(updateParams({ page: 1 }))
     }
   }, [])
 
   const handlePagination = async (page: number) => {
     dispatch(updateParams({ page }))
-    const queryString = new URLSearchParams({ ...queryParams, page: String(page) }).toString()
-    await dispatch(fetchTeachersList(queryString))
   }
 
   const handleChangeStatus = async (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
     dispatch(updateParams({ status: checked ? 'archive' : 'active', page: 1 }))
-    const queryString = new URLSearchParams({ status: checked ? 'archive' : 'active', page: '1' }).toString()
-    await dispatch(fetchTeachersList(queryString))
   }
 
   useEffect(() => {
@@ -162,7 +154,6 @@ export default function GroupsPage() {
   return (
     <div>
       <VideoHeader item={videoUrls.teachers} />
-
       <Box
         className='groups-page-header'
         sx={{
@@ -179,15 +170,14 @@ export default function GroupsPage() {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            // flexDirection: isMobile ? 'column' : 'row',
             gap: isMobile ? '5px' : '10px'
           }}
         >
           <Typography variant={isMobile ? 'h6' : 'h5'}>{t('Mentorlar')}</Typography>
-          <Chip label={`${teachersCount || 0}`} variant='outlined' color='primary' size='medium' />
+          <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' size='medium' />
           <FormControlLabel
             control={<Switch onChange={handleChangeStatus} />}
-            checked={queryParams.status === 'archive'}
+            checked={queryParams.status == 'archive'}
             label={t('archive')}
             sx={{ marginLeft: isMobile ? '0' : '10px' }}
           />
@@ -224,13 +214,11 @@ export default function GroupsPage() {
           </Button>
         </Box>
       </Box>
-
-      <DataTable loading={isLoading} columns={columns} data={teachers} rowClick={rowClick} />
-
-      {Math.ceil(teachersCount / 10) > 1 && !isLoading && (
+      <DataTable loading={isLoading} columns={columns} data={data?.results} rowClick={rowClick} />
+      {Math.ceil(data?.count / 10) > 1 && !isLoading && (
         <Pagination
           defaultPage={Number(queryParams.page)}
-          count={Math.ceil(teachersCount / 10)}
+          count={Math.ceil(data?.count / 10)}
           variant='outlined'
           shape='rounded'
           onChange={(e: any, page) => handlePagination(page)}
@@ -242,9 +230,7 @@ export default function GroupsPage() {
         />
       )}
       <TeacherCreateDialog />
-
       <TeacherEditDialog />
-
       <SendSMSModal
         handleEditClose={handleEditClose}
         openEdit={openSms}

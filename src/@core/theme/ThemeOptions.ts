@@ -1,4 +1,4 @@
-// ** MUI Theme Provider
+// ** MUI Theme Providers
 import { deepmerge } from '@mui/utils'
 import { ThemeOptions } from '@mui/material'
 

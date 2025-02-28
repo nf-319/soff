@@ -1,4 +1,3 @@
-// ** Next Import
 import Document, { Html, Head, Main, NextScript } from 'next/document'
 
 class CustomDocument extends Document {
@@ -63,6 +62,7 @@ class CustomDocument extends Document {
             ''
           )}
         </Head>
+
         <body>
           <Main />
           <NextScript />

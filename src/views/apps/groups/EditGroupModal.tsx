@@ -21,7 +21,7 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import SubLoader from '../loaders/SubLoader'
-import EmptyContent from 'src/@core/components/empty-content'
+import { EmptyContent } from 'src/@core/components/empty-content'
 import Calendar from './Calendar'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
@@ -38,20 +38,22 @@ import { getMontNumber } from 'src/@core/utils/gwt-month-name'
 import api from 'src/@core/utils/api'
 
 export default function EditGroupModal() {
-  const { isOpenEdit,teachersData,roomsData, groupData, courses, initialValues, formParams, queryParams, isGettingGroupDetails } =
-    useAppSelector(state => state.groups)
+  const {
+    isOpenEdit,
+    teachersData,
+    roomsData,
+    groupData,
+    courses,
+    initialValues,
+    formParams,
+    queryParams,
+    isGettingGroupDetails
+  } = useAppSelector(state => state.groups)
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [customWeekdays, setCustomWeekDays] = useState<string[]>([])
   const { query } = useRouter()
-
-
-  
-  
-
-
-  
 
   const options = roomsData?.map(item => ({
     label: item?.name,
@@ -93,10 +95,9 @@ export default function EditGroupModal() {
 
       if (response.meta.requestStatus === 'rejected') {
         formik.setErrors(response.payload)
-        console.log(response.payload);
-        
+        console.log(response.payload)
+
         toast.error(response.payload.msg)
-        
       } else {
         dispatch(updateParams({ is_recovery: false }))
         toast.success(t("O'zgrishlar muvafaqqiyati saqlandi"))
@@ -135,7 +136,7 @@ export default function EditGroupModal() {
 
   const handleChangeField = async (
     name: string,
-    event: SelectChangeEvent<string> | ChangeEvent<HTMLInputElement> | string 
+    event: SelectChangeEvent<string> | ChangeEvent<HTMLInputElement> | string
   ) => {
     formik.setFieldValue(name, event?.target?.value || event)
     if (name == 'teacher') {
@@ -218,7 +219,6 @@ export default function EditGroupModal() {
       dispatch(updateParams({ is_recovery: false }))
     }
   }, [])
-  
 
   return (
     <Drawer open={isOpenEdit} hideBackdrop anchor='right' variant='temporary' sx={{ width: '100%' }}>
@@ -368,37 +368,36 @@ export default function EditGroupModal() {
                   </Box>
                 ) : (
                   ''
-                  )}
-                   <FormControl fullWidth>
-              <InputLabel size='small' id='user-view-language-label'>
-                  {t("Xona")}
-                </InputLabel>
-                <Select
-                  size='small'
-                  label={t("Xona")}
-                  id='user-view-language'
-                  labelId='user-view-language-label'
-                  name='room'
-                  onChange={e => handleChangeField('room', e)}
-                  onBlur={formik.handleBlur}
-                  value={formik.values?.room}
-                  error={!!formik.errors.room && !!formik.touched.room}
-                >
-                  {roomsData?.map(room => (
-                    <MenuItem key={room.id} value={+room.id}>
-                      {room.name}
+                )}
+                <FormControl fullWidth>
+                  <InputLabel size='small' id='user-view-language-label'>
+                    {t('Xona')}
+                  </InputLabel>
+                  <Select
+                    size='small'
+                    label={t('Xona')}
+                    id='user-view-language'
+                    labelId='user-view-language-label'
+                    name='room'
+                    onChange={e => handleChangeField('room', e)}
+                    onBlur={formik.handleBlur}
+                    value={formik.values?.room}
+                    error={!!formik.errors.room && !!formik.touched.room}
+                  >
+                    {roomsData?.map(room => (
+                      <MenuItem key={room.id} value={+room.id}>
+                        {room.name}
+                      </MenuItem>
+                    ))}
+                    <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router?.push('/settings/office/rooms')}>
+                      {t('Yangi yaratish')}
+                      <IconifyIcon icon={'ion:add-sharp'} />
                     </MenuItem>
-                  ))}
-                  <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router?.push('/settings/office/rooms')}>
-                    {t('Yangi yaratish')}
-                    <IconifyIcon icon={'ion:add-sharp'} />
-                  </MenuItem>
-                </Select>
-                <FormHelperText error={!!formik.errors.room && !!formik.touched.room}>
-                  {!!formik.errors.room && !!formik.touched.room && formik.errors.room}
-                </FormHelperText>
-              </FormControl>
-
+                  </Select>
+                  <FormHelperText error={!!formik.errors.room && !!formik.touched.room}>
+                    {!!formik.errors.room && !!formik.touched.room && formik.errors.room}
+                  </FormHelperText>
+                </FormControl>
 
                 {/* <FormControl fullWidth>
                   <Autocomplete

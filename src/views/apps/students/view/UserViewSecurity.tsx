@@ -21,7 +21,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useContext, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import EmptyContent from 'src/@core/components/empty-content'
+import { EmptyContent } from 'src/@core/components/empty-content'
 import IconifyIcon from 'src/@core/components/icon'
 import DataTable from 'src/@core/components/table'
 import useResponsive from 'src/@core/hooks/useResponsive'
@@ -307,7 +307,6 @@ const UserViewSecurity = () => {
     await dispatch(fetchStudentDetail(Number(query?.student)))
   }
 
-
   useEffect(() => {
     if (query?.student) {
       dispatch(fetchStudentGroups(query?.student))
@@ -336,7 +335,7 @@ const UserViewSecurity = () => {
                   display: 'flex',
                   alignItems: 'center',
                   transition: 'color 0.3s ease, background-color 0.3s ease',
-                  padding:'5px',
+                  padding: '5px',
                   borderRadius: '50%',
                   '&:hover': {
                     color: 'gray',
@@ -391,7 +390,6 @@ const UserViewSecurity = () => {
                   {t('Tahrirlash')}
                 </MenuItem>
               </Menu>
-           
 
               <Link
                 href={`/groups/view/security/?id=${group.group_id}&month=${getMontName(null)}`}
@@ -679,12 +677,12 @@ const UserViewSecurity = () => {
       {/*<AddNote id={query.id} modalRef={modalRef} setModalRef={setModalRef} />
       <SentSMS smsTemps={smsTemps} id={query.id} modalRef={modalRef} setModalRef={setModalRef} />*/}
       <ExportDetailStudent id={group_data?.id} modalRef={modalRef} setModalRef={setModalRef} />
-         <StudentPaymentForm
-                student_id={query.id}
-                group={group_data?.group_id}
-                openEdit={openEdit}
-                setOpenEdit={setOpenEdit}
-              />
+      <StudentPaymentForm
+        student_id={query.id}
+        group={group_data?.group_id}
+        openEdit={openEdit}
+        setOpenEdit={setOpenEdit}
+      />
     </Box>
   )
 }

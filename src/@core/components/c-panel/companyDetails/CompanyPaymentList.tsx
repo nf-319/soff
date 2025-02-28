@@ -58,6 +58,7 @@ export default function CompanyPaymentList({ }: Props) {
             dataIndex: 'date',
             render: (date) => date
         },
+        
         {
             xs: 0.3,
             title: t("Izoh"),

@@ -9,16 +9,27 @@ import { useAppDispatch } from 'src/store'
 import { fetchDepartmentList, setDragonLoading, setLeadItems } from 'src/store/apps/leads'
 import api from 'src/@core/utils/api'
 import toast from 'react-hot-toast'
+import { QueryClient, QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
+import { LeadsType } from 'src/entities/lids'
+import { LeadsResult } from 'src/entities/lids/LeadsKaban'
 
 type Props = {
-  setLoading: (status: boolean) => void,
+  setLoading: (status: boolean) => void
   loading: boolean
   setOpenDialog: any
   id: number
+  refetch?: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
   defaultName: string
 }
 
-export default function EditDepartmentItemForm({ setLoading, setOpenDialog, loading, id, defaultName }: Props) {
+export default function EditDepartmentItemForm({
+  setLoading,
+  setOpenDialog,
+  refetch,
+  loading,
+  id,
+  defaultName
+}: Props) {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const query = window.location?.search?.split('?slug=')[1]
@@ -52,6 +63,9 @@ export default function EditDepartmentItemForm({ setLoading, setOpenDialog, load
         if (response.status == 200) {
           setLoading(false)
           setOpenDialog(null)
+          if (refetch) {
+            await refetch()
+          }
           await dispatch(fetchDepartmentList())
           await handleGetLealdItems()
           formik.resetForm()
@@ -64,14 +78,11 @@ export default function EditDepartmentItemForm({ setLoading, setOpenDialog, load
     }
   })
 
-  
-
   useEffect(() => {
     return () => {
       formik.resetForm()
     }
   }, [])
-
 
   return (
     <form

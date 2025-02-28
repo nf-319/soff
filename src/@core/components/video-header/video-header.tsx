@@ -1,3 +1,5 @@
+'use client'
+
 import { Box, Button } from '@mui/material'
 import IconifyIcon from '../icon'
 import { useAppDispatch } from 'src/store'
@@ -5,7 +7,7 @@ import { openVideoModal } from 'src/store/apps/settings'
 import { useTranslation } from 'react-i18next'
 import useResponsive from 'src/@core/hooks/useResponsive'
 
-interface VideoType {
+type VideoType = {
   title: string
   url: string
 }
@@ -95,10 +97,11 @@ export const videoUrls: {
     url: 'https://www.youtube.com/embed/j3EAsc_EFPE?si=Wj_f8-LyMToTLOmG'
   }
 }
-
-export default function VideoHeader({ item }: { item: VideoType }) {
+const VideoHeader = ({ item }: { item: VideoType }) => {
   const dispatch = useAppDispatch()
   const { isMobile } = useResponsive()
+  const { t } = useTranslation()
+
   const clickBtn = () => {
     dispatch(
       openVideoModal({
@@ -107,14 +110,13 @@ export default function VideoHeader({ item }: { item: VideoType }) {
       })
     )
   }
-  const { t } = useTranslation()
 
   return (
-    <Box sx={{ marginBottom: '10px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Button
         fullWidth={isMobile}
         onClick={clickBtn}
-        size='small'
+        size='medium'
         variant='outlined'
         sx={{ textTransform: 'unset', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '3px' }}
       >
@@ -124,3 +126,6 @@ export default function VideoHeader({ item }: { item: VideoType }) {
     </Box>
   )
 }
+
+VideoHeader.displayName = 'VideoHeader'
+export default VideoHeader
