@@ -12,7 +12,8 @@ import {
   fetchStudentDetail,
   fetchStudentsList,
   setOpenEdit,
-  updateStudent
+  updateStudent,
+  updateStudentParams
 } from 'src/store/apps/students'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 
@@ -55,6 +56,7 @@ export default function StudentRowOptions({ id }: Props) {
     await dispatch(updateStudent({ id, status: 'active' }))
     dispatch(disablePage(false))
     toast.success("O'quvchi muvaffaqiyatli aktivlashtirildi")
+    dispatch(updateStudentParams({ status: 'active' }))
     await dispatch(fetchStudentsList({ status: 'active' }))
     setLoading(false)
   }

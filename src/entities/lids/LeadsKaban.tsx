@@ -172,10 +172,11 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
           overflow: 'auto',
           flexDirection: isMobile ? 'column' : 'row',
           alignItems: 'start',
-          height: 'calc(100vh - 360px)',
+          height: '100%',
           gap: 20
         }}
       >
+        
         {displayData?.results?.length ? (
           displayData.results.map(section => (
             <Droppable key={section?.id} droppableId={String(section?.id)}>

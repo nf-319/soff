@@ -196,7 +196,6 @@ export default function GroupsPage() {
         return
       }
 
-      // dispatch(updateStudentParams({ offset: 0,limit:10 }))
       await dispatch(fetchStudentsList({ ...queryParams }))
     }
 
@@ -204,7 +203,7 @@ export default function GroupsPage() {
 
     return () => {
       dispatch(setOpenEdit(null))
-      dispatch(resetStudentsState())
+      dispatch(updateStudentParams({ limit: '10', offset: '0' }))
     }
   }, [])
 

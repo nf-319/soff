@@ -75,40 +75,33 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
 
   const handleSearch = (value: string) => {
     dispatch(updateStudentParams({ search: value }))
-    dispatch(fetchStudentsList(queryParams))
   }
 
   async function handleFilter(key: string, value: string | number | null) {
     dispatch(updateStudentParams({ [key]: value }))
-    dispatch(fetchStudentsList(queryParams))
-
+    
+    if (key == 'status') {
+      dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
+    }
     if (key === 'debt_date') {
       setIsActive(false)
       dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '', debt_date: `${value}` }))
-      dispatch(fetchStudentsList(queryParams))
     } else if (key === 'amount') {
       if (value === 'is_debtor') {
         setIsActive(false)
         dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '' }))
-        dispatch(fetchStudentsList(queryParams))
       } else if (value === 'not_in_debt') {
         setIsActive(false)
         dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: true }))
-        dispatch(fetchStudentsList(queryParams))
       }
       if (value === 'last_payment') {
         setIsActive(true)
         dispatch(updateStudentParams({ last_payment: true, is_debtor: '', not_in_debt: '' }))
-        dispatch(fetchStudentsList(queryParams))
       } else if (value === 'all') {
         setIsActive(true)
         dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '' }))
-        dispatch(fetchStudentsList(queryParams))
       }
       return
-    }
-    if (key === 'status') {
-      dispatch(updateStudentParams({ group_status: '', status: value,offset:0 }))
     }
   }
 
@@ -134,7 +127,6 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
     value: item?.id
   }))
 
-  
   useEffect(() => {
     dispatch(fetchStudentsList(queryParams))
   }, [queryParams])
