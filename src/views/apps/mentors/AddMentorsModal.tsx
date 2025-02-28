@@ -48,7 +48,7 @@ export const TeacherAvatar = styled(CustomAvatar)<AvatarProps>(({ theme }) => ({
   marginRight: theme.spacing(4)
 }))
 
-export default function AddMentorsModal() {
+const AddMentorsModal = () => {
   const [image, setImage] = useState<any>(null)
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
@@ -341,3 +341,6 @@ export default function AddMentorsModal() {
     </Box>
   )
 }
+
+AddMentorsModal.displayName = 'AddMentorsModal'
+export default AddMentorsModal

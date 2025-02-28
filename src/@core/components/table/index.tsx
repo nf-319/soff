@@ -2,7 +2,7 @@
 
 import { Box, Skeleton } from '@mui/material'
 import { useRouter } from 'next/router'
-import { ReactNode } from 'react'
+import { FC, ReactNode } from 'react'
 import { Placeholder } from 'react-bootstrap'
 import { EmptyContent } from '../empty-content'
 
@@ -27,7 +27,7 @@ type DataTableProps = {
   loading?: boolean
 }
 
-export default function DataTable({ columns, loading = false, data, minWidth, maxWidth, rowClick }: DataTableProps) {
+const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidth, maxWidth, rowClick }) => {
   const { query } = useRouter()
   function extractColors(str: string) {
     if (str) {
@@ -137,3 +137,6 @@ export default function DataTable({ columns, loading = false, data, minWidth, ma
     </div>
   )
 }
+
+
+export default DataTable

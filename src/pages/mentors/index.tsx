@@ -1,4 +1,5 @@
 'use client'
+
 import { Box, Button, Chip, FormControlLabel, Pagination, Switch, Typography } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import IconifyIcon from 'src/@core/components/icon'
@@ -7,8 +8,7 @@ import { useRouter } from 'next/router'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchTeachersList, updateParams, setOpenEdit, setOpenSms } from 'src/store/apps/mentors'
 import { formatCurrency } from 'src/@core/utils/format-currency'
-import { videoUrls } from 'src/@core/components/video-header/video-header'
-import dynamic from 'next/dynamic'
+import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { AuthContext } from 'src/context/AuthContext'
 import { toast } from 'react-hot-toast'
@@ -17,11 +17,9 @@ import { ModalTypes, SendSMSModal } from 'src/views/apps/students/view/UserViewL
 import { fetchSmsList } from 'src/store/apps/settings'
 import RowOptions from 'src/views/apps/mentors/RowOptions'
 import TeacherCreateDialog from 'src/views/apps/mentors/TeacherCreateDialog'
-
-const TeacherAvatar = dynamic(() => import('src/views/apps/mentors/AddMentorsModal').then(mod => mod.TeacherAvatar))
-const TeacherEditDialog = dynamic(() => import('src/views/apps/mentors/TeacherEditDialog'))
-const VideoHeader = dynamic(() => import('src/@core/components/video-header/video-header'))
-const DataTable = dynamic(() => import('src/@core/components/table'))
+import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
+import TeacherEditDialog from 'src/views/apps/mentors/TeacherEditDialog'
+import DataTable from 'src/@core/components/table/attandanceTable'
 
 export interface customTableProps {
   xs: number
@@ -36,16 +34,15 @@ export default function GroupsPage() {
   const dispatch = useAppDispatch()
   const { isMobile } = useResponsive()
   const { user } = useContext(AuthContext)
-  const [error, setError] = useState<any>({})
   const router = useRouter()
   const { smsTemps, getSMSTemps } = useSMS()
   const { teachers, teachersCount, queryParams, isLoading, openSms } = useAppSelector(state => state.mentors)
   const studentIds = teachers.map(student => student.id)
+
   const handleEditClickOpen = (value: ModalTypes) => {
     dispatch(setOpenSms(value))
   }
   const handleEditClose = () => {
-    setError({})
     dispatch(setOpenSms(null))
   }
   const date = new Date().toLocaleDateString()
@@ -84,13 +81,7 @@ export default function GroupsPage() {
       xs: 1.7,
       title: t('Doimiy oylik'),
       dataIndex: 'amount',
-      render: amount => {
-        if (!isNaN(Number(amount))) {
-          return `${formatCurrency(amount)} UZS`
-        } else {
-          return '*****'
-        }
-      }
+      render: amount => (!isNaN(Number(amount)) ? `${formatCurrency(amount)} UZS` : '*****')
     },
     {
       xs: 1.7,
