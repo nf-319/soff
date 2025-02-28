@@ -12,6 +12,8 @@ import { Skeleton, Tooltip } from '@mui/material'
 import { updateStudentParams } from 'src/store/apps/students'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { useGet } from 'src/hooks/useApi'
+import { AuthContext } from 'src/context/AuthContext'
+import { useContext, useEffect } from 'react'
 
 const DashboardStats = () => {
   const { statsData, isStatsLoading } = useAppSelector(state => state.dashboard)
@@ -20,7 +22,13 @@ const DashboardStats = () => {
   const { isMobile, isTablet } = useResponsive()
   const { push } = useRouter()
   const { t } = useTranslation()
-  const { data: stats, isLoading } = useGet('common/dashboard/statistic-list/')
+  const { user } = useContext(AuthContext)
+  
+  const { data: stats, isLoading, refetch } = useGet('common/dashboard/statistic-list/')
+  
+  useEffect(() => {
+    refetch()
+  },[user?.active_branch])
 
   function click(link: string) {
     if (link === 'debtors_amount') {
