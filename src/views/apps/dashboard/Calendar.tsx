@@ -13,7 +13,9 @@ import { fetchLessons, updateWeeks } from 'src/store/apps/dashboard'
 import Skeleton from '@mui/material/Skeleton'
 import { Divider } from '@mui/material'
 import { useGet } from 'src/hooks/useApi'
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { useAuth } from 'src/hooks/useAuth'
+import { AuthContext } from 'src/context/AuthContext'
 
 const Calendar = () => {
   const dispatch = useAppDispatch()
@@ -21,14 +23,19 @@ const Calendar = () => {
   const [queryParams, setQueryParams] = useState<string>(String(weeks))
   const { settings } = useSettings()
   const { skin } = settings
+  const { user } = useContext(AuthContext)
   const mdAbove = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'))
-  const { data, isLoading } = useGet('common/dashboard/', {
+  const { data, isLoading, refetch } = useGet('common/dashboard/', {
     params: { day_of_week: queryParams, interval }
   })
   const handleUpdateWeekDays = async (weekDays: string[]) => {
     dispatch(updateWeeks(weekDays))
     setQueryParams(weekDays.toString())
   }
+
+  useEffect(() => {
+    refetch()
+  }, [user?.active_branch])
 
   return (
     <CalendarWrapper
