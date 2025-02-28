@@ -183,7 +183,7 @@ export default function TeacherGroupsModal() {
                                   <TableCell>Id</TableCell>
                                   <TableCell>FIO</TableCell>
                                   <TableCell>Darslar</TableCell>
-                                  <TableCell>Chegirma</TableCell>
+                                  <TableCell>Jarima</TableCell>
                                   <TableCell>To'langan summa</TableCell>
                                   <TableCell>O'qituvchi ulushi</TableCell>
                                   <TableCell>O'chirish</TableCell>
