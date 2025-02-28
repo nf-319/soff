@@ -9,9 +9,8 @@ import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-hot-toast'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { deleteTeacher, fetchTeacherdetail, fetchTeachersList, setOpenEdit, updateParams } from 'src/store/apps/mentors'
+import { fetchTeacherdetail, fetchTeachersList, setOpenEdit, updateParams } from 'src/store/apps/mentors'
 import { disablePage } from 'src/store/apps/page'
-import { editEmployeeStatus } from 'src/store/apps/settings'
 import { SendSMSModal } from '../students/view/UserViewLeft'
 import useSMS from 'src/hooks/useSMS'
 import { useDelete, useGet, usePatch } from 'src/hooks/useApi'
@@ -26,12 +25,11 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
   const { queryParams } = useAppSelector(state => state.mentors)
   const dispatch = useAppDispatch()
   const [openSms, setOpenSms] = useState<any>()
-  const [loading, setLoading] = useState<boolean>(false)
   const rowOptionsOpen = Boolean(anchorEl)
   const { smsTemps, getSMSTemps } = useSMS()
   const { mutate: editMutate, isPending: editPending } = usePatch()
   const queryClient = useQueryClient()
-  const { mutate, isPending } = useDelete()
+  const { mutate, isPending: isPendingDelete } = useDelete()
   const handleEditClose = () => {
     setOpenSms(null)
   }
@@ -49,34 +47,26 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
   }
 
   const handleDeleteTeacher = async (id: string | number) => {
-    setLoading(true)
     dispatch(disablePage(true))
-    // const resp = await dispatch(deleteTeacher(id))
     mutate(ceoConfigs.employee_delete + id, {
-      onSuccess: async () => {
+      onSuccess: () => {
         toast.success(`${t("O'qituvchilar ro'yxatidan o'chirildi")}`, { position: 'top-center' })
-        queryClient.refetchQueries({ queryKey: ['mentors'] })
-        dispatch(updateParams({ page: '1', status: 'active' }))
+        queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })
       },
       onError: error => {
         toast.error(`${error?.response.data.msg}`, { position: 'top-center' })
       }
     })
-
-    setLoading(false)
     dispatch(disablePage(false))
   }
+
   const handleChange = async (id: string | number) => {
-    setLoading(true)
     editMutate(
       ceoConfigs.update_employee_status + id,
       { status: 'active' },
       {
-        onSuccess: async data => {
-          queryClient.refetchQueries({ queryKey: ['mentors'] })
-          // await refetch()
-          dispatch(updateParams({ page: '1', status: 'active' }))
-
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })
           toast.success("O'qituvchi qaytarildi")
         },
         onError: () => {
@@ -84,7 +74,6 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
         }
       }
     )
-    setLoading(false)
     dispatch(disablePage(false))
   }
 
@@ -115,8 +104,8 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
         PaperProps={{ style: { minWidth: '8rem' } }}
       >
         {status == 'archive' ? (
-          <MenuItem disabled={loading} onClick={() => handleChange(id)} sx={{ '& svg': { mr: 2 } }}>
-            {loading ? (
+          <MenuItem disabled={editPending} onClick={() => handleChange(id)} sx={{ '& svg': { mr: 2 } }}>
+            {editPending ? (
               <Typography>Tiklanmoqda...</Typography>
             ) : (
               <>
@@ -152,7 +141,7 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
         )}
       </Menu>
       <UserSuspendDialog
-        loading={isPending}
+        loading={isPendingDelete}
         handleOk={() => handleDeleteTeacher(id)}
         open={suspendDialogOpen}
         setOpen={setSuspendDialogOpen}

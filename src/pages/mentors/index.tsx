@@ -19,7 +19,6 @@ import RowOptions from 'src/views/apps/mentors/RowOptions'
 import TeacherCreateDialog from 'src/views/apps/mentors/TeacherCreateDialog'
 import { useGet } from 'src/hooks/useApi'
 import ceoConfigs from 'src/configs/ceo'
-import { useQueryClient } from '@tanstack/react-query'
 
 const TeacherAvatar = dynamic(() => import('src/views/apps/mentors/AddMentorsModal').then(mod => mod.TeacherAvatar))
 const TeacherEditDialog = dynamic(() => import('src/views/apps/mentors/TeacherEditDialog'))
@@ -47,9 +46,8 @@ export default function GroupsPage() {
   const handleEditClickOpen = (value: ModalTypes) => {
     dispatch(setOpenSms(value))
   }
-  const queryClient = useQueryClient()
 
-  const { data, isLoading, refetch } = useGet(ceoConfigs.teachers, { params: queryParams, deps: ['mentors'] })
+  const { data, isLoading } = useGet(ceoConfigs.teachers, { params: queryParams, deps: ['mentors'] })
 
   const handleEditClose = () => {
     setError({})
@@ -149,8 +147,6 @@ export default function GroupsPage() {
 
   const handleChangeStatus = async (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
     dispatch(updateParams({ status: checked ? 'archive' : 'active', page: 1 }))
-    // queryClient.invalidateQueries({ queryKey: ['mentors'] })
-    await refetch()
   }
 
   useEffect(() => {
