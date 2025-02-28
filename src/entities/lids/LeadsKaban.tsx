@@ -20,6 +20,7 @@ import { LeadsType } from './model'
 import IconifyIcon from 'src/@core/components/icon'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from 'src/@core/utils/api'
+import EditDepartmentItemForm from 'src/views/apps/lids/departmentItem/EditDepartmentItemForm'
 
 type LeadsChld = {
   id: number
@@ -27,7 +28,7 @@ type LeadsChld = {
   phone: string
 }
 
-type LeadsResult = {
+export type LeadsResult = {
   id: number
   name: string
   leads: LeadsChld[]
@@ -42,17 +43,25 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
   const { settings } = useSettings()
   const dispatch = useAppDispatch()
   const router = useRouter()
+  const [loading, setLoading] = useState<boolean>(false)
   const [studentModalOpen, setStudentModalOpen] = useState<boolean>(false)
   const { openLid } = useSelector((state: RootState) => state.leads)
   const [selectedLead, setSelectedLead] = useState<any | null>(null)
   const [source, setSource] = useState<any>(null)
+  const [edit, setEdit] = useState<any>()
+  const [open, setOpen] = useState<boolean>(false)
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
   const { id, search } = router.query
 
-  const { data: leadData, isLoading } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
-    params: { parent: id || defaultId, search }
+  const {
+    data: leadData,
+    isLoading,
+    refetch
+  } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
+    params: { parent: id || defaultId, search },
+    deps: ['departments-leads']
   })
 
   const [localLeadData, setLocalLeadData] = useState<LeadsType<LeadsResult[]> | null>(null)
@@ -200,7 +209,13 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
                       <Chip color='primary' variant='outlined' label={section.leads.length} />
                     </div>
 
-                    <IconButton sx={{ cursor: 'pointer' }}>
+                    <IconButton
+                      sx={{ cursor: 'pointer' }}
+                      onClick={() => {
+                        setOpen(true)
+                        setEdit(section)
+                      }}
+                    >
                       <IconifyIcon icon='fluent:text-bullet-list-square-edit-20-filled' color='orange' />
                     </IconButton>
                   </Box>
@@ -294,6 +309,24 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
 
           <DialogContent sx={{ minWidth: '320px' }}>
             <CreateAnonimUserForm source={source} />
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={open} onClose={() => setOpen(false)}>
+          <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography>{t('Tahrirlash')}</Typography>
+            <IconifyIcon onClick={() => setOpen(false)} icon={'material-symbols:close'} />
+          </DialogTitle>
+
+          <DialogContent sx={{ minWidth: '300px' }}>
+            <EditDepartmentItemForm
+              loading={loading}
+              setLoading={setLoading}
+              id={edit?.id}
+              refetch={refetch}
+              setOpenDialog={setOpen}
+              defaultName={edit?.name}
+            />
           </DialogContent>
         </Dialog>
 
