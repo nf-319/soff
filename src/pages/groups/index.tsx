@@ -1,4 +1,3 @@
-'use client'
 import {
   Box,
   Button,
@@ -47,6 +46,8 @@ import Excel from 'src/@core/components/excelButton/Excel'
 import OnlineLessonModal from 'src/views/apps/groups/view/GroupViewLeft/OnlineLessonModal'
 import { studentsUpdateParams } from 'src/store/apps/groupDetails'
 import DataTable from 'src/@core/components/table'
+import { useGet, usePatch } from 'src/hooks/useApi'
+import { useQueryClient } from '@tanstack/react-query'
 
 const IconifyIcon = dynamic(() => import('src/@core/components/icon'))
 const RowOptions = dynamic(() => import('src/views/apps/groups/RowOptions'))
@@ -73,7 +74,7 @@ export const TranslateWeekName: any = {
 }
 
 export default function GroupsPage() {
-  const { groups, isLoading, queryParams, groupCount } = useAppSelector(state => state.groups)
+  const { queryParams } = useAppSelector(state => state.groups)
   const dispatch = useAppDispatch()
   const router = useRouter()
   const { user } = useContext(AuthContext)
@@ -82,11 +83,16 @@ export default function GroupsPage() {
   const { isMobile } = useResponsive()
   const [page, setPage] = useState<number>(queryParams.page ? Number(queryParams.page) - 1 : 0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(() => Number(localStorage.getItem('rowsPerPage')) || 10)
-  const [loading, setLoading] = useState(false)
   const [updateStatusModal, setUpdateStatusModal] = useState(false)
   const [groupStatus, setGroupStatus] = useState<string | null>(null)
+  const queryClient = useQueryClient()
   const [group_id, setGroupId] = useState<number | null>(null)
   const [groupChoices, setGroupChoices] = useState([])
+  const { mutate, isPending } = usePatch()
+  const { data, isLoading } = useGet(ceoConfigs.groups, {
+    params: queryParams as Record<string, unknown>,
+    deps: ['groups-list']
+  })
 
   const columns: customTableProps[] = [
     {
@@ -195,8 +201,7 @@ export default function GroupsPage() {
     setRowsPerPage(Number(value))
     sessionStorage.setItem('rowsPerPage', `${value}`)
 
-    dispatch(updateParams({ limit: value }))
-    await dispatch(fetchGroups({ ...queryParams, limit: value, offset: `0` }))
+    dispatch(updateParams({ limit: value, offset: '0' }))
     setPage(0)
   }
 
@@ -204,8 +209,7 @@ export default function GroupsPage() {
     const adjustedPage: any = (Number(page) - 1) * rowsPerPage
     setPage(Number(page))
 
-    await dispatch(fetchGroups({ ...queryParams, limit: Number(rowsPerPage), offset: adjustedPage }))
-    dispatch(updateParams({ offset: adjustedPage }))
+    dispatch(updateParams({ offset: adjustedPage, limit: Number(rowsPerPage) }))
   }
 
   const handleOpenModal = async () => {
@@ -219,13 +223,6 @@ export default function GroupsPage() {
   }
 
   const pageLoad = async () => {
-    if (!queryParams.limit) {
-      dispatch(updateParams({ limit: rowsPerPage }))
-
-      await dispatch(fetchGroups({ ...queryParams }))
-    } else {
-      await dispatch(fetchGroups({ ...queryParams }))
-    }
     await dispatch(getMetaData())
   }
 
@@ -236,17 +233,16 @@ export default function GroupsPage() {
         status: Yup.string().nullable().required('Status kiritilishi shart')
       }),
     onSubmit: async values => {
-      setLoading(true)
-      const response = await api.patch(ceoConfigs.groups_updateStatus + group_id, values)
-      if (response.status == 200) {
-        toast.success("Status o'zgartirildi")
-        await dispatch(fetchGroups({ ...queryParams }))
-        setUpdateStatusModal(false)
-        setLoading(false)
-      } else {
-        toast.error('Xatolik')
-      }
-      setLoading(false)
+      mutate(ceoConfigs.groups_updateStatus + group_id, values, {
+        onSuccess: () => {
+          toast.success("Status o'zgartirildi")
+          queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
+          setUpdateStatusModal(false)
+        },
+        onError: () => {
+          toast.error('Xatolik')
+        }
+      })
     }
   })
   const getTeachers = async () => {
@@ -273,7 +269,7 @@ export default function GroupsPage() {
   }, [])
 
   useEffect(() => {
-    const group = groups?.find((item: any) => item.id == group_id)
+    const group = data?.results?.find((item: any) => item.id == group_id)
     if (group) {
       setGroupChoices(group.choices)
     }
@@ -299,6 +295,9 @@ export default function GroupsPage() {
 
     initializePage()
   }, [])
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
+  }, [user?.active_branch])
 
   return (
     <div>
@@ -311,7 +310,7 @@ export default function GroupsPage() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Typography variant='h5'>{t('Guruhlar')}</Typography>
-          {!isLoading && <Chip label={`${groupCount}`} variant='outlined' color='primary' />}
+          {!isLoading && <Chip label={`${data?.count}`} variant='outlined' color='primary' />}
         </Box>
         <Button
           onClick={handleOpenModal}
@@ -339,13 +338,13 @@ export default function GroupsPage() {
 
       {!isMobile && <GroupsFilter isMobile={isMobile} />}
 
-      <DataTable columns={columns} loading={isLoading} data={groups || []} rowClick={rowClick} />
+      <DataTable columns={columns} loading={isLoading} data={data?.results || []} rowClick={rowClick} />
 
-      {Math.ceil(groupCount / 10) > 1 && !isLoading && (
+      {Math.ceil(data?.count / 10) > 1 && !isLoading && (
         <div className='d-flex'>
           <Pagination
             page={Number(queryParams.offset) ? Number(queryParams.offset) / rowsPerPage + 1 : 1}
-            count={Math.ceil(groupCount / 10)}
+            count={Math.ceil(data?.cpount / 10)}
             variant='outlined'
             shape='rounded'
             onChange={(e: any, page) => handlePagination(String(page))}
@@ -430,7 +429,7 @@ export default function GroupsPage() {
                 >
                   {t('Bekor qilish')}
                 </Button>
-                <LoadingButton loading={loading} type='submit' size='small' variant='contained'>
+                <LoadingButton loading={isPending} type='submit' size='small' variant='contained'>
                   {t('Tasdiqlash')}
                 </LoadingButton>
               </Box>
