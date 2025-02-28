@@ -26,7 +26,7 @@ interface LidsDragonModalProps {
   }
 }
 import React, { useEffect, useState } from 'react'
-import EmptyContent from 'src/@core/components/empty-content'
+import { EmptyContent } from 'src/@core/components/empty-content'
 import IconifyIcon from 'src/@core/components/icon'
 import api from 'src/@core/utils/api'
 import { formatDate } from 'src/@core/utils/format'

@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import { Theme } from '@mui/material/styles'
 import SubLoader from '../loaders/SubLoader'
 import DashboardTable from './DashboardTable'
-import EmptyContent from 'src/@core/components/empty-content'
+import { EmptyContent } from 'src/@core/components/empty-content'
 
 const Calendar = () => {
   const { dashboardLessons, isUpdatingDashboard, workTime, formParams } = useAppSelector(state => state.groups)

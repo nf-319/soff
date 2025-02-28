@@ -1,7 +1,7 @@
 import { Pagination, TextField } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import EmptyContent from 'src/@core/components/empty-content'
+import { EmptyContent } from 'src/@core/components/empty-content'
 import { formatPhoneNumber } from 'src/@core/components/phone-input/format-phone-number'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'
@@ -13,9 +13,9 @@ export default function PaymentHistory() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const dispatch = useAppDispatch()
-  const { isMobile } = useResponsive();
+  const { isMobile } = useResponsive()
   const { t } = useTranslation()
-  const {settings} = useSettings()
+  const { settings } = useSettings()
   const { paymentCount, paymentLogs, isLoading } = useAppSelector(state => state.logs)
 
   async function handleSearch(search: string) {
@@ -48,8 +48,8 @@ export default function PaymentHistory() {
         !isLoading && (
           <div
             style={{
-                display: 'flex',
-                flexWrap:'wrap',
+              display: 'flex',
+              flexWrap: 'wrap',
               // flexDirection: 'column',
               gap: isMobile ? 10 : 40,
               marginTop: isMobile ? 0 : 30,
@@ -60,7 +60,7 @@ export default function PaymentHistory() {
               <div
                 className='payment-history-card'
                 style={{
-                  backgroundColor: settings.mode == 'dark' ?'#30334E':'white',
+                  backgroundColor: settings.mode == 'dark' ? '#30334E' : 'white',
                   padding: '20px',
                   borderRadius: '14px',
                   position: 'relative',
@@ -76,7 +76,7 @@ export default function PaymentHistory() {
                   style={{
                     position: isMobile ? 'relative' : 'absolute',
                     top: isMobile ? 0 : '-30px',
-                    backgroundColor: settings.mode == 'dark' ?'#30334E':'white',
+                    backgroundColor: settings.mode == 'dark' ? '#30334E' : 'white',
                     padding: isMobile ? 0 : '6px 20px',
                     left: 0,
                     borderTopLeftRadius: 10,
@@ -85,7 +85,7 @@ export default function PaymentHistory() {
                     margin: '0 0 4px'
                   }}
                 >
-                  {el.title}. {t("XODIM")}: {formatPhoneNumber(el?.admin_phone)} {el?.admin_name}
+                  {el.title}. {t('XODIM')}: {formatPhoneNumber(el?.admin_phone)} {el?.admin_name}
                 </p>
 
                 <div>

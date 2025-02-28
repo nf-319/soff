@@ -19,7 +19,7 @@ import api from 'src/@core/utils/api'
 import getMontName, { getMontNumber } from 'src/@core/utils/gwt-month-name'
 import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
-import EmptyContent from 'src/@core/components/empty-content'
+import { EmptyContent } from 'src/@core/components/empty-content'
 import SubLoader from '../../loaders/SubLoader'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { getAttendance, getDays, setGettingAttendance, updateParams } from 'src/store/apps/groupDetails'
@@ -453,29 +453,28 @@ const UserViewSecurity = () => {
     }
   }
 
-const queryString = useMemo(() => {
-  return new URLSearchParams(queryParams).toString();
-}, [queryParams]);
+  const queryString = useMemo(() => {
+    return new URLSearchParams(queryParams).toString()
+  }, [queryParams])
 
-const attendanceDate = useMemo(() => {
-  const year = query?.year || new Date().getFullYear();
-  const monthNumber = getMontNumber(query?.month);
-  return `${year}-${monthNumber}`;
-}, [query?.year, query?.month]);
+  const attendanceDate = useMemo(() => {
+    const year = query?.year || new Date().getFullYear()
+    const monthNumber = getMontNumber(query?.month)
+    return `${year}-${monthNumber}`
+  }, [query?.year, query?.month])
 
-useEffect(() => {
-  const fetchAttendance = async () => {
-    dispatch(setGettingAttendance(true));
-    if (query?.month && query?.id) {
-      await dispatch(getAttendance({ date: attendanceDate, group: query?.id, queryString }));
-      await dispatch(getDays({ date: attendanceDate, group: query?.id }));
+  useEffect(() => {
+    const fetchAttendance = async () => {
+      dispatch(setGettingAttendance(true))
+      if (query?.month && query?.id) {
+        await dispatch(getAttendance({ date: attendanceDate, group: query?.id, queryString }))
+        await dispatch(getDays({ date: attendanceDate, group: query?.id }))
+      }
+      dispatch(setGettingAttendance(false))
     }
-    dispatch(setGettingAttendance(false));
-  };
 
-  fetchAttendance();
-}, [queryParams.status, attendanceDate, queryString]);
-
+    fetchAttendance()
+  }, [queryParams.status, attendanceDate, queryString])
 
   return isGettingAttendance ? (
     <SubLoader />

@@ -6,11 +6,19 @@ import getMonthName from 'src/@core/utils/gwt-month-name'
 import SubLoader from '../loaders/SubLoader'
 import { useRouter } from 'next/router'
 import { Typography } from '@mui/material'
-import EmptyContent from 'src/@core/components/empty-content'
+import { EmptyContent } from 'src/@core/components/empty-content'
 import { useTranslation } from 'react-i18next'
 import { ILessonResponse } from 'src/types/apps/dashboardTypes'
 
-const LessonsTable = ({workTime,events,isLoading}:{workTime:string[],events:ILessonResponse[],isLoading?:boolean}) => {
+const LessonsTable = ({
+  workTime,
+  events,
+  isLoading
+}: {
+  workTime: string[]
+  events: ILessonResponse[]
+  isLoading?: boolean
+}) => {
   const { interval } = useAppSelector(state => state.dashboard)
   const { push } = useRouter()
   const { t } = useTranslation()
