@@ -380,6 +380,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
         <DialogContent sx={{ minWidth: '300px' }}>
           <SendSmsAnonimUserForm
             smsTemps={sms_list}
+            smsLoading={false}
             open={smsModal}
             user={selectedLead?.id}
             closeModal={() => setSmsModalOpen(false)}

@@ -43,8 +43,8 @@ import Status from '../../status'
 import useSMS from 'src/hooks/useSMS'
 import useBranches from 'src/hooks/useBranch'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import KanbanItemMenu from './KanbanItemMenu'
-import EditAnonimDialogDialog from 'src/views/apps/lids/anonimUser/EditAnonimUserDialog'
+import { KanbanItemMenu } from './KanbanItemMenu'
+import { EditAnonimDialogDialog } from 'src/views/apps/lids/anonimUser/EditAnonimUserDialog'
 import AddToGroupForm from 'src/views/apps/lids/anonimUser/AddToGroupForm'
 import MergeToDepartment from 'src/views/apps/lids/anonimUser/MergeForm'
 import SendSmsAnonimUserForm from 'src/views/apps/lids/anonimUser/SendSmsAnonimUserForm'
@@ -78,7 +78,6 @@ const KanbanItem = (props: KanbarItemProps) => {
   const [loadingDetail, setLoadingDetail] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<string>('tab-2')
   const [leadDetail, setLeadDetail] = useState([])
-
 
   const { total } = useAppSelector(state => state.user)
   const { queryParams, groups } = useAppSelector(state => state.leads)
@@ -460,24 +459,6 @@ const KanbanItem = (props: KanbarItemProps) => {
         )}
       </CardContent>
 
-      <KanbanItemMenu
-        is_amocrm={is_amocrm}
-        anchorEl={anchorEl}
-        setAnchorEl={setAnchorEl}
-        getSMSTemps={getSMSTemps}
-        getGroups={getGroups}
-        getBranches={getBranches}
-        setOpen={setOpen}
-      />
-
-      <EditAnonimDialogDialog
-        department={id}
-        open={open}
-        setOpen={setOpen}
-        item={props}
-        reRender={() => reRender(false)}
-      />
-
       <Dialog open={open === 'add-group'} onClose={() => setOpen(null)}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography>{t("Guruhga qo'shish")}</Typography>
@@ -500,15 +481,7 @@ const KanbanItem = (props: KanbarItemProps) => {
           <Typography>{t(open == 'merge-to' ? "Boshqa bo'limga o'tkazish" : "Soff crmga o'tkazish")}</Typography>
           <IconifyIcon icon={'material-symbols:close'} onClick={() => setOpen(null)} />
         </DialogTitle>
-        <DialogContent>
-          <MergeToDepartment
-            setOpen={setOpen}
-            open={open}
-            is_amocrm={is_amocrm}
-            item={props}
-            reRender={() => reRender(false)}
-          />
-        </DialogContent>
+        <DialogContent></DialogContent>
       </Dialog>
 
       <Dialog open={open === 'branch'} onClose={() => setOpen(null)}>
@@ -603,15 +576,6 @@ const KanbanItem = (props: KanbarItemProps) => {
           <Typography>{t('SMS yuborish')}</Typography>
           <IconifyIcon onClick={() => setOpen(null)} icon={'material-symbols:close'} />
         </DialogTitle>
-
-        <DialogContent sx={{ minWidth: '300px' }}>
-          <SendSmsAnonimUserForm
-            smsTemps={sms_list}
-            user={props.id}
-            closeModal={() => setOpen(null)}
-            reRender={() => getDepartmentItem('sms-history')}
-          />
-        </DialogContent>
       </Dialog>
 
       {/* Notes */}

@@ -2,26 +2,25 @@ import { Box, Menu, MenuItem } from '@mui/material'
 import { useAppSelector } from 'src/store'
 import IconifyIcon from '../../icon'
 import { useTranslation } from 'react-i18next'
+import { FC } from 'react'
 
 type Props = {
   anchorEl: any
   setAnchorEl: any
   getSMSTemps: any
-  getGroups: any
   getBranches: any
   setOpen: any
   is_amocrm?: boolean
 }
 
-export default function KanbanItemMenu({
+export const KanbanItemMenu: FC<Props> = ({
   anchorEl,
   setAnchorEl,
   getSMSTemps,
-  getGroups,
   getBranches,
   setOpen: setOpenNative,
   is_amocrm
-}: Props) {
+}) => {
   const { queryParams } = useAppSelector(state => state.leads)
   const { t } = useTranslation()
   const rowOptionsOpen = Boolean(anchorEl)
@@ -30,7 +29,7 @@ export default function KanbanItemMenu({
     setAnchorEl(null)
   }
 
-  function setOpen(value: any) {
+  const setOpen = (value: any) => {
     setAnchorEl(null)
     setOpenNative(value)
   }
@@ -55,7 +54,7 @@ export default function KanbanItemMenu({
         <Box>
           {is_amocrm ? (
             <>
-              <MenuItem onClick={() => (getGroups(), setOpen('add-group'))} sx={{ '& svg': { mr: 2 } }}>
+              <MenuItem onClick={() => setOpen('add-group')} sx={{ '& svg': { mr: 2 } }}>
                 <IconifyIcon icon='material-symbols:group-add' fontSize={17} />
                 {t("Guruhga qo'shish")}
               </MenuItem>
@@ -86,7 +85,7 @@ export default function KanbanItemMenu({
                 <IconifyIcon icon='subway:round-arrow-2' fontSize={17} />
                 {t("Boshqa bo'limga")}
               </MenuItem>
-              <MenuItem onClick={() => (getGroups(), setOpen('add-group'))} sx={{ '& svg': { mr: 2 } }}>
+              <MenuItem onClick={() => setOpen('add-group')} sx={{ '& svg': { mr: 2 } }}>
                 <IconifyIcon icon='material-symbols:group-add' fontSize={17} />
                 {t("Guruhga qo'shish")}
               </MenuItem>
@@ -107,6 +106,7 @@ export default function KanbanItemMenu({
             <IconifyIcon icon='mdi:sms' fontSize={20} />
             {t('SMS yuborish')}
           </MenuItem>
+
           <MenuItem onClick={() => setOpen('recover')} sx={{ '& svg': { mr: 2 } }}>
             <IconifyIcon icon='mdi:reload' fontSize={20} />
             {t('Tiklash')}

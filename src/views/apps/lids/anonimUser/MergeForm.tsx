@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from '@mui/material'
@@ -8,27 +8,44 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import {
   fetchAmoCrmPipelines,
   fetchDepartmentList,
+  setOpenItem,
   updateAmoCrmStudent,
   updateDepartmentStudent
 } from 'src/store/apps/leads'
 import toast from 'react-hot-toast'
+import { useGet } from 'src/hooks/useApi'
+import { LeadsResult } from 'src/entities/lids/LeadsKaban'
+import { LeadsType } from 'src/entities/lids'
+import { useAuth } from 'src/hooks/useAuth'
 
 type Props = {
   item: any
   reRender: any
   is_amocrm?: boolean
   open: any
-  setOpen:(val:any)=>void
+  currentId: string
+  setOpen: (val: any) => void
 }
 
-export default function MergeToDepartment({ setOpen,open, is_amocrm, item, reRender }: Props) {
+export default function MergeToDepartment({ setOpen, open, currentId, is_amocrm, item, reRender }: Props) {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
-  const { loading, leadData, pipelines } = useAppSelector(state => state.leads)
+  const { loading, pipelines } = useAppSelector(state => state.leads)
   const [department, setDepartment] = useState<any>(null)
-  const [loadingAmo,setLoading] = useState(false)
+  const [loadingAmo, setLoading] = useState(false)
+  const { user } = useAuth()
   const validationSchema = Yup.object({
     department: Yup.number().required("Bo'limni tanlang")
+  })
+
+  const { data: leadData } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
+    params: { branch: user?.active_branch },
+    deps: ['departments-leads']
+  })
+
+  const { data: parentLeadData } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
+    params: { branch: user?.active_branch, parent: department },
+    deps: ['departments-leads']
   })
 
   const initialValues: {
@@ -67,7 +84,7 @@ export default function MergeToDepartment({ setOpen,open, is_amocrm, item, reRen
           formik.setErrors(resp.payload)
         } else {
           toast.success('Muvaffaqiyatli kochirildi')
-           setOpen(null)
+          setOpen(null)
           await dispatch(fetchAmoCrmPipelines({}))
           await dispatch(fetchDepartmentList())
 
@@ -75,6 +92,7 @@ export default function MergeToDepartment({ setOpen,open, is_amocrm, item, reRen
         }
         setLoading(false)
       }
+      reRender()
     }
   })
 
@@ -101,9 +119,10 @@ export default function MergeToDepartment({ setOpen,open, is_amocrm, item, reRen
     >
       <FormControl fullWidth>
         <InputLabel>{t("Bo'lim")}</InputLabel>
+
         <Select label={t("Bo'lim")} defaultValue={''} onChange={e => setDepartment(e.target.value)}>
           {open == 'merge-to'
-            ? leadData?.map((el: any) => (
+            ? leadData?.results.map((el: any) => (
                 <MenuItem key={el.id} value={el.id}>
                   {el.name}
                 </MenuItem>
@@ -127,21 +146,28 @@ export default function MergeToDepartment({ setOpen,open, is_amocrm, item, reRen
             onBlur={handleBlur}
             value={values.department}
           >
-            {open == 'merge-to'
-              ? leadData
-                  ?.find((item: any) => item.id === department)
-                  ?.children?.map((el: any) => (
-                    <MenuItem key={el.id} value={el.id}>
-                      {el.name}
-                    </MenuItem>
-                  ))
-              : pipelines
-                  .find((item: any) => item.id === department)
-                  ?.children?.map((el: any) => (
-                    <MenuItem key={el.id} value={el.id}>
-                      {el.name}
-                    </MenuItem>
-                  ))}
+            {open == 'merge-to' ? (
+              parentLeadData?.results.length ? (
+                parentLeadData.results.map((el: any) => (
+                  <MenuItem key={el.id} value={el.id}>
+                    {el.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <Fragment>
+                  <MenuItem onClick={() =>  { setOpen(null); dispatch(setOpenItem(currentId))}}>+ Yangi bo'lim ochish</MenuItem>
+                  <MenuItem sx={{ color: '#d3d3d3' }}>Bo'lim majuda emas!</MenuItem>
+                </Fragment>
+              )
+            ) : (
+              pipelines
+                .find((item: any) => item.id === department)
+                ?.children?.map((el: any) => (
+                  <MenuItem key={el.id} value={el.id}>
+                    {el.name}
+                  </MenuItem>
+                ))
+            )}
           </Select>
           {!!errors.department && touched.department && <FormHelperText error>{errors.department}</FormHelperText>}
         </FormControl>

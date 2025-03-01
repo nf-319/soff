@@ -24,10 +24,12 @@ export default function EditDepartmentDialog(props: Props) {
         <Typography variant='h6' component='span'>
           {t("Bo'limni tahrirlash")}
         </Typography>
+
         <IconButton aria-label='close' onClick={handleClose}>
           <IconifyIcon icon='mdi:close' />
         </IconButton>
       </DialogTitle>
+
       <DialogContent sx={{ minWidth: '320px' }}>
         <EditDepartmentForm {...props} />
       </DialogContent>

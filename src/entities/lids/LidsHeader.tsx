@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next'
 import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import useDebounce from 'src/hooks/useDebounce'
+import { useAppDispatch } from 'src/store'
+import { setOpen } from 'src/store/apps/leads'
 
 export const LidsHeader = () => {
   const { push, query } = useRouter()
@@ -17,7 +19,7 @@ export const LidsHeader = () => {
 
   const searchQuery = Array.isArray(query.search) ? query.search[0] : query.search || ''
   const isActiveQuery = Array.isArray(query.is_active) ? query.is_active[0] : query.is_active
-
+  const dispatch = useAppDispatch()
   const [search, setSearch] = useState<string>(searchQuery)
   const [isActive, setIsActive] = useState<boolean>(isActiveQuery !== 'false')
   const searchVal = useDebounce(search, 800)
@@ -39,7 +41,7 @@ export const LidsHeader = () => {
       delete updatedQuery.is_active
     }
 
-    push({
+    void push({
       pathname: '/lids',
       query: updatedQuery
     })
@@ -79,7 +81,7 @@ export const LidsHeader = () => {
         {isMobile ? (
           <Button
             fullWidth
-            onClick={() => push('/lids/add-department')}
+            onClick={() => dispatch(setOpen('add-department'))}
             sx={{ minWidth: '300px', my: 4 }}
             size='small'
             variant='contained'
@@ -89,7 +91,7 @@ export const LidsHeader = () => {
           </Button>
         ) : (
           <Button
-            onClick={() => push('/lids/add-department')}
+            onClick={() => dispatch(setOpen('add-department'))}
             sx={{ minWidth: '300px' }}
             size='medium'
             variant='contained'

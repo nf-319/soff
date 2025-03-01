@@ -56,7 +56,6 @@ export const GroupsFilter = ({ isMobile }: GroupsFilterProps) => {
         }
       })
       .catch(err => {
-        console.log(err)
         toast.error(err.response.data.msg)
       })
     dispatch(setOnlineLessonLoading(false))
@@ -65,26 +64,19 @@ export const GroupsFilter = ({ isMobile }: GroupsFilterProps) => {
   const handleChangeStatus = async (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ status: e.target.value }))
     const queryString = new URLSearchParams({ ...queryParams, status: e.target.value }).toString()
-    await dispatch(fetchGroups({ ...queryParams, status: e.target.value }))
   }
   const handleChangeTeacher = async (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ teacher: e.target.value }))
-    await dispatch(fetchGroups({ ...queryParams, teacher: e.target.value }))
   }
   const handleChangeCourse = async (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ course: e.target.value }))
-    await dispatch(fetchGroups({ ...queryParams, course: e.target.value }))
   }
   const handleChangeDateOfWeek = (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ day_of_week: e.target.value }))
-    dispatch(fetchGroups({ ...queryParams, day_of_week: e.target.value }))
   }
 
   const handleSearch = async (searchVal: string) => {
-    setLoading(true)
     dispatch(updateParams({ search: searchVal }))
-    await dispatch(fetchGroups({ ...queryParams, search: searchVal }))
-    setLoading(false)
   }
 
   const queryString = new URLSearchParams({ ...queryParams }).toString()
