@@ -1,7 +1,7 @@
 'use client'
 
 import { Fragment, useEffect, useState } from 'react'
-import { Box, Button, IconButton, Skeleton, Tab, Tabs } from '@mui/material'
+import { Box, Button, IconButton, MenuItem, Select, SelectChangeEvent, Skeleton, Tab, Tabs } from '@mui/material'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from 'src/store'
 import { setOpenActionModal, setOpenItem, setOpenLid } from 'src/store/apps/leads'
@@ -43,14 +43,26 @@ const Lids = () => {
     params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
 
+  // Modified approach
   useEffect(() => {
     if (!leadData || leadData.results.length === 0) return
+
+    const currentDeptId = currentData?.id
 
     if (id) {
       const index = leadData.results.findIndex(item => String(item.id) === String(id))
       if (index !== -1) {
         setCurrentData(leadData.results[index])
         setSelectedTab(index)
+      }
+    } else if (currentDeptId) {
+      const index = leadData.results.findIndex(item => item.id === currentDeptId)
+      if (index !== -1) {
+        setCurrentData(leadData.results[index])
+        setSelectedTab(index)
+      } else {
+        setCurrentData(leadData.results[0])
+        setSelectedTab(0)
       }
     } else {
       const firstDept = leadData.results[0]
@@ -59,11 +71,11 @@ const Lids = () => {
     }
   }, [leadData, id])
 
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-    if (!leadData || !leadData.results[newValue]) return
+  const handleTabChange = (event: SelectChangeEvent<number>) => {
+    if (!leadData || !leadData.results[event.target.value as number]) return
 
-    const selectedDept = leadData.results[newValue]
-    setSelectedTab(newValue)
+    const selectedDept = leadData.results[event.target.value as number]
+    setSelectedTab(Number(event.target.value))
     setCurrentData(selectedDept)
   }
 
@@ -79,17 +91,15 @@ const Lids = () => {
 
       <Box display='flex' justifyContent='space-between' marginY={5} alignItems='center'>
         {isLoading ? (
-          <Tabs variant='standard'>
-            {[...Array(3)].map((_, index) => (
-              <Tab key={index} label={<Skeleton width={80} height={20} />} disabled />
-            ))}
-          </Tabs>
+          <Skeleton variant='rectangular' width={120} height={40} />
         ) : (
-          <Tabs value={selectedTab} onChange={handleTabChange} variant='scrollable' scrollButtons='auto'>
+          <Select size='medium' value={selectedTab} onChange={handleTabChange} displayEmpty>
             {leadData?.results.map((item, index) => (
-              <Tab key={item.id} label={item.name} value={index} />
+              <MenuItem key={item.id} value={index}>
+                {item.name}
+              </MenuItem>
             ))}
-          </Tabs>
+          </Select>
         )}
 
         <Box display='flex' justifyContent='space-between' gap={4} alignItems='center' flexShrink={0}>
@@ -110,13 +120,6 @@ const Lids = () => {
                   sx={{ cursor: 'pointer', marginLeft: 'auto' }}
                 >
                   <IconifyIcon icon={'fluent:person-add-24-filled'} color='#84cc16' />
-                </IconButton>
-
-                <IconButton
-                  onClick={() => dispatch(setOpenItem(currentDepartmentId))}
-                  sx={{ cursor: 'pointer', marginLeft: 'auto' }}
-                >
-                  <IconifyIcon icon={'heroicons-solid:view-grid-add'} color='#14b8a6' />
                 </IconButton>
 
                 {currentData?.name?.toLowerCase() !== 'leads' && (
