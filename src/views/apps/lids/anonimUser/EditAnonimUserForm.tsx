@@ -8,17 +8,20 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import { editDepartmentStudent, updateDepartmentStudent } from 'src/store/apps/leads'
 import { reversePhone } from 'src/@core/components/phone-input/format-phone-number'
 import PhoneInput from 'src/@core/components/phone-input'
+import { useQueryClient } from '@tanstack/react-query'
 
 type Props = {
   item: any
-    reRender: any
-  department:any
+  department: any
+  onClose: () => void
+  laed?: boolean
 }
 
-export default function EditAnonimUserForm({department, item, reRender }: Props) {
+export default function EditAnonimUserForm({ department, item, onClose, laed }: Props) {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const { loading } = useAppSelector(state => state.leads)
+  const queryClient = useQueryClient()
 
   const validationSchema = Yup.object({
     first_name: Yup.string().required('Ism kiriting'),
@@ -29,7 +32,7 @@ export default function EditAnonimUserForm({department, item, reRender }: Props)
     first_name: string
     phone: string
   } = {
-    first_name: item.title,
+    first_name: laed ? item.first_name : item.title,
     phone: item.phone
   }
 
@@ -37,15 +40,21 @@ export default function EditAnonimUserForm({department, item, reRender }: Props)
     initialValues,
     validationSchema,
     onSubmit: async values => {
-      const resp = await dispatch(
-        editDepartmentStudent({ id: item.id, ...values, phone: reversePhone(values.phone) })
+      try {
+        const resp = await dispatch(
+          editDepartmentStudent({ id: item.id, ...values, phone: reversePhone(values.phone) })
         )
-        
-      if (resp.meta.requestStatus === 'rejected') {
-        formik.setErrors(resp.payload)
-      } else {
-        await reRender()
-        formik.resetForm()
+
+        if (resp.meta.requestStatus === 'rejected') {
+          formik.setErrors(resp.payload)
+        } else {
+          formik.resetForm()
+          await queryClient.invalidateQueries({ queryKey: ['departments-leads'] })
+        }
+      } catch (error) {
+        console.error('Error updating department:', error)
+      } finally {
+        onClose()
       }
     }
   })
@@ -57,8 +66,6 @@ export default function EditAnonimUserForm({department, item, reRender }: Props)
       formik.resetForm()
     }
   }, [])
-    
-    
 
   return (
     <form
@@ -83,6 +90,7 @@ export default function EditAnonimUserForm({department, item, reRender }: Props)
         <InputLabel error={!!errors.phone && touched.phone} htmlFor='login-input'>
           {t('phone')}
         </InputLabel>
+
         <PhoneInput
           fullWidth
           label={t('phone')}

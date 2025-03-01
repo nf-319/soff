@@ -39,7 +39,7 @@ export const LidsHeader = () => {
       delete updatedQuery.is_active
     }
 
-    push({
+    void push({
       pathname: '/lids',
       query: updatedQuery
     })
