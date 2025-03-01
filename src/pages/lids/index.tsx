@@ -34,7 +34,7 @@ const Lids = () => {
 
   const { user } = useAuth()
 
-  const { data: leadData, isLoading } = useGet<LeadsType<DepartmentsResultType[]>>('leads/departments/', {
+  const { data: leadData, isLoading } = useGet<LeadsType<DepartmentsResultType[]>>('leads/departments/', {deps:['leads'],
     params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
 
