@@ -28,8 +28,8 @@ import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
 
 type Props = {
   source?: any
-  defaultId: string
-  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
+  defaultId?: string
+  refetch?: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
 }
 
 export default function CreateAnonimUserForm({ source, defaultId, refetch }: Props) {
@@ -87,7 +87,7 @@ export default function CreateAnonimUserForm({ source, defaultId, refetch }: Pro
     } catch (err) {
       console.error('Error fetching leads:', err)
     } finally {
-      await refetch()
+      if (refetch) await refetch()
       dispatch(setDragonLoading(false))
     }
   }
@@ -103,7 +103,7 @@ export default function CreateAnonimUserForm({ source, defaultId, refetch }: Pro
       } else {
         formik.resetForm()
         dispatch(setSectionId(null))
-        await refetch()
+        if (refetch) await refetch()
         await handleGetLealdItems()
         await dispatch(fetchDepartmentList())
       }
