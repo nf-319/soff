@@ -9,16 +9,14 @@ import { useAppDispatch } from 'src/store'
 import { fetchDepartmentList, setDragonLoading, setLeadItems } from 'src/store/apps/leads'
 import api from 'src/@core/utils/api'
 import toast from 'react-hot-toast'
-import { QueryClient, QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
-import { LeadsType } from 'src/entities/lids'
-import { LeadsResult } from 'src/entities/lids/LeadsKaban'
+import { QueryObserverResult, RefetchOptions, useQueryClient } from '@tanstack/react-query'
 
 type Props = {
   setLoading: (status: boolean) => void
   loading: boolean
   setOpenDialog: any
   id: number
-  refetch?: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
+  refetch?: (options?: RefetchOptions) => Promise<QueryObserverResult<any, any>>
   defaultName: string
 }
 
@@ -31,6 +29,7 @@ export default function EditDepartmentItemForm({
   defaultName
 }: Props) {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
   const dispatch = useAppDispatch()
   const query = window.location?.search?.split('?slug=')[1]
   const validationSchema = Yup.object({
@@ -53,8 +52,6 @@ export default function EditDepartmentItemForm({
     }
   }
 
-  console.log(defaultName)
-
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -62,12 +59,14 @@ export default function EditDepartmentItemForm({
       setLoading(true)
       try {
         const response = await api.patch(`leads/department-update/${id}`, values)
+         if (refetch) {
+           await refetch()
+         }
+        queryClient.invalidateQueries({ queryKey: ['leads/departments/', 'leads'] })
         if (response.status == 200) {
           setLoading(false)
           setOpenDialog(null)
-          if (refetch) {
-            await refetch()
-          }
+
           await dispatch(fetchDepartmentList())
           await handleGetLealsItems()
           formik.resetForm()
