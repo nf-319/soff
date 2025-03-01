@@ -16,7 +16,6 @@ type Props = {
 
 
 export default function EditDepartmentForm({ id, name }: Props) {
-
     const { t } = useTranslation()
     const dispatch = useAppDispatch()
     const { loading } = useAppSelector((state) => state.leads)
@@ -34,7 +33,7 @@ export default function EditDepartmentForm({ id, name }: Props) {
 
             const resp = await dispatch(editDepartment({ name: valuess.name, id }))
 
-            
+
             if (resp.meta.requestStatus === 'rejected') {
                 formik.setErrors(resp.payload)
             } else {

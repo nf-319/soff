@@ -1,18 +1,12 @@
-// ** React Imports
-import { useEffect, ReactNode } from 'react'
+'use client'
 
-// ** MUI Imports
+import { useEffect, FC, PropsWithChildren } from 'react'
 import { Direction as DrectionUI } from '@mui/material'
-
-// ** Emotion Imports
 import createCache from '@emotion/cache'
 import { CacheProvider } from '@emotion/react'
-
-// ** RTL Plugin
 import stylisRTLPlugin from 'stylis-plugin-rtl'
 
-interface DirectionProps {
-  children: ReactNode
+type Props = {
   direction: DrectionUI
 }
 
@@ -23,9 +17,7 @@ const styleCache = () =>
     stylisPlugins: [stylisRTLPlugin]
   })
 
-const Direction = (props: DirectionProps) => {
-  const { children, direction } = props
-
+export const Direction: FC<PropsWithChildren<Props>> = ({ children, direction }) => {
   useEffect(() => {
     document.dir = direction
   }, [direction])
@@ -37,4 +29,4 @@ const Direction = (props: DirectionProps) => {
   return <>{children}</>
 }
 
-export default Direction
+Direction.displayName = 'Direction'

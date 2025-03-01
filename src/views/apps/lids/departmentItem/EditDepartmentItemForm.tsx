@@ -39,7 +39,7 @@ export default function EditDepartmentItemForm({
 
   const initialValues: CreatesDepartmentState = { name: defaultName }
 
-  async function handleGetLealdItems() {
+  const handleGetLealsItems = async () => {
     if (!query) return
     dispatch(setDragonLoading(true))
 
@@ -52,6 +52,8 @@ export default function EditDepartmentItemForm({
       dispatch(setDragonLoading(false))
     }
   }
+
+  console.log(defaultName)
 
   const formik = useFormik({
     initialValues,
@@ -67,7 +69,7 @@ export default function EditDepartmentItemForm({
             await refetch()
           }
           await dispatch(fetchDepartmentList())
-          await handleGetLealdItems()
+          await handleGetLealsItems()
           formik.resetForm()
         }
       } catch (err: any) {
