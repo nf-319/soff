@@ -29,6 +29,7 @@ export default function EditDepartmentDialog(props: Props) {
           <IconifyIcon icon='mdi:close' />
         </IconButton>
       </DialogTitle>
+
       <DialogContent sx={{ minWidth: '320px' }}>
         <EditDepartmentForm {...props} />
       </DialogContent>
