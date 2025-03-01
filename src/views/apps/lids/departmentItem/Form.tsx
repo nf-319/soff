@@ -9,11 +9,13 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import { createDepartmentItem, fetchDepartmentList, setDragonLoading, setLeadItems } from 'src/store/apps/leads'
 import { useRouter } from 'next/router'
 import api from 'src/@core/utils/api'
+import { useQueryClient } from '@tanstack/react-query'
 
 type Props = {}
 
 export default function CreateDepartmentItemForm({}: Props) {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
   const dispatch = useAppDispatch()
   const { loading, leadData, openItem } = useAppSelector(state => state.leads)
   const validationSchema = Yup.object({
@@ -47,10 +49,10 @@ export default function CreateDepartmentItemForm({}: Props) {
       if (resp.meta.requestStatus === 'rejected') {
         formik.setErrors(resp.payload)
       } else {
-          
         await handleGetLealdItems()
         await dispatch(fetchDepartmentList())
         formik.resetForm()
+        await queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
       }
     }
   })

@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState, ReactNode, useLayoutEffect } from 'react'
+import {createContext, useEffect, useState, FC, PropsWithChildren} from 'react'
 
 import { useRouter } from 'next/router'
 
@@ -26,11 +26,7 @@ const defaultProvider: AuthValuesType = {
 
 const AuthContext = createContext(defaultProvider)
 
-type Props = {
-  children: ReactNode
-}
-
-const AuthProvider = ({ children }: Props) => {
+const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
   const { i18n } = useTranslation()

@@ -1,14 +1,14 @@
 'use client'
+
 import { Box, Button, Chip, FormControlLabel, Pagination, Switch, Typography } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import IconifyIcon from 'src/@core/components/icon'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { fetchTeachersList, updateParams, setOpenEdit, setOpenSms } from 'src/store/apps/mentors'
+import { updateParams, setOpenEdit, setOpenSms } from 'src/store/apps/mentors'
 import { formatCurrency } from 'src/@core/utils/format-currency'
-import { videoUrls } from 'src/@core/components/video-header/video-header'
-import dynamic from 'next/dynamic'
+import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { AuthContext } from 'src/context/AuthContext'
 import { toast } from 'react-hot-toast'
@@ -21,12 +21,11 @@ import { useGet } from 'src/hooks/useApi'
 import ceoConfigs from 'src/configs/ceo'
 import { useQueryClient } from '@tanstack/react-query'
 
-const TeacherAvatar = dynamic(() => import('src/views/apps/mentors/AddMentorsModal').then(mod => mod.TeacherAvatar))
-const TeacherEditDialog = dynamic(() => import('src/views/apps/mentors/TeacherEditDialog'))
-const VideoHeader = dynamic(() => import('src/@core/components/video-header/video-header'))
-const DataTable = dynamic(() => import('src/@core/components/table'))
+import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
+import TeacherEditDialog from 'src/views/apps/mentors/TeacherEditDialog'
+import DataTable from 'src/@core/components/table'
 
-export interface customTableProps {
+export type customTableProps = {
   xs: number
   title: string
   dataIndex?: string | ReactNode
@@ -39,12 +38,12 @@ export default function GroupsPage() {
   const dispatch = useAppDispatch()
   const { isMobile } = useResponsive()
   const { user } = useContext(AuthContext)
-  const [error, setError] = useState<any>({})
   const router = useRouter()
   const queryClient = useQueryClient()
   const { smsTemps, getSMSTemps } = useSMS()
-  const { teachers, teachersCount, queryParams, openSms } = useAppSelector(state => state.mentors)
+  const { teachers, queryParams, openSms } = useAppSelector(state => state.mentors)
   const studentIds = teachers.map(student => student.id)
+
   const handleEditClickOpen = (value: ModalTypes) => {
     dispatch(setOpenSms(value))
   }
@@ -52,7 +51,6 @@ export default function GroupsPage() {
   const { data, isLoading } = useGet(ceoConfigs.teachers, { params: queryParams, deps: ['mentors'] })
 
   const handleEditClose = () => {
-    setError({})
     dispatch(setOpenSms(null))
   }
 
@@ -94,13 +92,7 @@ export default function GroupsPage() {
       xs: 1.7,
       title: t('Doimiy oylik'),
       dataIndex: 'amount',
-      render: amount => {
-        if (!isNaN(Number(amount))) {
-          return `${formatCurrency(amount)} UZS`
-        } else {
-          return '*****'
-        }
-      }
+      render: amount => (!isNaN(Number(amount)) ? `${formatCurrency(amount)} UZS` : '*****')
     },
     {
       xs: 1.7,
@@ -122,7 +114,6 @@ export default function GroupsPage() {
       xs: 1,
       dataIndex: 'id',
       title: '',
-      // title: <Button onClick={() => push("/employee-attendance")} variant='outlined'>{t("Davomat")}</Button>,
       render: actions => <RowOptions id={actions} status={queryParams?.status} />
     }
   ]
@@ -163,7 +154,6 @@ export default function GroupsPage() {
   return (
     <div>
       <VideoHeader item={videoUrls.teachers} />
-
       <Box
         className='groups-page-header'
         sx={{
@@ -180,7 +170,6 @@ export default function GroupsPage() {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            // flexDirection: isMobile ? 'column' : 'row',
             gap: isMobile ? '5px' : '10px'
           }}
         >
@@ -225,9 +214,7 @@ export default function GroupsPage() {
           </Button>
         </Box>
       </Box>
-
       <DataTable loading={isLoading} columns={columns} data={data?.results} rowClick={rowClick} />
-
       {Math.ceil(data?.count / 10) > 1 && !isLoading && (
         <Pagination
           defaultPage={Number(queryParams.page)}
@@ -243,9 +230,7 @@ export default function GroupsPage() {
         />
       )}
       <TeacherCreateDialog />
-
       <TeacherEditDialog />
-
       <SendSMSModal
         handleEditClose={handleEditClose}
         openEdit={openSms}

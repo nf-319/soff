@@ -1,13 +1,6 @@
-// ** React Imports
 import { createContext, useState, ReactNode, useEffect } from 'react'
-
-// ** MUI Imports
 import { Direction } from '@mui/material'
-
-// ** ThemeConfig Import
 import themeConfig from 'src/configs/themeConfig'
-
-// ** Types Import
 import { Skin, Mode, AppBar, Footer, ThemeColor, ContentWidth, VerticalNavToggle } from 'src/@core/layouts/types'
 
 export type Settings = {
@@ -15,7 +8,7 @@ export type Settings = {
   mode: Mode
   appBar?: AppBar
   footer?: Footer
-  navHidden?: boolean // navigation menu
+  navHidden?: boolean
   appBarBlur: boolean
   direction: Direction
   navCollapsed: boolean
@@ -24,7 +17,7 @@ export type Settings = {
   layout?: 'vertical' | 'horizontal'
   lastLayout?: 'vertical' | 'horizontal'
   verticalNavToggleType: VerticalNavToggle
-  toastPosition?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right',
+  toastPosition?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'
   locale?: 'uz' | 'ru' | 'en' | 'fr' | 'ar'
 }
 
@@ -33,7 +26,7 @@ export type PageSpecificSettings = {
   mode?: Mode
   appBar?: AppBar
   footer?: Footer
-  navHidden?: boolean // navigation menu
+  navHidden?: boolean
   appBarBlur?: boolean
   direction?: Direction
   navCollapsed?: boolean
@@ -42,7 +35,7 @@ export type PageSpecificSettings = {
   layout?: 'vertical' | 'horizontal'
   lastLayout?: 'vertical' | 'horizontal'
   verticalNavToggleType?: VerticalNavToggle
-  toastPosition?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right',
+  toastPosition?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'
 }
 export type SettingsContextValue = {
   settings: Settings
@@ -78,7 +71,7 @@ const staticSettings = {
   layout: initialSettings.layout,
   navHidden: initialSettings.navHidden,
   lastLayout: initialSettings.lastLayout,
-  toastPosition: initialSettings.toastPosition,
+  toastPosition: initialSettings.toastPosition
 }
 
 const restoreSettings = (): Settings | null => {

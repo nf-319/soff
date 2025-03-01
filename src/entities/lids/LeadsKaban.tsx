@@ -2,9 +2,9 @@
 
 import { Close, PersonAddAlt } from '@mui/icons-material'
 import { Box, Button, Chip, Dialog, DialogContent, DialogTitle, IconButton, Skeleton, Typography } from '@mui/material'
-import { EyeIcon, Phone, User } from 'lucide-react'
+import { Ellipsis, EyeIcon, Phone, User } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState, useEffect, FC } from 'react'
+import { useState, useEffect, FC, Fragment } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -21,6 +21,16 @@ import IconifyIcon from 'src/@core/components/icon'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from 'src/@core/utils/api'
 import EditDepartmentItemForm from 'src/views/apps/lids/departmentItem/EditDepartmentItemForm'
+import { KanbanItemMenu } from 'src/@core/components/card-statistics/kanban-item/KanbanItemMenu'
+import useSMS from 'src/hooks/useSMS'
+import useBranches from 'src/hooks/useBranch'
+import { EditAnonimDialogDialog } from 'src/views/apps/lids/anonimUser/EditAnonimUserDialog'
+import { LeadNoteModal } from './modals/NodeModal'
+import { SmsModal } from './modals/SmsModal'
+import { BranchModal } from './modals/BranchModal'
+import { LeadDeleteModal } from './modals/LeadDeleteModal'
+import { AddGroup } from './modals/AddGroupModal'
+import { AddDepartmantModal } from './modals/AddDepartmantModal'
 
 type LeadsChld = {
   id: number
@@ -38,6 +48,19 @@ type Props = {
   defaultId: number | undefined
 }
 
+export type MenuOpenType =
+  | 'note'
+  | 'sms'
+  | 'merge-to-amo'
+  | 'merge-to'
+  | 'add-group'
+  | 'branch'
+  | 'add-group'
+  | 'edit'
+  | 'delete'
+  | 'recover'
+  | null
+
 export const LeadsKaban: FC<Props> = ({ defaultId }) => {
   const { isMobile } = useResponsive()
   const { settings } = useSettings()
@@ -48,19 +71,24 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
   const { openLid } = useSelector((state: RootState) => state.leads)
   const [selectedLead, setSelectedLead] = useState<any | null>(null)
   const [source, setSource] = useState<any>(null)
+  const [currentLead, setCurrentLead] = useState<any>(null)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [edit, setEdit] = useState<any>()
+  const { getSMSTemps } = useSMS()
+  const { getBranches } = useBranches()
+  const [menuOpen, setMenuOpen] = useState<MenuOpenType>(null)
   const [open, setOpen] = useState<boolean>(false)
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  const { id, search } = router.query
+  const { id, search, is_active } = router.query
 
   const {
     data: leadData,
     isLoading,
     refetch
   } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
-    params: { parent: id || defaultId, search },
+    params: { parent: id || defaultId, search, is_active: is_active ?? true },
     deps: ['departments-leads']
   })
 
@@ -86,6 +114,11 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
   const handleMenuOpen = (event: any, lead: any) => {
     setStudentModalOpen(true)
     setSelectedLead(lead)
+  }
+
+  const handleClick = (event: any, lead: any) => {
+    setCurrentLead(lead)
+    setAnchorEl(event.currentTarget)
   }
 
   const handleClose = () => {
@@ -172,7 +205,7 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
           overflow: 'auto',
           flexDirection: isMobile ? 'column' : 'row',
           alignItems: 'start',
-          height: 'calc(100vh - 360px)',
+          height: '100%',
           gap: 20
         }}
       >
@@ -258,9 +291,19 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
                                 </div>
                               </div>
 
-                              <IconButton onClick={event => handleMenuOpen(event, lead)}>
-                                <EyeIcon />
-                              </IconButton>
+                              <Box display='flex' alignItems='center'>
+                                <IconButton onClick={event => handleMenuOpen(event, lead)}>
+                                  <EyeIcon />
+                                </IconButton>
+
+                                <IconButton onClick={event => handleClick(event, lead)}>
+                                  <Ellipsis
+                                    style={{ marginLeft: 'auto', cursor: 'pointer' }}
+                                    aria-haspopup='true'
+                                    aria-controls='customized-menu'
+                                  />
+                                </IconButton>
+                              </Box>
                             </div>
                           )}
                         </Draggable>
@@ -296,6 +339,58 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
         ) : (
           <EmptyContent />
         )}
+        <KanbanItemMenu
+          is_amocrm={false} // is_amocrm -> store
+          anchorEl={anchorEl}
+          setAnchorEl={setAnchorEl}
+          getSMSTemps={getSMSTemps}
+          getBranches={getBranches}
+          setOpen={setMenuOpen}
+        />
+
+        <EditAnonimDialogDialog refetch={refetch} department={id} open={open} lead={edit} setOpen={setOpen} />
+
+        {currentLead && (
+          <Fragment>
+            <LeadNoteModal open={menuOpen} setOpen={setMenuOpen} leadId={currentLead.id} />
+            <SmsModal open={menuOpen} setOpen={setMenuOpen} leadId={currentLead.id} />
+
+            <BranchModal
+              open={menuOpen}
+              setOpen={setMenuOpen}
+              refetch={refetch}
+              leadId={currentLead.id}
+              leadFirstName={currentLead.first_name}
+              phone={currentLead.phone}
+            />
+            <EditAnonimDialogDialog
+              department={currentLead.id}
+              open={menuOpen}
+              lead={currentLead}
+              refetch={refetch}
+              setOpen={setMenuOpen}
+            />
+
+            <AddGroup open={menuOpen} leadId={currentLead.id} refetch={refetch} setOpen={setMenuOpen} />
+
+            <LeadDeleteModal
+              open={menuOpen}
+              setOpen={setMenuOpen}
+              refetch={refetch}
+              leadId={currentLead.id}
+              leadFirstName={currentLead.first_name}
+              leadPhone={currentLead.phone}
+            />
+
+            <AddDepartmantModal
+              currentId={String(defaultId)}
+              refetch={refetch}
+              open={menuOpen}
+              setOpen={setMenuOpen}
+              leadId={currentLead.id}
+            />
+          </Fragment>
+        )}
 
         <Dialog onClose={closeCreateLid} open={openLid !== null}>
           <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -308,7 +403,7 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
           </DialogTitle>
 
           <DialogContent sx={{ minWidth: '320px' }}>
-            <CreateAnonimUserForm source={source} />
+            <CreateAnonimUserForm refetch={refetch} defaultId={String(defaultId)} source={source} />
           </DialogContent>
         </Dialog>
 

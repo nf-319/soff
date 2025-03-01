@@ -1,47 +1,54 @@
+'use client'
 
 import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material'
-import React from 'react'
 import { useTranslation } from 'react-i18next'
 import IconifyIcon from 'src/@core/components/icon'
 import EditAnonimUserForm from './EditAnonimUserForm'
-
+import { FC } from 'react'
+import { QueryObserverResult, RefetchOptions, useQueryClient } from '@tanstack/react-query'
+import { LeadsType } from 'src/entities/lids'
+import { LeadsResult } from 'src/entities/lids/LeadsKaban'
 
 type Props = {
-    open: any
-    setOpen: any
-    item: any
-    reRender: any
-    department?:any
+  open: any
+  setOpen: any
+  department?: any
+  lead: any
+  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
 }
 
-export default function EditAnonimDialogDialog({department, open, setOpen, item, reRender }: Props) {
+export const EditAnonimDialogDialog: FC<Props> = ({ department, refetch, lead, open, setOpen }) => {
+  const { t } = useTranslation()
+  const queryClient = useQueryClient()
 
-    const { t } = useTranslation()
+  const closeCreateLid = async () => {
+    await refetch()
+    setOpen(null)
+  }
 
-    const closeCreateLid = () => {
-        setOpen(null)
-    }
+  return (
+    <Dialog onClose={closeCreateLid} open={open === 'edit'}>
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography variant='h6' component='span'>
+          {t('Lidni tahrirlash')}
+        </Typography>
 
+        <IconButton aria-label='close' onClick={closeCreateLid}>
+          <IconifyIcon icon='mdi:close' />
+        </IconButton>
+      </DialogTitle>
 
-
-    return (
-        <div>
-            <Dialog onClose={closeCreateLid} open={open === 'edit'}>
-                <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Typography variant='h6' component='span'>
-                        {t("Lidni tahrirlash")}
-                    </Typography>
-                    <IconButton
-                        aria-label='close'
-                        onClick={closeCreateLid}
-                    >
-                        <IconifyIcon icon='mdi:close' />
-                    </IconButton>
-                </DialogTitle>
-                <DialogContent sx={{ minWidth: '320px' }}>
-                    <EditAnonimUserForm department={department} item={item} reRender={reRender} />
-                </DialogContent>
-            </Dialog >
-        </div>
-    )
+      <DialogContent sx={{ minWidth: '320px' }}>
+        <EditAnonimUserForm
+          onClose={() => {
+            setOpen(null)
+            refetch()
+          }}
+          laed
+          department={department}
+          item={lead}
+        />
+      </DialogContent>
+    </Dialog>
+  )
 }

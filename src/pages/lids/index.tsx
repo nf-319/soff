@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Box, Button, IconButton, Skeleton, Tab, Tabs } from '@mui/material'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from 'src/store'
@@ -17,7 +17,7 @@ import { LeadsKaban, LeadsType, LidsHeader } from 'src/entities/lids'
 import { useAuth } from 'src/hooks/useAuth'
 import { LidsEditModal } from 'src/entities/lids/modals'
 
-type DepartmentsResultType = {
+export type DepartmentsResultType = {
   id: number
   name: string
   is_active: boolean
@@ -27,7 +27,6 @@ const Lids = () => {
   const { queryParams } = useSelector((state: RootState) => state.leads)
   const dispatch = useAppDispatch()
   const router = useRouter()
-  const params = new URLSearchParams(window.location.search)
   const { id, is_active } = router.query
   const [selectedTab, setSelectedTab] = useState<number>(0)
   const [currentData, setCurrentData] = useState<DepartmentsResultType | undefined>()
@@ -35,7 +34,12 @@ const Lids = () => {
 
   const { user } = useAuth()
 
-  const { data: leadData, isLoading } = useGet<LeadsType<DepartmentsResultType[]>>('leads/departments/', {
+  const {
+    data: leadData,
+    isLoading,
+    refetch
+  } = useGet<LeadsType<DepartmentsResultType[]>>('leads/departments/', {
+    deps: ['leads'],
     params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
 
@@ -52,8 +56,6 @@ const Lids = () => {
       const firstDept = leadData.results[0]
       setCurrentData(firstDept)
       setSelectedTab(0)
-
-      // Don't update the URL with ID when loading without ID
     }
   }, [leadData, id])
 
@@ -117,14 +119,16 @@ const Lids = () => {
                   <IconifyIcon icon={'heroicons-solid:view-grid-add'} color='#14b8a6' />
                 </IconButton>
 
-                <IconButton onClick={() => setOpen('edit')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
-                  <IconifyIcon icon={'fluent:text-bullet-list-square-edit-20-filled'} color='orange' />
-                </IconButton>
-
                 {currentData?.name?.toLowerCase() !== 'leads' && (
-                  <IconButton onClick={() => setOpen('delete')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
-                    <IconifyIcon icon={'icon-park-solid:delete-four'} color='red' style={{ padding: 1 }} />
-                  </IconButton>
+                  <Fragment>
+                    <IconButton onClick={() => setOpen('edit')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
+                      <IconifyIcon icon={'fluent:text-bullet-list-square-edit-20-filled'} color='orange' />
+                    </IconButton>
+
+                    <IconButton onClick={() => setOpen('delete')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
+                      <IconifyIcon icon={'icon-park-solid:delete-four'} color='red' style={{ padding: 1 }} />
+                    </IconButton>
+                  </Fragment>
                 )}
               </div>
             </Box>
@@ -134,13 +138,14 @@ const Lids = () => {
 
       <LeadsKaban defaultId={currentData?.id} />
 
-      <EditDepartmentDialog id={Number(currentDepartmentId)} name={''} />
+      <EditDepartmentDialog id={Number(currentDepartmentId)} name={(currentData && currentData.name) || ''} />
       <CreateDepartmentDialog />
-      <LidsDeleteModal id={currentData?.id as number} />
+      <LidsDeleteModal refetch={refetch} id={currentData?.id as number} />
 
       <CreateDepartmentItemDialog />
 
       <LidsEditModal
+        refetch={refetch}
         title={currentData?.name as string}
         id={currentData?.id as number}
         open={openDialog}
