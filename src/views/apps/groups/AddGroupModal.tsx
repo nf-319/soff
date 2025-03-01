@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { Autocomplete, Box, Drawer, FormHelperText, IconButton, InputLabel, TextField, Typography } from '@mui/material'
 import IconifyIcon from 'src/@core/components/icon'
 import MenuItem from '@mui/material/MenuItem'
@@ -24,6 +22,9 @@ import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
 import Router from 'next/router'
 import api from 'src/@core/utils/api'
+import { usePost } from 'src/hooks/useApi'
+import ceoConfigs from 'src/configs/ceo'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function AddGroupModal() {
   const { isOpenAddGroup, teachersData, roomsData, courses, formParams, queryParams, initialValues } = useAppSelector(
@@ -33,21 +34,23 @@ export default function AddGroupModal() {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [customWeekdays, setCustomWeekDays] = useState<string[]>([])
+  const { mutate, isPending } = usePost()
+  const queryClient = useQueryClient()
 
-  const options = roomsData?.map(item => ({
+  const options = roomsData?.map((item: any) => ({
     label: item?.name,
     value: item?.id
   }))
 
   const validationSchema = Yup.object({
-    name: Yup.string().required(t('Guruh nomini kiriting')),
-    course: Yup.string().required(t('Kursni tanlang')),
-    teacher: Yup.string().required(t("O'qituvchini tanlang")),
-    room: Yup.string().required(t('Xonani tanlang')),
-    start_date: Yup.string().required(t('Boshlanish sanasini tanlang')),
-    start_at: Yup.string().required(t('Boshlanish vaqtini tanlang')),
-    day_of_week: Yup.string().required(t('Dars kunlarini tanlang')),
-    end_at: Yup.string().required(t('Tugash vaqtini tanlang'))
+    name: Yup.string().required(t('Guruh nomini kiriting') || 'Guruh nomini kiriting'),
+    course: Yup.string().required(t('Kursni tanlang') || 'Kursni tanlang'),
+    teacher: Yup.string().required(t("O'qituvchini tanlang") || "O'qituvchini tanlang"),
+    room: Yup.string().required(t('Xonani tanlang') || 'Xonani tanlang'),
+    start_date: Yup.string().required(t('Boshlanish sanasini tanlang') || 'Boshlanish sanasini tanlang'),
+    start_at: Yup.string().required(t('Boshlanish vaqtini tanlang') || 'Boshlanish vaqtini tanlang'),
+    day_of_week: Yup.string().required(t('Dars kunlarini tanlang') || 'Dars kunlarini tanlang'),
+    end_at: Yup.string().required(t('Tugash vaqtini tanlang') || 'Tugash vaqtini tanlang')
   })
 
   const formik: any = useFormik({
@@ -62,24 +65,25 @@ export default function AddGroupModal() {
       } else {
         obj = { ...obj, day_of_week: formik.values.day_of_week.split(',') }
       }
-      const queryString = new URLSearchParams(queryParams).toString()
 
-      const resp = await dispatch(createGroup(obj))
-      if (resp.meta.requestStatus === 'rejected') {
-        formik.setErrors(resp.payload)
-      } else {
-        handleClose()
-        toast.success(t('Guruh muvaffaqiyatli yaratildi'))
-        await dispatch(fetchGroups({ ...queryParams }))
-      }
-      setLoading(false)
+      mutate(ceoConfigs.groups_create, obj, {
+        onSuccess: () => {
+          handleClose()
+          toast.success(t('Guruh muvaffaqiyatli yaratildi') || 'Guruh muvaffaqiyatli yaratildi')
+          queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
+        },
+        onError: err => {
+          formik.setErrors(err.response.data)
+        }
+      })
+
       dispatch(disablePage(false))
     }
   })
 
   const handleChangeField = async (
     name: string,
-    event: SelectChangeEvent<string> | ChangeEvent<HTMLInputElement> | string
+    event: SelectChangeEvent<string> | ChangeEvent<HTMLInputElement> | string | any
   ) => {
     formik.setFieldValue(name, event?.target?.value || event)
     if (name == 'teacher') {
@@ -276,7 +280,7 @@ export default function AddGroupModal() {
                   value={formik.values.room}
                   error={!!formik.errors.room && !!formik.touched.room}
                 >
-                  {roomsData?.map(room => (
+                  {roomsData?.map((room: any) => (
                     <MenuItem key={room.id} value={+room.id}>
                       {room.name}
                     </MenuItem>
@@ -307,7 +311,7 @@ export default function AddGroupModal() {
                   value={formik.values.teacher}
                   error={!!formik.errors.teacher && !!formik.touched.teacher}
                 >
-                  {teachersData?.map(teacher => (
+                  {teachersData?.map((teacher: any) => (
                     <MenuItem key={teacher.id} value={+teacher.id}>
                       {teacher.first_name}
                     </MenuItem>

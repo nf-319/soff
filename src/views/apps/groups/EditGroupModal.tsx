@@ -36,6 +36,8 @@ import {
 } from 'src/store/apps/groupDetails'
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
 import api from 'src/@core/utils/api'
+import { useQueryClient } from '@tanstack/react-query'
+import ceoConfigs from 'src/configs/ceo'
 
 export default function EditGroupModal() {
   const {
@@ -54,7 +56,7 @@ export default function EditGroupModal() {
   const [loading, setLoading] = useState(false)
   const [customWeekdays, setCustomWeekDays] = useState<string[]>([])
   const { query } = useRouter()
-
+  const queryClient = useQueryClient()
   const options = roomsData?.map(item => ({
     label: item?.name,
     value: item?.id
@@ -125,7 +127,7 @@ export default function EditGroupModal() {
           dispatch(setGettingAttendance(false))
           dispatch(setGettingGroupDetails(false))
         } else {
-          await dispatch(fetchGroups(queryParams))
+          queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
         }
         formik.resetForm()
       }
