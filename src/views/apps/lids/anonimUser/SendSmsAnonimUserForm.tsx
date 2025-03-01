@@ -15,6 +15,7 @@ type Props = {
   smsTemps: any[]
   smsLoading: boolean
   user: any
+  reRender?: () => void
   closeModal: any
   open?: boolean
 }
@@ -96,13 +97,12 @@ export default function SendSmsAnonimUserForm({ smsTemps, user, closeModal, smsL
             setParentId(e.target.value)
           }}
         >
-          {smsLoading
-            ? 'Malumot yuklanmoqda...'
-            : smsTemps.map((el: any) => (
-                <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
-                  <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>{el.description}</span>
-                </MenuItem>
-              ))}
+          {smsLoading ? 'Malumot yuklanmoqda...' : smsTemps.map((el: any) => (
+            <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
+              <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>{el.description}</span>
+            </MenuItem>
+          ))}
+
         </Select>
       </FormControl>
 
