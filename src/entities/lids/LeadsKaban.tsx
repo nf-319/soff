@@ -81,16 +81,17 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  const { id, search } = router.query
+  const { id, search, is_active } = router.query
 
   const {
     data: leadData,
     isLoading,
     refetch
   } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
-    params: { parent: id || defaultId, search },
+    params: { parent: id || defaultId, search, is_active: is_active ?? true },
     deps: ['departments-leads']
   })
+
   const [localLeadData, setLocalLeadData] = useState<LeadsType<LeadsResult[]> | null>(null)
 
   useEffect(() => {
@@ -390,6 +391,7 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
             />
           </Fragment>
         )}
+
         <Dialog onClose={closeCreateLid} open={openLid !== null}>
           <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography variant='h6' component='span'>
@@ -401,9 +403,10 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
           </DialogTitle>
 
           <DialogContent sx={{ minWidth: '320px' }}>
-            <CreateAnonimUserForm source={source} />
+            <CreateAnonimUserForm refetch={refetch} defaultId={String(defaultId)} source={source} />
           </DialogContent>
         </Dialog>
+
         <Dialog open={open} onClose={() => setOpen(false)}>
           <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography>{t('Tahrirlash')}</Typography>
@@ -421,6 +424,7 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
             />
           </DialogContent>
         </Dialog>
+
         <LidsDragonModal handleClose={handleClose} openModal={studentModalOpen} selectedLead={selectedLead} />
       </div>
     </DragDropContext>

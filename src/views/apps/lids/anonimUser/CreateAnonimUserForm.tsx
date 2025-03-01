@@ -20,17 +20,34 @@ import { reversePhone } from 'src/@core/components/phone-input/format-phone-numb
 import Router, { useRouter } from 'next/router'
 import KanbanItem from 'src/@core/components/card-statistics/kanban-item'
 import api from 'src/@core/utils/api'
+import { useGet } from 'src/hooks/useApi'
+import { LeadsResult } from 'src/entities/lids/LeadsKaban'
+import { LeadsType } from 'src/entities/lids'
+import { useAuth } from 'src/hooks/useAuth'
+import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
 
 type Props = {
   source?: any
+  defaultId: string
+  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
 }
 
-export default function CreateAnonimUserForm({ source }: Props) {
+export default function CreateAnonimUserForm({ source, defaultId, refetch }: Props) {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
+  const router = useRouter()
+  const { user } = useAuth()
   const query = window.location?.search?.split('?slug=')[1]
 
-  const { sectionId, loading, leadData, openLid, sourceData } = useAppSelector(state => state.leads)
+  const { id } = router.query
+  const { sectionId, loading, openLid } = useAppSelector(state => state.leads)
+
+  const { data: leadData } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
+    params: { branch: user?.active_branch, parent: id || defaultId },
+    deps: ['departments-leads']
+  })
+
+  const { data: sourseData } = useGet('leads/statistic/')
 
   const validationSchema = Yup.object({
     department: Yup.string().required("Bo'lim tanlang"),
@@ -39,10 +56,6 @@ export default function CreateAnonimUserForm({ source }: Props) {
     phone: Yup.string().required('Telefon raqam'),
     body: Yup.string()
   })
-
-  
-
-  
 
   const initialValues: {
     department: string
@@ -74,6 +87,7 @@ export default function CreateAnonimUserForm({ source }: Props) {
     } catch (err) {
       console.error('Error fetching leads:', err)
     } finally {
+      await refetch()
       dispatch(setDragonLoading(false))
     }
   }
@@ -89,6 +103,7 @@ export default function CreateAnonimUserForm({ source }: Props) {
       } else {
         formik.resetForm()
         dispatch(setSectionId(null))
+        await refetch()
         await handleGetLealdItems()
         await dispatch(fetchDepartmentList())
       }
@@ -103,7 +118,6 @@ export default function CreateAnonimUserForm({ source }: Props) {
       formik.resetForm()
     }
   }, [])
-    
 
   return (
     <form
@@ -114,6 +128,7 @@ export default function CreateAnonimUserForm({ source }: Props) {
         <InputLabel error={!!errors.department && touched.department} size='small' id='user-view-language-label'>
           {t("Bo'lim")}
         </InputLabel>
+
         <Select
           size='small'
           label={t("Bo'lim")}
@@ -126,19 +141,14 @@ export default function CreateAnonimUserForm({ source }: Props) {
           value={values.department}
           error={!!errors.department && touched.department}
         >
-          {leadData?.some((el: any) => el.id == openLid) ? (
-            leadData
-              ?.find((el: any) => el.id == openLid)
-              ?.children?.map((lead: any) => (
-                <MenuItem key={lead.id} value={Number(lead.id)}>
-                  {lead.name}
-                </MenuItem>
-              ))
-          ) : (
-            <></>
-          )}
+          {leadData?.results.map((lead: any) => (
+            <MenuItem key={lead.id} value={Number(lead.id)}>
+              {lead.name}
+            </MenuItem>
+          ))}
           <MenuItem sx={{ fontWeight: 600 }} onClick={() => dispatch(setOpenItem(openLid))}>
             {t('Yangi yaratish')}
+
             <IconifyIcon icon={'ion:add-sharp'} />
           </MenuItem>
         </Select>
@@ -165,11 +175,12 @@ export default function CreateAnonimUserForm({ source }: Props) {
           onBlur={handleBlur}
           value={values.source}
         >
-          {sourceData.map((lead: any) => (
-            <MenuItem key={lead.id} value={lead.id}>
-              {lead.name}
-            </MenuItem>
-          ))}
+          {sourseData &&
+            sourseData.result.map((lead: any) => (
+              <MenuItem key={lead.id} value={lead.id}>
+                {lead.name}
+              </MenuItem>
+            ))}
           <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router.push('/lids/stats')}>
             {t('Yangi yaratish')}
             <IconifyIcon icon={'ion:add-sharp'} />
