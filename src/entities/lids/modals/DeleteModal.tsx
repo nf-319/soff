@@ -1,5 +1,6 @@
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Dialog, DialogContent, Typography } from '@mui/material'
+import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
 import { FC, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
@@ -16,9 +17,10 @@ import {
 type Props = {
   id: number
   isAmmo?: boolean
+  refetch?: (options?: RefetchOptions) => Promise<QueryObserverResult<any, any>>
 }
 
-export const LidsDeleteModal: FC<Props> = ({ id, isAmmo }) => {
+export const LidsDeleteModal: FC<Props> = ({ id, refetch, isAmmo }) => {
   const { openActionModal, actionId, queryParams } = useSelector((state: RootState) => state.leads)
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
@@ -36,6 +38,7 @@ export const LidsDeleteModal: FC<Props> = ({ id, isAmmo }) => {
     await dispatch(editDepartment({ is_active: false, id: id }))
     setOpen(true)
     toast.success("Muvaffaqiyatli o'chirildi")
+    if (refetch) await refetch()
     await dispatch(fetchDepartmentList())
   }
 

@@ -17,7 +17,7 @@ import { LeadsKaban, LeadsType, LidsHeader } from 'src/entities/lids'
 import { useAuth } from 'src/hooks/useAuth'
 import { LidsEditModal } from 'src/entities/lids/modals'
 
-type DepartmentsResultType = {
+export type DepartmentsResultType = {
   id: number
   name: string
   is_active: boolean
@@ -34,7 +34,11 @@ const Lids = () => {
 
   const { user } = useAuth()
 
-  const { data: leadData, isLoading } = useGet<LeadsType<DepartmentsResultType[]>>('leads/departments/', {
+  const {
+    data: leadData,
+    isLoading,
+    refetch
+  } = useGet<LeadsType<DepartmentsResultType[]>>('leads/departments/', {
     deps: ['leads'],
     params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
@@ -136,11 +140,12 @@ const Lids = () => {
 
       <EditDepartmentDialog id={Number(currentDepartmentId)} name={(currentData && currentData.name) || ''} />
       <CreateDepartmentDialog />
-      <LidsDeleteModal id={currentData?.id as number} />
+      <LidsDeleteModal refetch={refetch} id={currentData?.id as number} />
 
       <CreateDepartmentItemDialog />
 
       <LidsEditModal
+        refetch={refetch}
         title={currentData?.name as string}
         id={currentData?.id as number}
         open={openDialog}
