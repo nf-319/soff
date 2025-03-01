@@ -1,6 +1,6 @@
 'use client'
 
-import {Fragment, useEffect, useState} from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Box, Button, IconButton, Skeleton, Tab, Tabs } from '@mui/material'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from 'src/store'
@@ -34,7 +34,8 @@ const Lids = () => {
 
   const { user } = useAuth()
 
-  const { data: leadData, isLoading } = useGet<LeadsType<DepartmentsResultType[]>>('leads/departments/', {deps:['leads'],
+  const { data: leadData, isLoading } = useGet<LeadsType<DepartmentsResultType[]>>('leads/departments/', {
+    deps: ['leads'],
     params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
 
@@ -133,7 +134,7 @@ const Lids = () => {
 
       <LeadsKaban defaultId={currentData?.id} />
 
-      <EditDepartmentDialog id={Number(currentDepartmentId)} name={currentData && currentData.name || ''} />
+      <EditDepartmentDialog id={Number(currentDepartmentId)} name={(currentData && currentData.name) || ''} />
       <CreateDepartmentDialog />
       <LidsDeleteModal id={currentData?.id as number} />
 
