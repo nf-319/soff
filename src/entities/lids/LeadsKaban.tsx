@@ -177,7 +177,7 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
     })
   }
 
-  if (isLoading)
+  if (isLoading) (
     <Box display='flex' flexDirection='column' marginBottom={10} gap={5}>
       <Box display='flex' gap={5}>
         <Skeleton variant='rounded' width={300} height={50} />
@@ -193,6 +193,7 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
         <Skeleton variant='rounded' width={300} height={80} />
       </Box>
     </Box>
+  )
 
   const displayData = localLeadData || leadData
 
