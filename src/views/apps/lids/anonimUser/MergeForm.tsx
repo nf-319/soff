@@ -38,13 +38,13 @@ export default function MergeToDepartment({ setOpen, open, currentId, is_amocrm,
     department: Yup.number().required("Bo'limni tanlang")
   })
 
-  const { data: leadData } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
-    params: { branch: user?.active_branch },
+  const { data: leadData } = useGet<LeadsType<LeadsResult[]>>('leads/department/parent/', {
+    params: { branch: user?.active_branch},
     deps: ['departments-leads']
   })
 
   const { data: parentLeadData } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
-    params: { branch: user?.active_branch, parent: department },
+    params: { branch: user?.active_branch, parent: currentId },
     deps: ['departments-leads']
   })
 
