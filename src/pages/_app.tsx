@@ -21,12 +21,6 @@ import { createEmotionCache } from 'src/@core/utils/create-emotion-cache'
 import DisabledProvider from 'src/@core/layouts/DisabledProvider'
 import { disableCache } from '@iconify/react'
 
-import 'prismjs'
-import 'prismjs/themes/prism-tomorrow.css'
-import 'prismjs/components/prism-jsx'
-import 'prismjs/components/prism-tsx'
-import 'react-perfect-scrollbar/dist/css/styles.css'
-
 import './globals.css'
 import { Providers, ThemeProvider } from 'src/providers'
 import { MyHead } from 'src/@core/components/Head'

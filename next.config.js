@@ -1,4 +1,5 @@
 const path = require('path')
+const { compile } = require('stylis')
 
 /** @type {import('next').NextConfig} */
 
@@ -16,6 +17,9 @@ module.exports = withTM({
   productionBrowserSourceMaps: false,
   optimizeFonts: false,
   swcMinify: false,
+  compiler: {
+    removeConsole: true
+  },
 
   webpack: (config, { dev }) => {
     config.resolve.alias = {
