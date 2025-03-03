@@ -1,4 +1,5 @@
 import { IconButton, Menu, MenuItem } from '@mui/material'
+import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import React, { MouseEvent, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -29,6 +30,7 @@ export default function StudentRowOptions({ id }: Props) {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const { queryParams } = useAppSelector(state => state.students)
+  const queryClient = useQueryClient()
 
   const rowOptionsOpen = Boolean(anchorEl)
 
@@ -57,7 +59,8 @@ export default function StudentRowOptions({ id }: Props) {
     dispatch(disablePage(false))
     toast.success("O'quvchi muvaffaqiyatli aktivlashtirildi")
     dispatch(updateStudentParams({ status: 'active' }))
-    await dispatch(fetchStudentsList({ status: 'active' }))
+    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+
     setLoading(false)
   }
 
@@ -68,7 +71,7 @@ export default function StudentRowOptions({ id }: Props) {
       .delete(`student/destroy/${id}/`)
       .then(res => {
         toast.success("O'quvchi muvaffaqiyatli o'chirildi")
-        dispatch(fetchStudentsList({ ...queryParams }))
+        queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
       })
       .catch(err => {
         toast.error(err.response.data.msg || "O'quvchini o'chirib bo'lmadi")

@@ -184,7 +184,7 @@ export default function GroupsPage() {
       xs: 0.4,
       dataIndex: 'id',
       title: t(''),
-      render: actions => <RowOptions id={actions} />
+      render: actions => <RowOptions groups={data?.results} id={actions} />
     }
   ]
 
