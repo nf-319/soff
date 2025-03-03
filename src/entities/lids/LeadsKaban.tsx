@@ -1,6 +1,6 @@
 'use client'
 
-import { Close, PersonAddAlt } from '@mui/icons-material'
+import { Close, Delete, PersonAddAlt } from '@mui/icons-material'
 import { Box, Button, Chip, Dialog, DialogContent, DialogTitle, IconButton, Skeleton, Typography } from '@mui/material'
 import { Ellipsis, EyeIcon, Phone, User } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -120,7 +120,7 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
 
     mutate(
       `leads/department-update/${deleteItem?.id}`,
-      { status: false },
+      { is_active: false },
       {
         onSuccess: () => {
           setDeleteItem(null)
@@ -281,7 +281,7 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
                           setDeleteItem(section)
                         }}
                       >
-                        <IconifyIcon icon='material-symbols:delete' color='red' />
+                        <Delete color='error' />
                       </IconButton>
                     </Box>
                   </Box>
@@ -457,6 +457,7 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
             />
           </DialogContent>
         </Dialog>
+
         <UserSuspendDialog
           loading={isPending}
           open={Boolean(deleteItem)}
