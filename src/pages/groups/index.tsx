@@ -437,7 +437,6 @@ export default function GroupsPage() {
           </DialogContent>
         </form>
       </Dialog>
-
       <OnlineLessonModal />
     </div>
   )

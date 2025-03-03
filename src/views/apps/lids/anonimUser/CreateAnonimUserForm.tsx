@@ -25,7 +25,6 @@ import { LeadsResult } from 'src/entities/lids/LeadsKaban'
 import { LeadsType } from 'src/entities/lids'
 import { useAuth } from 'src/hooks/useAuth'
 import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
-import { LeadKabanItem } from 'src/entities/lids/ui/LeadKanban'
 
 type Props = {
   source?: any
@@ -220,7 +219,16 @@ export default function CreateAnonimUserForm({ source, defaultId, refetch }: Pro
         {!!errors.phone && touched.phone && <FormHelperText error>{formik.errors.phone}</FormHelperText>}
       </FormControl>
 
-      {errors?.user && <LeadKabanItem currentId={newErrors.user.id} lead={newErrors.user} />}
+      {errors?.user && (
+        <KanbanItem
+          id={newErrors.user.id}
+          phone={newErrors.user.phone}
+          last_activity={newErrors.last_activity}
+          status='new'
+          title={newErrors.user.first_name}
+          is_view
+        />
+      )}
 
       <FormControl fullWidth>
         <TextField

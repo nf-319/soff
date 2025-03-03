@@ -65,6 +65,7 @@ export const today = `${new Date().getFullYear()}-${
 }-${new Date().getDate() > 9 ? new Date().getDate() : `0${new Date().getDate()}`}`
 
 const KanbanItem = (props: KanbarItemProps) => {
+  // ** Props
   const { title, phone, status, is_amocrm, handleEditLead, last_activity, id, is_view, reRender } = props
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [error, setError] = useState<any>({})
@@ -138,6 +139,24 @@ const KanbanItem = (props: KanbarItemProps) => {
     setLoadingDetail(false)
   }
 
+  const noteDepartmentItem = async (values: any) => {
+    setLoading(true)
+    try {
+      await api.post(`leads/lead-user-description/${id}/`, {
+        anonim_user: id,
+        body: values.body
+      })
+      await getDepartmentItem('lead-user-description')
+      toast.success(`${t('Eslatma yaratildi')}`, {
+        position: 'top-center'
+      })
+      setOpen(null)
+      setAnchorEl(null)
+      setLoading(false)
+    } catch {
+      setLoading(false)
+    }
+  }
   const formik = useFormik({
     initialValues: {
       reason: ''
@@ -226,6 +245,25 @@ const KanbanItem = (props: KanbarItemProps) => {
       setLoading(false)
     }
   }
+
+  const getLeadData = async () => {
+    const resp = await api.get(`leads/department/list/`, { params: { ...queryParams, is_active: true } })
+    setDepartmentsState(resp.data)
+  }
+  // useEffect(() => {
+  //   dispatch(fetchSmsList())
+  // },[])
+
+  // useEffect(() => {
+  //     getLeadData()
+  //     if (activeTab === 'tab-1') {
+  //         getDepartmentItem('anonim-user')
+  //     } else if (activeTab === 'tab-2') {
+  //         getDepartmentItem('lead-user-description')
+  //     } else {
+  //         getDepartmentItem('sms-history')
+  //     }
+  // }, [])
 
   return (
     <Card sx={{ cursor: 'pointer', mb: 2 }} draggable>

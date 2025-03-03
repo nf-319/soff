@@ -5,6 +5,7 @@ import { useContext, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import { AuthContext } from 'src/context/AuthContext'
 import { useAppDispatch, useAppSelector } from 'src/store'
+import { fetchLessons, fetchStatistics } from 'src/store/apps/dashboard'
 import DashboardPage from 'src/views/apps/dashboard/DashboardPage'
 import MyGroups from 'src/views/my-groups'
 
@@ -25,6 +26,7 @@ const AppCalendar = () => {
       router.push('/')
       toast.error('Sahifaga kirish huquqingiz yoq!')
     }
+    // await Promise.all([dispatch(fetchStatistics()), dispatch(fetchLessons({ queryWeeks: weeks, interval: interval }))])
   }
 
   useEffect(() => {

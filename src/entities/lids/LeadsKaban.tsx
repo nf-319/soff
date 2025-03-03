@@ -2,6 +2,7 @@
 
 import { Close, PersonAddAlt } from '@mui/icons-material'
 import { Box, Button, Chip, Dialog, DialogContent, DialogTitle, IconButton, Skeleton, Typography } from '@mui/material'
+import { Ellipsis, EyeIcon, Phone, User } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState, useEffect, FC, Fragment } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
@@ -14,6 +15,7 @@ import { useDelete, useGet, usePatch } from 'src/hooks/useApi'
 import { RootState, useAppDispatch } from 'src/store'
 import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
 import CreateAnonimUserForm from 'src/views/apps/lids/anonimUser/CreateAnonimUserForm'
+import { LidsDragonModal } from 'src/views/apps/lids/LidsDragonModal'
 import { LeadsType } from './model'
 import IconifyIcon from 'src/@core/components/icon'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -23,7 +25,6 @@ import { KanbanItemMenu } from 'src/@core/components/card-statistics/kanban-item
 import useSMS from 'src/hooks/useSMS'
 import useBranches from 'src/hooks/useBranch'
 import { EditAnonimDialogDialog } from 'src/views/apps/lids/anonimUser/EditAnonimUserDialog'
-<<<<<<< HEAD
 import { LeadNoteModal } from './modals/NodeModal'
 import { SmsModal } from './modals/SmsModal'
 import { BranchModal } from './modals/BranchModal'
@@ -32,9 +33,6 @@ import { AddGroup } from './modals/AddGroupModal'
 import { AddDepartmantModal } from './modals/AddDepartmantModal'
 import toast from 'react-hot-toast'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
-=======
-import { LeadKabanItem } from './ui/LeadKanban'
->>>>>>> 53d2c79dad4bcb815ee10bba52bac7d28aada574
 
 type LeadsChld = {
   id: number
@@ -71,9 +69,16 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
   const dispatch = useAppDispatch()
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>(false)
+  const [studentModalOpen, setStudentModalOpen] = useState<boolean>(false)
   const { openLid } = useSelector((state: RootState) => state.leads)
+  const [selectedLead, setSelectedLead] = useState<any | null>(null)
   const [source, setSource] = useState<any>(null)
+  const [currentLead, setCurrentLead] = useState<any>(null)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [edit, setEdit] = useState<any>()
+  const { getSMSTemps } = useSMS()
+  const { getBranches } = useBranches()
+  const [menuOpen, setMenuOpen] = useState<MenuOpenType>(null)
   const [open, setOpen] = useState<boolean>(false)
   const { t } = useTranslation()
   const queryClient = useQueryClient()
@@ -110,7 +115,6 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
     }
   })
 
-<<<<<<< HEAD
   const handleDelete = async () => {
     if (!deleteItem?.id) return
 
@@ -144,8 +148,6 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
     setStudentModalOpen(false)
   }
 
-=======
->>>>>>> 53d2c79dad4bcb815ee10bba52bac7d28aada574
   const closeCreateLid = () => {
     dispatch(setOpenLid(null))
     dispatch(setAddSource(false))
@@ -292,12 +294,50 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
                       section.leads.map((lead: any, index: number) => (
                         <Draggable key={lead?.id} draggableId={String(lead?.id)} index={index}>
                           {(provided, snapshot) => (
-                            <LeadKabanItem
-                              provided={provided}
-                              snapshot={snapshot}
-                              lead={lead}
-                              currentId={String(defaultId)}
-                            />
+                            <div
+                              className={`shadow-sm p-3 ${settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'} rounded`}
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={{
+                                ...provided.draggableProps.style,
+                                opacity: snapshot.isDragging ? '0.5' : '1',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                borderRadius: 10,
+                                marginBottom: 10,
+                                textAlign: 'center',
+                                padding: '5px'
+                              }}
+                            >
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                  <User width={20} height={20} color='blue' />
+
+                                  {lead.first_name}
+                                </div>
+
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                  <Phone width={18} height={18} color='blue' />
+                                  <Typography fontSize={12}>{lead?.phone}</Typography>
+                                </div>
+                              </div>
+
+                              <Box display='flex' alignItems='center'>
+                                <IconButton onClick={event => handleMenuOpen(event, lead)}>
+                                  <EyeIcon />
+                                </IconButton>
+
+                                <IconButton onClick={event => handleClick(event, lead)}>
+                                  <Ellipsis
+                                    style={{ marginLeft: 'auto', cursor: 'pointer' }}
+                                    aria-haspopup='true'
+                                    aria-controls='customized-menu'
+                                  />
+                                </IconButton>
+                              </Box>
+                            </div>
                           )}
                         </Draggable>
                       ))
@@ -332,15 +372,64 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
         ) : (
           <EmptyContent />
         )}
+        <KanbanItemMenu
+          is_amocrm={false} // is_amocrm -> store
+          anchorEl={anchorEl}
+          setAnchorEl={setAnchorEl}
+          getSMSTemps={getSMSTemps}
+          getBranches={getBranches}
+          setOpen={setMenuOpen}
+        />
 
-        <EditAnonimDialogDialog department={id} open={open} lead={edit} setOpen={setOpen} />
+        <EditAnonimDialogDialog refetch={refetch} department={id} open={open} lead={edit} setOpen={setOpen} />
+
+        {currentLead && (
+          <Fragment>
+            <LeadNoteModal open={menuOpen} setOpen={setMenuOpen} leadId={currentLead.id} />
+            <SmsModal open={menuOpen} setOpen={setMenuOpen} leadId={currentLead.id} />
+
+            <BranchModal
+              open={menuOpen}
+              setOpen={setMenuOpen}
+              refetch={refetch}
+              leadId={currentLead.id}
+              leadFirstName={currentLead.first_name}
+              phone={currentLead.phone}
+            />
+            <EditAnonimDialogDialog
+              department={currentLead.id}
+              open={menuOpen}
+              lead={currentLead}
+              refetch={refetch}
+              setOpen={setMenuOpen}
+            />
+
+            <AddGroup open={menuOpen} leadId={currentLead.id} refetch={refetch} setOpen={setMenuOpen} />
+
+            <LeadDeleteModal
+              open={menuOpen}
+              setOpen={setMenuOpen}
+              refetch={refetch}
+              leadId={currentLead.id}
+              leadFirstName={currentLead.first_name}
+              leadPhone={currentLead.phone}
+            />
+
+            <AddDepartmantModal
+              currentId={String(defaultId)}
+              refetch={refetch}
+              open={menuOpen}
+              setOpen={setMenuOpen}
+              leadId={currentLead.id}
+            />
+          </Fragment>
+        )}
 
         <Dialog onClose={closeCreateLid} open={openLid !== null}>
           <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography variant='h6' component='span'>
               {t('Yangi Lid')}
             </Typography>
-
             <IconButton aria-label='close' onClick={closeCreateLid}>
               <Close />
             </IconButton>
@@ -368,7 +457,6 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
             />
           </DialogContent>
         </Dialog>
-<<<<<<< HEAD
         <UserSuspendDialog
           loading={isPending}
           open={Boolean(deleteItem)}
@@ -376,8 +464,6 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
           handleOk={handleDelete}
         />
         <LidsDragonModal handleClose={handleClose} openModal={studentModalOpen} selectedLead={selectedLead} />
-=======
->>>>>>> 53d2c79dad4bcb815ee10bba52bac7d28aada574
       </div>
     </DragDropContext>
   )
