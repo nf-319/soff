@@ -8,11 +8,10 @@ import { MenuOpenType } from '../LeadsKaban'
 type Props = {
   open: string | null
   setOpen: Dispatch<SetStateAction<MenuOpenType>>
-  onClose?: () => void
   leadId: string | null
 }
 
-export const LeadNoteModal: FC<Props> = ({ open, setOpen, onClose, leadId }) => {
+export const LeadNoteModal: FC<Props> = ({ open, setOpen, leadId }) => {
   const { t } = useTranslation()
 
   return (
@@ -26,10 +25,7 @@ export const LeadNoteModal: FC<Props> = ({ open, setOpen, onClose, leadId }) => 
       </DialogTitle>
 
       <DialogContent sx={{ minWidth: '300px' }}>
-        <AddNoteAnonimUser
-          user={leadId}
-          closeModal={() => setOpen(null)}
-        />
+        <AddNoteAnonimUser user={leadId} closeModal={() => setOpen(null)} />
       </DialogContent>
     </Dialog>
   )

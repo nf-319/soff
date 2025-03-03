@@ -497,6 +497,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
       setIsActive(false)
       await dispatch(userData?.id)
     } catch (err: any) {
+
       if (err.response.status) {
         setIsErrorText(err.response.data.message)
         setLoading(false)
@@ -542,9 +543,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
               labelId='demo-simple-select-outlined-label'
             >
               {sms_list.map(item => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.description}
-                </MenuItem>
+                <MenuItem value={item.id}>{item.description}</MenuItem>
               ))}
             </Select>
           </FormControl>

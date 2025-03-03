@@ -10,7 +10,6 @@ type Props = {
   open: string | null
   setOpen: Dispatch<SetStateAction<MenuOpenType>>
   leadId: string | null
-  onClose?: () => void
 }
 
 export const SmsModal: FC<Props> = ({ open, setOpen, leadId }) => {
@@ -28,12 +27,7 @@ export const SmsModal: FC<Props> = ({ open, setOpen, leadId }) => {
       </DialogTitle>
 
       <DialogContent sx={{ minWidth: '300px' }}>
-        <SendSmsAnonimUserForm
-          smsLoading={isLoading}
-          smsTemps={data}
-          user={leadId}
-          closeModal={() =>  setOpen(null)}
-        />
+        <SendSmsAnonimUserForm smsLoading={isLoading} smsTemps={data} user={leadId} closeModal={() => setOpen(null)} />
       </DialogContent>
     </Dialog>
   )

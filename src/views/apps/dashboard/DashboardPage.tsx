@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useContext } from 'react'
+import { useContext } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
 import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
 import { Icon } from '@iconify/react'
@@ -19,13 +19,13 @@ export default function DashboardPage() {
   const dispatch = useAppDispatch()
 
   return (
-    <Box component='section' display='grid' alignItems='center' gap={6}>
+    <>
       <Box display={!isMobile ? 'flex' : 'block'} alignItems='center' gap={5} justifyContent='flex-end'>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <Box sx={{ marginBottom: '10px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <Button
             fullWidth={isMobile}
             onClick={() => dispatch(updateEyeVisible(!eyeVisible))}
-            size='medium'
+            size='small'
             variant='outlined'
             sx={{ textTransform: 'unset', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '3px' }}
           >
@@ -52,6 +52,6 @@ export default function DashboardPage() {
         (!user?.currentRole && user?.role.includes('ceo')) ||
         user?.currentRole === 'watcher' ||
         user?.role.includes('watcher')) && <DashboardNumbers />}
-    </Box>
+    </>
   )
 }

@@ -21,6 +21,12 @@ import { createEmotionCache } from 'src/@core/utils/create-emotion-cache'
 import DisabledProvider from 'src/@core/layouts/DisabledProvider'
 import { disableCache } from '@iconify/react'
 
+import 'prismjs'
+import 'prismjs/themes/prism-tomorrow.css'
+import 'prismjs/components/prism-jsx'
+import 'prismjs/components/prism-tsx'
+import 'react-perfect-scrollbar/dist/css/styles.css'
+
 import './globals.css'
 import { Providers, ThemeProvider } from 'src/providers'
 import { MyHead } from 'src/@core/components/Head'
@@ -37,6 +43,12 @@ type Props = {
 }
 
 const clientSideEmotionCache = createEmotionCache()
+
+if (themeConfig.routingLoader) {
+  Router.events.on('routeChangeStart', NProgress.start)
+  Router.events.on('routeChangeError', NProgress.done)
+  Router.events.on('routeChangeComplete', NProgress.done)
+}
 
 const Guard: FC<PropsWithChildren<Props>> = ({ children, authGuard, guestGuard }) => {
   if (guestGuard) return <GuestGuard fallback={<Spinner />}>{children}</GuestGuard>

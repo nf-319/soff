@@ -12,7 +12,7 @@ import {
   DialogTitle,
   IconButton
 } from '@mui/material'
-import { ReactNode, useContext, useEffect, useState } from 'react'
+import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import DataTable from 'src/@core/components/table'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
@@ -21,7 +21,7 @@ import CreateStudentModal from 'src/views/apps/students/CreateStudentModal'
 import EditStudentModal from 'src/views/apps/students/EditStudentModal'
 import StudentRowOptions from 'src/views/apps/students/StudentRowOptions'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { setStudentId, updateStudentParams } from 'src/store/apps/students'
+import { fetchStudentsList, resetStudentsState, setStudentId, updateStudentParams } from 'src/store/apps/students'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { setOpenEdit } from 'src/store/apps/students'
 import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
@@ -41,7 +41,7 @@ export type customTableProps = {
   render?: (source: any) => any | undefined
 }
 
-const GroupsPage = () => {
+export default function GroupsPage() {
   const { t } = useTranslation()
   const router = useRouter()
   const { isMobile } = useResponsive()
@@ -50,10 +50,9 @@ const GroupsPage = () => {
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
 
-  const { queryParams } = useAppSelector(state => state.students)
+  const { queryParams, total_debts } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const queryString = new URLSearchParams({ ...queryParams } as Record<string, string>).toString()
-
   const { data, isLoading } = useGet('student/new-list/', {
     deps: ['students-list'],
     params: queryParams as Record<string, unknown>
@@ -183,10 +182,12 @@ const GroupsPage = () => {
     setRowsPerPage(value)
 
     dispatch(updateStudentParams({ limit: value, offset: 0 }))
+    // await dispatch(fetchStudentsList({ ...queryParams, limit: String(value), offset: '0' }))
   }
 
   const handlePagination = async (page: string | number) => {
     const adjustedPage: any = (Number(page) - 1) * rowsPerPage
+    // await dispatch(fetchStudentsList({ ...queryParams, limit: String(rowsPerPage), offset: adjustedPage }))
     dispatch(updateStudentParams({ offset: adjustedPage }))
   }
 
@@ -202,6 +203,8 @@ const GroupsPage = () => {
         toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
         return
       }
+
+      // await dispatch(fetchStudentsList({ ...queryParams }))
     }
 
     initialize()
@@ -228,10 +231,16 @@ const GroupsPage = () => {
           <Typography variant='h5'>{t("O'quvchilar")}</Typography>
           {!isLoading && <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' />}
           {!isLoading && queryParams.is_debtor && (
-            <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm"} variant='outlined' color='error' />
+            <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm" } variant='outlined' color='error' />
           )}
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
+          {/* <>
+            <input type='file' ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
+            <Button onClick={handleClick} variant='outlined' size='small'>
+              {t("O'quvchilarni import qilish")}
+            </Button>
+          </> */}
           <Button
             onClick={() => dispatch(setOpenEdit('create'))}
             variant='contained'
@@ -291,7 +300,7 @@ const GroupsPage = () => {
           <Select
             size='small'
             onChange={e => handleRowsPerPageChange(Number(e.target.value))}
-            value={rowsPerPage || ''}
+            value={rowsPerPage}
             className='page-resize'
           >
             <MenuItem value={10}>10</MenuItem>
@@ -310,7 +319,6 @@ const GroupsPage = () => {
           <Typography variant='h6' component='span'>
             {t('Modal title')}
           </Typography>
-
           <IconButton
             aria-label='close'
             onClick={() => setOpen(false)}
@@ -319,11 +327,9 @@ const GroupsPage = () => {
             <IconifyIcon icon='mdi:close' />
           </IconButton>
         </DialogTitle>
-
         <DialogContent>
           <StudentsFilter isMobile={isMobile} />
         </DialogContent>
-
         <DialogActions className='dialog-actions-dense'>
           <Button onClick={() => setOpen(false)}>{t('Davom etish')}</Button>
         </DialogActions>
@@ -331,6 +337,3 @@ const GroupsPage = () => {
     </div>
   )
 }
-
-GroupsPage.displayName = 'GroupsPage'
-export default GroupsPage

@@ -83,7 +83,6 @@ const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidt
       ) : data?.length > 0 ? (
         data?.map((item, index) => {
           const colors = extractColors(item.color)
-
           return (
             <Box
               minWidth={minWidth || '1200px'}
@@ -127,7 +126,7 @@ const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidt
                 <Box
                   sx={{ width: '55%', zIndex: 1, height: '36px', position: 'absolute' }}
                   onClick={() => handleClick(item.id)}
-                />
+                ></Box>
               )}
             </Box>
           )
@@ -138,5 +137,6 @@ const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidt
     </div>
   )
 }
+
 
 export default DataTable

@@ -8,10 +8,7 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import {
   fetchAmoCrmPipelines,
   fetchDepartmentList,
-  setAddSource,
   setOpenItem,
-  setOpenLid,
-  setSectionId,
   updateAmoCrmStudent,
   updateDepartmentStudent
 } from 'src/store/apps/leads'
@@ -42,12 +39,12 @@ export default function MergeToDepartment({ setOpen, open, currentId, is_amocrm,
   })
 
   const { data: leadData } = useGet<LeadsType<LeadsResult[]>>('leads/department/parent/', {
-    params: { branch: user?.active_branch },
+    params: { branch: user?.active_branch},
     deps: ['departments-leads']
   })
 
   const { data: parentLeadData } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
-    params: { branch: user?.active_branch, parent: department },
+    params: { branch: user?.active_branch, parent: currentId },
     deps: ['departments-leads']
   })
 
@@ -88,9 +85,6 @@ export default function MergeToDepartment({ setOpen, open, currentId, is_amocrm,
         } else {
           toast.success('Muvaffaqiyatli kochirildi')
           setOpen(null)
-          dispatch(setOpenLid(null))
-          dispatch(setAddSource(false))
-          dispatch(setSectionId(null))
           await dispatch(fetchAmoCrmPipelines({}))
           await dispatch(fetchDepartmentList())
 
@@ -161,14 +155,7 @@ export default function MergeToDepartment({ setOpen, open, currentId, is_amocrm,
                 ))
               ) : (
                 <Fragment>
-                  <MenuItem
-                    onClick={() => {
-                      setOpen(null)
-                      dispatch(setOpenItem(currentId))
-                    }}
-                  >
-                    + Yangi bo'lim ochish
-                  </MenuItem>
+                  <MenuItem onClick={() =>  { setOpen(null); dispatch(setOpenItem(currentId))}}>+ Yangi bo'lim ochish</MenuItem>
                   <MenuItem sx={{ color: '#d3d3d3' }}>Bo'lim majuda emas!</MenuItem>
                 </Fragment>
               )

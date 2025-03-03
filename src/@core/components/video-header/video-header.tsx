@@ -112,7 +112,7 @@ const VideoHeader = ({ item }: { item: VideoType }) => {
   }
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Button
         fullWidth={isMobile}
         onClick={clickBtn}

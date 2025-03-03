@@ -10,7 +10,6 @@ import api from 'src/@core/utils/api'
 import toast from 'react-hot-toast'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchSmsList, fetchSmsListQuery } from 'src/store/apps/settings'
-import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
 
 type Props = {
   smsTemps: any[]
@@ -48,9 +47,6 @@ export default function SendSmsAnonimUserForm({ smsTemps, user, closeModal, smsL
         })
         setLoading(false)
         closeModal()
-        dispatch(setOpenLid(null))
-        dispatch(setAddSource(false))
-        dispatch(setSectionId(null))
         toast.success(`${t("SMS muvaffaqiyatli jo'natildi!")}`, {
           position: 'top-center'
         })
@@ -101,13 +97,12 @@ export default function SendSmsAnonimUserForm({ smsTemps, user, closeModal, smsL
             setParentId(e.target.value)
           }}
         >
-          {smsLoading
-            ? 'Malumot yuklanmoqda...'
-            : smsTemps.map((el: any) => (
-                <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
-                  <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>{el.description}</span>
-                </MenuItem>
-              ))}
+          {smsLoading ? 'Malumot yuklanmoqda...' : smsTemps.map((el: any) => (
+            <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
+              <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>{el.description}</span>
+            </MenuItem>
+          ))}
+
         </Select>
       </FormControl>
 
