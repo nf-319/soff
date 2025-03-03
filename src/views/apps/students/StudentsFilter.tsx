@@ -167,7 +167,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
               }
             }}
           >
-            <MenuItem value={''}>
+            <MenuItem value=''>
               <b>{t('Barchasi')}</b>
             </MenuItem>
             {courses.map(course => (
@@ -177,6 +177,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
             ))}
           </Select>
         </FormControl>
+
         <FormControl fullWidth>
           <InputLabel size='small' id='demo-simple-select-outlined-label'>
             {t('Maktab')}
@@ -193,7 +194,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
               handleFilter('school', e.target.value)
             }}
           >
-            <MenuItem value={''}>
+            <MenuItem value=''>
               <b>{t('Barchasi')}</b>
             </MenuItem>
             {schools.map((school: any) => (
@@ -220,7 +221,6 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
               <b>{t('Barchasi')}</b>
             </MenuItem>
             <MenuItem value={'active'}>{t('active')}</MenuItem>
-            {/* <MenuItem value={'archive'}>{t('archive')}</MenuItem> */}
             <MenuItem value={'new'}>{t('test')}</MenuItem>
             <MenuItem value={'frozen'}>{t('frozen')}</MenuItem>
             <MenuItem value={'not_activated'}>{t('Sinov darsidan ketganlar')}</MenuItem>

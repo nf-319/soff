@@ -12,9 +12,7 @@ import { AuthContext } from 'src/context/AuthContext'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchModerationSalaries, updateSalaryBonus, updateSalaryFine } from 'src/store/apps/finance'
 
-type Props = {}
-
-export default function SalaryConfirm({}: Props) {
+const SalaryConfirm = () => {
   const { t } = useTranslation()
   const { back, push } = useRouter()
   const dispatch = useAppDispatch()
@@ -144,6 +142,7 @@ export default function SalaryConfirm({}: Props) {
           </IconButton>
           <Typography sx={{ fontSize: '20px', flexGrow: 1 }}>{t('Oylik hisoblash')}</Typography>
         </Box>
+
         <DataTable
           loading={isPending}
           maxWidth='100%'
@@ -151,6 +150,7 @@ export default function SalaryConfirm({}: Props) {
           columns={withdrawCol}
           data={moderation_salaries}
         />
+
         {moderation_salaries.length > 0 && !isPending && moderation_salaries[0].status !== 'approved' && (
           <LoadingButton
             loading={loading === 'frozen'}
@@ -163,6 +163,7 @@ export default function SalaryConfirm({}: Props) {
             {t('Vaqtincha saqlash')}
           </LoadingButton>
         )}
+
         {moderation_salaries.length > 0 && !isPending && moderation_salaries[0].status !== 'approved' && is_update && (
           <LoadingButton
             loading={loading === 'approved'}
@@ -177,9 +178,6 @@ export default function SalaryConfirm({}: Props) {
       </Box>
 
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', minWidth: '300px', justifyContent: 'space-between' }}>
-          {/* <IconifyIcon icon={'mdi:close'} onClick={() => setOpen(false)} /> */}
-        </DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '350px' }}>
           <Typography sx={{ fontSize: '24px', textAlign: 'center' }}>
             {t("O'zgarishlarni butunlay saqlamoqchimisiz?")}
@@ -196,3 +194,6 @@ export default function SalaryConfirm({}: Props) {
     </div>
   )
 }
+
+SalaryConfirm.displayName = 'SalaryConfirm'
+export default SalaryConfirm

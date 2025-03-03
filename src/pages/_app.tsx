@@ -38,12 +38,6 @@ type Props = {
 
 const clientSideEmotionCache = createEmotionCache()
 
-if (themeConfig.routingLoader) {
-  Router.events.on('routeChangeStart', NProgress.start)
-  Router.events.on('routeChangeError', NProgress.done)
-  Router.events.on('routeChangeComplete', NProgress.done)
-}
-
 const Guard: FC<PropsWithChildren<Props>> = ({ children, authGuard, guestGuard }) => {
   if (guestGuard) return <GuestGuard fallback={<Spinner />}>{children}</GuestGuard>
   if (authGuard) return <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>

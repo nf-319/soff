@@ -3,11 +3,8 @@ import { toast } from 'react-hot-toast'
 import api from 'src/@core/utils/api'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { handleEditClickOpen, setMeetLink, setOnlineLessonLoading } from 'src/store/apps/groupDetails'
-
-// ** MUI Imports
 import LoadingButton from '@mui/lab/LoadingButton'
 import Dialog from '@mui/material/Dialog'
-import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import DialogTitle from '@mui/material/DialogTitle'
 import FormControl from '@mui/material/FormControl'
@@ -20,23 +17,20 @@ import * as Yup from 'yup'
 import { fetchSmsList, fetchSmsListQuery } from 'src/store/apps/settings'
 import Link from 'next/link'
 import IconifyIcon from 'src/@core/components/icon'
-import { useRouter } from 'next/router'
 import { MetaTypes } from 'src/types/apps/groupsTypes'
 
 export default function OnlineLessonModal() {
   const [isLoading, setLoading] = useState(false)
-  const { openEdit, students, meet_link, onlineLessonLoading } = useAppSelector(state => state.groupDetails)
+  const { meet_link, onlineLessonLoading } = useAppSelector(state => state.groupDetails)
   const [isSentSms, setIsSentSms] = useState(false)
   const dispatch = useAppDispatch()
   const [groups, setGroups] = useState<any>()
   const [successText, setIsSuccessText] = useState('')
   const { t } = useTranslation()
   const [parent_id, setParentId] = useState<number | null>(null)
-  const router = useRouter()
   const [openModal, setOpenModal] = useState<any>(null)
   const [groupId, setGroupId] = useState<number | null>(null)
 
-  // Extract access_token from URL
   useEffect(() => {
     const url = new URL(window.location.href)
     const params = new URLSearchParams(url.search)
@@ -47,21 +41,11 @@ export default function OnlineLessonModal() {
     }
   }, [])
 
-  async function getGroups() {
+  const getGroups = async () => {
     await api
       .get('common/group-check-list/')
       .then(res => setGroups(res.data))
       .catch(error => console.log(error))
-  }
-
-  // Function to send access_token to backend
-  const sendAccessTokenToBackend = async (token: string) => {
-    try {
-      const response = await api.post('path/to/endpoint', { token })
-      console.log('Access token sent successfully:', response.data)
-    } catch (error) {
-      console.error('Error sending access token:', error)
-    }
   }
 
   const handleCopy = () => {
@@ -132,28 +116,28 @@ export default function OnlineLessonModal() {
     value: item?.id
   }))
 
-  function handleCancel() {
+  const handleCancel = () => {
     const url = new URL(window.location.href)
     const params = new URLSearchParams(url.search)
 
-    // Remove 'modal' and 'access_token' parameters
     params.delete('modal')
     params.delete('access_token')
 
-    // Update the URL without reloading the page
     history.replaceState(null, '', `${url.pathname}?${params.toString()}`)
+  }
+
+  const handleClose = () => {
+    setOpenModal(null)
+    handleCancel()
+    dispatch(handleEditClickOpen(null))
+    setIsSuccessText('')
+    setIsSentSms(false)
   }
 
   return (
     <Dialog
-      open={openModal}
-      onClose={() => {
-        setOpenModal(null)
-        handleCancel()
-        dispatch(handleEditClickOpen(null))
-        setIsSuccessText('')
-        setIsSentSms(false)
-      }}
+      open={Boolean(openModal)}
+      onClose={handleClose}
       aria-labelledby='user-view-edit'
       sx={{ '& .MuiPaper-root': { width: '100%', maxWidth: 450, p: [1, 3] } }}
       aria-describedby='user-view-edit-description'
@@ -161,6 +145,7 @@ export default function OnlineLessonModal() {
       <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
         {t('Online darsni boshlash')}
       </DialogTitle>
+
       <DialogContent>
         {onlineLessonLoading ? (
           <Typography textAlign='center'>Yuklanmoqda...</Typography>
@@ -180,7 +165,7 @@ export default function OnlineLessonModal() {
         <Box sx={{ width: '100%', marginTop: 5 }}>
           <Autocomplete
             disablePortal
-            options={groupOptions}
+            options={groupOptions || []}
             onChange={(e: any, v: any) => setGroupId(v.value)}
             size='small'
             renderInput={params => <TextField {...params} label={t('Guruh')} />}
