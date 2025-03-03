@@ -49,6 +49,7 @@ import { TeacherAvatar, VisuallyHiddenInput } from '../mentors/AddMentorsModal'
 import { revereAmount } from 'src/@core/components/amount-input'
 import api from 'src/@core/utils/api'
 import ceoConfigs from 'src/configs/ceo'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function CreateStudentForm() {
   // ** Hooks
@@ -68,6 +69,7 @@ export default function CreateStudentForm() {
   const [loading, setLoading] = useState<boolean>(false)
   const [isDiscount, setIsDiscount] = useState<boolean>(false)
   const [checked, setChecked] = useState(false)
+  const queryClient = useQueryClient()
   const [parents, setParents] = useState([])
   const school_type = localStorage.getItem('school_type')
   const getGroups = async () => {
@@ -149,10 +151,10 @@ export default function CreateStudentForm() {
         //   }
         //   await api.post(`common/personal-payment/`, discountConfig)
         // }
-
+        
         toast.success("O'quvchi muvaffaqiyatli yaratildi")
         await dispatch(updateStudentParams({ status: 'active' }))
-        await dispatch(fetchStudentsList({ status: 'active' }))
+        queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
         dispatch(setOpenEdit(null))
         formik.resetForm()
         setIsGroup(false)
