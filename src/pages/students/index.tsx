@@ -31,6 +31,8 @@ import useResponsive from 'src/@core/hooks/useResponsive'
 import IconifyIcon from 'src/@core/components/icon'
 import ExcelStudents from 'src/@core/components/excelButton/ExcelStudents'
 import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
+import { useGet } from 'src/hooks/useApi'
+import { useQueryClient } from '@tanstack/react-query'
 
 export type customTableProps = {
   xs: number
@@ -46,9 +48,15 @@ export default function GroupsPage() {
   const { user } = useContext(AuthContext)
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
-  const { students, isLoading, studentsCount, queryParams, total_debts } = useAppSelector(state => state.students)
+  const queryClient = useQueryClient()
+
+  const { queryParams, total_debts } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const queryString = new URLSearchParams({ ...queryParams } as Record<string, string>).toString()
+  const { data, isLoading } = useGet('student/new-list/', {
+    deps: ['students-list'],
+    params: queryParams as Record<string, unknown>
+  })
 
   const columns: customTableProps[] = [
     {
@@ -174,12 +182,12 @@ export default function GroupsPage() {
     setRowsPerPage(value)
 
     dispatch(updateStudentParams({ limit: value, offset: 0 }))
-    await dispatch(fetchStudentsList({ ...queryParams, limit: String(value), offset: '0' }))
+    // await dispatch(fetchStudentsList({ ...queryParams, limit: String(value), offset: '0' }))
   }
 
   const handlePagination = async (page: string | number) => {
     const adjustedPage: any = (Number(page) - 1) * rowsPerPage
-    await dispatch(fetchStudentsList({ ...queryParams, limit: String(rowsPerPage), offset: adjustedPage }))
+    // await dispatch(fetchStudentsList({ ...queryParams, limit: String(rowsPerPage), offset: adjustedPage }))
     dispatch(updateStudentParams({ offset: adjustedPage }))
   }
 
@@ -196,7 +204,7 @@ export default function GroupsPage() {
         return
       }
 
-      await dispatch(fetchStudentsList({ ...queryParams }))
+      // await dispatch(fetchStudentsList({ ...queryParams }))
     }
 
     initialize()
@@ -206,6 +214,10 @@ export default function GroupsPage() {
       dispatch(updateStudentParams({ limit: '10', offset: '0' }))
     }
   }, [])
+
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+  }, [user?.active_branch])
 
   return (
     <div>
@@ -217,9 +229,9 @@ export default function GroupsPage() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Typography variant='h5'>{t("O'quvchilar")}</Typography>
-          {!isLoading && <Chip label={`${studentsCount}`} variant='outlined' color='primary' />}
+          {!isLoading && <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' />}
           {!isLoading && queryParams.is_debtor && (
-            <Chip label={`${formatCurrency(total_debts)}` + " so'm"} variant='outlined' color='error' />
+            <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm" } variant='outlined' color='error' />
           )}
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
@@ -260,25 +272,27 @@ export default function GroupsPage() {
         color
         loading={isLoading}
         columns={columns}
-        data={[
-          ...students.map(el => ({
-            ...el,
-            color:
-              Number(el.balance) < 0
-                ? 'rgba(227, 18, 18, 0.1)'
-                : el.payment_status <= 5 && el.payment_status
-                ? 'rgba(237, 156, 64, 0.22)'
-                : ''
-          }))
-        ]}
+        data={
+          Array.isArray(data?.results)
+            ? data.results.map((el: any) => ({
+                ...el,
+                color:
+                  Number(el.balance) < 0
+                    ? 'rgba(227, 18, 18, 0.1)'
+                    : el.payment_status <= 5 && el.payment_status
+                    ? 'rgba(237, 156, 64, 0.22)'
+                    : ''
+              }))
+            : []
+        }
         rowClick={rowClick}
       />
 
-      {studentsCount > 10 && !isLoading && (
+      {data?.count > 10 && !isLoading && (
         <div className='d-flex'>
           <Pagination
             page={Number(queryParams.offset) ? Number(queryParams.offset) / rowsPerPage + 1 : 1}
-            count={Math.ceil(studentsCount / rowsPerPage)}
+            count={Math.ceil(data?.count / rowsPerPage)}
             variant='outlined'
             shape='rounded'
             onChange={(e: any, page) => handlePagination(page)}

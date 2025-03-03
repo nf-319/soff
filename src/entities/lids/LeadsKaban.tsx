@@ -1,6 +1,6 @@
 'use client'
 
-import { Close, PersonAddAlt } from '@mui/icons-material'
+import { Close, Delete, PersonAddAlt } from '@mui/icons-material'
 import { Box, Button, Chip, Dialog, DialogContent, DialogTitle, IconButton, Skeleton, Typography } from '@mui/material'
 import { Ellipsis, EyeIcon, Phone, User } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux'
 import { EmptyContent } from 'src/@core/components/empty-content'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'
-import { useGet } from 'src/hooks/useApi'
+import { useDelete, useGet, usePatch } from 'src/hooks/useApi'
 import { RootState, useAppDispatch } from 'src/store'
 import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
 import CreateAnonimUserForm from 'src/views/apps/lids/anonimUser/CreateAnonimUserForm'
@@ -31,6 +31,8 @@ import { BranchModal } from './modals/BranchModal'
 import { LeadDeleteModal } from './modals/LeadDeleteModal'
 import { AddGroup } from './modals/AddGroupModal'
 import { AddDepartmantModal } from './modals/AddDepartmantModal'
+import toast from 'react-hot-toast'
+import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 
 type LeadsChld = {
   id: number
@@ -80,8 +82,9 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
   const [open, setOpen] = useState<boolean>(false)
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-
+  const [deleteItem, setDeleteItem] = useState<any | null>(null)
   const { id, search, is_active } = router.query
+  const { mutate, isPending } = usePatch()
 
   const {
     data: leadData,
@@ -110,6 +113,25 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
       queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/'] })
     }
   })
+
+  const handleDelete = async () => {
+    if (!deleteItem?.id) return
+
+    mutate(
+      `leads/department-update/${deleteItem?.id}`,
+      { is_active: false },
+      {
+        onSuccess: () => {
+          setDeleteItem(null)
+          toast.success("Bo'lim o'chirildi")
+          queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/'] })
+        },
+        onError: (err: any) => {
+          toast.error(err.response?.data || 'Xatolik yuz berdi')
+        }
+      }
+    )
+  }
 
   const handleMenuOpen = (event: any, lead: any) => {
     setStudentModalOpen(true)
@@ -177,7 +199,7 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
     })
   }
 
-  if (isLoading) (
+  if (isLoading)
     <Box display='flex' flexDirection='column' marginBottom={10} gap={5}>
       <Box display='flex' gap={5}>
         <Skeleton variant='rounded' width={300} height={50} />
@@ -193,7 +215,6 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
         <Skeleton variant='rounded' width={300} height={80} />
       </Box>
     </Box>
-  )
 
   const displayData = localLeadData || leadData
 
@@ -226,7 +247,7 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
                     borderRadius: 10
                   }}
                 >
-                  <Box display='flex' alignItems='center' justifyContent='space-between' gap={4}>
+                  <Box display='flex' alignItems='center' justifyContent='space-between'>
                     <div
                       style={{
                         display: 'flex',
@@ -243,15 +264,25 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
                       <Chip color='primary' variant='outlined' label={section.leads.length} />
                     </div>
 
-                    <IconButton
-                      sx={{ cursor: 'pointer' }}
-                      onClick={() => {
-                        setOpen(true)
-                        setEdit(section)
-                      }}
-                    >
-                      <IconifyIcon icon='fluent:text-bullet-list-square-edit-20-filled' color='orange' />
-                    </IconButton>
+                    <Box display={'flex'}>
+                      <IconButton
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          setOpen(true)
+                          setEdit(section)
+                        }}
+                      >
+                        <IconifyIcon icon='fluent:text-bullet-list-square-edit-20-filled' color='orange' />
+                      </IconButton>
+                      <IconButton
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          setDeleteItem(section)
+                        }}
+                      >
+                        <Delete color='error' />
+                      </IconButton>
+                    </Box>
                   </Box>
 
                   <div
@@ -426,6 +457,12 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
           </DialogContent>
         </Dialog>
 
+        <UserSuspendDialog
+          loading={isPending}
+          open={Boolean(deleteItem)}
+          setOpen={setDeleteItem}
+          handleOk={handleDelete}
+        />
         <LidsDragonModal handleClose={handleClose} openModal={studentModalOpen} selectedLead={selectedLead} />
       </div>
     </DragDropContext>

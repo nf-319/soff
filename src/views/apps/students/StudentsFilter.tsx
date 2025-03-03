@@ -79,7 +79,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
 
   async function handleFilter(key: string, value: string | number | null) {
     dispatch(updateStudentParams({ [key]: value }))
-    
+
     if (key == 'status') {
       dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
     }
@@ -127,10 +127,6 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
     value: item?.id
   }))
 
-  useEffect(() => {
-    dispatch(fetchStudentsList(queryParams))
-  }, [queryParams])
-
   if (isMobile)
     <form id='mobile-filter-form'>
       <Box display={'flex'} gap={2} flexDirection={'column'} paddingTop={isMobile ? 3 : 0} rowGap={isMobile ? 4 : 0}>
@@ -156,7 +152,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
             {t('Kurslar')}
           </InputLabel>
           <Select
-            onClick={() => setKey('course')}
+            onOpen={() => setKey('course')}
             key={'course'}
             size='small'
             label={t('Kurslar')}
@@ -187,7 +183,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
           </InputLabel>
 
           <Select
-            onClick={() => setKey('school')}
+            onOpen={() => setKey('school')}
             size='small'
             label={t('Maktab')}
             value={queryParams.school}
@@ -367,7 +363,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
 
           <Select
             size='small'
-            onClick={() => setKey('course')}
+            onOpen={() => setKey('course')}
             key={'course'}
             label={t('Kurslar')}
             defaultValue={''}
@@ -396,7 +392,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
             {t('Maktab')}
           </InputLabel>
           <Select
-            onClick={() => setKey('school')}
+            onOpen={() => setKey('school')}
             size='small'
             label={t('Maktab')}
             id='demo-simple-select-outlined'
@@ -426,7 +422,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
           </InputLabel>
           <Select
             size='small'
-            onClick={() => setKey('group_status')}
+            onOpen={() => setKey('group_status')}
             label={t('Guruhdagi holati')}
             value={queryParams.group_status}
             id='demo-simple-select-outlined'

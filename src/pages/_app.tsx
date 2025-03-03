@@ -1,60 +1,30 @@
-import { FC, PropsWithChildren, ReactNode } from 'react'
-import { Router } from 'next/router'
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
-import NProgress from 'nprogress'
 import { CacheProvider } from '@emotion/react'
 import type { EmotionCache } from '@emotion/cache'
-import 'src/configs/i18n'
 import { defaultACLObj } from 'src/configs/acl'
-import themeConfig from 'src/configs/themeConfig'
 import { Toaster } from 'react-hot-toast'
 import UserLayout from 'src/layouts/UserLayout'
 import AclGuard from 'src/@core/components/auth/AclGuard'
-import AuthGuard from 'src/@core/components/auth/AuthGuard'
-import GuestGuard from 'src/@core/components/auth/GuestGuard'
-import Spinner from 'src/@core/components/spinner'
 import { AuthProvider } from 'src/context/AuthContext'
 import { SettingsConsumer, SettingsProvider } from 'src/@core/context/settingsContext'
 import ReactHotToast from 'src/@core/styles/libs/react-hot-toast'
 import { createEmotionCache } from 'src/@core/utils/create-emotion-cache'
 import DisabledProvider from 'src/@core/layouts/DisabledProvider'
 import { disableCache } from '@iconify/react'
-
-import 'prismjs'
-import 'prismjs/themes/prism-tomorrow.css'
-import 'prismjs/components/prism-jsx'
-import 'prismjs/components/prism-tsx'
-import 'react-perfect-scrollbar/dist/css/styles.css'
-
-import './globals.css'
-import { Providers, ThemeProvider } from 'src/providers'
+import { Guard, Providers, ThemeProvider } from 'src/providers'
 import { MyHead } from 'src/@core/components/Head'
 import { WindowWrapper } from 'src/layouts'
+
+import './globals.css'
+import 'src/configs/i18n'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
   emotionCache: EmotionCache
 }
 
-type Props = {
-  authGuard: boolean
-  guestGuard: boolean
-}
-
 const clientSideEmotionCache = createEmotionCache()
-
-if (themeConfig.routingLoader) {
-  Router.events.on('routeChangeStart', NProgress.start)
-  Router.events.on('routeChangeError', NProgress.done)
-  Router.events.on('routeChangeComplete', NProgress.done)
-}
-
-const Guard: FC<PropsWithChildren<Props>> = ({ children, authGuard, guestGuard }) => {
-  if (guestGuard) return <GuestGuard fallback={<Spinner />}>{children}</GuestGuard>
-  if (authGuard) return <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>
-  return <>{children}</>
-}
 
 disableCache('all')
 
