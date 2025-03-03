@@ -1,27 +1,29 @@
 import { Box, Dialog, DialogContent, FormControl, TextField, Typography } from '@mui/material'
-import { Dispatch, FC, SetStateAction, useState } from 'react'
-import { LeadsResult, MenuOpenType } from '../LeadsKaban'
+import { Dispatch, FC, SetStateAction } from 'react'
+import { MenuOpenType } from '../LeadsKaban'
 import { useTranslation } from 'react-i18next'
 import * as Yup from 'yup'
 import { LoadingButton } from '@mui/lab'
 import { useFormik } from 'formik'
 import api from 'src/@core/utils/api'
-import { useRouter } from 'next/router'
-import { QueryObserverResult, RefetchOptions, useQueryClient } from '@tanstack/react-query'
-import { LeadsType } from '../model'
+import { useQueryClient } from '@tanstack/react-query'
+import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
+import { useAppDispatch } from 'src/store'
 
 type Props = {
   open: string | null
   setOpen: Dispatch<SetStateAction<MenuOpenType>>
   leadId: string
   leadFirstName: string
+  onClose?: () => void
   leadPhone: string
-  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
 }
 
-export const LeadDeleteModal: FC<Props> = ({ open, setOpen, refetch, leadId, leadFirstName, leadPhone }) => {
+export const LeadDeleteModal: FC<Props> = ({ open, onClose, setOpen, leadId, leadFirstName, leadPhone }) => {
   const { t } = useTranslation()
-  const query = useQueryClient()
+  const queryClient = useQueryClient()
+  const dispatch = useAppDispatch()
+
   const formik = useFormik({
     initialValues: {
       reason: ''
@@ -48,7 +50,7 @@ export const LeadDeleteModal: FC<Props> = ({ open, setOpen, refetch, leadId, lea
     }
     try {
       const resp = await api.patch(`leads/anonim-user/update/${id}/`, newValues)
-      await refetch()
+      queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
       return Promise.resolve(resp)
     } catch (err: any) {
       return Promise.reject(err)
@@ -61,6 +63,10 @@ export const LeadDeleteModal: FC<Props> = ({ open, setOpen, refetch, leadId, lea
       setSubmitting(false)
       resetForm()
       setOpen(null)
+      dispatch(setOpenLid(null))
+      dispatch(setAddSource(false))
+      dispatch(setSectionId(null))
+      if (onClose) onClose()
     } catch (err: any) {
       setSubmitting(false)
     }
@@ -72,6 +78,7 @@ export const LeadDeleteModal: FC<Props> = ({ open, setOpen, refetch, leadId, lea
         <Typography sx={{ fontSize: '24px', marginBottom: '20px', textAlign: 'center' }}>
           {t("Rostdan ham o'chirib tashlamoqchimisiz?")}
         </Typography>
+
         <form
           onSubmit={formik.handleSubmit}
           style={{ paddingTop: '5px', display: 'flex', flexDirection: 'column', gap: '15px' }}
@@ -95,6 +102,7 @@ export const LeadDeleteModal: FC<Props> = ({ open, setOpen, refetch, leadId, lea
             <LoadingButton variant='outlined' size='small' color='error' onClick={() => setOpen(null)}>
               {t('Bekor qilish')}
             </LoadingButton>
+
             <LoadingButton loading={formik.isSubmitting} type='submit' size='small' variant='contained'>
               {t("O'chirish")}
             </LoadingButton>
