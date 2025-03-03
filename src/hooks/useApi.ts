@@ -57,7 +57,7 @@ export const patchRequest = <T>(
 
 
 export const deleteRequest = (url: string, config?: AxiosRequestConfig) =>
-  api.delete(`/${url}/`, config).then(res => res.data)
+  api.delete(`/${url}`, config).then(res => res.data)
 
 // --------------------------------------------------------------------------------
 
