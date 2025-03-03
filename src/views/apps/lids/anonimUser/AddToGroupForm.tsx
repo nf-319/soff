@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import { today } from 'src/@core/components/card-statistics/kanban-item'
 import api from 'src/@core/utils/api'
 import toast, { Toaster } from 'react-hot-toast'
-import { setAddSource, setDragonLoading, setLeadItems, setOpenLid, setSectionId } from 'src/store/apps/leads'
+import { setDragonLoading, setLeadItems } from 'src/store/apps/leads'
 
 type Props = {
   item: any
@@ -48,9 +48,6 @@ export default function AddToGroupForm({ setOpenParent, setOpen, is_amocrm, item
     try {
       const res = await api.get(`leads/department/${query}`)
       dispatch(setLeadItems(res.data))
-      dispatch(setOpenLid(null))
-      dispatch(setAddSource(false))
-      dispatch(setSectionId(null))
     } catch (err) {
       console.error('Error fetching leads:', err)
     } finally {

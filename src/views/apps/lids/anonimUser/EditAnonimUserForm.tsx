@@ -5,13 +5,7 @@ import { FormControl, FormHelperText, InputLabel, TextField } from '@mui/materia
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import {
-  editDepartmentStudent,
-  setAddSource,
-  setOpenLid,
-  setSectionId,
-  updateDepartmentStudent
-} from 'src/store/apps/leads'
+import { editDepartmentStudent, updateDepartmentStudent } from 'src/store/apps/leads'
 import { reversePhone } from 'src/@core/components/phone-input/format-phone-number'
 import PhoneInput from 'src/@core/components/phone-input'
 import { useQueryClient } from '@tanstack/react-query'
@@ -55,10 +49,7 @@ export default function EditAnonimUserForm({ department, item, onClose, laed }: 
           formik.setErrors(resp.payload)
         } else {
           formik.resetForm()
-          queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
-          dispatch(setOpenLid(null))
-          dispatch(setAddSource(false))
-          dispatch(setSectionId(null))
+          await queryClient.invalidateQueries({ queryKey: ['departments-leads'] })
         }
       } catch (error) {
         console.error('Error updating department:', error)

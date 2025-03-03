@@ -10,11 +10,11 @@ const STALE_TIME_MS = STALE_TIME_SECONDS * SECONDS_IN_MS
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // refetchOnMount: false,
-      // refetchOnReconnect: false,
-      // refetchOnWindowFocus: false,
-      // retry: QUERY_RETRY_COUNT,
-      // staleTime: STALE_TIME_MS,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+      retry: QUERY_RETRY_COUNT,
+      staleTime: STALE_TIME_MS,
     },
   },
 })

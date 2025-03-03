@@ -7,8 +7,10 @@ const SubLoader = () => {
   const { t } = useTranslation()
 
   return (
-    <Box sx={{ my: 3, display: 'flex', alignItems: 'center', flexDirection: 'column', width: '100%', mt: '70px' }}>
-      <CircularProgress sx={{ mb: 4 }} />
+    <Box
+      sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', width: '100%' }}
+    >
+      <CircularProgress />
 
       <Typography variant='overline' component='h2' textTransform={'capitalize'}>
         {t('Loading...')}
