@@ -7,6 +7,8 @@ import { FormControl, FormHelperText, TextField } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import api from 'src/@core/utils/api'
+import { useAppDispatch } from 'src/store'
+import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
 
 type Props = {
   user: any
@@ -15,6 +17,7 @@ type Props = {
 
 export default function AddNoteAnonimUser({ user, closeModal }: Props) {
   const { t } = useTranslation()
+  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState<any>(false)
 
   const validationSchema = Yup.object({
@@ -35,6 +38,10 @@ export default function AddNoteAnonimUser({ user, closeModal }: Props) {
         })
         setLoading(false)
         closeModal()
+
+        dispatch(setOpenLid(null))
+        dispatch(setAddSource(false))
+        dispatch(setSectionId(null))
         formik.resetForm()
       } catch {
         setLoading(false)

@@ -45,7 +45,7 @@ jobs:
           if [[ $GITHUB_REF == refs/heads/main ]]; then
             echo "${{ secrets.PROD_ENV_FILE }}" > .env
           elif [[ $GITHUB_REF == refs/heads/staging ]]; then
-            echo "${{ secrets.STAGING_ENV_FILE }}" > .env
+            echo "${{ secrets.TEST_ENV_FILE }}" > .env
           else
             echo "${{ secrets.DEV_ENV_FILE }}" > .env
           fi
@@ -58,9 +58,9 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.ref_name }}
         with:
-          host: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_HOST || secrets.DEV_SERVER_HOST }}
-          username: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_USER || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_USER || secrets.DEV_SERVER_USER }}
-          key: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_SSH_KEY || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_SSH_KEY || secrets.DEV_SERVER_SSH_KEY }}
+          host: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/staging' && secrets.TEST_SERVER_HOST || secrets.DEV_SERVER_HOST }}
+          username: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_USER || github.ref == 'refs/heads/staging' && secrets.TEST_SERVER_USER || secrets.DEV_SERVER_USER }}
+          key: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_SSH_KEY || github.ref == 'refs/heads/staging' && secrets.TEST_SERVER_SSH_KEY || secrets.DEV_SERVER_SSH_KEY }}
           script_stop: true
           envs: BRANCH_NAME
           script: |
@@ -84,9 +84,9 @@ jobs:
       - name: Build fayllarni yuborish
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_HOST || secrets.DEV_SERVER_HOST }}
-          username: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_USER || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_USER || secrets.DEV_SERVER_USER }}
-          key: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_SSH_KEY || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_SSH_KEY || secrets.DEV_SERVER_SSH_KEY }}
+          host: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/staging' && secrets.TEST_SERVER_HOST || secrets.DEV_SERVER_HOST }}
+          username: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_USER || github.ref == 'refs/heads/staging' && secrets.TEST_SERVER_USER || secrets.DEV_SERVER_USER }}
+          key: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_SSH_KEY || github.ref == 'refs/heads/staging' && secrets.TEST_SERVER_SSH_KEY || secrets.DEV_SERVER_SSH_KEY }}
           source: '.next/,public/,package.json,package-lock.json,next.config.js,.env'
           target: '/projects/frontend/${{ github.ref_name }}'
           strip_components: 0
@@ -97,9 +97,9 @@ jobs:
           BRANCH_NAME: ${{ github.ref_name }}
           APP_NAME: ${{ secrets.APP_NAME || 'nextjs-app' }}
         with:
-          host: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_HOST || secrets.DEV_SERVER_HOST }}
-          username: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_USER || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_USER || secrets.DEV_SERVER_USER }}
-          key: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_SSH_KEY || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_SSH_KEY || secrets.DEV_SERVER_SSH_KEY }}
+          host: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/staging' && secrets.TEST_SERVER_HOST || secrets.DEV_SERVER_HOST }}
+          username: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_USER || github.ref == 'refs/heads/staging' && secrets.TEST_SERVER_USER || secrets.DEV_SERVER_USER }}
+          key: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_SSH_KEY || github.ref == 'refs/heads/staging' && secrets.TEST_SERVER_SSH_KEY || secrets.DEV_SERVER_SSH_KEY }}
           script_stop: true
           envs: BRANCH_NAME,APP_NAME
           script: |

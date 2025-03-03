@@ -88,6 +88,7 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
       <IconButton size='small' onClick={handleRowOptionsClick}>
         <IconifyIcon icon='mdi:dots-vertical' />
       </IconButton>
+
       <Menu
         keepMounted
         anchorEl={anchorEl}
@@ -103,43 +104,50 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
         }}
         PaperProps={{ style: { minWidth: '8rem' } }}
       >
-        {status == 'archive' ? (
-          <MenuItem disabled={editPending} onClick={() => handleChange(id)} sx={{ '& svg': { mr: 2 } }}>
-            {editPending ? (
-              <Typography>Tiklanmoqda...</Typography>
-            ) : (
-              <>
-                <IconifyIcon icon='icon-park-outline:return' fontSize={20} />
-                {t('Tiklash')}
-              </>
-            )}
-          </MenuItem>
-        ) : (
-          <>
-            <MenuItem
-              component={Link}
-              sx={{ '& svg': { mr: 2 } }}
-              onClick={handleRowOptionsClose}
-              href={`/mentors/view/security?id=${id}`}
-            >
-              <IconifyIcon icon='mdi:eye-outline' fontSize={20} />
-              {t("Ko'rish")}
-            </MenuItem>
-            <MenuItem onClick={() => handleEdit(id)} sx={{ '& svg': { mr: 2 } }}>
-              <IconifyIcon icon='mdi:pencil-outline' fontSize={20} />
-              {t('Tahrirlash')}
-            </MenuItem>
-            <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
-              <IconifyIcon icon='mdi:delete-outline' fontSize={20} />
-              {t("O'chirish")}
-            </MenuItem>
-            <MenuItem onClick={() => (getSMSTemps(), setOpenSms('sms'))} sx={{ '& svg': { mr: 2 } }}>
-              <IconifyIcon icon='mdi:sms' fontSize={20} />
-              {t('SMS yuborish')}
-            </MenuItem>
-          </>
-        )}
+        {status === 'archive'
+          ? [
+              <MenuItem
+                key='restore'
+                disabled={editPending}
+                onClick={() => handleChange(id)}
+                sx={{ '& svg': { mr: 2 } }}
+              >
+                {editPending ? (
+                  <Typography>Tiklanmoqda...</Typography>
+                ) : (
+                  <>
+                    <IconifyIcon icon='icon-park-outline:return' fontSize={20} />
+                    {t('Tiklash')}
+                  </>
+                )}
+              </MenuItem>
+            ]
+          : [
+              <MenuItem
+                key='view'
+                component={Link}
+                sx={{ '& svg': { mr: 2 } }}
+                onClick={handleRowOptionsClose}
+                href={`/mentors/view/security?id=${id}`}
+              >
+                <IconifyIcon icon='mdi:eye-outline' fontSize={20} />
+                {t("Ko'rish")}
+              </MenuItem>,
+              <MenuItem key='edit' onClick={() => handleEdit(id)} sx={{ '& svg': { mr: 2 } }}>
+                <IconifyIcon icon='mdi:pencil-outline' fontSize={20} />
+                {t('Tahrirlash')}
+              </MenuItem>,
+              <MenuItem key='delete' onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
+                <IconifyIcon icon='mdi:delete-outline' fontSize={20} />
+                {t("O'chirish")}
+              </MenuItem>,
+              <MenuItem key='sms' onClick={() => (getSMSTemps(), setOpenSms('sms'))} sx={{ '& svg': { mr: 2 } }}>
+                <IconifyIcon icon='mdi:sms' fontSize={20} />
+                {t('SMS yuborish')}
+              </MenuItem>
+            ]}
       </Menu>
+
       <UserSuspendDialog
         loading={isPendingDelete}
         handleOk={() => handleDeleteTeacher(id)}

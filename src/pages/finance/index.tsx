@@ -1,3 +1,5 @@
+'use client'
+
 import Grid from '@mui/material/Grid'
 import CardStatisticsLiveVisitors from 'src/views/ui/cards/statistics/CardStatisticsLiveVisitors'
 import KeenSliderWrapper from 'src/@core/styles/libs/keen-slider'
@@ -39,17 +41,12 @@ import { toast } from 'react-hot-toast'
 import { EmptyContent } from 'src/@core/components/empty-content'
 import { Close } from '@mui/icons-material'
 
-export function formatDateString(date: Date) {
+export const formatDateString = (date: Date) => {
   const day = String(date.getDate()).padStart(2, '0')
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const year = date.getFullYear()
 
   return `${year}-${month}-${day}`
-}
-type Plan = {
-  done_amount: number
-  percentage: number
-  planned_amount: number
 }
 
 const CardStatistics = () => {
@@ -186,7 +183,7 @@ const CardStatistics = () => {
       setOpen(null)
       dispatch(getExpenseCategories({ ...allNumbersParams }))
     } catch (err) {
-      console.log(err)
+      console.error(err)
     } finally {
       setLoading(false)
     }
@@ -198,7 +195,7 @@ const CardStatistics = () => {
       setOpen(null)
       dispatch(getIncomeCategories({ ...allNumbersParams }))
     } catch (err) {
-      console.log(err)
+      console.error(err)
     } finally {
       setLoading(false)
     }
@@ -216,6 +213,7 @@ const CardStatistics = () => {
     try {
       await api.patch(`/finance/budget-category/update/${deleteCategory}/`, { is_active: false })
       setDeleteCategory(null)
+
       dispatch(getExpenseCategories(''))
       dispatch(getIncomeCategories(''))
     } catch (err) {
@@ -261,6 +259,7 @@ const CardStatistics = () => {
         <HeadingFilter />
         <VideoHeader item={videoUrls.finance} />
       </Box>
+
       <KeenSliderWrapper>
         <Grid container spacing={4} columnSpacing={6}>
           <Grid item xs={12}>
@@ -273,6 +272,7 @@ const CardStatistics = () => {
 
           <Grid item xs={12} md={8} mb={10}>
             <CardStatisticsLiveVisitors />
+
             {numbersLoad ? (
               <Skeleton width={'100%'} height={250} />
             ) : (

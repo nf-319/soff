@@ -17,14 +17,12 @@ import Delete from './Delete'
 import UserViewStudentsList from '../ViewStudents/UserViewStudentsList'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import OnlineLessonModal from './OnlineLessonModal'
-import { status } from 'nprogress'
 
 const UserViewLeft = () => {
   const { studentsQueryParams, isGettingStudents } = useAppSelector(state => state.groupDetails)
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
   const { query } = useRouter()
-  const { isTablet, isDesktop, isMobile } = useResponsive()
 
   const queryString = useMemo(() => {
     return new URLSearchParams(studentsQueryParams).toString()

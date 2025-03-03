@@ -24,8 +24,8 @@ export const LidsEditModal: FC<Props> = ({ open, refetch, setOpen, title, id }) 
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography>{t('Tahrirlash')}</Typography>
 
-        <IconButton>
-          <IconifyIcon onClick={() => setOpen(null)} icon={'material-symbols:close'} />
+        <IconButton onClick={() => setOpen(null)}>
+          <IconifyIcon icon={'material-symbols:close'} />
         </IconButton>
       </DialogTitle>
 
