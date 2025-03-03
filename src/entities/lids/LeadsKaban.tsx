@@ -85,7 +85,6 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
   const [deleteItem, setDeleteItem] = useState<any | null>(null)
   const { id, search, is_active } = router.query
   const { mutate, isPending } = usePatch()
-  console.log(deleteItem)
 
   const {
     data: leadData,
