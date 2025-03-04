@@ -20,9 +20,7 @@ class CustomDocument extends Document {
           {/* Google Analytics */}
           {process.env.NODE_ENV === 'production' ? (
             <script defer src='https://www.googletagmanager.com/gtag/js?id=G-JNC979VFER'></script>
-          ) : (
-            ''
-          )}
+          ) : null}
           {process.env.NODE_ENV === 'production' ? (
             <script
               defer
@@ -35,9 +33,7 @@ class CustomDocument extends Document {
               `
               }}
             />
-          ) : (
-            ''
-          )}
+          ) : null}
 
           {process.env.NODE_ENV === 'production' ? (
             <script
@@ -58,9 +54,7 @@ class CustomDocument extends Document {
               `
               }}
             />
-          ) : (
-            ''
-          )}
+          ) : null}
         </Head>
 
         <body>
@@ -72,39 +66,5 @@ class CustomDocument extends Document {
     )
   }
 }
-
-// CustomDocument.getInitialProps = async ctx => {
-//   const originalRenderPage = ctx.renderPage
-//   const cache = createEmotionCache()
-//   const { extractCriticalToChunks } = createEmotionServer(cache)
-
-//   ctx.renderPage = () =>
-//     originalRenderPage({
-//       enhanceApp: App => props =>
-//       (
-//         <App
-//           {...props} // @ts-ignore
-//           emotionCache={cache}
-//         />
-//       )
-//     })
-
-//   const initialProps = await Document.getInitialProps(ctx)
-//   const emotionStyles = extractCriticalToChunks(initialProps.html)
-//   const emotionStyleTags = emotionStyles.styles.map(style => {
-//     return (
-//       <style
-//         key={style.key}
-//         dangerouslySetInnerHTML={{ __html: style.css }}
-//         data-emotion={`${style.key} ${style.ids.join(' ')}`}
-//       />
-//     )
-//   })
-
-//   return {
-//     ...initialProps,
-//     styles: [...Children.toArray(initialProps.styles), ...emotionStyleTags]
-//   }
-// }
 
 export default CustomDocument

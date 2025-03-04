@@ -1,6 +1,6 @@
 import { IconButton, Menu } from '@mui/material'
 import { MouseEvent, useState } from 'react'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import MenuItem from '@mui/material/MenuItem'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 import { useTranslation } from 'react-i18next'
@@ -9,8 +9,8 @@ import { useAppDispatch } from 'src/store'
 import { disablePage } from 'src/store/apps/page'
 import { deleteCRM, deleteCRMPayment, fetchCRMPayments, handleEditClientPayment } from 'src/store/apps/c-panel'
 import Router from 'next/router'
-import { StudentsPaymentsModal } from 'src/@core/components/c-panel/DeleteStudentsPayments'
-import { AddStudentModal } from 'src/@core/components/c-panel/AddStudentModal'
+import { StudentsPaymentsModal } from '../../../components/c-panel/DeleteStudentsPayments'
+import { AddStudentModal } from '../../../components/c-panel/AddStudentModal'
 
 const CrmRowOptions = ({ id }: { id: number | string }) => {
   const { t } = useTranslation()

@@ -1,6 +1,6 @@
 // ** Redux Imports
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { today } from 'src/@core/components/card-statistics/kanban-item'
+import { today } from '../../../components/card-statistics/kanban-item'
 import api from 'src/@core/utils/api'
 import { AllNumbersParams, IFinanceState } from 'src/types/apps/finance'
 

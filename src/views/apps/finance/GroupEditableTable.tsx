@@ -1,6 +1,6 @@
 import { Box, Card, Checkbox, Paper, Radio, Typography, styled } from '@mui/material'
 import React from 'react'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 

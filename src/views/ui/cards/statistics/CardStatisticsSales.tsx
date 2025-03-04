@@ -7,14 +7,14 @@ import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Custom Components Imports
-import CustomAvatar from 'src/@core/components/mui/avatar'
-import OptionsMenu from 'src/@core/components/option-menu'
+import CustomAvatar from '../../../../components/mui/avatar'
+import OptionsMenu from '../../../../components/option-menu'
 
 interface SaleDataType {
   icon: string

@@ -8,7 +8,7 @@ import CardContent from '@mui/material/CardContent'
 import { ApexOptions } from 'apexcharts'
 
 // ** Custom Components Imports
-import ReactApexcharts from 'src/@core/components/react-apexcharts'
+import ReactApexcharts from '../../../../components/react-apexcharts'
 
 // ** Util Import
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'

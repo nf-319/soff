@@ -15,7 +15,7 @@ import MuiTab, { TabProps } from '@mui/material/Tab'
 import CircularProgress from '@mui/material/CircularProgress'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 
 // ** Demo Components Imports
 import UserViewSecurity from 'src/views/apps/mentors/view/UserViewSecurity'

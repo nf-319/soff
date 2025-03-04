@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { useEffect } from 'react';
-import PaymentsList from 'src/@core/components/c-panel/sms-payments/PaymentsList';
+import PaymentsList from '../../components/c-panel/sms-payments/PaymentsList';
 import { useAppDispatch } from 'src/store';
 import { fetchCRMPayments } from 'src/store/apps/c-panel';
 

@@ -16,7 +16,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 // ** FullCalendar & App Components Imports
 import CalendarWrapper from 'src/@core/styles/libs/fullcalendar'
 
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../components/icon'
 
 // ** Actions
 import { Button, Checkbox, Dialog, DialogContent, DialogTitle, FormControl, Typography } from '@mui/material'

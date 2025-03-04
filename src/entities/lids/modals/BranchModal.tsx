@@ -11,10 +11,10 @@ import {
   Typography
 } from '@mui/material'
 import { Dispatch, FC, SetStateAction, useState } from 'react'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import { LeadsResult, MenuOpenType } from '../LeadsKaban'
 import { useTranslation } from 'react-i18next'
-import Form from 'src/@core/components/form'
+import Form from '../../../components/form'
 import { LoadingButton } from '@mui/lab'
 import { useGet } from 'src/hooks/useApi'
 import showResponseError from 'src/@core/utils/show-response-error'

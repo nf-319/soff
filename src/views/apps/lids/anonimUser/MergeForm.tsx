@@ -34,6 +34,7 @@ export default function MergeToDepartment({ setOpen, open, currentId, is_amocrm,
   const [department, setDepartment] = useState<any>(null)
   const [loadingAmo, setLoading] = useState(false)
   const { user } = useAuth()
+
   const validationSchema = Yup.object({
     department: Yup.number().required("Bo'limni tanlang")
   })
@@ -43,8 +44,10 @@ export default function MergeToDepartment({ setOpen, open, currentId, is_amocrm,
     deps: ['departments-leads']
   })
 
+  console.log(department)
+
   const { data: parentLeadData } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
-    params: { branch: user?.active_branch, parent: currentId },
+    params: { branch: user?.active_branch, parent: department},
     deps: ['departments-leads']
   })
 

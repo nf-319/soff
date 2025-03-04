@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import AmountInput, { revereAmount } from 'src/@core/components/amount-input';
+import AmountInput, { revereAmount } from '../../../../components/amount-input';
 import { useAppDispatch, useAppSelector } from 'src/store';
 import { createAdvance, getAdvanceList, setOpenCreateModal, setOpenEdit, updateAdvance } from 'src/store/apps/finance/advanceSlice';
 import { IAdvanceFormState } from 'src/types/apps/finance';

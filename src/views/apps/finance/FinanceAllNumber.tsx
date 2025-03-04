@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import { useTranslation } from 'react-i18next'
 import { AuthContext } from 'src/context/AuthContext'
 import useResponsive from 'src/@core/hooks/useResponsive'
-import { EmptyContent } from 'src/@core/components/empty-content'
+import { EmptyContent } from '../../../components/empty-content'
 
 export const yearItems = [
   { label: 2021, value: 2021 },

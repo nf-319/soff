@@ -11,7 +11,7 @@ import TableContainer from '@mui/material/TableContainer'
 import FormControlLabel from '@mui/material/FormControlLabel'
 
 // ** Custom Components Imports
-import CustomChip from 'src/@core/components/mui/chip'
+import CustomChip from '../../../../components/mui/chip'
 
 const ReviewComplete = () => {
   return (

@@ -1,5 +1,5 @@
 import { Box, Drawer, IconButton, Typography } from '@mui/material'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setOpenEdit } from 'src/store/apps/mentors'

@@ -5,7 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
 import Button from '@mui/material/Button'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import { useAppDispatch, useAppSelector } from "src/store"
 import { handleOpen, handleChangeWeeks } from 'src/store/apps/dashboard'
 import { TranslateWeekName } from "src/pages/groups"

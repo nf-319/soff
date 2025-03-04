@@ -8,7 +8,7 @@ import { useState, useEffect, FC, Fragment } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { EmptyContent } from 'src/@core/components/empty-content'
+import { EmptyContent } from '../../components/empty-content'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import { useDelete, useGet, usePatch } from 'src/hooks/useApi'
@@ -17,11 +17,11 @@ import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
 import CreateAnonimUserForm from 'src/views/apps/lids/anonimUser/CreateAnonimUserForm'
 import { LidsDragonModal } from 'src/views/apps/lids/LidsDragonModal'
 import { LeadsType } from './model'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../components/icon'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from 'src/@core/utils/api'
 import EditDepartmentItemForm from 'src/views/apps/lids/departmentItem/EditDepartmentItemForm'
-import { KanbanItemMenu } from 'src/@core/components/card-statistics/kanban-item/KanbanItemMenu'
+import { KanbanItemMenu } from '../../components/card-statistics/kanban-item/KanbanItemMenu'
 import useSMS from 'src/hooks/useSMS'
 import useBranches from 'src/hooks/useBranch'
 import { EditAnonimDialogDialog } from 'src/views/apps/lids/anonimUser/EditAnonimUserDialog'
@@ -57,7 +57,6 @@ export type MenuOpenType =
   | 'merge-to'
   | 'add-group'
   | 'branch'
-  | 'add-group'
   | 'edit'
   | 'delete'
   | 'recover'
@@ -199,22 +198,25 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
     })
   }
 
-  if (isLoading)
-    <Box display='flex' flexDirection='column' marginBottom={10} gap={5}>
-      <Box display='flex' gap={5}>
-        <Skeleton variant='rounded' width={300} height={50} />
-        <Skeleton variant='rounded' width={300} height={50} />
-        <Skeleton variant='rounded' width={300} height={50} />
-        <Skeleton variant='rounded' width={300} height={50} />
-      </Box>
+  if (isLoading) {
+    return (
+      <Box display='flex' flexDirection='column' marginBottom={10} gap={5}>
+        <Box display='flex' gap={5}>
+          <Skeleton variant='rounded' width={300} height={50} />
+          <Skeleton variant='rounded' width={300} height={50} />
+          <Skeleton variant='rounded' width={300} height={50} />
+          <Skeleton variant='rounded' width={300} height={50} />
+        </Box>
 
-      <Box display='flex' gap={5}>
-        <Skeleton variant='rounded' width={300} height={80} />
-        <Skeleton variant='rounded' width={300} height={80} />
-        <Skeleton variant='rounded' width={300} height={80} />
-        <Skeleton variant='rounded' width={300} height={80} />
+        <Box display='flex' gap={5}>
+          <Skeleton variant='rounded' width={300} height={80} />
+          <Skeleton variant='rounded' width={300} height={80} />
+          <Skeleton variant='rounded' width={300} height={80} />
+          <Skeleton variant='rounded' width={300} height={80} />
+        </Box>
       </Box>
-    </Box>
+    )
+  }
 
   const displayData = localLeadData || leadData
 

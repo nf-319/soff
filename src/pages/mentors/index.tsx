@@ -2,13 +2,13 @@
 
 import { Box, Button, Chip, FormControlLabel, Pagination, Switch, Typography } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../components/icon'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { updateParams, setOpenEdit, setOpenSms } from 'src/store/apps/mentors'
 import { formatCurrency } from 'src/@core/utils/format-currency'
-import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
+import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { AuthContext } from 'src/context/AuthContext'
 import { toast } from 'react-hot-toast'
@@ -23,7 +23,7 @@ import { useQueryClient } from '@tanstack/react-query'
 
 import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
 import TeacherEditDialog from 'src/views/apps/mentors/TeacherEditDialog'
-import DataTable from 'src/@core/components/table'
+import DataTable from '../../components/table'
 
 export type customTableProps = {
   xs: number

@@ -1,15 +1,13 @@
-// ** React Imports
+'use client'
+
 import { ReactNode } from 'react'
-
-// ** MUI Components
 import useMediaQuery from '@mui/material/useMediaQuery'
-import { styled, useTheme } from '@mui/material/styles'
+import { styled } from '@mui/material/styles'
 
-interface FooterIllustrationsProp {
+type FooterIllustrationsProp = {
   image?: ReactNode
 }
 
-// Styled Components
 const MaskImg = styled('img')(({ theme }) => ({
   zIndex: -1,
   bottom: '0',
@@ -21,15 +19,8 @@ const MaskImg = styled('img')(({ theme }) => ({
 }))
 
 const FooterIllustrationsV2 = (props: FooterIllustrationsProp) => {
-  // ** Props
   const { image } = props
-
-  // ** Hook
-  const theme = useTheme()
-
-  // ** Vars
-  const hidden = useMediaQuery(theme.breakpoints.down('md'))
-
+  const hidden = useMediaQuery('md')
   const src = (image as string) || `/images/request-form-bg.svg`
 
   if (!hidden) {
@@ -39,4 +30,5 @@ const FooterIllustrationsV2 = (props: FooterIllustrationsProp) => {
   }
 }
 
+FooterIllustrationsV2.displayName = 'FooterIllustrationsV2'
 export default FooterIllustrationsV2

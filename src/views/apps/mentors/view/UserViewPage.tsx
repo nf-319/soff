@@ -4,13 +4,13 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
-import { videoUrls } from 'src/@core/components/video-header/video-header'
+import { videoUrls } from '../../../../components/video-header/video-header'
 import { AuthContext } from 'src/context/AuthContext'
 import useTeachers from 'src/hooks/useTeachers'
 
 const UserViewLeft = dynamic(() => import('src/views/apps/mentors/view/UserViewLeft'));
 const UserViewRight = dynamic(() => import('src/views/apps/mentors/view/UserViewRight'));
-const VideoHeader = dynamic(() => import('src/@core/components/video-header/video-header'));
+const VideoHeader = dynamic(() => import('../../../../components/video-header/video-header'));
 
 const UserView = ({ tab }: any) => {
   const router = useRouter()

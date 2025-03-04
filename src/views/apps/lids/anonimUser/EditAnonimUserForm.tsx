@@ -6,8 +6,8 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { editDepartmentStudent, updateDepartmentStudent } from 'src/store/apps/leads'
-import { reversePhone } from 'src/@core/components/phone-input/format-phone-number'
-import PhoneInput from 'src/@core/components/phone-input'
+import { reversePhone } from '../../../../components/phone-input/format-phone-number'
+import PhoneInput from '../../../../components/phone-input'
 import { useQueryClient } from '@tanstack/react-query'
 
 type Props = {

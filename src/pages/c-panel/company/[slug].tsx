@@ -1,5 +1,5 @@
 import { GetServerSidePropsContext } from 'next/types';
-import EditCompany from 'src/@core/components/c-panel/companyDetails/EditCompany';
+import EditCompany from '../../../components/c-panel/companyDetails/EditCompany';
 
 
 type Props = {

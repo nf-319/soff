@@ -2,14 +2,14 @@
 
 import Card from '@mui/material/Card'
 import { ApexOptions } from 'apexcharts'
-import ReactApexcharts from 'src/@core/components/react-apexcharts'
+import ReactApexcharts from '../../../../components/react-apexcharts'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { Box, Skeleton, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useAppSelector } from 'src/store'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useState } from 'react'
-import { EmptyContent } from 'src/@core/components/empty-content'
+import { EmptyContent } from '../../../../components/empty-content'
 
 const CardWidgetsWeeklyOverview = () => {
   const { isMobile } = useResponsive()

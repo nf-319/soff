@@ -1,8 +1,8 @@
 // @ts-nocheck
 'use client'
 
-import CardStatsVertical from 'src/@core/components/card-statistics/card-stats-vertical'
-import IconifyIcon from 'src/@core/components/icon'
+import CardStatsVertical from '../../../components/card-statistics/card-stats-vertical'
+import IconifyIcon from '../../../components/icon'
 import Box from '@mui/material/Box'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import useResponsive from 'src/@core/hooks/useResponsive'
@@ -23,9 +23,9 @@ const DashboardStats = () => {
   const { push } = useRouter()
   const { t } = useTranslation()
   const { user } = useContext(AuthContext)
-  
+
   const { data: stats, isLoading, refetch } = useGet('common/dashboard/statistic-list/')
-  
+
   useEffect(() => {
     refetch()
   },[user?.active_branch])

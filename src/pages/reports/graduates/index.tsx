@@ -10,7 +10,7 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import DataTable from 'src/@core/components/table'
+import DataTable from '../../../components/table'
 import api from 'src/@core/utils/api'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchGroupChecklist } from 'src/store/apps/groups'

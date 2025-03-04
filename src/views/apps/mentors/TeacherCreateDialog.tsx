@@ -2,7 +2,7 @@
 
 import { Box, IconButton, Typography, styled } from '@mui/material'
 import MuiDrawer, { DrawerProps } from '@mui/material/Drawer'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import AddMentorsModal from './AddMentorsModal'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -28,7 +28,7 @@ export default function TeacherCreateDialog() {
 
   const dispatch = useAppDispatch()
 
-  function onClose() {
+  const onClose = () => {
     dispatch(setOpenEdit(null))
   }
 

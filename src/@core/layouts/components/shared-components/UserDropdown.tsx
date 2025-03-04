@@ -15,7 +15,7 @@ import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 
 // ** Context
 import { useAuth } from 'src/hooks/useAuth'
