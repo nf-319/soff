@@ -22,7 +22,7 @@ import CustomChip from '../../../../components/mui/chip'
 import OptionsMenu from '../../../../components/option-menu'
 
 // ** Types
-import { ProfileTeamsTechType, ProfileConnectionsType } from 'src/@fake-db/types'
+import { ProfileTeamsTechType, ProfileConnectionsType } from '../../../../types/types'
 
 interface Props {
   teams: ProfileTeamsTechType[]

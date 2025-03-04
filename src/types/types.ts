@@ -1,5 +1,5 @@
-import { ThemeColor } from 'src/@core/layouts/types'
-import { TeacherType } from 'src/hooks/useTeachers'
+import { ThemeColor } from '../@core/layouts/types'
+import { TeacherType } from '../hooks/useTeachers'
 
 // User Profile pages
 //-------------------

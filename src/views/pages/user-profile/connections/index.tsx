@@ -17,7 +17,7 @@ import CardContent from '@mui/material/CardContent'
 import Icon from '../../../../components/icon'
 
 // ** Types
-import { ConnectionsTabType } from 'src/@fake-db/types'
+import { ConnectionsTabType } from '../../../../types/types'
 
 // ** Custom Components Imports
 import CustomChip from '../../../../components/mui/chip'

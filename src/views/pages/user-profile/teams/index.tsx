@@ -19,7 +19,7 @@ import CardContent from '@mui/material/CardContent'
 import Icon from '../../../../components/icon'
 
 // ** Types
-import { TeamsTabType } from 'src/@fake-db/types'
+import { TeamsTabType } from '../../../../types/types'
 
 // ** Custom Components Imports
 import CustomChip from '../../../../components/mui/chip'

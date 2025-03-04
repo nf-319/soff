@@ -8,7 +8,7 @@ import ActivityTimeline from 'src/views/pages/user-profile/profile/ActivityTimel
 import ConnectionsTeams from 'src/views/pages/user-profile/profile/ConnectionsTeams'
 
 // ** Types
-import { ProfileTabType } from 'src/@fake-db/types'
+import { ProfileTabType } from '../../../../types/types'
 
 const ProfileTab = ({ data }: { data: ProfileTabType }) => {
   return data && Object.values(data).length ? (

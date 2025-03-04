@@ -25,7 +25,7 @@ import axios from 'axios'
 import { studentsUpdateParams } from 'src/store/apps/groupDetails'
 import { useQueryClient } from '@tanstack/react-query'
 import ceoConfigs from 'src/configs/ceo'
-import { GroupType } from 'src/@fake-db/types'
+import { GroupType } from '../../../types/types'
 
 const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }) => {
   const { queryParams } = useAppSelector(state => state.groups)

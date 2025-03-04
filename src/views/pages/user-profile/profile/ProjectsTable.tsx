@@ -16,7 +16,7 @@ import axios from 'axios'
 
 // ** Types Imports
 import { ThemeColor } from 'src/@core/layouts/types'
-import { ProjectTableRowType } from 'src/@fake-db/types'
+import { ProjectTableRowType } from '../../../../types/types'
 
 // ** Custom Components Imports
 import OptionsMenu from '../../../../components/option-menu'

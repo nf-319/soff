@@ -20,7 +20,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Icon from '../../../../components/icon'
 
 // ** Types
-import { ProjectsTabType } from 'src/@fake-db/types'
+import { ProjectsTabType } from '../../../../types/types'
 
 // ** Utils Import
 import { getInitials } from 'src/@core/utils/get-initials'
