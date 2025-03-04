@@ -9,7 +9,7 @@ import CardContent from '@mui/material/CardContent'
 import { ApexOptions } from 'apexcharts'
 
 // ** Custom Components Imports
-import ReactApexcharts from 'src/@core/components/react-apexcharts'
+import ReactApexcharts from '../../../../components/react-apexcharts'
 
 const CardStatsDonutChart = () => {
   // ** Hook

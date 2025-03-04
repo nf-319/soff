@@ -1,5 +1,5 @@
-import CompanyMonthlyPlan from 'src/@core/components/c-panel/settings/monthlyPlan/CompanyMonthlyPlan'
-import CompanySmsPlanList from 'src/@core/components/c-panel/settings/smsPlan/CompanySmsPlanList'
+import CompanyMonthlyPlan from '../../components/c-panel/settings/monthlyPlan/CompanyMonthlyPlan'
+import CompanySmsPlanList from '../../components/c-panel/settings/smsPlan/CompanySmsPlanList'
 import { Box } from '@mui/material'
 import { useEffect } from 'react'
 import { useAppDispatch } from 'src/store'

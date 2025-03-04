@@ -2,7 +2,7 @@ import { Box, Typography, Pagination, Select, MenuItem, debounce, TextField } fr
 import { count } from 'console'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import DataTable, { customTableDataProps } from 'src/@core/components/table'
+import DataTable, { customTableDataProps } from '../../../components/table'
 import api from 'src/@core/utils/api'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setLogins } from 'src/store/apps/settings'

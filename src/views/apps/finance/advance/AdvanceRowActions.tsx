@@ -2,7 +2,7 @@ import { IconButton, Menu, MenuItem } from '@mui/material';
 import { MouseEvent, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import IconifyIcon from 'src/@core/components/icon';
+import IconifyIcon from '../../../../components/icon';
 import api from 'src/@core/utils/api';
 import { useAppDispatch, useAppSelector } from 'src/store';
 import { getAdvanceList, setOpenEdit } from 'src/store/apps/finance/advanceSlice';

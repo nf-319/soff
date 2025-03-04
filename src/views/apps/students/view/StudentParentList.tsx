@@ -1,8 +1,8 @@
 import { Box, Button, IconButton, Typography } from '@mui/material'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
-import DataTable from 'src/@core/components/table'
+import IconifyIcon from '../../../../components/icon'
+import DataTable from '../../../../components/table'
 import { customTableProps } from 'src/pages/students'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import AddStudentParent from './AddStudentParent'
@@ -22,7 +22,7 @@ export default function StudentParentList() {
   const { query } = useRouter()
   const [deleteLoading,setDeleteLoading] = useState(false)
 
-  
+
 
   async function handleDelete() {
     setDeleteLoading(true)

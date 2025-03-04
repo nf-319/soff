@@ -1,7 +1,7 @@
 import { Box, Button, Chip, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import IconifyIcon from 'src/@core/components/icon';
-import Status from 'src/@core/components/status';
+import IconifyIcon from '../../../components/icon';
+import Status from '../../../components/status';
 import useResponsive from 'src/@core/hooks/useResponsive';
 import { useAppDispatch, useAppSelector } from 'src/store';
 import { setOpenEdit } from 'src/store/apps/students';

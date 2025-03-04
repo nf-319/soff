@@ -8,13 +8,13 @@ import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 
 // ** Third Party Imports
 import { ApexOptions } from 'apexcharts'
 
 // ** Custom Components Imports
-import ReactApexcharts from 'src/@core/components/react-apexcharts'
+import ReactApexcharts from '../../../../components/react-apexcharts'
 
 // ** Util Import
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'

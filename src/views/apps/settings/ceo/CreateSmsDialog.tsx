@@ -13,7 +13,7 @@ import {
 import { useFormik } from 'formik'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import * as Yup from 'yup'
 import MuiDrawer, { DrawerProps } from '@mui/material/Drawer'
 import { createSms, fetchSmsList, fetchSmsListQuery, setOpenCreateSms } from 'src/store/apps/settings'

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { toast } from 'react-hot-toast'
-import { today } from 'src/@core/components/card-statistics/kanban-item'
+import { today } from '../../../components/card-statistics/kanban-item'
 import api from 'src/@core/utils/api'
 import ceoConfigs from 'src/configs/ceo'
 import { IGroupsState, IQueryParams } from 'src/types/apps/groupsTypes'

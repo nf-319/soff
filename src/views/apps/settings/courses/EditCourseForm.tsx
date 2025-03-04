@@ -9,7 +9,7 @@ import * as Yup from 'yup'
 import useBranches from 'src/hooks/useBranch'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
-import AmountInput, { revereAmount } from 'src/@core/components/amount-input'
+import AmountInput, { revereAmount } from '../../../../components/amount-input'
 
 type Props = {}
 

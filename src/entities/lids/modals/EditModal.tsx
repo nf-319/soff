@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui
 import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
 import { FC, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import EditDepartmentItemForm from 'src/views/apps/lids/departmentItem/EditDepartmentItemForm'
 
 type Props = {

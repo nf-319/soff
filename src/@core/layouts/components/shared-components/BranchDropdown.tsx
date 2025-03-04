@@ -1,8 +1,8 @@
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 
 // ** Custom Components Imports
-import OptionsMenu from 'src/@core/components/option-menu'
+import OptionsMenu from '../../../../components/option-menu'
 
 // ** Type Import
 import { Typography } from '@mui/material'

@@ -13,14 +13,14 @@ import {
 
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
-import Form from 'src/@core/components/form'
+import Form from '../../../../../components/form'
 import { useEffect, useState } from 'react'
 import StudentsNotesList from './StudentNotesList'
 import api from 'src/@core/utils/api'
 import showResponseError from 'src/@core/utils/show-response-error'
 import { useRouter } from 'next/router'
-import IconifyIcon from 'src/@core/components/icon'
-import { EmptyContent } from 'src/@core/components/empty-content'
+import IconifyIcon from '../../../../../components/icon'
+import { EmptyContent } from '../../../../../components/empty-content'
 import SubLoader from '../../../loaders/SubLoader'
 
 const UserViewOverview = () => {

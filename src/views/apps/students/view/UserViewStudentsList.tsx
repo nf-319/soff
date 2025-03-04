@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Typography } from '@mui/material'
-import Status from 'src/@core/components/status'
+import Status from '../../../../components/status'
 import { formatDateTime } from 'src/@core/utils/date-formatter'
 import { useTranslation } from 'react-i18next'
 

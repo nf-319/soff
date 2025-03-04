@@ -3,7 +3,7 @@ import {
     Menu
 } from '@mui/material'
 import React, { MouseEvent, useState } from 'react'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import MenuItem from '@mui/material/MenuItem'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 import { useTranslation } from 'react-i18next'
@@ -64,10 +64,10 @@ export default function SmsTableRowOptions({ id,parent_id }: Props) {
 
 
     async function handleEdit(id: number) {
-        
+
         handleRowOptionsClose()
         const find = smschild_list.find(el => el.id === id) || sms_list.find(el => el.id === id)
-        
+
         dispatch(setOpenEditSms(find))
     }
 

@@ -1,7 +1,7 @@
 import { Dispatch, FC, SetStateAction } from 'react'
 import { MenuOpenType } from '../LeadsKaban'
 import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import { useTranslation } from 'react-i18next'
 import SendSmsAnonimUserForm from 'src/views/apps/lids/anonimUser/SendSmsAnonimUserForm'
 import { useGet } from 'src/hooks/useApi'

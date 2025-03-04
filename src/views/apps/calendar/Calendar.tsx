@@ -8,7 +8,7 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../components/icon'
 
 // ** Types
 import { CalendarType } from 'src/types/apps/calendarTypes'

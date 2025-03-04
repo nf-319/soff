@@ -10,7 +10,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 import { AuthContext } from 'src/context/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
-import QRCodeScanner from 'src/@core/components/qrCodeScanner'
+import QRCodeScanner from '../components/qrCodeScanner'
 
 type Props = {
   contentHeightFixed?: boolean

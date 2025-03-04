@@ -16,7 +16,7 @@ import MuiMenu, { MenuProps } from '@mui/material/Menu'
 import MuiMenuItem, { MenuItemProps } from '@mui/material/MenuItem'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 
 // ** Third Party Components
 import PerfectScrollbarComponent from 'react-perfect-scrollbar'
@@ -25,7 +25,7 @@ import PerfectScrollbarComponent from 'react-perfect-scrollbar'
 import { Settings } from 'src/@core/context/settingsContext'
 
 // ** Custom Components Imports
-import CustomAvatar from 'src/@core/components/mui/avatar'
+import CustomAvatar from '../../../../components/mui/avatar'
 
 export type ShortcutsType = {
   url: string

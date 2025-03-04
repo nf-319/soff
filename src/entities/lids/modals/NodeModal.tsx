@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material'
 import { Dispatch, FC, SetStateAction } from 'react'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import AddNoteAnonimUser from 'src/views/apps/lids/anonimUser/AddNoteAnonimUser'
 import { MenuOpenType } from '../LeadsKaban'
 

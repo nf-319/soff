@@ -3,7 +3,7 @@ import { FormControl, FormHelperText, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import AmountInput, { revereAmount } from 'src/@core/components/amount-input';
+import AmountInput, { revereAmount } from '../../../components/amount-input';
 import api from 'src/@core/utils/api';
 import * as Yup from 'yup';
 

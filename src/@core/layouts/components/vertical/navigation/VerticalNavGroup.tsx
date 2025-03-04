@@ -18,7 +18,7 @@ import ListItemButton from '@mui/material/ListItemButton'
 import clsx from 'clsx'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../../components/icon'
 
 // ** Configs Import
 import themeConfig from 'src/configs/themeConfig'

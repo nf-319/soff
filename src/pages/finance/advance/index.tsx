@@ -3,14 +3,14 @@ import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from 'src/@core/utils/format-currency';
 import 'react-datepicker/dist/react-datepicker.css';
-import DataTable from 'src/@core/components/table';
+import DataTable from '../../../components/table';
 import { useAppDispatch, useAppSelector } from 'src/store';
 import { getAdvanceList, getStaffs, setOpenCreateModal, updateParams } from 'src/store/apps/finance/advanceSlice';
 import CreateModal from 'src/views/apps/finance/advance/CreateModal';
 import EditModal from 'src/views/apps/finance/advance/EditModal';
 import { monthItems, yearItems } from 'src/views/apps/finance/FinanceAllNumber';
-import { today } from 'src/@core/components/card-statistics/kanban-item';
-import IconifyIcon from 'src/@core/components/icon';
+import { today } from '../../../components/card-statistics/kanban-item';
+import IconifyIcon from '../../../components/icon';
 import Router, { useRouter } from 'next/router';
 import useResponsive from 'src/@core/hooks/useResponsive';
 import { AuthContext } from 'src/context/AuthContext';
@@ -84,7 +84,7 @@ function Slug() {
                         <Typography sx={{ fontSize: '20px', flexGrow: 1 }}>{t("Avanslar")}</Typography>
                     </Box>
                     <Select
-                        
+
                         value={year}
                         onChange={(e) => handleYearDate(e.target.value, 'y')}
                         size='small'

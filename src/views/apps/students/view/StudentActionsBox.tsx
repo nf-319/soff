@@ -1,7 +1,7 @@
 import { Box, Button, CardContent, Tooltip } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import { useAppDispatch } from 'src/store'
 
 type Props = {}

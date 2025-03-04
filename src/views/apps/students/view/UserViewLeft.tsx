@@ -19,14 +19,14 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 
 // ** Custom Components
-import CustomAvatar from 'src/@core/components/mui/avatar'
+import CustomAvatar from '../../../../components/mui/avatar'
 
 // ** Utils Import
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 
 import { ButtonGroup, Checkbox, Chip, FormHelperText, Radio, RadioGroup, Skeleton, Tooltip } from '@mui/material'
-import Form from 'src/@core/components/form'
+import Form from '../../../../components/form'
 import { addPeriodToThousands } from 'src/pages/settings/office/courses'
 import UserViewStudentsList from './UserViewStudentsList'
 import useStudent, { StudentTypes } from 'src/hooks/useStudents'
@@ -38,7 +38,7 @@ import showResponseError from 'src/@core/utils/show-response-error'
 import usePayment from 'src/hooks/usePayment'
 import api from 'src/@core/utils/api'
 import useSMS from 'src/hooks/useSMS'
-import { today } from 'src/@core/components/card-statistics/kanban-item'
+import { today } from '../../../../components/card-statistics/kanban-item'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchStudentDetail, fetchStudentGroups, fetchStudentPayment } from 'src/store/apps/students'
 import StudentPaymentForm from './StudentPaymentForm'

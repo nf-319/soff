@@ -2,12 +2,12 @@
 
 import { Box, Button, Card, CardContent, Grid, Tooltip, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import CustomAvatar from 'src/@core/components/mui/avatar'
+import CustomAvatar from '../../../components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
-import CustomChip from 'src/@core/components/mui/chip'
+import CustomChip from '../../../components/mui/chip'
 import { ThemeColor } from 'src/@core/layouts/types'
 import { useAppSelector } from 'src/store'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import { useState } from 'react'
 import EditProfile from './EditProfile'
 

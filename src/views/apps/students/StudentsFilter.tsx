@@ -13,7 +13,7 @@ import {
   TextField
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchStudentsList, updateStudentParams } from 'src/store/apps/students'
 import useCourses from 'src/hooks/useCourses'
@@ -28,7 +28,7 @@ import 'rsuite/DateRangePicker/styles/index.css'
 import { DatePicker } from 'rsuite'
 import { format } from 'date-fns'
 import { fetchSchoolsList, fetchSmsList } from 'src/store/apps/settings'
-import ExcelStudents from 'src/@core/components/excelButton/ExcelStudents'
+import ExcelStudents from '../../../components/excelButton/ExcelStudents'
 import ceoConfigs from 'src/configs/ceo'
 
 type StudentsFilterProps = {

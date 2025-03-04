@@ -1,10 +1,10 @@
 import { Box, Card, CardContent, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import IconifyIcon from "src/@core/components/icon";
+import IconifyIcon from "../../../components/icon";
 import { useTranslation } from "react-i18next";
 import { useContext, useEffect, useState } from "react";
 import api from "src/@core/utils/api";
-import DataTable from "src/@core/components/table";
+import DataTable from "../../../components/table";
 import { formatCurrency } from "src/@core/utils/format-currency";
 import { formatDateTime } from "src/@core/utils/date-formatter";
 import { customTableProps } from "src/pages/groups";

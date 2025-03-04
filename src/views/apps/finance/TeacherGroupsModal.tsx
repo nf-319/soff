@@ -13,7 +13,7 @@ import {
   Typography,
   Skeleton
 } from '@mui/material'
-import { EmptyContent } from 'src/@core/components/empty-content'
+import { EmptyContent } from '../../../components/empty-content'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setCalculatedSalary } from 'src/store/apps/finance'

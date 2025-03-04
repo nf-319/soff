@@ -1,4 +1,4 @@
-import { GroupType } from 'src/@fake-db/types'
+import { GroupType } from '../types'
 import { ILessonResponse } from './dashboardTypes'
 import { TacherItemType } from './mentorsTypes'
 

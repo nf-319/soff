@@ -12,10 +12,10 @@ import {
   Typography
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import Router from 'next/router'
-import DataTable, { customTableDataProps } from 'src/@core/components/table'
+import DataTable, { customTableDataProps } from '../../../components/table'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import api from 'src/@core/utils/api'
@@ -23,7 +23,7 @@ import toast from 'react-hot-toast'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { SelectPicker } from 'rsuite'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { today } from 'src/@core/components/card-statistics/kanban-item'
+import { today } from '../../../components/card-statistics/kanban-item'
 import { fetchInvestments, updateParams } from 'src/store/apps/finance/investments'
 import { monthItems, yearItems } from 'src/views/apps/finance/FinanceAllNumber'
 import InvestmentRowOptions from 'src/views/apps/finance/investment/InvestmentRowOptions'
@@ -39,7 +39,7 @@ const InvestmentPage = () => {
     const queryString = new URLSearchParams(
       Object.fromEntries(Object.entries(queryParams).map(([key, value]) => [key, String(value)]))
     ).toString()
-    
+
     dispatch(fetchInvestments(queryString))
   }, [])
   const handleYearDate = async (value: any, t: 'm' | 'y') => {

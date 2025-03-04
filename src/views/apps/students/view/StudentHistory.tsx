@@ -1,7 +1,7 @@
 import { Box } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { EmptyContent } from 'src/@core/components/empty-content'
+import { EmptyContent } from '../../../../components/empty-content'
 import api from 'src/@core/utils/api'
 
 interface IStudentHistory {

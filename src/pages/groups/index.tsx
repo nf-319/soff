@@ -28,7 +28,7 @@ import {
   updateParams
 } from 'src/store/apps/groups'
 import { useRouter } from 'next/router'
-import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
+import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
 import { GroupsFilter } from 'src/views/apps/groups/GroupsFilter'
 import getLessonDays from 'src/@core/utils/getLessonDays'
 import dynamic from 'next/dynamic'
@@ -42,14 +42,14 @@ import api from 'src/@core/utils/api'
 import { LoadingButton } from '@mui/lab'
 import ceoConfigs from 'src/configs/ceo'
 import { Icon } from '@iconify/react'
-import Excel from 'src/@core/components/excelButton/Excel'
+import Excel from '../../components/excelButton/Excel'
 import OnlineLessonModal from 'src/views/apps/groups/view/GroupViewLeft/OnlineLessonModal'
 import { studentsUpdateParams } from 'src/store/apps/groupDetails'
-import DataTable from 'src/@core/components/table'
+import DataTable from '../../components/table'
 import { useGet, usePatch } from 'src/hooks/useApi'
 import { useQueryClient } from '@tanstack/react-query'
 
-const IconifyIcon = dynamic(() => import('src/@core/components/icon'))
+const IconifyIcon = dynamic(() => import('../../components/icon'))
 const RowOptions = dynamic(() => import('src/views/apps/groups/RowOptions'))
 const EditGroupModal = dynamic(() => import('src/views/apps/groups/EditGroupModal'))
 const AddGroupModal = dynamic(() => import('src/views/apps/groups/AddGroupModal'))

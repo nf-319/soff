@@ -1,5 +1,5 @@
 import { Autocomplete, Box, Drawer, FormHelperText, IconButton, InputLabel, TextField, Typography } from '@mui/material'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'

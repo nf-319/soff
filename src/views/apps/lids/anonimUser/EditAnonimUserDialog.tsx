@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import EditAnonimUserForm from './EditAnonimUserForm'
 import { FC } from 'react'
 import { QueryObserverResult, RefetchOptions, useQueryClient } from '@tanstack/react-query'

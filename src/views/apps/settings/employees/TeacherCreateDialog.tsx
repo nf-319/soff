@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, IconButton, Typography, styled } from '@mui/material'
 import MuiDrawer, { DrawerProps } from '@mui/material/Drawer';
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setOpenEdit } from 'src/store/apps/mentors'

@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
+import VideoHeader, { videoUrls } from '../../../components/video-header/video-header'
 import { customTableProps } from '../../groups'
 import { useRouter } from 'next/router'
 import getMonthName from 'src/@core/utils/gwt-month-name'
@@ -19,8 +19,8 @@ import { fetchAttendances } from 'src/store/apps/attandance'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { AttandanceFilters } from 'src/views/apps/attandances/AttandanceFilters'
-import AttandanceDataTable from 'src/@core/components/table/attandanceTable'
-import IconifyIcon from 'src/@core/components/icon'
+import AttandanceDataTable from '../../../components/table/attandanceTable'
+import IconifyIcon from '../../../components/icon'
 export default function Attandences() {
   const { t } = useTranslation()
   const { isMobile } = useResponsive()

@@ -3,8 +3,8 @@ import { Box, Dialog, DialogContent, DialogTitle, Grid, IconButton, Typography }
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import CardFinanceCategory from 'src/@core/components/card-statistics/card-finance-category';
-import IconifyIcon from 'src/@core/components/icon';
+import CardFinanceCategory from '../../../components/card-statistics/card-finance-category';
+import IconifyIcon from '../../../components/icon';
 
 
 export default function FinanceCategories({ categryData, confirmDeleteCategory, loading, setDeleteCategory, deleteCategory }: any) {

@@ -1,7 +1,7 @@
 import { Box, Button, FormControlLabel, IconButton, Menu, Pagination, Switch, Typography } from '@mui/material'
 import { MouseEvent, ReactNode, useContext, useEffect, useState } from 'react'
-import IconifyIcon from 'src/@core/components/icon'
-import DataTable from 'src/@core/components/table'
+import IconifyIcon from '../../../../components/icon'
+import DataTable from '../../../../components/table'
 import MenuItem from '@mui/material/MenuItem'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 import { useTranslation } from 'react-i18next'
@@ -22,7 +22,7 @@ import api from 'src/@core/utils/api'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
-import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
+import VideoHeader, { videoUrls } from '../../../../components/video-header/video-header'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { AuthContext } from 'src/context/AuthContext'
 import { useRouter } from 'next/router'
@@ -65,7 +65,7 @@ export default function GroupsPage() {
     const rowOptionsOpen = Boolean(anchorEl)
 
     const handleRowOptionsClick = (event: MouseEvent<HTMLElement>) => {
-      
+
       setAnchorEl(event.currentTarget)
     }
     const handleRowOptionsClose = () => {
@@ -325,8 +325,8 @@ export default function GroupsPage() {
       size="small"
           aria-label="Small button group"
           sx={{display:'flex',flexDirection:isMobile ? 'column':'row'}}
-      orientation={isMobile ? 'vertical' : 'horizontal'} 
-      fullWidth={isMobile} 
+      orientation={isMobile ? 'vertical' : 'horizontal'}
+      fullWidth={isMobile}
     >
       {buttons}
     </ButtonGroup>
