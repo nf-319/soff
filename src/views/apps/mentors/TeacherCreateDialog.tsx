@@ -28,7 +28,7 @@ export default function TeacherCreateDialog() {
 
   const dispatch = useAppDispatch()
 
-  function onClose() {
+  const onClose = () => {
     dispatch(setOpenEdit(null))
   }
 

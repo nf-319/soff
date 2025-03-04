@@ -29,6 +29,9 @@ module.exports = withTM({
     }
     return config
   },
+  experimental: {
+    scrollRestoration: true
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*' },

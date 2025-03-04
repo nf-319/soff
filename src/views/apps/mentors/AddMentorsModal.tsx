@@ -133,28 +133,10 @@ const AddMentorsModal = () => {
         }
       })
       dispatch(disablePage(false))
-      // const resp = await dispatch(createTeacher(newValues))
-
-      // if (resp.meta.requestStatus === 'rejected') {
-      //   formik.setErrors(resp.payload)
-      // } else {
-      //   queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })
-      //   formik.resetForm()
-      //   setImage(null)
-      //   toast.success("O'qituvchi muvaffaqiyatli yaratildi")
-      // }
-      // dispatch(disablePage(false))
     }
   })
 
   const handleCheckboxChange = (key: string, value: any) => {
-    if (key === 'amount') {
-      formik.setFieldValue('is_fixed_salary', true)
-      formik.setFieldValue('percentage', 0)
-    } else if (key == 'percentage') {
-      formik.setFieldValue('amount', 0)
-      formik.setFieldValue('is_fixed_salary', false)
-    }
     formik.setFieldValue(key, String(value))
   }
 
@@ -279,7 +261,6 @@ const AddMentorsModal = () => {
 
                 handleCheckboxChange('percentage', value)
               }}
-              disabled={Boolean(formik.values.amount)}
               onBlur={formik.handleBlur}
               value={formik.values.percentage}
               error={!!formik.errors.percentage && formik.touched.percentage}
@@ -293,12 +274,10 @@ const AddMentorsModal = () => {
 
           <FormControl sx={{ width: '100%' }}>
             <AmountInput
-              type='number'
               label={t('Oylik ish haqi')}
               name='amount'
               onChange={e => handleCheckboxChange('amount', e.target.value)}
               onBlur={formik.handleBlur}
-              disabled={Boolean(formik.values.percentage)}
               value={formik.values.amount}
               error={!!formik.errors.amount && formik.touched.amount}
             />
@@ -308,12 +287,10 @@ const AddMentorsModal = () => {
           </FormControl>
           <FormControl sx={{ width: '100%' }}>
             <AmountInput
-              // type='number'
               label={t('Darslar soni')}
               name='lesson_amount'
               onChange={e => handleCheckboxChange('lesson_amount', e.target.value)}
               onBlur={formik.handleBlur}
-              // disabled={!formik.values.is_fixed_salary}
               value={formik.values.lesson_amount}
               error={!!formik.errors.lesson_amount && formik.touched.lesson_amount}
             />
