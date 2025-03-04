@@ -211,7 +211,7 @@ export default function GroupsPage() {
 
     return () => {
       dispatch(setOpenEdit(null))
-      dispatch(updateStudentParams({ limit: '10', offset: '0' }))
+      dispatch(updateStudentParams({ limit: '10', offset: '0', course:'',teacher:'',group:'' }))
     }
   }, [])
 

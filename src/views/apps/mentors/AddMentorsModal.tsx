@@ -293,7 +293,6 @@ const AddMentorsModal = () => {
 
           <FormControl sx={{ width: '100%' }}>
             <AmountInput
-              type='number'
               label={t('Oylik ish haqi')}
               name='amount'
               onChange={e => handleCheckboxChange('amount', e.target.value)}
