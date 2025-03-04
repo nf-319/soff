@@ -8,7 +8,7 @@ module.exports = {
   optimizeFonts: false,
   swcMinify: true,
 
-  webpack: (config, { dev }) => {
+  webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       apexcharts: path.resolve(__dirname, './node_modules/apexcharts-clevision')
