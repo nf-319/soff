@@ -1,7 +1,7 @@
 import { Box, IconButton, Typography, styled } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import MuiDrawer, { DrawerProps } from '@mui/material/Drawer'
 import { setOpenEditSms } from 'src/store/apps/settings'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -31,7 +31,7 @@ export default function EditSmsDialog({ }: Props) {
     const { t } = useTranslation()
     const dispatch = useAppDispatch()
     const { openEditSms } = useAppSelector(state => state.settings)
-     
+
     const setOpenAddGroup = () => {
         dispatch(setOpenEditSms(null))
     }
@@ -47,7 +47,7 @@ export default function EditSmsDialog({ }: Props) {
                 }}
             >
                 <Typography variant='h6' sx={{ fontWeight: 600 }}>
-                   {openEditSms?.parent ?"Shablonni o'zgartirish": "Kategoriyani o'zgartirish"} 
+                   {openEditSms?.parent ?"Shablonni o'zgartirish": "Kategoriyani o'zgartirish"}
                 </Typography>
                 <IconButton
                     onClick={setOpenAddGroup}

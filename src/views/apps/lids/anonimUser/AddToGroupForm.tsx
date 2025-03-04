@@ -5,7 +5,7 @@ import { FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } 
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { today } from 'src/@core/components/card-statistics/kanban-item'
+import { today } from '../../../../components/card-statistics/kanban-item'
 import api from 'src/@core/utils/api'
 import toast, { Toaster } from 'react-hot-toast'
 import { setDragonLoading, setLeadItems } from 'src/store/apps/leads'

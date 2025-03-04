@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import api from 'src/@core/utils/api'
 import Router from 'next/router'
 import showResponseError from 'src/@core/utils/show-response-error'
-import Form from 'src/@core/components/form'
+import Form from '../../../components/form'
 
 export default function CreateCompany() {
   const [error, setError] = useState<any>({})

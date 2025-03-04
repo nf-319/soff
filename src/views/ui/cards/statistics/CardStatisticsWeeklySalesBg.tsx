@@ -15,10 +15,10 @@ import clsx from 'clsx'
 import { useKeenSlider } from 'keen-slider/react'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 
 // ** Custom Components Imports
-import CustomAvatar from 'src/@core/components/mui/avatar'
+import CustomAvatar from '../../../../components/mui/avatar'
 
 interface SwiperData {
   img: string

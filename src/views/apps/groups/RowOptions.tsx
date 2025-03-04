@@ -2,7 +2,7 @@
 
 import { IconButton, Menu } from '@mui/material'
 import { MouseEvent, useEffect, useState } from 'react'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import MenuItem from '@mui/material/MenuItem'
 import Link from 'next/link'
 import UserSuspendDialog from 'src/views/apps/groups/view/UserSuspendDialog'
@@ -20,7 +20,7 @@ import {
 } from 'src/store/apps/groups'
 import { disablePage } from 'src/store/apps/page'
 import { toast } from 'react-hot-toast'
-import Excel from 'src/@core/components/excelButton/Excel'
+import Excel from '../../../components/excelButton/Excel'
 import axios from 'axios'
 import { studentsUpdateParams } from 'src/store/apps/groupDetails'
 import { useQueryClient } from '@tanstack/react-query'
@@ -143,7 +143,7 @@ const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }
             {t("Guruhni boshqa filialga ko'chirish")}
           </MenuItem>
         )}
-        {/* 
+        {/*
                 {queryParams.status === 'archived' ? <MenuItem onClick={() => handleRecovery(id)} sx={{ '& svg': { mr: 2 } }}>
                     <IconifyIcon icon='mdi:reload' fontSize={20} />
                     {t("Tiklash")}

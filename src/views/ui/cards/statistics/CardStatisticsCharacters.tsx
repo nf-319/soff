@@ -2,10 +2,10 @@
 import Grid from '@mui/material/Grid'
 
 // ** Type Import
-import { CardStatsCharacterProps } from 'src/@core/components/card-statistics/types'
+import { CardStatsCharacterProps } from '../../../../components/card-statistics/types'
 
 // ** Custom Components Imports
-import CardStatisticsCharacter from 'src/@core/components/card-statistics/card-stats-with-image'
+import CardStatisticsCharacter from '../../../../components/card-statistics/card-stats-with-image'
 
 interface Props {
   data: CardStatsCharacterProps[]

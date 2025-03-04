@@ -14,7 +14,7 @@ import {
   RadioGroup,
   TextField
 } from '@mui/material'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import LoadingButton from '@mui/lab/LoadingButton'
 
 // ** Assets
@@ -28,8 +28,8 @@ import { fetchStudentsList, setOpenEdit, updateStudent, updateStudentParams } fr
 import { useAppDispatch, useAppSelector } from 'src/store'
 import useGroups from 'src/hooks/useGroups'
 import useResponsive from 'src/@core/hooks/useResponsive'
-import PhoneInput from 'src/@core/components/phone-input'
-import { reversePhone } from 'src/@core/components/phone-input/format-phone-number'
+import PhoneInput from '../../../components/phone-input'
+import { reversePhone } from '../../../components/phone-input/format-phone-number'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
 import { TeacherAvatar, VisuallyHiddenInput } from '../mentors/AddMentorsModal'

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import Status from 'src/@core/components/status';
+import Status from '../../../../../components/status';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Fade from '@mui/material/Fade';
-import IconifyIcon from 'src/@core/components/icon';
+import IconifyIcon from '../../../../../components/icon';
 import { formatDateTime } from 'src/@core/utils/date-formatter';
 import { handleOpenDeleteNote } from 'src/store/apps/groupDetails';
 import { useAppDispatch } from 'src/store';

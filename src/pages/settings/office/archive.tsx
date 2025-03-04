@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Box, Card, CardContent, FormControl, Input, InputLabel, MenuItem, Select } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import IconifyIcon from 'src/@core/components/icon';
-import DataTable, { customTableDataProps } from 'src/@core/components/table';
+import IconifyIcon from '../../../components/icon';
+import DataTable, { customTableDataProps } from '../../../components/table';
 
 export default function Archive() {
 

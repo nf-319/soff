@@ -21,8 +21,8 @@ import { useEffect, useState } from 'react'
 import 'react-datepicker/dist/react-datepicker.css' // Import CSS file for react-datepicker
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-import Excel from 'src/@core/components/excelButton/Excel'
-import IconifyIcon from 'src/@core/components/icon'
+import Excel from '../../../components/excelButton/Excel'
+import IconifyIcon from '../../../components/icon'
 import api from 'src/@core/utils/api'
 import useDebounce from 'src/hooks/useDebounce'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -52,7 +52,7 @@ export const GroupsFilter = ({ isMobile }: GroupsFilterProps) => {
       .then(res => {
         if (res.data.url) {
          router.push(res.data.url)
-       
+
         }
       })
       .catch(err => {

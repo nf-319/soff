@@ -21,7 +21,7 @@ import DatePicker from 'react-datepicker'
 import { useForm, Controller } from 'react-hook-form'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../components/icon'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'

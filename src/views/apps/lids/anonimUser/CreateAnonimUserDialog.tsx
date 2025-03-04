@@ -1,7 +1,7 @@
 
 import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
 import CreateAnonimUserForm from './CreateAnonimUserForm'

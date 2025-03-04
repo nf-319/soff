@@ -16,14 +16,14 @@ import { useFormik } from "formik";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import IconifyIcon from "src/@core/components/icon";
+import IconifyIcon from "../../../../../components/icon";
 import useResponsive from "src/@core/hooks/useResponsive";
 import api from "src/@core/utils/api";
 import { useAppDispatch, useAppSelector } from "src/store";
 import { getExams, setOpen } from "src/store/apps/groupDetails";
 import { ExamType } from "./GroupExamsList";
 import * as Yup from "yup";
-import { today } from "src/@core/components/card-statistics/kanban-item";
+import { today } from "../../../../../components/card-statistics/kanban-item";
 
 
 export default function AddExam() {

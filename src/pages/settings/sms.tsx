@@ -1,6 +1,6 @@
 import { Box, Button, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../components/icon'
 import SubLoader from 'src/views/apps/loaders/SubLoader'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchSmsList, fetchSmsListQuery, setOpenCreateSms, setOpenCreateSmsCategory } from 'src/store/apps/settings'
@@ -11,7 +11,7 @@ import SmsTableRowOptions from 'src/views/apps/settings/ceo/SmsTableRowOptions'
 import CreateSmsDialog from 'src/views/apps/settings/ceo/CreateSmsDialog'
 import CreateSmsCategoryDialog from 'src/views/apps/settings/ceo/CreateSmsCategoryDialog'
 import EditSmsDialog from 'src/views/apps/settings/ceo/EditSmsDialog'
-import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
+import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
 import { useTranslation } from 'react-i18next'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 import api from 'src/@core/utils/api'
@@ -115,7 +115,7 @@ export default function RoomsPage() {
       ) : (
         sms_list.map(item => (
           <Accordion
-          
+
             key={item.id}
             sx={{ marginY: 5 ,borderRadius:2,border:'none',position:'unset'}}
             expanded={parentId === item.id}

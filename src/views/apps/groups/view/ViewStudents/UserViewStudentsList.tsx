@@ -33,7 +33,7 @@ import {
 import useDebounce from 'src/hooks/useDebounce'
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
 import { useFormik } from 'formik'
-import StudentsDataTable from 'src/@core/components/table/studentsTable'
+import StudentsDataTable from '../../../../../components/table/studentsTable'
 import GroupDetailRowOptions from '../../GroupDetailRowOptions'
 import Link from 'next/link'
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip'

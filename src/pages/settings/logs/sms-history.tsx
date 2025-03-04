@@ -1,6 +1,6 @@
 import { Chip, MenuItem, Pagination, Select } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import DataTable, { customTableDataProps } from 'src/@core/components/table'
+import DataTable, { customTableDataProps } from '../../../components/table'
 import api from 'src/@core/utils/api'
 import { DateRangePicker, Input } from 'rsuite'
 import 'rsuite/DateRangePicker/styles/index.css'
@@ -171,13 +171,13 @@ function SMSHistory() {
             value={query?.limit || '10'}
             size='small'
             style={{ width: '80px' }}
-            onChange={evt => push({ 
-              pathname, 
-              query: { 
-                ...query, 
-                limit: evt.target.value, 
-                offset: 0 
-              } 
+            onChange={evt => push({
+              pathname,
+              query: {
+                ...query,
+                limit: evt.target.value,
+                offset: 0
+              }
             })}
           >
             <MenuItem value={'10'}>10</MenuItem>

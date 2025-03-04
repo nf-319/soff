@@ -13,7 +13,7 @@ import MuiStep, { StepProps } from '@mui/material/Step'
 import CardContent, { CardContentProps } from '@mui/material/CardContent'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 
 // ** Custom Components Imports
 import StepperCustomDot from 'src/views/forms/form-wizard/StepperCustomDot'

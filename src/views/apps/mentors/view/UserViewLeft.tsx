@@ -9,8 +9,8 @@ import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 
 // ** Custom Components
-import CustomChip from 'src/@core/components/mui/chip'
-import CustomAvatar from 'src/@core/components/mui/avatar'
+import CustomChip from '../../../../components/mui/chip'
+import CustomAvatar from '../../../../components/mui/avatar'
 
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'

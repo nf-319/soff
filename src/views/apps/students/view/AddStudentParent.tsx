@@ -12,11 +12,11 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { useAppDispatch, useAppSelector } from 'src/store';
 import { useFormik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
-import PhoneInput from 'src/@core/components/phone-input';
+import PhoneInput from '../../../../components/phone-input';
 import api from 'src/@core/utils/api';
 import { toast } from 'react-hot-toast';
 import { fetchStudentDetail } from 'src/store/apps/students';
-import { reversePhone } from 'src/@core/components/phone-input/format-phone-number';
+import { reversePhone } from '../../../../components/phone-input/format-phone-number';
 
 interface IAddParentProps {
     open: "create" | "edit" | null;
@@ -53,7 +53,7 @@ const AddStudentParent = ({ open, setOpen }: IAddParentProps) => {
     // }, [open, studentData]);
 
     const handleCreateParent = async (values: IParentData, helpers: FormikHelpers<IParentData>) => {
-        
+
         try {
             setLoading(true);
             const response = await api.post('/student/parent/create/', { first_name:values.first_name,phone:values.phone, student: studentData?.id });
@@ -99,7 +99,7 @@ const AddStudentParent = ({ open, setOpen }: IAddParentProps) => {
         initialValues,
         validationSchema,
         onSubmit: async (values, helpers) => {
-            
+
             if (open === "create") {
                 await handleCreateParent(values, helpers);
             } else if (open === "edit") {
@@ -113,9 +113,9 @@ const AddStudentParent = ({ open, setOpen }: IAddParentProps) => {
         setOpen(null);
     };
 
-    
-    
-    
+
+
+
 
     return (
         <Dialog

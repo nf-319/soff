@@ -16,9 +16,9 @@ import {
 
 // ** Demo Component Imports
 import { UserViewStudentsItem } from './UserViewStudentsList'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import { useEffect, useState } from 'react'
-import Form from 'src/@core/components/form'
+import Form from '../../../../components/form'
 import api from 'src/@core/utils/api'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
@@ -26,7 +26,7 @@ import showResponseError from 'src/@core/utils/show-response-error'
 import { useRouter } from 'next/router'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchStudentComments, fetchStudentDetail } from 'src/store/apps/students'
-import { EmptyContent } from 'src/@core/components/empty-content'
+import { EmptyContent } from '../../../../components/empty-content'
 
 interface ItemTypes {
   data: {

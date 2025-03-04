@@ -19,7 +19,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import usePayment from 'src/hooks/usePayment'
 import useBranches from 'src/hooks/useBranch'
@@ -31,7 +31,7 @@ import { useTranslation } from 'react-i18next'
 import showResponseError from 'src/@core/utils/show-response-error'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { AuthContext } from 'src/context/AuthContext'
-import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
+import VideoHeader, { videoUrls } from '../../../components/video-header/video-header'
 import { toast } from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import { Icon } from '@iconify/react'

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 // ** Components
 import MuiDrawer, { DrawerProps } from '@mui/material/Drawer';
 import { Box, IconButton, Typography, styled } from '@mui/material';
-import IconifyIcon from 'src/@core/components/icon';
+import IconifyIcon from '../../../components/icon';
 import EditStudentForm from './EditStudentForm';
 
 // ** Assets

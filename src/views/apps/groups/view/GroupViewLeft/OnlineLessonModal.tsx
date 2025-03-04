@@ -19,7 +19,7 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { fetchSmsList, fetchSmsListQuery } from 'src/store/apps/settings'
 import Link from 'next/link'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../../components/icon'
 import { useRouter } from 'next/router'
 import { MetaTypes } from 'src/types/apps/groupsTypes'
 

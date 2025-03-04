@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import { AuthContext } from 'src/context/AuthContext'
-import { useAppDispatch, useAppSelector } from 'src/store'
 import DashboardPage from 'src/views/apps/dashboard/DashboardPage'
 import MyGroups from 'src/views/my-groups'
 

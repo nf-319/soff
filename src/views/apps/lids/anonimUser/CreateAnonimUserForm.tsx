@@ -14,11 +14,11 @@ import {
   setOpenItem,
   setSectionId
 } from 'src/store/apps/leads'
-import IconifyIcon from 'src/@core/components/icon'
-import PhoneInput from 'src/@core/components/phone-input'
-import { reversePhone } from 'src/@core/components/phone-input/format-phone-number'
+import IconifyIcon from '../../../../components/icon'
+import PhoneInput from '../../../../components/phone-input'
+import { reversePhone } from '../../../../components/phone-input/format-phone-number'
 import Router, { useRouter } from 'next/router'
-import KanbanItem from 'src/@core/components/card-statistics/kanban-item'
+import KanbanItem from '../../../../components/card-statistics/kanban-item'
 import api from 'src/@core/utils/api'
 import { useGet } from 'src/hooks/useApi'
 import { LeadsResult } from 'src/entities/lids/LeadsKaban'

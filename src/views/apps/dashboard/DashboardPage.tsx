@@ -2,7 +2,7 @@
 
 import { useContext } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
-import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
+import VideoHeader, { videoUrls } from '../../../components/video-header/video-header'
 import { Icon } from '@iconify/react'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { updateEyeVisible } from 'src/store/apps/dashboard'

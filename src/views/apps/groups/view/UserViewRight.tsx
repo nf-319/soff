@@ -11,7 +11,7 @@ import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
 import { styled } from '@mui/material/styles'
 import MuiTab, { TabProps } from '@mui/material/Tab'
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 import UserViewBilling from 'src/views/apps/groups/view/UserViewBilling'
 import UserViewOverview from 'src/views/apps/groups/view/GroupsNotes/UserViewOverview'
 import UserViewSecurity from 'src/views/apps/groups/view/UserViewSecurity'
@@ -72,7 +72,7 @@ const UserViewRight = ({ tab }: Props) => {
     }
   }, [tab])
 
-  
+
 
   return (
     <TabContext value={activeTab}>

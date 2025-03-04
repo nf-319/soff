@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 import { useTranslation } from 'react-i18next'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { OctagonAlert } from 'lucide-react'

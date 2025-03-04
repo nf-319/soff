@@ -7,7 +7,7 @@ import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../components/icon'
 
 // ** Theme Config Import
 import themeConfig from 'src/configs/themeConfig'
@@ -17,13 +17,13 @@ import { LayoutProps } from 'src/@core/layouts/types'
 
 // ** Components
 import AppBar from './components/vertical/appBar'
-import Customizer from 'src/@core/components/customizer'
+import Customizer from '../../components/customizer'
 import Navigation from './components/vertical/navigation'
 import Footer from './components/shared-components/footer'
-import ScrollToTop from 'src/@core/components/scroll-to-top'
+import ScrollToTop from '../../components/scroll-to-top'
 import { useAuth } from 'src/hooks/useAuth'
-import StaticsModal from 'src/@core/components/statics-modal'
-import QrCodeModal from '../components/qrCode-Modal'
+import StaticsModal from '../../components/statics-modal'
+import QrCodeModal from '../../components/qrCode-Modal'
 import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
