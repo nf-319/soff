@@ -18,15 +18,15 @@ import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../../components/icon'
 
 // ** Type Imports
 import { ThemeColor } from 'src/@core/layouts/types'
 import { InvoiceType } from 'src/types/apps/invoiceTypes'
 
 // ** Custom Component Imports
-import CustomAvatar from 'src/@core/components/mui/avatar'
-import OptionsMenu from 'src/@core/components/option-menu'
+import CustomAvatar from '../../../../../components/mui/avatar'
+import OptionsMenu from '../../../../../components/option-menu'
 
 interface Props {
   invoiceData: InvoiceType[]

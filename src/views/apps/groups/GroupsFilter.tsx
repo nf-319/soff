@@ -14,14 +14,15 @@ import {
   SelectChangeEvent,
   TextField
 } from '@mui/material'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 // ** Third Party Imports
 import 'react-datepicker/dist/react-datepicker.css' // Import CSS file for react-datepicker
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-import Excel from 'src/@core/components/excelButton/Excel'
-import IconifyIcon from 'src/@core/components/icon'
+import Excel from '../../../components/excelButton/Excel'
+import IconifyIcon from '../../../components/icon'
 import api from 'src/@core/utils/api'
 import useDebounce from 'src/hooks/useDebounce'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -41,7 +42,7 @@ export const GroupsFilter = ({ isMobile }: GroupsFilterProps) => {
   const [search, setSearch] = useState<string>('')
   const searchVal = useDebounce(search, 600)
   const [loading, setLoading] = useState<boolean>(false)
-
+  const router = useRouter()
   const { t } = useTranslation()
 
   async function handleGetMeetLink() {
@@ -50,14 +51,11 @@ export const GroupsFilter = ({ isMobile }: GroupsFilterProps) => {
       .get(`meets/google/login/`)
       .then(res => {
         if (res.data.url) {
-          window.location.assign(res.data.url)
-          // console.log(window.location);
+         router.push(res.data.url)
 
-          // dispatch(setMeetLink(res.data.url))
         }
       })
       .catch(err => {
-        console.log(err)
         toast.error(err.response.data.msg)
       })
     dispatch(setOnlineLessonLoading(false))
@@ -66,26 +64,19 @@ export const GroupsFilter = ({ isMobile }: GroupsFilterProps) => {
   const handleChangeStatus = async (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ status: e.target.value }))
     const queryString = new URLSearchParams({ ...queryParams, status: e.target.value }).toString()
-    await dispatch(fetchGroups({ ...queryParams, status: e.target.value }))
   }
   const handleChangeTeacher = async (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ teacher: e.target.value }))
-    await dispatch(fetchGroups({ ...queryParams, teacher: e.target.value }))
   }
   const handleChangeCourse = async (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ course: e.target.value }))
-    await dispatch(fetchGroups({ ...queryParams, course: e.target.value }))
   }
   const handleChangeDateOfWeek = (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ day_of_week: e.target.value }))
-    dispatch(fetchGroups({ ...queryParams, day_of_week: e.target.value }))
   }
 
   const handleSearch = async (searchVal: string) => {
-    setLoading(true)
     dispatch(updateParams({ search: searchVal }))
-    await dispatch(fetchGroups({ ...queryParams, search: searchVal }))
-    setLoading(false)
   }
 
   const queryString = new URLSearchParams({ ...queryParams }).toString()

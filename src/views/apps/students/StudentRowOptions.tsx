@@ -1,9 +1,10 @@
 import { IconButton, Menu, MenuItem } from '@mui/material'
+import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import React, { MouseEvent, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import api from 'src/@core/utils/api'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { disablePage } from 'src/store/apps/page'
@@ -12,7 +13,8 @@ import {
   fetchStudentDetail,
   fetchStudentsList,
   setOpenEdit,
-  updateStudent
+  updateStudent,
+  updateStudentParams
 } from 'src/store/apps/students'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 
@@ -28,6 +30,7 @@ export default function StudentRowOptions({ id }: Props) {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const { queryParams } = useAppSelector(state => state.students)
+  const queryClient = useQueryClient()
 
   const rowOptionsOpen = Boolean(anchorEl)
 
@@ -55,7 +58,9 @@ export default function StudentRowOptions({ id }: Props) {
     await dispatch(updateStudent({ id, status: 'active' }))
     dispatch(disablePage(false))
     toast.success("O'quvchi muvaffaqiyatli aktivlashtirildi")
-    await dispatch(fetchStudentsList({ status: 'active' }))
+    dispatch(updateStudentParams({ status: 'active' }))
+    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+
     setLoading(false)
   }
 
@@ -66,7 +71,7 @@ export default function StudentRowOptions({ id }: Props) {
       .delete(`student/destroy/${id}/`)
       .then(res => {
         toast.success("O'quvchi muvaffaqiyatli o'chirildi")
-        dispatch(fetchStudentsList({ ...queryParams }))
+        queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
       })
       .catch(err => {
         toast.error(err.response.data.msg || "O'quvchini o'chirib bo'lmadi")

@@ -2,13 +2,13 @@
 import Grid from '@mui/material/Grid'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 
 // ** Types Imports
-import { CardStatsHorizontalProps } from 'src/@core/components/card-statistics/types'
+import { CardStatsHorizontalProps } from '../../../../components/card-statistics/types'
 
 // ** Custom Components Imports
-import CardStatisticsHorizontal from 'src/@core/components/card-statistics/card-stats-horizontal'
+import CardStatisticsHorizontal from '../../../../components/card-statistics/card-stats-horizontal'
 import useResponsive from 'src/@core/hooks/useResponsive'
 
 interface Props {
@@ -28,7 +28,7 @@ const CardStatsHorizontal = ({ data }: Props) => {
               md={3}
               sm={3}
               key={index}
-             
+
             >
               {item.id ? (
                 <a href={item.id} style={{ textDecoration: 'none', cursor: 'pointer' }}>

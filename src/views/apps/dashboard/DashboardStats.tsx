@@ -1,6 +1,8 @@
-//@ts-nocheck
-import CardStatsVertical from 'src/@core/components/card-statistics/card-stats-vertical'
-import IconifyIcon from 'src/@core/components/icon'
+// @ts-nocheck
+'use client'
+
+import CardStatsVertical from '../../../components/card-statistics/card-stats-vertical'
+import IconifyIcon from '../../../components/icon'
 import Box from '@mui/material/Box'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import useResponsive from 'src/@core/hooks/useResponsive'
@@ -9,13 +11,24 @@ import { useTranslation } from 'react-i18next'
 import { Skeleton, Tooltip } from '@mui/material'
 import { updateStudentParams } from 'src/store/apps/students'
 import { formatCurrency } from 'src/@core/utils/format-currency'
+import { useGet } from 'src/hooks/useApi'
+import { AuthContext } from 'src/context/AuthContext'
+import { useContext, useEffect } from 'react'
 
-export default function DashboardStats() {
-  const { stats, statsData, isStatsLoading } = useAppSelector(state => state.dashboard)
+const DashboardStats = () => {
+  const { statsData, isStatsLoading } = useAppSelector(state => state.dashboard)
+
   const dispatch = useAppDispatch()
   const { isMobile, isTablet } = useResponsive()
   const { push } = useRouter()
   const { t } = useTranslation()
+  const { user } = useContext(AuthContext)
+
+  const { data: stats, isLoading, refetch } = useGet('common/dashboard/statistic-list/')
+
+  useEffect(() => {
+    refetch()
+  },[user?.active_branch])
 
   function click(link: string) {
     if (link === 'debtors_amount') {
@@ -45,12 +58,12 @@ export default function DashboardStats() {
     active_groups: 'Ayni vaqtda faol guruhlar soni',
     active_students: "Ayni vaqtda faol o'quvchilar soni",
     active_debts_count: `Umumiy qarzdor o'quvchilar soni : ${stats?.debtor_users} ta, arxivdagi o'quvchilar soni : ${stats?.active_debts_count} ta (1 ta o'quvchi 2 va undan ortiq guruhda o'qishi mumkin)`,
-    active_debts_amount: `Umumiy o'quvchilar qarzdorligi : ${formatCurrency(stats?.debtors_amount) + " so'm"}    
+    active_debts_amount: `Umumiy o'quvchilar qarzdorligi : ${formatCurrency(stats?.debtors_amount) + " so'm"}
     ${
       stats?.archive_debts_amount < 0
         ? `Arxivdagi o'quvchilar qarzdorligi : ${formatCurrency(stats.archive_debts_amount) + " so'm"}`
         : ''
-    } 
+    }
     `,
     leads_count: "Kurslarga ro'yxatdan o'tgan faol lidlar soni",
     not_activated_students: "Sinov darsiga kelib ketgan o'quvchilar soni",
@@ -68,9 +81,9 @@ export default function DashboardStats() {
         gridTemplateColumns: `repeat(${isMobile ? 3 : isTablet ? 4 : 9}, 1fr)`
       }}
     >
-      {isStatsLoading
+      {isLoading
         ? statsData.map((_, index) => (
-            <Box key={index} className='' sx={{ cursor: 'pointer' }} onClick={() => click(_.link)}>
+            <Box key={`${_.key}-${index}`} className='' sx={{ cursor: 'pointer' }} onClick={() => click(_.link)}>
               <Skeleton
                 sx={{ bgcolor: 'grey.300' }}
                 variant='rectangular'
@@ -82,11 +95,12 @@ export default function DashboardStats() {
             </Box>
           ))
         : ''}
-      {stats && !isStatsLoading
+
+      {stats && !isLoading
         ? stats?.payment_approaching
           ? statsData.map((_, index) => (
-              <Tooltip arrow title={tooltip[_.key]}>
-                <Box key={index} className='' sx={{ cursor: 'pointer' }} onClick={() => click(_.link)}>
+              <Tooltip key={`${_.key}-${index}`} arrow title={tooltip[_.key]}>
+                <Box sx={{ cursor: 'pointer' }} onClick={() => click(_.link)}>
                   <CardStatsVertical
                     data_key={_.key}
                     title={stats?.[_.key]}
@@ -100,8 +114,8 @@ export default function DashboardStats() {
           : statsData
               ?.filter(el => el.key !== 'payment_approaching')
               .map((_, index) => (
-                <Tooltip arrow title={tooltip[_.key]}>
-                  <Box key={index} className='' sx={{ cursor: 'pointer' }} onClick={() => click(_.link)}>
+                <Tooltip key={`${_.key}-${index}`} arrow title={tooltip[_.key]}>
+                  <Box sx={{ cursor: 'pointer' }} onClick={() => click(_.link)}>
                     <CardStatsVertical
                       key={_.key}
                       title={stats?.[_.key]}
@@ -116,3 +130,5 @@ export default function DashboardStats() {
     </Box>
   )
 }
+
+export default DashboardStats

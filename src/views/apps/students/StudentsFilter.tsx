@@ -13,7 +13,7 @@ import {
   TextField
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchStudentsList, updateStudentParams } from 'src/store/apps/students'
 import useCourses from 'src/hooks/useCourses'
@@ -28,9 +28,8 @@ import 'rsuite/DateRangePicker/styles/index.css'
 import { DatePicker } from 'rsuite'
 import { format } from 'date-fns'
 import { fetchSchoolsList, fetchSmsList } from 'src/store/apps/settings'
-import ExcelStudents from 'src/@core/components/excelButton/ExcelStudents'
+import ExcelStudents from '../../../components/excelButton/ExcelStudents'
 import ceoConfigs from 'src/configs/ceo'
-import { fetchGroups, updateParams } from 'src/store/apps/groups'
 
 type StudentsFilterProps = {
   isMobile: boolean
@@ -41,7 +40,6 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
   const { students, queryParams } = useAppSelector(state => state.students)
   const { schools } = useAppSelector(state => state.settings)
   const [key, setKey] = useState<string>('')
-  const [search,setSearch] = useState('')
   const { getCourses, courses } = useCourses()
   const [groups, setGroups] = useState<any>()
   const [teachers, setTeachers] = useState<any>()
@@ -75,18 +73,16 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
       .catch(error => console.log(error))
   }
 
-  const handleSearch = useCallback(
-    debounce((search: string) => {
-      dispatch(updateStudentParams({ search }));
-    }, 500), 
-    [dispatch]
-  );
-  
-  useEffect(() => {
-    handleSearch(search);
-  }, [search, handleSearch]);
+  const handleSearch = (value: string) => {
+    dispatch(updateStudentParams({ search: value }))
+  }
+
   async function handleFilter(key: string, value: string | number | null) {
     dispatch(updateStudentParams({ [key]: value }))
+
+    if (key == 'status') {
+      dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
+    }
     if (key === 'debt_date') {
       setIsActive(false)
       dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '', debt_date: `${value}` }))
@@ -106,9 +102,6 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
         dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '' }))
       }
       return
-    }
-    if (key === 'status') {
-      dispatch(updateStudentParams({ group_status: '', status: value }))
     }
   }
 
@@ -134,11 +127,6 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
     value: item?.id
   }))
 
-
-  useEffect(() => {
-    dispatch(fetchStudentsList(queryParams as any))
-  }, [queryParams])
-
   if (isMobile)
     <form id='mobile-filter-form'>
       <Box display={'flex'} gap={2} flexDirection={'column'} paddingTop={isMobile ? 3 : 0} rowGap={isMobile ? 4 : 0}>
@@ -147,7 +135,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
             {t('Qidirish')}
           </InputLabel>
           <OutlinedInput
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => handleSearch(e.target.value)}
             endAdornment={
               <InputAdornment position='end'>
                 <IconifyIcon icon={'tabler:search'} />
@@ -164,7 +152,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
             {t('Kurslar')}
           </InputLabel>
           <Select
-            onClick={() => setKey('course')}
+            onOpen={() => setKey('course')}
             key={'course'}
             size='small'
             label={t('Kurslar')}
@@ -193,8 +181,9 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
           <InputLabel size='small' id='demo-simple-select-outlined-label'>
             {t('Maktab')}
           </InputLabel>
+
           <Select
-            onClick={() => setKey('school')}
+            onOpen={() => setKey('school')}
             size='small'
             label={t('Maktab')}
             value={queryParams.school}
@@ -354,7 +343,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
           </InputLabel>
 
           <OutlinedInput
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => handleSearch(e.target.value)}
             endAdornment={
               <InputAdornment position='end'>
                 <IconifyIcon icon={'tabler:search'} />
@@ -374,7 +363,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
 
           <Select
             size='small'
-            onClick={() => setKey('course')}
+            onOpen={() => setKey('course')}
             key={'course'}
             label={t('Kurslar')}
             defaultValue={''}
@@ -403,7 +392,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
             {t('Maktab')}
           </InputLabel>
           <Select
-            onClick={() => setKey('school')}
+            onOpen={() => setKey('school')}
             size='small'
             label={t('Maktab')}
             id='demo-simple-select-outlined'
@@ -433,7 +422,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
           </InputLabel>
           <Select
             size='small'
-            onClick={() => setKey('group_status')}
+            onOpen={() => setKey('group_status')}
             label={t('Guruhdagi holati')}
             value={queryParams.group_status}
             id='demo-simple-select-outlined'

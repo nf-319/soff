@@ -14,11 +14,11 @@ import FormHelperText from '@mui/material/FormHelperText'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 
 // ** Type Imports
-import { CustomRadioIconsData, CustomRadioIconsProps } from 'src/@core/components/custom-radio/types'
+import { CustomRadioIconsData, CustomRadioIconsProps } from '../../../../components/custom-radio/types'
 
 // ** Custom Components Imports
-import CustomChip from 'src/@core/components/mui/chip'
-import CustomRadioIcons from 'src/@core/components/custom-radio/icons'
+import CustomChip from '../../../../components/mui/chip'
+import CustomRadioIcons from '../../../../components/custom-radio/icons'
 
 interface IconType {
   icon: CustomRadioIconsProps['icon']

@@ -14,10 +14,10 @@ import TimelineConnector from '@mui/lab/TimelineConnector'
 import MuiTimeline, { TimelineProps } from '@mui/lab/Timeline'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 
 // ** Custom Components Import
-import OptionsMenu from 'src/@core/components/option-menu'
+import OptionsMenu from '../../../../components/option-menu'
 
 // Styled Timeline component
 const Timeline = styled(MuiTimeline)<TimelineProps>({

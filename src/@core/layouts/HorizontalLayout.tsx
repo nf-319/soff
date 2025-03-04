@@ -3,21 +3,22 @@ import AppBar from '@mui/material/AppBar'
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
 import MuiToolbar, { ToolbarProps } from '@mui/material/Toolbar'
-import Icon from 'src/@core/components/icon'
+import Icon from '../../components/icon'
 import themeConfig from 'src/configs/themeConfig'
 import { LayoutProps } from 'src/@core/layouts/types'
-import Customizer from 'src/@core/components/customizer'
+import Customizer from '../../components/customizer'
 import Footer from './components/shared-components/footer'
 import Navigation from './components/horizontal/navigation'
-import ScrollToTop from 'src/@core/components/scroll-to-top'
+import ScrollToTop from '../../components/scroll-to-top'
 import AppBarContent from './components/horizontal/app-bar-content'
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 import { useAuth } from 'src/hooks/useAuth'
-import DraggableIcon from '../components/soffBotIcon'
-import StaticsModal from '../components/statics-modal'
-import QrCodeModal from '../components/qrCode-Modal'
+import StaticsModal from '../../components/statics-modal'
+import QrCodeModal from '../../components/qrCode-Modal'
 import { useContext } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
+import DraggableIcon from 'src/pages/soffBotIcon'
+import { useRouter } from 'next/router'
 
 const HorizontalLayoutWrapper = styled(Box)({
   height: '100%',
@@ -69,6 +70,7 @@ const HorizontalLayout = (props: LayoutProps) => {
     horizontalLayoutProps
   } = props
 
+  const router = useRouter()
   const { skin, appBar, navHidden, appBarBlur, contentWidth } = settings
   const appBarProps = horizontalLayoutProps?.appBar?.componentProps
   const userNavMenuContent = horizontalLayoutProps?.navMenu?.content
@@ -189,7 +191,7 @@ const HorizontalLayout = (props: LayoutProps) => {
                         />
                       </Box>
                       {(user?.role.includes('admin') || user?.role.includes('ceo')) &&
-                        !window.location.pathname.includes('/c-panel') && <StaticsModal />}
+                        !router.pathname.includes('/c-panel') && <StaticsModal />}
 
                       <QrCodeModal />
                     </>
@@ -218,8 +220,9 @@ const HorizontalLayout = (props: LayoutProps) => {
 
         {themeConfig.disableCustomizer || hidden ? null : (
           <>
-            {(user?.role.includes('ceo') || user?.role.includes('admin')) &&
-              !window.location.pathname.includes('/c-panel') && <DraggableIcon />}
+            {(user?.role.includes('ceo') || user?.role.includes('admin')) && !router.pathname.includes('/c-panel') && (
+              <DraggableIcon />
+            )}
 
             <Customizer />
           </>

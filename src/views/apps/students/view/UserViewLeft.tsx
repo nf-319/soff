@@ -19,14 +19,14 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 
 // ** Custom Components
-import CustomAvatar from 'src/@core/components/mui/avatar'
+import CustomAvatar from '../../../../components/mui/avatar'
 
 // ** Utils Import
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 
 import { ButtonGroup, Checkbox, Chip, FormHelperText, Radio, RadioGroup, Skeleton, Tooltip } from '@mui/material'
-import Form from 'src/@core/components/form'
+import Form from '../../../../components/form'
 import { addPeriodToThousands } from 'src/pages/settings/office/courses'
 import UserViewStudentsList from './UserViewStudentsList'
 import useStudent, { StudentTypes } from 'src/hooks/useStudents'
@@ -38,7 +38,7 @@ import showResponseError from 'src/@core/utils/show-response-error'
 import usePayment from 'src/hooks/usePayment'
 import api from 'src/@core/utils/api'
 import useSMS from 'src/hooks/useSMS'
-import { today } from 'src/@core/components/card-statistics/kanban-item'
+import { today } from '../../../../components/card-statistics/kanban-item'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchStudentDetail, fetchStudentGroups, fetchStudentPayment } from 'src/store/apps/students'
 import StudentPaymentForm from './StudentPaymentForm'
@@ -497,7 +497,6 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
       setIsActive(false)
       await dispatch(userData?.id)
     } catch (err: any) {
-      console.log(err)
 
       if (err.response.status) {
         setIsErrorText(err.response.data.message)
@@ -514,7 +513,6 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
       dispatch(fetchSmsListQuery(parent_id))
     }
   }, [parent_id])
-
   return (
     <Dialog
       open={openEdit === 'sms'}
@@ -524,7 +522,11 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
       aria-describedby='user-view-edit-description'
     >
       <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
-        <Typography>{t(`Xabar (${`smslar soni:${usersData?.length}` || 'sms'})`)}</Typography>
+        {userData?.length ? (
+          <Typography>{t(`Xabar (${`smslar soni:${usersData?.length}` || 'sms'})`)}</Typography>
+        ) : (
+          <Typography>{t(`Xabar (sms)`)}</Typography>
+        )}
       </DialogTitle>
       <DialogContent>
         <form style={{ marginTop: 10 }} onSubmit={formik.handleSubmit}>

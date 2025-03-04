@@ -1,49 +1,26 @@
 import { Box, Button, Chip, ClickAwayListener, MenuItem, Select, TextField, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../../components/icon'
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip'
 import { useEffect, useState } from 'react'
 import api from 'src/@core/utils/api'
 import getMontName, { getMontNumber } from 'src/@core/utils/gwt-month-name'
 import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
-import EmptyContent from 'src/@core/components/empty-content'
+import { EmptyContent } from '../../../../../components/empty-content'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import {
-  getDays,
-  getStudentsGrades,
-  setGettingAttendance,
-  setGettingGrades,
-  updateGradeParams
-} from 'src/store/apps/groupDetails'
+import { getDays, getStudentsGrades, updateGradeParams } from 'src/store/apps/groupDetails'
 import { toast } from 'react-hot-toast'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import SubLoader from 'src/views/apps/loaders/SubLoader'
 import dayjs from 'dayjs'
 
-interface Result {
+type Result = {
   date: string
   year: string
 }
-
-const today = new Date().getDate()
-
-const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: '#f5f5f9',
-    color: 'rgba(0, 0, 0, 0.87)',
-    maxWidth: 180,
-    fontSize: theme.typography.pxToRem(12),
-    border: '1px solid #dadde9'
-  }
-}))
-
 const Item = ({
-  currentDate,
   defaultValue,
-  groupId,
   userId,
   date,
   opened_id,
@@ -60,7 +37,7 @@ const Item = ({
   const [value, setValue] = useState<number>(defaultValue)
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
-  const {  query,  } = useRouter()
+  const { query } = useRouter()
   const handleGradeClick = async (grade: number) => {
     // if (grade < 1 || grade >= 100) {
     //   toast.error('1 dan 100 gacha bo‘lgan sonlarni tanlashingiz mumkin')
@@ -80,7 +57,6 @@ const Item = ({
       try {
         await api.post(`common/group-student/rating/create/`, data)
         // await dispatch(getStudentsGrades({ id: query?.id, queryString: '' }))
-
       } catch (e: any) {
         toast.error(e.response?.data.msg || 'Bahoni saqlab bo‘lmadi, qayta urinib ko‘ring')
         setValue(defaultValue)
@@ -98,7 +74,6 @@ const Item = ({
     }
   }, [opened_id])
 
-
   return (
     <Box sx={{ position: 'relative' }}>
       {value != null ? (
@@ -107,14 +82,14 @@ const Item = ({
             <TextField
               variant='outlined'
               value={value}
-              onChange={(e:any) => handleGradeClick(e.target.value)}
+              onChange={(e: any) => handleGradeClick(e.target.value)}
               onClick={() => setOpen(true)}
               size='small'
               // inputProps={{ readOnly: true }}
               sx={{
                 width: '50px',
                 display: 'flex',
-                justifyContent:'center',
+                justifyContent: 'center',
                 textAlign: 'center',
                 cursor: 'pointer',
                 '& .MuiOutlinedInput-root': {
@@ -354,7 +329,8 @@ const GroupStudentGrades = () => {
                             size='small'
                             sx={{
                               color: Number(student?.gpa) >= 4 ? 'green' : Number(student?.gpa) >= 3 ? 'orange' : 'red',
-                              borderColor: Number(student?.gpa) >= 4 ? 'green' : Number(student?.gpa) >= 3 ? 'orange' : 'red'
+                              borderColor:
+                                Number(student?.gpa) >= 4 ? 'green' : Number(student?.gpa) >= 3 ? 'orange' : 'red'
                             }}
                             variant='outlined'
                             label={student?.gpa}
@@ -388,7 +364,7 @@ const GroupStudentGrades = () => {
                                 currentDate={currentDate}
                                 opened_id={opened_id}
                                 setOpenedId={setOpenedId}
-                                defaultValue={"-"}
+                                defaultValue={'-'}
                                 groupId={query?.id}
                                 userId={student.id}
                                 date={hour.date}

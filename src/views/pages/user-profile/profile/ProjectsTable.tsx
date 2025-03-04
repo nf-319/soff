@@ -19,8 +19,8 @@ import { ThemeColor } from 'src/@core/layouts/types'
 import { ProjectTableRowType } from 'src/@fake-db/types'
 
 // ** Custom Components Imports
-import OptionsMenu from 'src/@core/components/option-menu'
-import CustomAvatar from 'src/@core/components/mui/avatar'
+import OptionsMenu from '../../../../components/option-menu'
+import CustomAvatar from '../../../../components/mui/avatar'
 
 // ** Utils Import
 import { getInitials } from 'src/@core/utils/get-initials'

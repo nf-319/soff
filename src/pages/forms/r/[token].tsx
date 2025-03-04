@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from 'react'
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 import { useState } from 'react'
 import { TextField, Typography, Box, FormControl, FormHelperText, Checkbox } from '@mui/material'
-import Form from 'src/@core/components/form'
+import Form from '../../../components/form'
 import LoadingButton from '@mui/lab/LoadingButton'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import toast from 'react-hot-toast'
@@ -185,7 +185,7 @@ function RequestForm({ uuid }: InferGetStaticPropsType<typeof getServerSideProps
       setComponents(resp.data?.response?.[0]?.questions)
       setFormData(resp.data?.response?.[0])
         setSuccessText(resp.data.response?.[0].success_text)
-        
+
     } catch (err: any) {
       console.log(err)
     }

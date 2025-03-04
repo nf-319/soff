@@ -15,24 +15,24 @@ import {
     styled,
     TextField,
 } from '@mui/material';
-import IconifyIcon from 'src/@core/components/icon';
+import IconifyIcon from '../../../../components/icon';
 import FormControl from '@mui/material/FormControl';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { today } from 'src/@core/components/card-statistics/kanban-item';
+import { today } from '../../../../components/card-statistics/kanban-item';
 import { useTranslation } from 'react-i18next';
 import * as Yup from "yup";
 import { useFormik } from 'formik';
 import { useAppDispatch } from 'src/store';
 import { useEffect, useRef, useState } from 'react';
-import CustomAvatar from 'src/@core/components/mui/avatar';
+import CustomAvatar from '../../../../components/mui/avatar';
 import { createEmployee, fetchEmployees, setOpenCreateSms } from 'src/store/apps/settings';
 import useBranches from 'src/hooks/useBranch';
 import useRoles from 'src/hooks/useRoles';
-import PhoneInput from 'src/@core/components/phone-input';
-import { reversePhone } from 'src/@core/components/phone-input/format-phone-number';
+import PhoneInput from '../../../../components/phone-input';
+import { reversePhone } from '../../../../components/phone-input/format-phone-number';
 import { disablePage } from 'src/store/apps/page';
 import toast from 'react-hot-toast';
-import AmountInput, { revereAmount } from 'src/@core/components/amount-input';
+import AmountInput, { revereAmount } from '../../../../components/amount-input';
 import Router from 'next/router';
 
 export const VisuallyHiddenInput = styled('input')({
@@ -56,7 +56,7 @@ export const TeacherAvatar = styled(CustomAvatar)<AvatarProps>(({ theme }) => ({
 export default function CreateEmployeeForm() {
     const [image, setImage] = useState<any>(null)
 
-    // ** Hooks 
+    // ** Hooks
     const { t } = useTranslation()
     const dispatch = useAppDispatch()
     const profilePhoto: any = useRef(null)
@@ -160,8 +160,8 @@ export default function CreateEmployeeForm() {
             dispatch(setOpenCreateSms(false))
         }
     }, [])
-    
-    
+
+
 
     return (
         <Box width={'100%'}>
@@ -326,7 +326,7 @@ export default function CreateEmployeeForm() {
                     </FormControl>
                     {formik.values.roles.length == 1 && formik.values.roles[0] == 3 &&
                         <FormControl sx={{ width: '100%' }}>
-                            
+
                      <AmountInput
                          // type='number'
                          label={t("Xar bir dars bo'yicha")}

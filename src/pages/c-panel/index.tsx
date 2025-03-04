@@ -1,5 +1,5 @@
 import React from 'react'
-import CompanyList from 'src/@core/components/c-panel/CompanyList'
+import CompanyList from '../../components/c-panel/CompanyList'
 
 
 export default function CPanel() {

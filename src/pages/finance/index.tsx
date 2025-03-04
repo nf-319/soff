@@ -1,10 +1,5 @@
-// ** MUI Imports
 import Grid from '@mui/material/Grid'
-
-// ** Demo Components Imports
 import CardStatisticsLiveVisitors from 'src/views/ui/cards/statistics/CardStatisticsLiveVisitors'
-
-// ** Styled Component Import
 import KeenSliderWrapper from 'src/@core/styles/libs/keen-slider'
 import ApexChartWrapper from 'src/@core/styles/libs/react-apexcharts'
 import {
@@ -20,50 +15,41 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import GroupFinanceTable from 'src/views/apps/finance/GroupTable'
-import IconifyIcon from 'src/@core/components/icon'
 import 'react-datepicker/dist/react-datepicker.css'
 import 'rsuite/DateRangePicker/styles/index.css'
 import { useContext, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { customTableDataProps } from 'src/@core/components/lid-table'
-import DataTable from 'src/@core/components/table'
+import { customTableDataProps } from '../../components/lid-table'
+import DataTable from '../../components/table'
 import api from 'src/@core/utils/api'
 import LoadingButton from '@mui/lab/LoadingButton'
 import FinanceCategories from 'src/views/apps/finance/FinanceCategories'
 import { formatCurrency } from 'src/@core/utils/format-currency'
-import EmptyContent from 'src/@core/components/empty-content'
 import { getMonthFullName } from 'src/@core/utils/gwt-month-name'
 import Router, { useRouter } from 'next/router'
-import SubLoader from 'src/views/apps/loaders/SubLoader'
 import StatsPaymentMethods from 'src/views/apps/finance/StatsPaymentMethods'
 import FinanceAllNumber from 'src/views/apps/finance/FinanceAllNumber'
-import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
+import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
 import HeadingFilter from 'src/views/apps/finance/HeadingFilter'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { getExpenseCategories, getIncomeCategories } from 'src/store/apps/finance'
-import getMonthName from 'src/@core/utils/getMonthName'
 import { AuthContext } from 'src/context/AuthContext'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { toast } from 'react-hot-toast'
+import { EmptyContent } from '../../components/empty-content'
+import { Close } from '@mui/icons-material'
 
 export function formatDateString(date: Date) {
   const day = String(date.getDate()).padStart(2, '0')
-  const month = String(date.getMonth() + 1).padStart(2, '0') // getMonth() is zero-based
+  const month = String(date.getMonth() + 1).padStart(2, '0')
   const year = date.getFullYear()
 
   return `${year}-${month}-${day}`
 }
-interface Plan {
+type Plan = {
   done_amount: number
   percentage: number
   planned_amount: number
-}
-
-interface FinancialData {
-  all_numbers: {
-    plans: Plan
-  }
 }
 
 const CardStatistics = () => {
@@ -198,7 +184,7 @@ const CardStatistics = () => {
     try {
       await api.post(`finance/budget-category/create/`, { name: nameVal, status: 'expense' })
       setOpen(null)
-      dispatch(getExpenseCategories({...allNumbersParams}))
+      dispatch(getExpenseCategories({ ...allNumbersParams }))
     } catch (err) {
       console.log(err)
     } finally {
@@ -210,7 +196,7 @@ const CardStatistics = () => {
     try {
       await api.post(`finance/budget-category/create/`, { name: nameVal, status: 'income' })
       setOpen(null)
-      dispatch(getIncomeCategories({...allNumbersParams}))
+      dispatch(getIncomeCategories({ ...allNumbersParams }))
     } catch (err) {
       console.log(err)
     } finally {
@@ -284,6 +270,7 @@ const CardStatistics = () => {
           <Grid item xs={12} sm={12} md={4}>
             <StatsPaymentMethods />
           </Grid>
+
           <Grid item xs={12} md={8} mb={10}>
             <CardStatisticsLiveVisitors />
             {numbersLoad ? (
@@ -291,10 +278,10 @@ const CardStatistics = () => {
             ) : (
               all_numbers && (
                 <Box width='100%' mx='auto' pt={5}>
-                  <Paper elevation={3} sx={{ p: 3, borderRadius: 1 }}>
+                  <Paper elevation={3} sx={{ p: 4, borderRadius: 1 }}>
                     {all_numbers.month ? (
                       <Typography variant='h6' align='center' gutterBottom>
-                        {all_numbers.year} - {month[all_numbers.month]}  oyidagi natijalar
+                        {all_numbers.year} - {month[all_numbers.month]} oyidagi natijalar
                       </Typography>
                     ) : (
                       <Typography variant='h6' align='center' gutterBottom>
@@ -343,10 +330,7 @@ const CardStatistics = () => {
                             mt={2}
                           >
                             Qarzdorlik summasi:
-                            <br /> {formatNumber(
-                              all_numbers.plans?.debt_amount || 0
-                            )}{' '}
-                            so'm
+                            <br /> {formatNumber(all_numbers.plans?.debt_amount || 0)} so'm
                           </Typography>
                           <Typography color={all_numbers.plans.percentage >= 65 ? 'white' : 'black'} textAlign={'end'}>
                             {100 % -all_numbers.plans.percentage.toFixed(1) || 0}%
@@ -374,6 +358,7 @@ const CardStatistics = () => {
               </Button>
             </Box>
           </Grid>
+
           <div id='chiqimlar'></div>
 
           <Grid item xs={12} md={12}>
@@ -418,9 +403,6 @@ const CardStatistics = () => {
           <Grid item xs={12} md={12}>
             <Box sx={{ display: 'flex', gap: '10px', flexGrow: 1 }}>
               <Typography sx={{ fontSize: '20px', flexGrow: 1 }}>{t('Oyliklar hisoboti')}</Typography>
-              {/* <Link href='/finance/salary-confirm' >
-                                <Button variant='contained'>{t("Oylik ishlash")}</Button>
-                            </Link> */}
             </Box>
 
             <DataTable
@@ -438,8 +420,9 @@ const CardStatistics = () => {
       <Dialog open={open === 'create'} onClose={() => setOpen(null)}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', minWidth: '300px', justifyContent: 'space-between' }}>
           <Typography>{t("Xarajatlar bo'limini yaratish")}</Typography>
-          <IconifyIcon icon={'mdi:close'} onClick={() => setOpen(null)} />
+          <Close onClick={() => setOpen(null)} />
         </DialogTitle>
+
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <TextField
             required
@@ -457,8 +440,10 @@ const CardStatistics = () => {
       <Dialog open={open === 'income'} onClose={() => setOpen(null)}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', minWidth: '300px', justifyContent: 'space-between' }}>
           <Typography>{t("Kirimlar bo'limini yaratish")}</Typography>
-          <IconifyIcon icon={'mdi:close'} onClick={() => setOpen(null)} />
+
+          <Close onClick={() => setOpen(null)} />
         </DialogTitle>
+
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <TextField
             required
@@ -468,6 +453,7 @@ const CardStatistics = () => {
             fullWidth
             onChange={e => setNameVal(e.target.value)}
           />
+
           <LoadingButton loading={loading} onClick={() => createIncomeCategroy()} variant='contained'>
             {t('Saqlash')}
           </LoadingButton>

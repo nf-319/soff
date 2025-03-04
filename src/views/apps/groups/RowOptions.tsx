@@ -1,8 +1,8 @@
-// @ts-nocheck
+//@ts-nocheck
 
 import { IconButton, Menu } from '@mui/material'
 import { MouseEvent, useEffect, useState } from 'react'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import MenuItem from '@mui/material/MenuItem'
 import Link from 'next/link'
 import UserSuspendDialog from 'src/views/apps/groups/view/UserSuspendDialog'
@@ -20,15 +20,18 @@ import {
 } from 'src/store/apps/groups'
 import { disablePage } from 'src/store/apps/page'
 import { toast } from 'react-hot-toast'
-import Excel from 'src/@core/components/excelButton/Excel'
+import Excel from '../../../components/excelButton/Excel'
 import axios from 'axios'
 import { studentsUpdateParams } from 'src/store/apps/groupDetails'
+import { useQueryClient } from '@tanstack/react-query'
+import ceoConfigs from 'src/configs/ceo'
+import { GroupType } from 'src/@fake-db/types'
 
-const RowOptions = ({ id }: { id: number | string }) => {
-  const { queryParams, groups } = useAppSelector(state => state.groups)
+const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }) => {
+  const { queryParams } = useAppSelector(state => state.groups)
   const dispatch = useAppDispatch()
   const [isDeleting, setDeleting] = useState(false)
-
+  const queryClient = useQueryClient()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
   const [suspendDialogOpen2, setSuspendDialogOpen2] = useState<boolean>(false)
@@ -59,7 +62,6 @@ const RowOptions = ({ id }: { id: number | string }) => {
   const handleChangeBranch = async (id: any) => {
     dispatch(handleChangeBranchOpenEdit(true))
     await Promise.all([dispatch(getGroupsDetails(id))])
-
   }
 
   const handleEdit = async (id: any) => {
@@ -87,15 +89,14 @@ const RowOptions = ({ id }: { id: number | string }) => {
   //   await Promise.all([dispatch(getDashboardLessons(queryString)), dispatch(getGroupsDetails(id))])
   // }
 
-  const handleDeleteTeacher = async (id: string | number) => {
+  const handleDeleteGroup = async (id: string | number) => {
     setDeleting(true)
     dispatch(disablePage(true))
     const response: any = await dispatch(deleteGroups(id))
     if (response.meta.requestStatus == 'rejected') {
       toast.error(response.payload.msg || "Guruhni o'chirib bo'lmadi")
     } else {
-      const queryString = new URLSearchParams(queryParams).toString()
-      await dispatch(fetchGroups(queryParams))
+      queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
     }
     setDeleting(false)
     dispatch(disablePage(false))
@@ -124,8 +125,9 @@ const RowOptions = ({ id }: { id: number | string }) => {
         <MenuItem
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
-          onClick={() => { setAnchorEl(null), dispatch(studentsUpdateParams({ status: 'active,new' })) }
-          }
+          onClick={() => {
+            setAnchorEl(null), dispatch(studentsUpdateParams({ status: 'active,new' }))
+          }}
           href={`/groups/view/security?id=${id}&month=${getMontName(null)}`}
         >
           <IconifyIcon icon='mdi:eye-outline' fontSize={20} />
@@ -136,12 +138,12 @@ const RowOptions = ({ id }: { id: number | string }) => {
           {t('Tahrirlash')}
         </MenuItem>
         {group?.status !== 'archived' && (
-          <MenuItem onClick={()=>handleChangeBranch(id)} sx={{ '& svg': { mr: 2 } }}>
+          <MenuItem onClick={() => handleChangeBranch(id)} sx={{ '& svg': { mr: 2 } }}>
             <IconifyIcon icon='material-symbols:swap-horiz' fontSize={20} />
             {t("Guruhni boshqa filialga ko'chirish")}
           </MenuItem>
         )}
-        {/* 
+        {/*
                 {queryParams.status === 'archived' ? <MenuItem onClick={() => handleRecovery(id)} sx={{ '& svg': { mr: 2 } }}>
                     <IconifyIcon icon='mdi:reload' fontSize={20} />
                     {t("Tiklash")}
@@ -171,14 +173,14 @@ const RowOptions = ({ id }: { id: number | string }) => {
       </Menu>
       <UserSuspendDialog
         isDeleting={isDeleting}
-        handleOk={() => handleDeleteTeacher(id)}
+        handleOk={() => handleDeleteGroup(id)}
         open={suspendDialogOpen}
         setOpen={setSuspendDialogOpen}
       />
       <UserSuspendDialog
         warning="Esda tuting guruhga aloqador barcha malumotlar o'chiriladi"
         isDeleting={isDeleting}
-        handleOk={() => handleDeleteTeacher(id)}
+        handleOk={() => handleDeleteGroup(id)}
         open={suspendDialogOpen2}
         setOpen={setSuspendDialogOpen2}
       />

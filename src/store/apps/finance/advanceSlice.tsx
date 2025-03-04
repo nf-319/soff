@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { today } from 'src/@core/components/card-statistics/kanban-item';
-import { customTableDataProps } from 'src/@core/components/table';
+import { today } from '../../../components/card-statistics/kanban-item';
+import { customTableDataProps } from '../../../components/table';
 import api from 'src/@core/utils/api';
 import { formatCurrency } from 'src/@core/utils/format-currency';
 import ceoConfigs from 'src/configs/ceo';

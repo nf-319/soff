@@ -21,8 +21,8 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 
 // ** Custom Components
-import CustomChip from 'src/@core/components/mui/chip'
-import CustomAvatar from 'src/@core/components/mui/avatar'
+import CustomChip from '../../../../../components/mui/chip'
+import CustomAvatar from '../../../../../components/mui/avatar'
 
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
@@ -31,7 +31,7 @@ import { ThemeColor } from 'src/@core/layouts/types'
 import { getInitials } from 'src/@core/utils/get-initials'
 import { useTranslation } from 'react-i18next'
 import useEmployee from 'src/hooks/useEmployee'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../../components/icon'
 
 import { styled } from '@mui/material/styles'
 import toast from 'react-hot-toast'

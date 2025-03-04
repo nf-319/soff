@@ -21,7 +21,7 @@ import clsx from 'clsx'
 import { usePopper } from 'react-popper'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../../components/icon'
 
 // ** Theme Config Import
 import themeConfig from 'src/configs/themeConfig'

@@ -9,7 +9,7 @@ import IconButton from '@mui/material/IconButton'
 import { Settings } from 'src/@core/context/settingsContext'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../components/icon'
 
 
 interface Props {

@@ -1,7 +1,6 @@
-// ** React Imports
-import { useState } from 'react'
+'use client'
 
-// ** MUI Imports
+import { useState } from 'react'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
@@ -9,25 +8,23 @@ import Typography from '@mui/material/Typography'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 import { useTranslation } from 'react-i18next'
 import LoadingButton from '@mui/lab/LoadingButton'
+import { OctagonAlert } from 'lucide-react'
 
 type Props = {
   open: boolean
   setOpen: (val: boolean) => void
-  handleOk?: () => any,
-  okText?: string | undefined,
+  handleOk?: () => any
+  okText?: string | undefined
   loading?: boolean
 }
 
 const UserSuspendDialog = (props: Props) => {
-  // ** Props
   const { open, setOpen, handleOk, okText, loading } = props
   const { t } = useTranslation()
 
-  // ** States
   const [userInput, setUserInput] = useState<string>('yes')
   const [secondDialogOpen, setSecondDialogOpen] = useState<boolean>(false)
 
@@ -57,7 +54,7 @@ const UserSuspendDialog = (props: Props) => {
     }
   }
 
-  function handleModalClose() {
+  const handleModalClose = () => {
     setSecondDialogOpen(false)
   }
 
@@ -66,15 +63,27 @@ const UserSuspendDialog = (props: Props) => {
       <Dialog fullWidth open={open} onClose={handleClose} sx={{ '& .MuiPaper-root': { width: '100%', maxWidth: 512 } }}>
         <DialogContent>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-            <Box sx={{ mb: 4, maxWidth: '85%', textAlign: 'center', '& svg': { mb: 12.25, color: 'warning.main' } }}>
-              <Icon icon='mdi:alert-circle-outline' fontSize='5.5rem' />
+            <Box
+              sx={{
+                mb: 4,
+                maxWidth: '85%',
+                textAlign: 'center',
+                gap: 4,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}
+            >
+              <OctagonAlert size={65} color='#E5B700' />
+
               <Typography variant='h4' sx={{ color: 'text.secondary' }}>
-                {t("Ishonchingiz komilmi?")}
+                Ishonchingiz komilmi?
               </Typography>
             </Box>
-            <Typography>{t("Siz bu jarayonni ortqa qaytara olmaysiz!")}</Typography>
+            <Typography>Siz bu jarayonni ortqa qaytara olmaysiz!</Typography>
           </Box>
         </DialogContent>
+
         <DialogActions sx={{ justifyContent: 'center' }}>
           <LoadingButton
             loading={loading}
@@ -85,13 +94,14 @@ const UserSuspendDialog = (props: Props) => {
           >
             {okText ? okText : t("O'chirish")}
           </LoadingButton>
+
           <Button
             variant='outlined'
             style={{ marginTop: '30px' }}
             color='secondary'
             onClick={() => handleConfirmation2('cancel')}
           >
-            {t("Bekor qilish")}
+            {t('Bekor qilish')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -121,10 +131,12 @@ const UserSuspendDialog = (props: Props) => {
             <Typography variant='h4' sx={{ mb: 6 }}>
               {userInput === 'yes' ? t('Muvaffaqiyatli!') : t('Bekor qilindi')}
             </Typography>
-            <Typography>{userInput === 'yes' ? t(`Muvaffaqiyatli o'chirilidi!`) : t("O'chirish  bekor qilindi")}</Typography>
+            <Typography>
+              {userInput === 'yes' ? t(`Muvaffaqiyatli o'chirilidi!`) : t("O'chirish  bekor qilindi")}
+            </Typography>
             <DialogActions sx={{ justifyContent: 'center', p: 3 }}>
               <Button variant='contained' onClick={handleModalClose}>
-                {t("Yaxshi")}
+                {t('Yaxshi')}
               </Button>
             </DialogActions>
           </Box>

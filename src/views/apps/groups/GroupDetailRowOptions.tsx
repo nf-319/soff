@@ -20,7 +20,7 @@ import { useRouter } from 'next/router'
 import React, { MouseEvent, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import api from 'src/@core/utils/api'
 import useBranches from 'src/hooks/useBranch'
 import useSMS from 'src/hooks/useSMS'
@@ -34,7 +34,13 @@ import {
   setUpdateStatusModal
 } from 'src/store/apps/groupDetails'
 import { disablePage } from 'src/store/apps/page'
-import { deleteStudent, fetchStudentDetail, fetchStudentsList, updateStudent } from 'src/store/apps/students'
+import {
+  deleteStudent,
+  fetchStudentDetail,
+  fetchStudentsList,
+  setGroupChecklist,
+  updateStudent
+} from 'src/store/apps/students'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 import StudentPaymentForm from '../students/view/StudentPaymentForm'
 import { LoadingButton } from '@mui/lab'
@@ -44,8 +50,6 @@ import AddNote from './view/ViewStudents/AddNote'
 import SentSMS from './view/ViewStudents/SentSMS'
 import ExportStudent from './view/ViewStudents/ExportStudent'
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
-import { useFormik } from 'formik'
-import * as Yup from 'yup'
 
 type Props = {
   id: number
@@ -56,12 +60,8 @@ export type ModalTypes = 'group' | 'withdraw' | 'payment' | 'sms' | 'delete' | '
 export default function GroupDetailRowOptions({ id }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const { push, query } = useRouter()
-  const { students, studentsQueryParams, isGettingStudents, queryParams, openLeadModal,updateStatusModal } = useAppSelector(
-    state => state.groupDetails
-  
-  )
-
-  
+  const { students, studentsQueryParams, isGettingStudents, queryParams, openLeadModal, updateStatusModal } =
+    useAppSelector(state => state.groupDetails)
 
   const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
@@ -75,16 +75,11 @@ export default function GroupDetailRowOptions({ id }: Props) {
     setStudent(students?.find(item => item.id == id))
   }, [])
 
-
   const dispatch = useAppDispatch()
 
   const rowOptionsOpen = Boolean(anchorEl)
   const { getBranches, branches } = useBranches()
   const [activate, setActivate] = useState<boolean>(false)
-
-  
-  
-  
 
   const handleClose = (value: 'none' | 'left' | 'payment' | 'notes' | 'sms' | 'export') => {
     setAnchorEl(null)
@@ -106,36 +101,38 @@ export default function GroupDetailRowOptions({ id }: Props) {
   const handleRowOptionsClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
-  const handleRowOptionsClose = () => {
-    setAnchorEl(null)
-  }
 
   const handleLeft = async () => {
-    setLoading(true)
-    try {
-      await api.delete(`common/group-student-delete/${student?.id}/`)
-      toast.success("O'quvchi guruhdan chetlatildi", { position: 'top-center' })
-      setLoading(false)
-      const queryString = new URLSearchParams(studentsQueryParams).toString()
-      const queryStringAttendance = new URLSearchParams(queryParams).toString()
-      await dispatch(getStudents({ id: query.id, queryString: queryString }))
-      dispatch(setGettingAttendance(true))
-      if (query.month && query?.id) {
-        await dispatch(
-          getAttendance({
-            date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query.month)}`,
-            group: query?.id,
-            queryString: queryStringAttendance
-          })
-        )
+    if (student?.student?.balance < 0) {
+      toast.error("Qarzdor o'quvchini guruhdan chetlatib bo'lmaydi")
+    } else {
+      setLoading(true)
+
+      try {
+        await api.delete(`common/group-student-delete/${student?.id}/`)
+        toast.success("O'quvchi guruhdan chetlatildi", { position: 'top-center' })
+        setLoading(false)
+        const queryString = new URLSearchParams(studentsQueryParams).toString()
+        const queryStringAttendance = new URLSearchParams(queryParams).toString()
+        await dispatch(getStudents({ id: query.id, queryString: queryString }))
+        dispatch(setGettingAttendance(true))
+        if (query.month && query?.id) {
+          await dispatch(
+            getAttendance({
+              date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query.month)}`,
+              group: query?.id,
+              queryString: queryStringAttendance
+            })
+          )
+        }
+        dispatch(setGettingAttendance(false))
+      } catch (err: any) {
+        console.error(err)
+        toast.error(err.response.data.msg)
+        setLoading(false)
       }
-      dispatch(setGettingAttendance(false))
-    } catch (err: any) {
-      console.log(err)
-      toast.error(err.response.data.msg)
-      setLoading(false)
+      setOpenLeft(false)
     }
-    setOpenLeft(false)
   }
 
   const handleActive = async () => {
@@ -146,6 +143,13 @@ export default function GroupDetailRowOptions({ id }: Props) {
     toast.success("O'quvchi muvaffaqiyatli aktivlashtirildi")
     await dispatch(fetchStudentsList({ status: 'archive' }))
     setLoading(false)
+  }
+
+  async function getGroups() {
+    await api
+      .get(`common/group-check-list/?student=${student?.student?.id}`)
+      .then(res => dispatch(setGroupChecklist(res.data)))
+      .catch(error => console.error(error))
   }
 
   async function submitDelete() {
@@ -159,17 +163,12 @@ export default function GroupDetailRowOptions({ id }: Props) {
       })
       .catch(err => {
         toast.error(err.response.data.msg || "O'quvchini o'chirib bo'lmadi")
-        console.log(err)
+        console.error(err)
       })
 
     dispatch(disablePage(false))
     setLoading(false)
-    }
-    
-
-  
-  
-  
+  }
 
   return (
     <>
@@ -188,7 +187,9 @@ export default function GroupDetailRowOptions({ id }: Props) {
       >
         <MenuItem
           sx={{ display: 'flex', alignItems: 'center', gap: '7px' }}
-          onClick={async () => handleEditClickOpen('payment')}
+          onClick={async () => {
+            handleEditClickOpen('payment'), getGroups()
+          }}
         >
           <Icon fontSize={'20px'} icon={'ic:baseline-payments'} />
           {t("To'lov")}
@@ -249,10 +250,7 @@ export default function GroupDetailRowOptions({ id }: Props) {
           </Box>
         </DialogContent>
       </Dialog>
-      <Dialog
-        open={openLeadModal}
-        onClose={() => (dispatch(setOpenLeadModal(null)), handleClose('none'))}
-      >
+      <Dialog open={openLeadModal} onClose={() => (dispatch(setOpenLeadModal(null)), handleClose('none'))}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography sx={{ fontSize: '20px', textAlign: 'center' }}>{t("Lidlar bo'limga qo'shish")}</Typography>
           <IconifyIcon
@@ -264,8 +262,14 @@ export default function GroupDetailRowOptions({ id }: Props) {
           <MergeToDepartment studentId={String(student?.id)} />
         </DialogContent>
       </Dialog>
-    
-      <EditStudent status={student?.status} student={student?.student} id={student?.id} activate={activate} setActivate={setActivate} />
+
+      <EditStudent
+        status={student?.status}
+        student={student?.student}
+        id={student?.id}
+        activate={activate}
+        setActivate={setActivate}
+      />
       <AddNote id={student?.student?.id} modalRef={modalRef} setModalRef={setModalRef} />
       <SentSMS smsTemps={smsTemps} id={student?.student?.id} modalRef={modalRef} setModalRef={setModalRef} />
       <ExportStudent id={student?.id} modalRef={modalRef} setModalRef={setModalRef} />

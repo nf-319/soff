@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { Box, Button, Pagination, Typography } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
-import IconifyIcon from 'src/@core/components/icon'
-import DataTable from 'src/@core/components/table'
+import IconifyIcon from '../../../components/icon'
+import DataTable from '../../../components/table'
 import MuiDrawer, { DrawerProps } from '@mui/material/Drawer'
 import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
@@ -11,7 +11,7 @@ import { fetchCoursesList, setOpenCreateSms, updateParams } from 'src/store/apps
 import CourseListRowOptions from 'src/views/apps/settings/courses/CourseListRowOptions'
 import CreateCourseDialog from 'src/views/apps/settings/courses/CreateCourseDialog'
 import EditCourseDialog from 'src/views/apps/settings/courses/EditCourseDialog'
-import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
+import VideoHeader, { videoUrls } from '../../../components/video-header/video-header'
 import { toast } from 'react-hot-toast'
 import { AuthContext } from 'src/context/AuthContext'
 import { useRouter } from 'next/router'
@@ -59,7 +59,12 @@ export default function GroupsPage() {
   const { course_list, is_pending, courseQueryParams } = useAppSelector(state => state.settings)
 
   useEffect(() => {
-    if (!user?.role.includes('ceo') && !user?.role.includes('admin') && !user?.role.includes('watcher')&& !user?.role.includes('marketolog')) {
+    if (
+      !user?.role.includes('ceo') &&
+      !user?.role.includes('admin') &&
+      !user?.role.includes('watcher') &&
+      !user?.role.includes('marketolog')
+    ) {
       push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
     }

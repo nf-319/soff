@@ -1,4 +1,3 @@
-// ** MUI Imports
 import {
   Box,
   Button,
@@ -15,19 +14,15 @@ import {
   Select,
   TextField
 } from '@mui/material'
-
-// ** Types
-
-// ** Demo Component Imports
 import { UserViewStudentsItem } from './UserViewStudentsList'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import { useEffect, useState } from 'react'
 import api from 'src/@core/utils/api'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import useSMS from 'src/hooks/useSMS'
-import EmptyContent from 'src/@core/components/empty-content'
+import { EmptyContent } from '../../../../components/empty-content'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { fetchSmsList, fetchSmsListQuery } from 'src/store/apps/settings'
@@ -63,8 +58,8 @@ const UserSmsList = () => {
       const resp = await api.get(`auth/sms-history/?user=${query.student}`)
       setData(resp.data?.results)
       setLoading(false)
-        setOpen(false)
-        formik.resetForm()
+      setOpen(false)
+      formik.resetForm()
     } catch (err: any) {
       if (err?.response?.data) {
         formik.setErrors(err?.response?.data)

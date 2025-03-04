@@ -1,27 +1,18 @@
-// ** MUI Imports
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Stomp from 'stompjs'
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
-
-// ** Type Import
+import Icon from '../../../components/icon'
 import { Settings } from 'src/@core/context/settingsContext'
-
-// ** Components
 import ModeToggler from 'src/@core/layouts/components/shared-components/ModeToggler'
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
 import LanguageDropdown from 'src/@core/layouts/components/shared-components/LanguageDropdown'
-// import NotificationDropdown, {
-//   NotificationsType
-// } from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import BranchDropdown from 'src/@core/layouts/components/shared-components/BranchDropdown'
-import Clock from 'src/@core/components/clock'
+import Clock from '../../../components/clock'
 import { Autocomplete, Button, TextField, Tooltip, Typography } from '@mui/material'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import VideoModal from 'src/@core/components/video-header'
+import VideoModal from '../../../components/video-header'
 import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import { useContext, useEffect, useState } from 'react'
 import { setNotifications } from 'src/store/apps/user'
@@ -44,26 +35,26 @@ interface Props {
 
 const AppBarContent = (props: Props) => {
   const { hidden, settings, saveSettings, toggleNavVisibility } = props
-  const { companyInfo, notifications } = useAppSelector(state => state.user)
   const { user } = useContext(AuthContext)
   const [search, setSearch] = useState('')
   const [searchLoading, setSearchLoading] = useState(false)
-  const debouncedSearch = useDebounce(search, 1000)
+  const debouncedSearch = useDebounce(search, 500)
   const { isMobile } = useResponsive()
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
+  const [open, setOpen] = useState<boolean>(false)
   const [stompClient, setStompClient] = useState<Stomp.Client | null>(null)
 
   const [employees, setEmployees] = useState<any>([])
 
-  const renderRoleBasedLink = (role: string, id: string, role_id: string) => {
-    dispatch(updateQueryParams({ role: role_id }))
+  const renderRoleBasedLink = (option: any) => {
+    dispatch(updateQueryParams({ role: option.role_id }))
 
-    switch (role) {
+    switch (option.role) {
       case 'STUDENT':
-        return `/students/view/security?student=${id}`
+        return `/students/view/security?student=${option.id}`
       case 'TEACHER':
-        return `/mentors/view/security?id=${id}`
+        return `/mentors/view/security?id=${option.id}`
       case 'ADMIN':
         return `/settings/ceo/users`
       case 'CEO':
@@ -72,39 +63,36 @@ const AppBarContent = (props: Props) => {
         return `/settings/ceo/users`
     }
   }
-
   async function handleSearch(query: string) {
     if (!query) {
       setEmployees([])
+      setSearchLoading(false)
       return
     }
-    setSearchLoading(true)
-    const res = await api.get(`${ceoConfigs.employee_checklist}?search=${query}`)
-    setEmployees(res.data)
-    setSearchLoading(false)
+
+    try {
+      const res = await api.get(`${ceoConfigs.employee_checklist}?search=${query}`)
+      setEmployees(res.data)
+    } catch (error) {
+      console.error(error)
+      setEmployees([])
+    } finally {
+      setSearchLoading(false)
+    }
   }
 
+  useEffect(() => {
+    if (search) {
+      setSearchLoading(true)
+    }
+  }, [search])
   useEffect(() => {
     handleSearch(debouncedSearch)
   }, [debouncedSearch])
 
-  function clickGlobalPay() {
+  const clickGlobalPay = () => {
     dispatch(setGlobalPay(true))
   }
-
-  // useEffect(() => {
-  //   const socket = new WebSocket(`wss://test.api-soffcrm.uz/ws/notifications/${user?.id}/`)
-  //   socket.onopen = () => {
-  //     socket.send(JSON.stringify({ subscribe: `notifications/${user?.id}/` }))
-  //   }
-  //   socket.onmessage = event => {
-  //     const data = JSON.parse(event.data)
-  //     dispatch(setNotifications(data?.notifications?.length || 0))
-  //   }
-  //   return () => {
-  //     socket.close()
-  //   }
-  // }, [user?.id])
 
   return (
     <div style={{ width: '100%', display: 'block' }}>
@@ -124,28 +112,32 @@ const AppBarContent = (props: Props) => {
 
         {!isMobile && (
           <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {user?.role.join(', ') !== 'student' && (
+            {user?.role !== 'student' && (
               <>
                 <Autocomplete
-                  open={search == '' ? false : true}
+                  open={open}
+                  onOpen={() => setOpen(search.length !== 0)}
                   sx={{ paddingX: 10 }}
                   disablePortal
                   onClose={() => {
+                    if (search === '') setOpen(false)
                     setEmployees([])
+                    setOpen(false)
                   }}
-                  loading={searchLoading}
-                  loadingText={'Yuklanmoqda..'}
                   options={employees || []}
                   fullWidth
-                  noOptionsText="Ma'lumot yo'q.."
                   size='small'
-                  getOptionLabel={(option: any) => option.first_name}
+                  loadingText={'Yuklanmoqda..'}
+                  loading={searchLoading}
+                  noOptionsText={search === '' ? "O'quvchi yoki Teacher Qidirish" : "Malumot yo'q"}
+                  getOptionLabel={(option: any) => option?.first_name || ''}
+                  filterOptions={options => options}
                   renderOption={(props, option: any) => (
                     <li {...props} key={option.id}>
                       <Link
                         style={{ textDecoration: 'none' }}
                         onClick={() => dispatch(setStudentId(option.id))}
-                        href={renderRoleBasedLink(option.role, option.id, option.role_id)}
+                        href={renderRoleBasedLink(option)}
                       >
                         <Icon
                           icon={
@@ -192,17 +184,10 @@ const AppBarContent = (props: Props) => {
                 </Button>
               </>
             )}
-            {/* <Clock />
-        <Typography variant='body2'>|</Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-        <IconifyIcon style={{ fontSize: '18px', color: '#40c0e7' }} icon={'la:user-clock'} />
-        <Typography variant='body2'>{t(`Ish vaqti`)} {companyInfo?.work_start_time} - {companyInfo?.work_end_time}</Typography>
-        </Box> */}
           </Box>
         )}
         <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
           <LanguageDropdown settings={settings} saveSettings={saveSettings} />
-          {/* <ModeToggler settings={settings} saveSettings={saveSettings} /> */}
           <NotificationDropdown settings={settings} />
           <UserDropdown settings={settings} />
         </Box>
@@ -224,7 +209,7 @@ const AppBarContent = (props: Props) => {
               <Link
                 style={{ textDecoration: 'none' }}
                 onClick={() => dispatch(setStudentId(option.id))}
-                href={renderRoleBasedLink(option.role, option.id, option.role_id)}
+                href={renderRoleBasedLink(option)}
               >
                 <Icon
                   icon={

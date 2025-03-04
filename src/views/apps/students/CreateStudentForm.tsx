@@ -18,12 +18,12 @@ import {
   Select,
   TextField
 } from '@mui/material'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import LoadingButton from '@mui/lab/LoadingButton'
 
 // ** Assets
 import { useTranslation } from 'react-i18next'
-import { today } from 'src/@core/components/card-statistics/kanban-item'
+import { today } from '../../../components/card-statistics/kanban-item'
 
 // ** Packs
 import * as Yup from 'yup'
@@ -40,15 +40,16 @@ import {
 import { useAppDispatch, useAppSelector } from 'src/store'
 import useGroups from 'src/hooks/useGroups'
 import useResponsive from 'src/@core/hooks/useResponsive'
-import PhoneInput from 'src/@core/components/phone-input'
-import { reversePhone } from 'src/@core/components/phone-input/format-phone-number'
+import PhoneInput from '../../../components/phone-input'
+import { reversePhone } from '../../../components/phone-input/format-phone-number'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
 import Router from 'next/router'
 import { TeacherAvatar, VisuallyHiddenInput } from '../mentors/AddMentorsModal'
-import { revereAmount } from 'src/@core/components/amount-input'
+import { revereAmount } from '../../../components/amount-input'
 import api from 'src/@core/utils/api'
 import ceoConfigs from 'src/configs/ceo'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function CreateStudentForm() {
   // ** Hooks
@@ -68,6 +69,7 @@ export default function CreateStudentForm() {
   const [loading, setLoading] = useState<boolean>(false)
   const [isDiscount, setIsDiscount] = useState<boolean>(false)
   const [checked, setChecked] = useState(false)
+  const queryClient = useQueryClient()
   const [parents, setParents] = useState([])
   const school_type = localStorage.getItem('school_type')
   const getGroups = async () => {
@@ -152,7 +154,7 @@ export default function CreateStudentForm() {
 
         toast.success("O'quvchi muvaffaqiyatli yaratildi")
         await dispatch(updateStudentParams({ status: 'active' }))
-        await dispatch(fetchStudentsList({ status: 'active' }))
+        queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
         dispatch(setOpenEdit(null))
         formik.resetForm()
         setIsGroup(false)
@@ -177,12 +179,12 @@ export default function CreateStudentForm() {
     setChecked(event.target.checked)
   }
 
- 
+
 
   const handleSearch = useCallback(
     debounce(async (val: string) => {
       await dispatch(fetchGroupCheckList(val));
-    }, 500), 
+    }, 500),
     []
   );
   return (

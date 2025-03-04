@@ -1,22 +1,20 @@
-import { Box, Button, Chip, IconButton, Pagination, Typography } from '@mui/material';
+import { Box, Button, Chip, IconButton, Pagination, Typography, Select, MenuItem } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from 'src/@core/utils/format-currency';
 import 'react-datepicker/dist/react-datepicker.css';
-import DataTable from 'src/@core/components/table';
+import DataTable from '../../../components/table';
 import { useAppDispatch, useAppSelector } from 'src/store';
 import { getAdvanceList, getStaffs, setOpenCreateModal, updateParams } from 'src/store/apps/finance/advanceSlice';
 import CreateModal from 'src/views/apps/finance/advance/CreateModal';
 import EditModal from 'src/views/apps/finance/advance/EditModal';
-import { SelectPicker } from 'rsuite';
 import { monthItems, yearItems } from 'src/views/apps/finance/FinanceAllNumber';
-import { today } from 'src/@core/components/card-statistics/kanban-item';
-import IconifyIcon from 'src/@core/components/icon';
+import { today } from '../../../components/card-statistics/kanban-item';
+import IconifyIcon from '../../../components/icon';
 import Router, { useRouter } from 'next/router';
 import useResponsive from 'src/@core/hooks/useResponsive';
 import { AuthContext } from 'src/context/AuthContext';
 import { toast } from 'react-hot-toast';
-
 
 function Slug() {
     const { isLoading, queryParams, advanceList, columns } = useAppSelector(state => state.advanceSlice)
@@ -85,71 +83,28 @@ function Slug() {
                         </IconButton>
                         <Typography sx={{ fontSize: '20px', flexGrow: 1 }}>{t("Avanslar")}</Typography>
                     </Box>
-                    <SelectPicker
-                        onChange={(v) => handleYearDate(v, 'y')}
-                        size='sm'
-                        data={yearItems}
-                        style={{ width: isMobile ? "auto" : 224, margin: isMobile ? "0" : '0 10px 0 auto', order: 3 }}
+                    <Select
+
                         value={year}
-                        searchable={false}
-                        menuStyle={{ maxHeight: 300, overflowY: 'auto' }}
-                        placeholder="Yilni tanlang"
-                        renderMenuItem={(label, item) => {
-                            const [isHovered, setIsHovered] = useState(false);
-
-                            return (
-                                <div
-                                    key={item.value}  // Unique key for each item
-                                    style={{
-                                        padding: '10px',
-                                        backgroundColor: isHovered ? '#e0e0e0' : (item.index % 2 === 0 ? '#f0f0f0' : '#ffffff'), // Hover effect
-                                        color: '#333', // Text color
-                                        fontSize: '14px', // Font size
-                                        cursor: 'pointer', // Pointer cursor on hover
-                                        transition: 'background-color 0.3s', // Smooth transition
-                                    }}
-                                    onMouseEnter={() => setIsHovered(true)} // Set hover state to true
-                                    onMouseLeave={() => setIsHovered(false)} // Set hover state to false
-                                >
-                                    {label}
-                                </div>
-                            );
-                        }}
-                    />
-                    <SelectPicker
-                        onChange={(v) => handleYearDate(v, 'm')}
-                        size='sm'
-                        data={monthItems}
-                        style={{ width: isMobile ? "auto" : 224, order: 4 }}
+                        onChange={(e) => handleYearDate(e.target.value, 'y')}
+                        size='small'
+                        sx={{ width: isMobile ? "auto" : 224, margin: isMobile ? "0" : '0 10px 0 auto', order: 3 }}
+                    >
+                        {yearItems.map((item) => (
+                            <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>
+                        ))}
+                    </Select>
+                    <Select
                         value={month}
-                        searchable={false}
-                        placeholder="Oyni tanlang"
-                        menuStyle={{ maxHeight: 300, overflowY: 'auto' }}
-                        renderMenuItem={(label, item) => {
-                            const [isHovered, setIsHovered] = useState(false);
-
-                            return (
-                                <div
-                                    key={item.value}  // Unique key for each item
-                                    style={{
-                                        padding: '10px',
-                                        backgroundColor: isHovered ? '#e0e0e0' : (item.index % 2 === 0 ? '#f0f0f0' : '#ffffff'), // Hover effect
-                                        color: '#333', // Text color
-                                        fontSize: '14px', // Font size
-                                        cursor: 'pointer', // Pointer cursor on hover
-                                        transition: 'background-color 0.3s', // Smooth transition
-                                    }}
-                                    onMouseEnter={() => setIsHovered(true)} // Set hover state to true
-                                    onMouseLeave={() => setIsHovered(false)} // Set hover state to false
-                                >
-                                    {label}
-                                </div>
-                            );
-                        }}
-                    />
-
-
-                    <Typography sx={{ fontSize: '14px', order: 2, color: 'error.main', ml: 4, display: 'flex', alignItems: 'center', mr: 4, gap: '5px' }} >
+                        onChange={(e) => handleYearDate(e.target.value, 'm')}
+                        size='small'
+                        sx={{ width: isMobile ? "auto" : 224, order: 4 }}
+                    >
+                        {monthItems.map((item) => (
+                            <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>
+                        ))}
+                    </Select>
+                    <Typography sx={{ fontSize: '14px', order: 2, color: 'error.main', ml: 4, display: 'flex', alignItems: 'center', mr: 4, gap: '5px' }}>
                         <Chip variant='outlined' size='medium' sx={{ fontSize: "14px", fontWeight: "bold" }} color="success" label={`${formatCurrency(advanceList?.total_prepayments)} UZS`} />
                     </Typography>
                     <Button variant='contained' size='small' sx={{ order: 5, gridColumn: "1/3" }} onClick={() => dispatch(setOpenCreateModal(true))}>{t("Avans berish")}</Button>
@@ -163,5 +118,4 @@ function Slug() {
     )
 }
 
-
-export default Slug
+export default Slug;

@@ -1,9 +1,9 @@
 import { Box, Button, Pagination, Typography } from '@mui/material'
 import { ReactNode, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
-import DataTable from 'src/@core/components/table'
-import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
+import IconifyIcon from '../../../components/icon'
+import DataTable from '../../../components/table'
+import VideoHeader, { videoUrls } from '../../../components/video-header/video-header'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchSchoolList } from 'src/store/apps/settings'
 import RoomListRowOptions from 'src/views/apps/settings/rooms/RoomsRowOptions'
@@ -11,7 +11,7 @@ import CreateSchoolDialog from 'src/views/apps/settings/schools/CreateSchoolDial
 import EditSchoolDialog from 'src/views/apps/settings/schools/EditSchoolDialog'
 import SchoolsRowOptions from 'src/views/apps/settings/schools/SchoolsRowOption'
 
-export interface customTableProps {
+export type customTableProps = {
   xs: number
   title: string
   dataIndex?: string | ReactNode
@@ -79,7 +79,7 @@ export default function SchoolsPage() {
         />
       )}
       <CreateSchoolDialog openModal={openSchoolModal} setOpenModal={setOpenSchoolModal} />
-      
+
       <EditSchoolDialog />
     </div>
   )

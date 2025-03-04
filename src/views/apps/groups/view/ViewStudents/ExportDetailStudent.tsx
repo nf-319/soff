@@ -21,7 +21,7 @@ import {
 } from '@mui/material'
 import { toast } from 'react-hot-toast'
 import { fetchGroupChecklist, fetchGroups } from 'src/store/apps/groups'
-import { today } from 'src/@core/components/card-statistics/kanban-item'
+import { today } from '../../../../../components/card-statistics/kanban-item'
 import { getAttendance, getStudents, setGettingAttendance } from 'src/store/apps/groupDetails'
 import { useRouter } from 'next/router'
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
@@ -42,7 +42,7 @@ export default function ExportDetailStudent({
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
   const { query } = useRouter()
-  
+
   const [isDiscount, setIsDiscount] = useState<boolean>(false)
 
   const formik: any = useFormik({

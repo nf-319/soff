@@ -23,10 +23,10 @@ import MuiTabList, { TabListProps } from '@mui/lab/TabList'
 import FormControlLabel from '@mui/material/FormControlLabel'
 
 // ** Custom Components Imports
-import CustomChip from 'src/@core/components/mui/chip'
+import CustomChip from '../../../../components/mui/chip'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../components/icon'
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   '& .MuiTabs-indicator': {

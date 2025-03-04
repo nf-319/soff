@@ -1,42 +1,35 @@
-// ** MUI Imports
-import { Box, Button, Card, CardContent, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, TextField } from '@mui/material'
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  TextField
+} from '@mui/material'
 
-
-// ** Types
-
-// ** Demo Component Imports
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
-import Form from 'src/@core/components/form'
+import Form from '../../../../../components/form'
 import { useEffect, useState } from 'react'
 import StudentsNotesList from './StudentNotesList'
 import api from 'src/@core/utils/api'
 import showResponseError from 'src/@core/utils/show-response-error'
 import { useRouter } from 'next/router'
-import IconifyIcon from 'src/@core/components/icon'
-import EmptyContent from 'src/@core/components/empty-content'
+import IconifyIcon from '../../../../../components/icon'
+import { EmptyContent } from '../../../../../components/empty-content'
 import SubLoader from '../../../loaders/SubLoader'
 
-
-// interface ItemTypes {
-//   data: {
-//     id: number
-//     created_at: string
-//     description: string
-//     current_user: string | null
-//   }[]
-// }
-
-
-
 const UserViewOverview = () => {
-
   const { t } = useTranslation()
   const [open, setOpen] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [data, setData] = useState<null | any[]>(null)
   const setError = (val: any) => {
-    console.log(val);
+    console.log(val)
   }
   const { query } = useRouter()
 
@@ -65,7 +58,7 @@ const UserViewOverview = () => {
   }
 
   useEffect(() => {
-    (async function () {
+    ;(async function () {
       await getNotes()
     })()
   }, [])
@@ -73,19 +66,30 @@ const UserViewOverview = () => {
   return (
     <Box>
       <Box sx={{ width: '100%', display: 'flex' }}>
-        <Button startIcon={<IconifyIcon icon='ic:baseline-add' />} onClick={() => setOpen(true)} sx={{ marginLeft: 'auto' }} variant='contained' size='small'>{t('Yangi eslatma')}</Button>
+        <Button
+          startIcon={<IconifyIcon icon='ic:baseline-add' />}
+          onClick={() => setOpen(true)}
+          sx={{ marginLeft: 'auto' }}
+          variant='contained'
+          size='small'
+        >
+          {t('Yangi eslatma')}
+        </Button>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        {loading ? <SubLoader /> :
-          data && data?.length > 0 ? data?.map((el: any) => (
+        {loading ? (
+          <SubLoader />
+        ) : data && data?.length > 0 ? (
+          data?.map((el: any) => (
             <Card key={el.id} sx={{ maxWidth: '450px' }}>
               <CardContent>
                 <StudentsNotesList getNotes={getNotes} setOpenEdit={setOpen} comment={el} />
               </CardContent>
             </Card>
-
-          )) : <EmptyContent />
-        }
+          ))
+        ) : (
+          <EmptyContent />
+        )}
 
         <Dialog
           open={open}
@@ -100,21 +104,15 @@ const UserViewOverview = () => {
           <DialogContent>
             <Form valueTypes='json' sx={{ marginTop: 10 }} onSubmit={handleAddNote} id='edit-employee-pay-ddas'>
               <FormControl fullWidth>
-                <TextField
-                  rows={4}
-                  multiline
-                  label={t("Kiriting...")}
-                  name='body'
-                  defaultValue={''}
-                />
+                <TextField rows={4} multiline label={t('Kiriting...')} name='body' defaultValue={''} />
               </FormControl>
 
               <DialogActions sx={{ justifyContent: 'center' }}>
                 <LoadingButton loading={loading} type='submit' variant='contained' sx={{ mr: 1 }}>
-                  {t("Saqlash")}
+                  {t('Saqlash')}
                 </LoadingButton>
                 <Button variant='outlined' type='button' color='secondary' onClick={() => setOpen(false)}>
-                  {t("Bekor qilish")}
+                  {t('Bekor qilish')}
                 </Button>
               </DialogActions>
             </Form>

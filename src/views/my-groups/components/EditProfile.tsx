@@ -8,8 +8,8 @@ import { FormControl, FormHelperText, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { revereAmount } from 'src/@core/components/amount-input';
-import { today } from 'src/@core/components/card-statistics/kanban-item';
+import { revereAmount } from '../../../components/amount-input';
+import { today } from '../../../components/card-statistics/kanban-item';
 import api from 'src/@core/utils/api';
 import * as Yup from 'yup';
 

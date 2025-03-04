@@ -8,7 +8,7 @@ import { styled } from '@mui/material/styles'
 import FormHelperText from '@mui/material/FormHelperText'
 import InputAdornment from '@mui/material/InputAdornment'
 import Typography, { TypographyProps } from '@mui/material/Typography'
-import Icon from 'src/@core/components/icon'
+import Icon from '../../components/icon'
 import * as yup from 'yup'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -19,12 +19,13 @@ import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 import LoadingButton from '@mui/lab/LoadingButton'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import toast from 'react-hot-toast'
-import PhoneInput from 'src/@core/components/phone-input'
+import PhoneInput from '../../components/phone-input'
 import { useTranslation } from 'react-i18next'
-import { reversePhone } from 'src/@core/components/phone-input/format-phone-number'
+import { reversePhone } from '../../components/phone-input/format-phone-number'
 import api from 'src/@core/utils/api'
 import { setPublicSettings, toggleModal } from 'src/store/apps/page'
 import { useAppDispatch } from 'src/store'
+import { useRouter } from 'next/router'
 
 const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   padding: theme.spacing(20),
@@ -62,12 +63,14 @@ const LoginPage = () => {
   const [data, setData] = useState<any>(null)
   const dispatch = useAppDispatch()
   const auth = useAuth()
+  const router = useRouter()
   const { isMobile } = useResponsive()
   const { t } = useTranslation()
 
   const pageLoad = async () => {
     try {
       const response = await api.get('common/public-settings/')
+
       if (response.status == 200) {
         dispatch(setPublicSettings(response.data))
         localStorage.setItem('school_type', response.data?.type)

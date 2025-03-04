@@ -1,7 +1,7 @@
 import { Box, IconButton, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import { CustomeDrawer } from 'src/pages/settings/office/courses'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setOpenCreateSms, setOpenEditRoom } from 'src/store/apps/settings'

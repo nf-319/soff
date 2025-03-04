@@ -1,4 +1,3 @@
-'use client'
 import {
   Box,
   Button,
@@ -10,11 +9,9 @@ import {
   FormControl,
   FormHelperText,
   IconButton,
-  InputLabel,
   MenuItem,
   Pagination,
   Select,
-  TablePagination,
   Typography
 } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
@@ -26,13 +23,12 @@ import {
   getDashboardLessons,
   getMetaData,
   handleOpenAddModal,
-  resetGroupParams,
   setRoomsData,
   setTeacherData,
   updateParams
 } from 'src/store/apps/groups'
 import { useRouter } from 'next/router'
-import { videoUrls } from 'src/@core/components/video-header/video-header'
+import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
 import { GroupsFilter } from 'src/views/apps/groups/GroupsFilter'
 import getLessonDays from 'src/@core/utils/getLessonDays'
 import dynamic from 'next/dynamic'
@@ -46,18 +42,17 @@ import api from 'src/@core/utils/api'
 import { LoadingButton } from '@mui/lab'
 import ceoConfigs from 'src/configs/ceo'
 import { Icon } from '@iconify/react'
-import Excel from 'src/@core/components/excelButton/Excel'
+import Excel from '../../components/excelButton/Excel'
 import OnlineLessonModal from 'src/views/apps/groups/view/GroupViewLeft/OnlineLessonModal'
 import { studentsUpdateParams } from 'src/store/apps/groupDetails'
-import { status } from 'nprogress'
+import DataTable from '../../components/table'
+import { useGet, usePatch } from 'src/hooks/useApi'
+import { useQueryClient } from '@tanstack/react-query'
 
-const IconifyIcon = dynamic(() => import('src/@core/components/icon'))
-const DataTable = dynamic(() => import('src/@core/components/table'))
-const MuiDrawer = dynamic(() => import('@mui/material/Drawer'))
+const IconifyIcon = dynamic(() => import('../../components/icon'))
 const RowOptions = dynamic(() => import('src/views/apps/groups/RowOptions'))
 const EditGroupModal = dynamic(() => import('src/views/apps/groups/EditGroupModal'))
 const AddGroupModal = dynamic(() => import('src/views/apps/groups/AddGroupModal'))
-const VideoHeader = dynamic(() => import('src/@core/components/video-header/video-header'))
 
 export interface customTableProps {
   xs: number
@@ -79,7 +74,7 @@ export const TranslateWeekName: any = {
 }
 
 export default function GroupsPage() {
-  const { groups, isLoading, queryParams, groupCount } = useAppSelector(state => state.groups)
+  const { queryParams } = useAppSelector(state => state.groups)
   const dispatch = useAppDispatch()
   const router = useRouter()
   const { user } = useContext(AuthContext)
@@ -88,11 +83,16 @@ export default function GroupsPage() {
   const { isMobile } = useResponsive()
   const [page, setPage] = useState<number>(queryParams.page ? Number(queryParams.page) - 1 : 0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(() => Number(localStorage.getItem('rowsPerPage')) || 10)
-  const [loading, setLoading] = useState(false)
   const [updateStatusModal, setUpdateStatusModal] = useState(false)
   const [groupStatus, setGroupStatus] = useState<string | null>(null)
+  const queryClient = useQueryClient()
   const [group_id, setGroupId] = useState<number | null>(null)
   const [groupChoices, setGroupChoices] = useState([])
+  const { mutate, isPending } = usePatch()
+  const { data, isLoading } = useGet(ceoConfigs.groups, {
+    params: queryParams as Record<string, unknown>,
+    deps: ['groups-list']
+  })
 
   const columns: customTableProps[] = [
     {
@@ -184,25 +184,24 @@ export default function GroupsPage() {
       xs: 0.4,
       dataIndex: 'id',
       title: t(''),
-      render: actions => <RowOptions id={actions} />
+      render: actions => <RowOptions groups={data?.results} id={actions} />
     }
   ]
 
   const queryString = new URLSearchParams(
     Object.entries(queryParams).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== null) {
-        acc[key] = String(value);
+        acc[key] = String(value)
       }
-      return acc;
+      return acc
     }, {} as Record<string, string>)
-  ).toString();
+  ).toString()
   const handleRowsPerPageChange = async (value: number) => {
     const limit = value
     setRowsPerPage(Number(value))
-    localStorage.setItem('rowsPerPage', `${value}`)
+    sessionStorage.setItem('rowsPerPage', `${value}`)
 
-    dispatch(updateParams({ limit: value }))
-    await dispatch(fetchGroups({ ...queryParams, limit: value, offset: `0` }))
+    dispatch(updateParams({ limit: value, offset: '0' }))
     setPage(0)
   }
 
@@ -210,8 +209,7 @@ export default function GroupsPage() {
     const adjustedPage: any = (Number(page) - 1) * rowsPerPage
     setPage(Number(page))
 
-    await dispatch(fetchGroups({ ...queryParams, limit: Number(rowsPerPage), offset: adjustedPage }))
-    dispatch(updateParams({ offset: adjustedPage }))
+    dispatch(updateParams({ offset: adjustedPage, limit: Number(rowsPerPage) }))
   }
 
   const handleOpenModal = async () => {
@@ -221,17 +219,10 @@ export default function GroupsPage() {
 
   const rowClick = (id: any) => {
     router.push(`/groups/view/security?id=${id}&month=${getMonthName(null)}`)
-    dispatch(studentsUpdateParams({status:'active,new'}))
+    dispatch(studentsUpdateParams({ status: 'active,new' }))
   }
 
   const pageLoad = async () => {
-    if (!queryParams.limit) {
-      dispatch(updateParams({ limit: rowsPerPage }))
-
-      await dispatch(fetchGroups({ ...queryParams }))
-    } else {
-      await dispatch(fetchGroups({ ...queryParams }))
-    }
     await dispatch(getMetaData())
   }
 
@@ -242,17 +233,16 @@ export default function GroupsPage() {
         status: Yup.string().nullable().required('Status kiritilishi shart')
       }),
     onSubmit: async values => {
-      setLoading(true)
-      const response = await api.patch(ceoConfigs.groups_updateStatus + group_id, values)
-      if (response.status == 200) {
-        toast.success("Status o'zgartirildi")
-        await dispatch(fetchGroups({ ...queryParams }))
-        setUpdateStatusModal(false)
-        setLoading(false)
-      } else {
-        toast('Xatolik')
-      }
-      setLoading(false)
+      mutate(ceoConfigs.groups_updateStatus + group_id, values, {
+        onSuccess: () => {
+          toast.success("Status o'zgartirildi")
+          queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
+          setUpdateStatusModal(false)
+        },
+        onError: () => {
+          toast.error('Xatolik')
+        }
+      })
     }
   })
   const getTeachers = async () => {
@@ -270,7 +260,7 @@ export default function GroupsPage() {
       .get('common/room-check-list/')
       .then(data => dispatch(setRoomsData(data.data)))
       .catch(error => {
-        console.log(error)
+        console.error(error)
       })
   }
   useEffect(() => {
@@ -279,7 +269,7 @@ export default function GroupsPage() {
   }, [])
 
   useEffect(() => {
-    const group = groups?.find((item: any) => item.id == group_id)
+    const group = data?.results?.find((item: any) => item.id == group_id)
     if (group) {
       setGroupChoices(group.choices)
     }
@@ -305,10 +295,14 @@ export default function GroupsPage() {
 
     initializePage()
   }, [])
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
+  }, [user?.active_branch])
 
   return (
     <div>
       <VideoHeader item={videoUrls.groups} />
+
       <Box
         className='groups-page-header'
         sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0' }}
@@ -316,7 +310,7 @@ export default function GroupsPage() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Typography variant='h5'>{t('Guruhlar')}</Typography>
-          {!isLoading && <Chip label={`${groupCount}`} variant='outlined' color='primary' />}
+          {!isLoading && <Chip label={`${data?.count}`} variant='outlined' color='primary' />}
         </Box>
         <Button
           onClick={handleOpenModal}
@@ -327,11 +321,12 @@ export default function GroupsPage() {
           {t("Yangi qo'shish")}
         </Button>
       </Box>
+
       {isMobile && (
         <>
           <Button
             size='small'
-            sx={{ marginLeft: 'auto', width: '100%',marginBottom:2}}
+            sx={{ marginLeft: 'auto', width: '100%', marginBottom: 2 }}
             variant='outlined'
             onClick={() => setOpen(true)}
           >
@@ -342,12 +337,14 @@ export default function GroupsPage() {
       )}
 
       {!isMobile && <GroupsFilter isMobile={isMobile} />}
-      <DataTable columns={columns} loading={isLoading} data={groups || []} rowClick={rowClick} color text_color />
-      {Math.ceil(groupCount / 10) > 1 && !isLoading && (
+
+      <DataTable columns={columns} loading={isLoading} data={data?.results || []} rowClick={rowClick} />
+
+      {Math.ceil(data?.count / 10) > 1 && !isLoading && (
         <div className='d-flex'>
           <Pagination
             page={Number(queryParams.offset) ? Number(queryParams.offset) / rowsPerPage + 1 : 1}
-            count={Math.ceil(groupCount / 10)}
+            count={Math.ceil(data?.cpount / 10)}
             variant='outlined'
             shape='rounded'
             onChange={(e: any, page) => handlePagination(String(page))}
@@ -371,7 +368,6 @@ export default function GroupsPage() {
       <EditGroupModal />
       <GroupChangeBranchModal />
 
-      
       <Dialog fullScreen onClose={() => setOpen(false)} aria-labelledby='full-screen-dialog-title' open={open}>
         <DialogTitle id='full-screen-dialog-title'>
           <Typography variant='h6' component='span'>
@@ -392,6 +388,7 @@ export default function GroupsPage() {
           <Button onClick={() => setOpen(false)}>{t('Davom etish')}</Button>
         </DialogActions>
       </Dialog>
+
       <Dialog open={updateStatusModal} onClose={() => setUpdateStatusModal(false)}>
         <form onSubmit={formik.handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
           <DialogContent sx={{ maxWidth: '350px' }}>
@@ -400,9 +397,6 @@ export default function GroupsPage() {
             </Typography>
 
             <FormControl sx={{ maxWidth: '100%', marginBottom: 3 }} fullWidth>
-              {/* <InputLabel size='small' id='demo-simple-select-outlined-label'>
-                Status (holati)
-              </InputLabel> */}
               <Select
                 size='small'
                 placeholder='Status (holati)'
@@ -414,8 +408,6 @@ export default function GroupsPage() {
                 name='status'
                 error={!!formik.errors.status && !!formik.touched.status}
               >
-                {/* <MenuItem value={'active'}>Aktiv</MenuItem>
-                <MenuItem value={'frozen'}>Muzlatish</MenuItem> */}
                 {groupChoices?.map(el => (
                   <MenuItem value={el} key={el}>
                     {t(el)}
@@ -424,6 +416,7 @@ export default function GroupsPage() {
               </Select>
               <FormHelperText error>{!!formik.errors.status ? `${formik.errors.status}` : ''}</FormHelperText>
             </FormControl>
+
             <DialogActions>
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
                 <Button
@@ -436,7 +429,7 @@ export default function GroupsPage() {
                 >
                   {t('Bekor qilish')}
                 </Button>
-                <LoadingButton loading={loading} type='submit' size='small' variant='contained'>
+                <LoadingButton loading={isPending} type='submit' size='small' variant='contained'>
                   {t('Tasdiqlash')}
                 </LoadingButton>
               </Box>
@@ -444,7 +437,7 @@ export default function GroupsPage() {
           </DialogContent>
         </form>
       </Dialog>
-      <OnlineLessonModal/>
+      <OnlineLessonModal />
     </div>
   )
 }

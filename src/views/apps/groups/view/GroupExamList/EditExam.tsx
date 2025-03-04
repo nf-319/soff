@@ -16,7 +16,7 @@ import { useFormik } from "formik";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import IconifyIcon from "src/@core/components/icon";
+import IconifyIcon from "../../../../../components/icon";
 import useResponsive from "src/@core/hooks/useResponsive";
 import api from "src/@core/utils/api";
 import { useAppDispatch, useAppSelector } from "src/store";

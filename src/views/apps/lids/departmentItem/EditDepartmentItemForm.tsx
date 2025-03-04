@@ -9,17 +9,27 @@ import { useAppDispatch } from 'src/store'
 import { fetchDepartmentList, setDragonLoading, setLeadItems } from 'src/store/apps/leads'
 import api from 'src/@core/utils/api'
 import toast from 'react-hot-toast'
+import { QueryObserverResult, RefetchOptions, useQueryClient } from '@tanstack/react-query'
 
 type Props = {
-  setLoading: (status: boolean) => void,
+  setLoading: (status: boolean) => void
   loading: boolean
   setOpenDialog: any
   id: number
+  refetch?: (options?: RefetchOptions) => Promise<QueryObserverResult<any, any>>
   defaultName: string
 }
 
-export default function EditDepartmentItemForm({ setLoading, setOpenDialog, loading, id, defaultName }: Props) {
+export default function EditDepartmentItemForm({
+  setLoading,
+  setOpenDialog,
+  refetch,
+  loading,
+  id,
+  defaultName
+}: Props) {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
   const dispatch = useAppDispatch()
   const query = window.location?.search?.split('?slug=')[1]
   const validationSchema = Yup.object({
@@ -28,7 +38,7 @@ export default function EditDepartmentItemForm({ setLoading, setOpenDialog, load
 
   const initialValues: CreatesDepartmentState = { name: defaultName }
 
-  async function handleGetLealdItems() {
+  const handleGetLealsItems = async () => {
     if (!query) return
     dispatch(setDragonLoading(true))
 
@@ -49,11 +59,16 @@ export default function EditDepartmentItemForm({ setLoading, setOpenDialog, load
       setLoading(true)
       try {
         const response = await api.patch(`leads/department-update/${id}`, values)
+         if (refetch) {
+           await refetch()
+         }
+        queryClient.invalidateQueries({ queryKey: ['leads/departments/', 'leads'] })
         if (response.status == 200) {
           setLoading(false)
           setOpenDialog(null)
+
           await dispatch(fetchDepartmentList())
-          await handleGetLealdItems()
+          await handleGetLealsItems()
           formik.resetForm()
         }
       } catch (err: any) {
@@ -64,14 +79,11 @@ export default function EditDepartmentItemForm({ setLoading, setOpenDialog, load
     }
   })
 
-  
-
   useEffect(() => {
     return () => {
       formik.resetForm()
     }
   }, [])
-
 
   return (
     <form

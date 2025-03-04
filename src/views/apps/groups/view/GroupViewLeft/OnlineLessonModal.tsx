@@ -19,14 +19,13 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { fetchSmsList, fetchSmsListQuery } from 'src/store/apps/settings'
 import Link from 'next/link'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../../components/icon'
 import { useRouter } from 'next/router'
 import { MetaTypes } from 'src/types/apps/groupsTypes'
 
 export default function OnlineLessonModal() {
   const [isLoading, setLoading] = useState(false)
   const { openEdit, students, meet_link, onlineLessonLoading } = useAppSelector(state => state.groupDetails)
-  const { smschild_list, sms_list } = useAppSelector(state => state.settings)
   const [isSentSms, setIsSentSms] = useState(false)
   const dispatch = useAppDispatch()
   const [groups, setGroups] = useState<any>()

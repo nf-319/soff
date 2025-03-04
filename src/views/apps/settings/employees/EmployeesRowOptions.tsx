@@ -1,7 +1,7 @@
 import { IconButton, Menu, MenuItem } from '@mui/material'
 import React, { MouseEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import useEmployee from 'src/hooks/useEmployee'
 import { useAppDispatch } from 'src/store'
 import { setEmployeeData } from 'src/store/apps/settings'

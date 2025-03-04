@@ -16,7 +16,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 
 // ** Custom Components Imports
-import CustomChip from 'src/@core/components/mui/chip'
+import CustomChip from '../../../../components/mui/chip'
 
 const furnishingArray = [
   'AC',

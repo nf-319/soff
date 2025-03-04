@@ -14,7 +14,7 @@ import {
     IconButton
 } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import IconifyIcon from 'src/@core/components/icon'; // Assuming you're using Iconify for icons
+import IconifyIcon from '../../../components/icon'; // Assuming you're using Iconify for icons
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/router';
 

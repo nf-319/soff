@@ -13,7 +13,7 @@ import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../../components/icon'
 
 interface ConnectedAccountsType {
   title: string

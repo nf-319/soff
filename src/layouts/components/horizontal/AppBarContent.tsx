@@ -5,12 +5,12 @@ import LanguageDropdown from 'src/@core/layouts/components/shared-components/Lan
 import BranchDropdown from 'src/@core/layouts/components/shared-components/BranchDropdown'
 import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import { Autocomplete, Button, Input, TextField, Tooltip } from '@mui/material'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setGlobalPay, setStudentId } from 'src/store/apps/students'
 import GlobalPaymentModal from 'src/views/apps/students/GlobalPaymentModal'
-import VideoModal from 'src/@core/components/video-header'
+import VideoModal from '../../../components/video-header'
 import { useTranslation } from 'react-i18next'
 import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import api from 'src/@core/utils/api'
@@ -37,6 +37,7 @@ const AppBarContent = (props: Props) => {
   const [search, setSearch] = useState('')
   const [searchLoading, setSearchLoading] = useState(false)
   const debouncedSearch = useDebounce(search, 500)
+  const [open, setOpen] = useState<boolean>(false)
 
   function clickGlobalPay() {
     dispatch(setGlobalPay(true))
@@ -62,20 +63,29 @@ const AppBarContent = (props: Props) => {
   async function handleSearch(query: string) {
     if (!query) {
       setEmployees([])
+      setSearchLoading(false)
       return
     }
-    setSearchLoading(true)
-    const res = await api.get(`${ceoConfigs.employee_checklist}?search=${query}`)
-    setEmployees(res.data)
-    setSearchLoading(false)
+
+    try {
+      const res = await api.get(`${ceoConfigs.employee_checklist}?search=${query}`)
+      setEmployees(res.data)
+    } catch (error) {
+      console.error(error)
+      setEmployees([])
+    } finally {
+      setSearchLoading(false)
+    }
   }
 
   useEffect(() => {
+    if (search) {
+      setSearchLoading(true)
+    }
+  }, [search])
+  useEffect(() => {
     handleSearch(debouncedSearch)
   }, [debouncedSearch])
-
-  const subdomain = location.hostname.split('.')
-  const baseURL = subdomain.length < 3 ? `test` : `${subdomain[0]}`
 
   return (
     <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
@@ -86,18 +96,21 @@ const AppBarContent = (props: Props) => {
         !window.location.hostname.split('.').includes('c-panel') && (
           <>
             <Autocomplete
-              open={search == '' ? false : true}
+              open={open}
+              onOpen={() => setOpen(search.length !== 0)}
               sx={{ paddingX: 10 }}
               disablePortal
               onClose={() => {
+                if (search === '') setOpen(false)
                 setEmployees([])
+                setOpen(false)
               }}
               options={employees || []}
               fullWidth
               size='small'
               loadingText={'Yuklanmoqda..'}
               loading={searchLoading}
-              noOptionsText={"Ma'lumot yo'q.."}
+              noOptionsText={search === '' ? "O'quvchi yoki Teacher Qidirish" : "Malumot yo'q"}
               getOptionLabel={(option: any) => option?.first_name || ''}
               filterOptions={options => options}
               renderOption={(props, option: any) => (
@@ -162,7 +175,6 @@ const AppBarContent = (props: Props) => {
 
       <LanguageDropdown settings={settings} saveSettings={saveSettings} />
 
-      {/* <ModeToggler settings={settings} saveSettings={saveSettings} /> */}
       <NotificationDropdown settings={settings} />
       <UserDropdown settings={settings} />
       <GlobalPaymentModal />

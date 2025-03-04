@@ -14,7 +14,7 @@ import CardContent from '@mui/material/CardContent'
 import axios from 'axios'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../components/icon'
 
 // ** Types
 import { ProfileHeaderType } from 'src/@fake-db/types'

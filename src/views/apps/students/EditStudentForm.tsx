@@ -14,7 +14,7 @@ import {
   RadioGroup,
   TextField
 } from '@mui/material'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../components/icon'
 import LoadingButton from '@mui/lab/LoadingButton'
 
 // ** Assets
@@ -24,15 +24,16 @@ import { useTranslation } from 'react-i18next'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { UpdateStudentDto } from 'src/types/apps/studentsTypes'
-import { fetchStudentsList, setOpenEdit, updateStudent } from 'src/store/apps/students'
+import { fetchStudentsList, setOpenEdit, updateStudent, updateStudentParams } from 'src/store/apps/students'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import useGroups from 'src/hooks/useGroups'
 import useResponsive from 'src/@core/hooks/useResponsive'
-import PhoneInput from 'src/@core/components/phone-input'
-import { reversePhone } from 'src/@core/components/phone-input/format-phone-number'
+import PhoneInput from '../../../components/phone-input'
+import { reversePhone } from '../../../components/phone-input/format-phone-number'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
 import { TeacherAvatar, VisuallyHiddenInput } from '../mentors/AddMentorsModal'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function EditStudentForm() {
   // ** Hooks
@@ -51,7 +52,7 @@ export default function EditStudentForm() {
   const [image, setImage] = useState<any>(null)
   const profilePhoto: any = useRef(null)
   const school_type = localStorage.getItem('school_type')
-
+  const queryClient = useQueryClient()
   const validationSchema = Yup.object({
     first_name: Yup.string().required('Ismingizni kiriting'),
     phone: Yup.string().required('Telefon raqam kiriting'),
@@ -77,41 +78,40 @@ export default function EditStudentForm() {
     onSubmit: async (values: UpdateStudentDto) => {
       setLoading(true)
       dispatch(disablePage(true))
-      const newValues = new FormData();
+      const newValues = new FormData()
 
       for (const [key, value] of Object.entries(values)) {
         if (!['image'].includes(key)) {
-          if (key === "phone") {
-            newValues.append(key, reversePhone(value as any));
-          } else if (key === "school") {
-            newValues.append(key, value || ''); 
-          } else if (Array.isArray(value) || typeof value === "object") {
-            newValues.append(key, JSON.stringify(value)); 
+          if (key === 'phone') {
+            newValues.append(key, reversePhone(value as any))
+          } else if (key === 'school') {
+            newValues.append(key, value || '')
+          } else if (Array.isArray(value) || typeof value === 'object') {
+            newValues.append(key, JSON.stringify(value))
           } else {
-            newValues.append(key, value as any);
+            newValues.append(key, value as any)
           }
         }
       }
-      
+
       if (image) {
-        newValues.append("image", image);
+        newValues.append('image', image)
       } else {
-        console.error("Invalid image type:", image);
+        console.error('Invalid image type:', image)
       }
-      
+
       for (let pair of newValues.entries()) {
-        console.log(pair[0], pair[1]);
+        console.log(pair[0], pair[1])
       }
-      
-      const resp = await dispatch(updateStudent({ data: newValues, id: studentData?.id }));
-      
+
+      const resp = await dispatch(updateStudent({ data: newValues, id: studentData?.id }))
 
       if (resp.meta.requestStatus === 'rejected') {
         formik.setErrors(resp.payload)
       } else {
         toast.success("O'zgarishlar muvaffaqiyatli saqlandi")
-        await dispatch(fetchStudentsList({ ...queryParams, limit: String(rowsPerPage) }))
-
+        await dispatch(updateStudentParams({ ...queryParams, limit: String(rowsPerPage) }))
+        queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
         dispatch(setOpenEdit(null))
         formik.resetForm()
         setIsGroup(false)

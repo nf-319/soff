@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
-import VideoHeader, { videoUrls } from 'src/@core/components/video-header/video-header'
+import VideoHeader, { videoUrls } from '../../../../../components/video-header/video-header'
 import { AuthContext } from 'src/context/AuthContext'
 import useEmployee from 'src/hooks/useEmployee'
 

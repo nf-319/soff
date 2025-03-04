@@ -1,18 +1,13 @@
 'use client'
-import dynamic from 'next/dynamic'
+
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import { AuthContext } from 'src/context/AuthContext'
-import { useAppDispatch, useAppSelector } from 'src/store'
-import { fetchLessons, fetchStatistics } from 'src/store/apps/dashboard'
-
-const MyGroups = dynamic(() => import('src/views/my-groups'), { ssr: false })
-const DashboardPage = dynamic(() => import('src/views/apps/dashboard/DashboardPage'), { ssr: false })
+import DashboardPage from 'src/views/apps/dashboard/DashboardPage'
+import MyGroups from 'src/views/my-groups'
 
 const AppCalendar = () => {
-  const { weeks, interval } = useAppSelector(state => state.dashboard)
-  const dispatch = useAppDispatch()
   const { user } = useContext(AuthContext)
   const router = useRouter()
 
@@ -27,14 +22,17 @@ const AppCalendar = () => {
       router.push('/')
       toast.error('Sahifaga kirish huquqingiz yoq!')
     }
-    await Promise.all([dispatch(fetchStatistics()), dispatch(fetchLessons({ queryWeeks: weeks, interval: interval }))])
   }
 
   useEffect(() => {
     pageLoad()
   }, [])
 
-  return user?.role.length === 1 && user?.role.includes('teacher') ? <MyGroups /> : <DashboardPage />
+  return user?.currentRole === 'teacher' || (user?.role.length === 1 && user.role.includes('teacher')) ? (
+    <MyGroups />
+  ) : (
+    <DashboardPage />
+  )
 }
 
 export default AppCalendar

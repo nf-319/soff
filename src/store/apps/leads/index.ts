@@ -118,7 +118,6 @@ export const updateDepartmentStudent = createAsyncThunk(
     try {
       let response
 
-
       if (data.is_amocrm) {
         response = await api.post(`amocrm/leads/export/`, data.data)
       } else {
@@ -142,11 +141,13 @@ export const editDepartmentStudent = createAsyncThunk(
     try {
       let response
 
-
       if (data.is_amocrm) {
         response = await api.post(`amocrm/leads/export/`, data.data)
       } else {
-        response = await api.patch(`leads/anonim-user/update/${data.id}/`, { first_name:data.first_name,phone:data.phone })
+        response = await api.patch(`leads/anonim-user/update/${data.id}/`, {
+          first_name: data.first_name,
+          phone: data.phone
+        })
       }
 
       return response.data
@@ -166,8 +167,7 @@ export const updateAmoCrmStudent = createAsyncThunk(
     try {
       let response
 
-
-        response = await api.patch(`amocrm/lead/update/${data.id}/`, {status_id:data.data.department})
+      response = await api.patch(`amocrm/lead/update/${data.id}/`, { status_id: data.data.department })
 
       return response.data
     } catch (err: any) {
@@ -183,7 +183,7 @@ export const updateAmoCrmStudent = createAsyncThunk(
 const initialState: ILeadsState = {
   sourceData: [],
   groups: [],
-  dragonLoading:false,
+  dragonLoading: false,
   pipelines: [],
   leadData: [],
   departmentLoading: false,
@@ -193,7 +193,7 @@ const initialState: ILeadsState = {
   openLid: null,
   sectionId: null,
   addSource: false,
-  leadItems:null,
+  leadItems: null,
   loading: false,
   search: '',
   queryParams: {

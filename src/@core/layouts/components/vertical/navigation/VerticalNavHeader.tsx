@@ -11,10 +11,10 @@ import Typography, { TypographyProps } from '@mui/material/Typography'
 import { LayoutProps } from 'src/@core/layouts/types'
 
 // ** Custom Icon Import
-import Icon from 'src/@core/components/icon'
+import Icon from '../../../../../components/icon'
 
 // ** Configs
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../../components/icon'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useTranslation } from 'react-i18next'
 import { useAppSelector } from 'src/store'

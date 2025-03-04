@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react'
+'use client'
+
+import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from '@mui/material'
@@ -11,13 +13,14 @@ import { fetchSmsList, fetchSmsListQuery } from 'src/store/apps/settings'
 
 type Props = {
   smsTemps: any[]
+  smsLoading: boolean
   user: any
+  reRender?: () => void
   closeModal: any
-  reRender: any
   open?: boolean
 }
 
-export default function SendSmsAnonimUserForm({ smsTemps, user, closeModal, reRender, open }: Props) {
+export default function SendSmsAnonimUserForm({ smsTemps, user, closeModal, smsLoading, open }: Props) {
   const { t } = useTranslation()
   const [sms, setSMS] = useState<any>('')
   const [loading, setLoading] = useState<any>('')
@@ -47,7 +50,6 @@ export default function SendSmsAnonimUserForm({ smsTemps, user, closeModal, reRe
         toast.success(`${t("SMS muvaffaqiyatli jo'natildi!")}`, {
           position: 'top-center'
         })
-        await reRender()
         formik.resetForm()
       } catch {
         formik.setErrors({ message: 'Xabar matni belgilangan miqdordan oshib ketdi, maksimal belgilar soni 555ta' })
@@ -75,7 +77,6 @@ export default function SendSmsAnonimUserForm({ smsTemps, user, closeModal, reRe
     }
   }, [])
 
-
   return (
     <form
       onSubmit={formik.handleSubmit}
@@ -96,11 +97,12 @@ export default function SendSmsAnonimUserForm({ smsTemps, user, closeModal, reRe
             setParentId(e.target.value)
           }}
         >
-          {smsTemps.map((el: any) => (
+          {smsLoading ? 'Malumot yuklanmoqda...' : smsTemps.map((el: any) => (
             <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
               <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>{el.description}</span>
             </MenuItem>
           ))}
+
         </Select>
       </FormControl>
 

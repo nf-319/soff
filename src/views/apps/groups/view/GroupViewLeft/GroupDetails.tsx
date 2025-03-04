@@ -4,11 +4,11 @@ import { useContext, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AuthContext } from 'src/context/AuthContext'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import CustomChip from 'src/@core/components/mui/chip'
+import CustomChip from '../../../../../components/mui/chip'
 import { ThemeColor } from 'src/@core/layouts/types'
 import getLessonDays from 'src/@core/utils/getLessonDays'
 import { addPeriodToThousands } from 'src/pages/settings/office/courses'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../../components/icon'
 import { getSMSTemp, handleEditClickOpen, setMeetLink, setOnlineLessonLoading } from 'src/store/apps/groupDetails'
 import EditGroupModal from '../../EditGroupModal'
 import { getDashboardLessons, getGroupsDetails, getMetaData, handleOpenEdit } from 'src/store/apps/groups'
@@ -43,7 +43,7 @@ export default function GroupDetails() {
     await dispatch(getSMSTemp())
   }
 
-  
+
 
   const handleEdit = async (id: any) => {
     dispatch(handleOpenEdit(true))
@@ -62,10 +62,8 @@ export default function GroupDetails() {
       .get(`meets/google/login/`)
       .then(res => {
         if (res.data.url) {
-          window.location.assign(res.data.url)
-          // console.log(window.location);
+          router.push(res.data.url)
 
-          // dispatch(setMeetLink(res.data.url))
         }
       })
       .catch(err => {

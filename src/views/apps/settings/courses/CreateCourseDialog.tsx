@@ -1,19 +1,17 @@
 import { Box, IconButton, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import { CustomeDrawer } from 'src/pages/settings/office/courses'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setOpenCreateSms } from 'src/store/apps/settings'
 
 import CreateCourseForm from './CreateCourseForm'
 
-type Props = {}
-
-export default function CreateCourseDialog({}: Props) {
+export default function CreateCourseDialog() {
   const { t } = useTranslation()
   const { openCreateSms } = useAppSelector(state => state.settings)
-  
+
   const dispatch = useAppDispatch()
 
   const setOpenAddGroup = () => {
@@ -45,6 +43,7 @@ export default function CreateCourseDialog({}: Props) {
         >
           <IconifyIcon icon='mdi:close' fontSize={20} />
         </IconButton>
+        sole
       </Box>
 
       {openCreateSms && <CreateCourseForm />}

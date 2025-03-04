@@ -12,15 +12,15 @@ import DialogActions from '@mui/material/DialogActions'
 import { useTranslation } from 'react-i18next'
 import { FormHelperText, Typography } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
-import { today } from 'src/@core/components/card-statistics/kanban-item'
+import { today } from '../../../../components/card-statistics/kanban-item'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import usePayment from 'src/hooks/usePayment'
 import Router, { useRouter } from 'next/router'
 import { fetchStudentDetail, fetchStudentGroups, fetchStudentPayment } from 'src/store/apps/students'
-import AmountInput, { revereAmount } from 'src/@core/components/amount-input'
-import IconifyIcon from 'src/@core/components/icon'
+import AmountInput, { revereAmount } from '../../../../components/amount-input'
+import IconifyIcon from '../../../../components/icon'
 import { getStudents } from 'src/store/apps/groupDetails'
 import api from 'src/@core/utils/api'
 
@@ -37,7 +37,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
   const [showWarning, setShowWarning] = useState<boolean>(false)
   const { studentsQueryParams } = useAppSelector(state => state.groupDetails)
   const { t } = useTranslation()
-  const { studentData,groupsChecklist } = useAppSelector(state => state.students)
+  const { studentData, groupsChecklist } = useAppSelector(state => state.students)
   const userData: any = { ...studentData }
   const { getPaymentMethod, paymentMethods, createPayment } = usePayment()
   const { query } = useRouter()
@@ -51,6 +51,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
     payment_date: Yup.string().required('Tanlash majburiy')
   })
 
+
   const initialValues = {
     payment_type: '',
     group: ``,
@@ -59,7 +60,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
     payment_date: today
   }
 
-  const formik: any = useFormik({
+  const formik = useFormik({
     initialValues,
     validationSchema,
     onSubmit: async values => {
@@ -99,13 +100,12 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
   }
   const handleConfirmCancel = () => {
     setShowWarning(false)
+    formik.resetForm()
   }
 
   const handleDismissWarning = () => {
     setShowWarning(false)
   }
-
-
 
   useEffect(() => {
     if (studentData) {
@@ -125,9 +125,6 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
       getPaymentMethod()
     }
   }, [openEdit])
-
-  
- 
 
   return (
     <div>
@@ -202,7 +199,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
               >
                 {groupsChecklist?.map((group: any) => (
                   <MenuItem key={group.id} value={group.id}>
-                    {`${group.name + (` , ${group?.total_payments||'0'} so'm`)}`}
+                    {`${group.name + ` , ${group?.total_payments || '0'} so'm`}`}
                   </MenuItem>
                 ))}
               </Select>
@@ -281,12 +278,21 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
           {t('Eslatma')}
         </DialogTitle>
         <DialogContent>
-          <Typography id='warning-dialog-description' sx={{ mt: 2, textAlign: 'center' }}>
+          <Typography id='warning-dialog-description' sx={{ mt: 1, textAlign: 'center' }}>
             {t(`Bekor qilishga ishonchingiz komilmi?`)} <br />
           </Typography>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center' }}>
-          <Button variant='contained' color='error' onClick={handleConfirmCancel}>
+          <Button
+            variant='contained'
+            color='primary'
+            onClick={() => {
+              setOpenEdit('payment'), setShowWarning(false)
+            }}
+          >
+            {t('Ortga qaytish')}
+          </Button>
+          <Button    variant='contained' color='error' onClick={handleConfirmCancel}>
             {t('Bekor qilish')}
           </Button>
         </DialogActions>

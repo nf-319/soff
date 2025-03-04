@@ -1,6 +1,6 @@
 import { IconButton, Menu, MenuItem } from '@mui/material'
 import React, { MouseEvent, useState } from 'react'
-import IconifyIcon from 'src/@core/components/icon'
+import IconifyIcon from '../../../../components/icon'
 import UserSuspendDialog from '../../mentors/view/UserSuspendDialog'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { useTranslation } from 'react-i18next'

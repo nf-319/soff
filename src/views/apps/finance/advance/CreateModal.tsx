@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import AmountInput, { revereAmount } from 'src/@core/components/amount-input';
+import AmountInput, { revereAmount } from '../../../../components/amount-input';
 import api from 'src/@core/utils/api';
 import ceoConfigs from 'src/configs/ceo';
 import { useAppDispatch, useAppSelector } from 'src/store';
@@ -25,7 +25,7 @@ export default function CreateModal() {
             setEmployes(res.data)
         }).catch((err) => {
             console.log(err)
-            
+
         })
     }
 
@@ -59,7 +59,7 @@ export default function CreateModal() {
         formik.resetForm()
     }
     useEffect(() => {
-       getEmployee() 
+       getEmployee()
     },[])
 
     return (

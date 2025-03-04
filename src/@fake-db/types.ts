@@ -1,50 +1,5 @@
-// Type Imports
 import { ThemeColor } from 'src/@core/layouts/types'
-import {
-  CardStatsCharacterProps,
-  CardStatsHorizontalProps,
-  CardStatsVerticalProps
-} from 'src/@core/components/card-statistics/types'
 import { TeacherType } from 'src/hooks/useTeachers'
-
-// Template Search
-//----------------
-export type AppBarSearchType = {
-  id: number
-  url: string
-  icon: string
-  title: string
-  category: string
-}
-export type AutocompleteType = {
-  year: number
-  title: string
-}
-
-// Faq Page
-//-------------------
-export type FaqQAndAType = {
-  id: string
-  answer: string
-  question: string
-}
-export type FaqType = {
-  [key: string]: {
-    id: string
-    icon: string
-    title: string
-    subtitle: string
-    qandA: FaqQAndAType[]
-  }
-}
-
-// Card Statistics Page
-//-------------------------------
-export type CardStatsType = {
-  statsVertical: CardStatsVerticalProps[]
-  statsCharacter: CardStatsCharacterProps[]
-  statsHorizontal: CardStatsHorizontalProps[]
-}
 
 // User Profile pages
 //-------------------
@@ -142,49 +97,6 @@ export type ProfileTabType = {
 }
 export type UserProfileActiveTab = ProfileTabType | TeamsTabType[] | ProjectsTabType[] | ConnectionsTabType[]
 
-// Data Grid page
-//---------------
-export type DataGridRowType = {
-  id: number
-  age: string
-  post: string
-  city: string
-  email: string
-  salary: number
-  status: number
-  avatar: string
-  full_name: string
-  start_date: string
-  experience: string
-}
-
-// Help Center
-//------------
-export type HelpCenterSubcategoryArticlesType = {
-  slug: string
-  title: string
-  content: string
-}
-export type HelpCenterSubcategoriesType = {
-  icon: string
-  slug: string
-  title: string
-  articles: HelpCenterSubcategoryArticlesType[]
-}
-export type HelpCenterCategoriesType = {
-  icon: string
-  slug: string
-  title: string
-  avatarColor: ThemeColor
-  subCategories: HelpCenterSubcategoriesType[]
-}
-export type HelpCenterArticlesOverviewType = {
-  img: string
-  slug: string
-  title: string
-  subtitle: string
-}
-
 export interface CouseType {
   id: any
   name: string
@@ -200,25 +112,6 @@ export interface CouseType {
   }[]
   room: any
   start_at: any
-}
-
-export interface GroupTypeFromList {
-  id: number
-  name: string
-  course_name: CouseType
-  start_date: string
-  teacher: TeacherType
-  monthly_amount: string
-  room: {
-    id: string | number
-    name: string
-    branch: {
-      id: string | number
-      name: string
-    }
-  }
-  start_at: any
-  student_count: number
 }
 
 export interface GroupType {
