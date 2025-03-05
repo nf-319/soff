@@ -16,6 +16,7 @@ import { useGet } from 'src/hooks/useApi'
 import { LeadsKaban, LeadsType, LidsHeader } from 'src/entities/lids'
 import { useAuth } from 'src/hooks/useAuth'
 import { LidsEditModal } from 'src/entities/lids/modals'
+import useResponsive from 'src/@core/hooks/useResponsive'
 
 export type DepartmentsResultType = {
   id: number
@@ -31,7 +32,7 @@ const Lids = () => {
   const [selectedTab, setSelectedTab] = useState<number>(0)
   const [currentData, setCurrentData] = useState<DepartmentsResultType | undefined>()
   const [openDialog, setOpenDialog] = useState<'edit' | 'recover' | null>(null)
-
+  const { isMobile } = useResponsive()
   const { user } = useAuth()
 
   const {
@@ -88,12 +89,18 @@ const Lids = () => {
   return (
     <div>
       <LidsHeader />
-
-      <Box display='flex' justifyContent='space-between' marginY={5} alignItems='center'>
+      <Box display={isMobile ? '' : 'flex'} justifyContent='space-between' marginY={5} alignItems='center'>
         {isLoading ? (
           <Skeleton variant='rectangular' width={120} height={40} />
         ) : (
-          <Select size='medium' value={selectedTab} onChange={handleTabChange} displayEmpty>
+          <Select
+            sx={{ marginBottom: isMobile ? 4 : 0 }}
+            fullWidth={isMobile}
+            size='medium'
+            value={selectedTab}
+            onChange={handleTabChange}
+            displayEmpty
+          >
             {leadData?.results.map((item, index) => (
               <MenuItem key={item.id} value={index}>
                 {item.name}
@@ -104,6 +111,7 @@ const Lids = () => {
 
         <Box display='flex' justifyContent='space-between' gap={4} alignItems='center' flexShrink={0}>
           <Button
+            fullWidth={isMobile}
             size='medium'
             variant='outlined'
             onClick={() => dispatch(setOpenItem(currentDepartmentId))}
