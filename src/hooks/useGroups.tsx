@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useState } from "react"
 import api from "src/@core/utils/api";
-import { GroupType } from "src/@fake-db/types";
+import { GroupType } from "../types/types";
 import ceoConfigs from "src/configs/ceo";
 
 

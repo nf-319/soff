@@ -17,7 +17,7 @@ import axios from 'axios'
 import Icon from '../../../components/icon'
 
 // ** Types
-import { ProfileHeaderType } from 'src/@fake-db/types'
+import { ProfileHeaderType } from '../../../types/types'
 
 const ProfilePicture = styled('img')(({ theme }) => ({
   width: 120,

@@ -1,31 +1,17 @@
 const path = require('path')
 
 /** @type {import('next').NextConfig} */
-
-const withTM = require('next-transpile-modules')([
-  '@fullcalendar/common',
-  '@fullcalendar/react',
-  '@fullcalendar/daygrid',
-  '@fullcalendar/list',
-  '@fullcalendar/timegrid'
-])
-
-module.exports = withTM({
+module.exports = {
   trailingSlash: false,
 
   productionBrowserSourceMaps: false,
   optimizeFonts: false,
-  swcMinify: false,
+  swcMinify: true,
 
-  webpack: (config, { dev }) => {
+  webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       apexcharts: path.resolve(__dirname, './node_modules/apexcharts-clevision')
-    }
-    if (config.cache && !dev) {
-      config.cache = Object.freeze({
-        type: 'memory'
-      })
     }
     return config
   },
@@ -35,4 +21,4 @@ module.exports = withTM({
       { protocol: 'http', hostname: '*' }
     ]
   }
-})
+}

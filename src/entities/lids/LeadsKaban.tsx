@@ -57,7 +57,6 @@ export type MenuOpenType =
   | 'merge-to'
   | 'add-group'
   | 'branch'
-  | 'add-group'
   | 'edit'
   | 'delete'
   | 'recover'
@@ -199,22 +198,25 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
     })
   }
 
-  if (isLoading)
-    <Box display='flex' flexDirection='column' marginBottom={10} gap={5}>
-      <Box display='flex' gap={5}>
-        <Skeleton variant='rounded' width={300} height={50} />
-        <Skeleton variant='rounded' width={300} height={50} />
-        <Skeleton variant='rounded' width={300} height={50} />
-        <Skeleton variant='rounded' width={300} height={50} />
-      </Box>
+  if (isLoading) {
+    return (
+      <Box display='flex' flexDirection='column' marginBottom={10} gap={5}>
+        <Box display='flex' gap={5}>
+          <Skeleton variant='rounded' width={300} height={50} />
+          <Skeleton variant='rounded' width={300} height={50} />
+          <Skeleton variant='rounded' width={300} height={50} />
+          <Skeleton variant='rounded' width={300} height={50} />
+        </Box>
 
-      <Box display='flex' gap={5}>
-        <Skeleton variant='rounded' width={300} height={80} />
-        <Skeleton variant='rounded' width={300} height={80} />
-        <Skeleton variant='rounded' width={300} height={80} />
-        <Skeleton variant='rounded' width={300} height={80} />
+        <Box display='flex' gap={5}>
+          <Skeleton variant='rounded' width={300} height={80} />
+          <Skeleton variant='rounded' width={300} height={80} />
+          <Skeleton variant='rounded' width={300} height={80} />
+          <Skeleton variant='rounded' width={300} height={80} />
+        </Box>
       </Box>
-    </Box>
+    )
+  }
 
   const displayData = localLeadData || leadData
 
