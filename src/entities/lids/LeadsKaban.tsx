@@ -33,6 +33,7 @@ import { AddGroup } from './modals/AddGroupModal'
 import { AddDepartmantModal } from './modals/AddDepartmantModal'
 import toast from 'react-hot-toast'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
+import Link from 'next/link'
 
 type LeadsChld = {
   id: number
@@ -319,7 +320,10 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
                                   {lead.first_name}
                                 </div>
 
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                <Link
+                                  href={`tel:${lead?.phone}`}
+                                  style={{ display: 'flex', alignItems: 'center', gap: 5,textDecoration:'none' }}
+                                >
                                   <Phone width={18} height={18} color='blue' />
                                   <Typography
                                     fontSize={12}
@@ -332,15 +336,10 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
                                         borderRadius: '4px'
                                       }
                                     }}
-                                    onClick={() => {
-                                      if (lead?.phone) {
-                                        window.location.href = `tel:${lead.phone}`
-                                      }
-                                    }}
                                   >
                                     {lead?.phone}
                                   </Typography>
-                                </div>
+                                </Link>
                               </div>
 
                               <Box display='flex' alignItems='center'>
