@@ -40,9 +40,9 @@ export const fetchGroupCheckList = createAsyncThunk('fetchGroupCheckList', async
 export const updateStudent = createAsyncThunk(
   'students/updateStudent',
 
-  async ({ status, id }: any, { rejectWithValue }) => {
+  async ({ data, id }: any, { rejectWithValue }) => {
     try {
-      const response = await api.patch(`student/update/${id}`, { status: status })
+      const response = await api.patch(`student/update/${id}`,data)
       return response.data
     } catch (err: any) {
       if (err.response) {

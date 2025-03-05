@@ -57,6 +57,8 @@ const UserSmsList = () => {
     try {
       const resp = await api.get(`auth/sms-history/?user=${query.student}`)
       setData(resp.data?.results)
+      console.log(resp);
+      
       setLoading(false)
       setOpen(false)
       formik.resetForm()
@@ -67,6 +69,8 @@ const UserSmsList = () => {
       setLoading(false)
     }
   }
+
+  
 
   const handleAddNote = async (value: any) => {
     setLoading(true)
@@ -82,7 +86,8 @@ const UserSmsList = () => {
   }
 
   useEffect(() => {
-    dispatch(fetchSmsList())
+    // dispatch(fetchSmsList())
+    getSmsList()
   }, [])
   useEffect(() => {
     if (parent_id) {
