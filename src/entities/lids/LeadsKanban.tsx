@@ -22,6 +22,7 @@ import EditDepartmentItemForm from 'src/views/apps/lids/departmentItem/EditDepar
 import { EditAnonimDialogDialog } from 'src/views/apps/lids/anonimUser/EditAnonimUserDialog'
 import toast from 'react-hot-toast'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
+import Link from 'next/link'
 import { LeadKanbanItem } from './LeadKanbanItem'
 
 type LeadsChild = {

@@ -32,7 +32,6 @@ export default function AddGroupModal() {
   )
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
-  const [loading, setLoading] = useState(false)
   const [customWeekdays, setCustomWeekDays] = useState<string[]>([])
   const { mutate, isPending } = usePost()
   const queryClient = useQueryClient()
@@ -57,7 +56,6 @@ export default function AddGroupModal() {
     initialValues,
     validationSchema,
     onSubmit: async values => {
-      setLoading(true)
       dispatch(disablePage(true))
       let obj = { ...values }
       if (!formik.values.day_of_week || formik.values.day_of_week == '0') {
@@ -76,7 +74,6 @@ export default function AddGroupModal() {
           formik.setErrors(err.response.data)
         }
       })
-
       dispatch(disablePage(false))
     }
   })
@@ -374,7 +371,7 @@ export default function AddGroupModal() {
                 </FormHelperText>
               </FormControl>
 
-              <LoadingButton loading={loading} variant='contained' type='submit' fullWidth>
+              <LoadingButton loading={isPending} variant='contained' type='submit' fullWidth>
                 {t('Saqlash')}
               </LoadingButton>
             </form>

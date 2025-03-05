@@ -40,6 +40,7 @@ import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import AddToGroupForm from './anonimUser/AddToGroupForm'
 import { fetchGroupChecklist } from 'src/store/apps/groups'
+import Link from 'next/link'
 
 type InfoItemProps = {
   icon: React.ReactNode
@@ -49,8 +50,24 @@ type InfoItemProps = {
 
 const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value }) => {
   const { settings } = useSettings()
-  return (
+  return label === 'Telefon raqami' ? (
+    <Link href={`tel:${value}`} style={{textDecoration:'none'}}>
+      <div
+        style={{ cursor: 'pointer' }}
+        className={`d-flex align-items-center p-3 ${
+          settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'
+        } rounded-3 shadow-sm hover:bg-secondary transition-all duration-200`}
+      >
+        <div className='text-primary me-3'>{icon}</div>
+        <div>
+          <p className={`mb-1 ${settings.mode == 'dark' ? 'text-ligt' : 'text-muted'}`}>{label}</p>
+          <p className={`mb-0 font-weight-bold ${settings.mode == 'dark' ? 'text-ligt' : 'text-dark'}`}>{value}</p>
+        </div>
+      </div>
+    </Link>
+  ) : (
     <div
+      style={{ cursor: 'pointer' }}
       className={`d-flex align-items-center p-3 ${
         settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'
       } rounded-3 shadow-sm hover:bg-secondary transition-all duration-200`}
