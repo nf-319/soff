@@ -9,7 +9,6 @@ import OutlinedInput from '@mui/material/OutlinedInput'
 import FormHelperText from '@mui/material/FormHelperText'
 import InputAdornment from '@mui/material/InputAdornment'
 import Typography from '@mui/material/Typography'
-import Icon from '../../components/icon'
 import themeConfig from 'src/configs/themeConfig'
 import * as yup from 'yup'
 import { useForm, Controller } from 'react-hook-form'
@@ -22,12 +21,18 @@ import PhoneInput from '../../components/phone-input'
 import { useTranslation } from 'react-i18next'
 import { reversePhone } from '../../components/phone-input/format-phone-number'
 import api from 'src/@core/utils/api'
-import { setPublicSettings } from 'src/store/apps/page'
-import { useAppDispatch } from 'src/store'
+import { RootState, useAppDispatch } from 'src/store'
 import Image from 'next/image'
+import Cookie from 'js-cookie'
 import { styled } from '@mui/material/styles'
 import { TypographyProps } from '@mui/material'
 import Zoom from '@mui/material/Zoom'
+import authConfig from 'src/configs/auth'
+import { setCompanyInfo, setRoles } from '../../store/apps/user'
+import { useRouter } from 'next/router'
+import { useSelector } from 'react-redux'
+import { Eye } from 'lucide-react'
+import { setPublicSettings } from '../../store/apps/page'
 
 const schema = yup.object().shape({
   phone: yup.string().required('Telefon raqam kiriting'),
@@ -55,26 +60,11 @@ type FormData = {
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
-  const [data, setData] = useState<any>(null)
   const dispatch = useAppDispatch()
   const auth = useAuth()
+  const { public_settings }  = useSelector((item: RootState) => item.page)
+  const router = useRouter()
   const { t } = useTranslation()
-
-  useEffect(() => {
-    const pageLoad = async () => {
-      try {
-        const response = await api.get('common/public-settings/')
-        if (response.status === 200) {
-          dispatch(setPublicSettings(response.data))
-          localStorage.setItem('school_type', response.data?.type)
-          setData(response.data)
-        }
-      } catch {
-        toast.error("Markaz ma'lumotini olib bo'lmadi")
-      }
-    }
-    pageLoad()
-  }, [dispatch])
 
   const {
     control,
@@ -87,21 +77,94 @@ const LoginPage = () => {
     resolver: yupResolver(schema)
   })
 
-  const onSubmit = async (data: FormData) => {
-    setLoading(true)
-    const { phone, password } = data
-    await auth.login({ phone: reversePhone(phone), password }, (resp: any) => {
-      if (resp?.response) {
-        setLoading(false)
-        Object.keys(resp?.response?.data).map((el: any) => {
-          return setError(el, {
+  useEffect(() => {
+    const pageLoad = async () => {
+      try {
+        const response = await api.get('common/public-settings/')
+        if (response.status === 200) {
+          dispatch(setPublicSettings(response.data))
+          localStorage.setItem('school_type', response.data?.type)
+          dispatch(setPublicSettings(response.data))
+        }
+      } catch {
+        toast.error("Markaz ma'lumotini olib bo'lmadi")
+      }
+    }
+    void pageLoad()
+  }, [dispatch])
+
+  const handleLogin = async (params: { phone: string, password: string }) => {
+    try {
+      setLoading(true)
+
+      const response = await api.post(authConfig.loginEndpoint, params)
+      Cookie.set('token', response.data.tokens.access)
+      Cookie.set('roles', JSON.stringify(response.data.roles))
+      window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.tokens.access)
+      window.localStorage.setItem('userData', JSON.stringify({ ...response.data }))
+
+
+      const userRoles = response.data.roles
+        .filter((el: any) => el.exists)
+        .map((el: any) => el.name?.toLowerCase())
+
+      dispatch(setRoles(userRoles))
+
+      if (
+        !window.location.hostname.split('.').includes('c-panel') &&
+        !window.location.hostname.split('.').includes('localhost')
+      ) {
+        const resp = await api.get('common/settings/list/')
+        dispatch(setCompanyInfo(resp.data[0]))
+      }
+
+      const isMarketable = userRoles.includes('marketolog')
+      const returnUrl = router.query.returnUrl
+      const redirectURL = isMarketable
+        ? '/lids'
+        : (returnUrl && returnUrl !== '/' ? returnUrl : '/')
+
+      await router.push(redirectURL as string)
+
+      dispatch(setRoles(userRoles))
+      auth.setUser({
+        last_login: response.data?.last_login,
+        phone: response.data.phone,
+        gpa: response.data?.gpa,
+        id: response.data.id,
+        fullName: response.data.first_name,
+        username: response.data.phone,
+        password: 'null',
+        avatar: response.data.image,
+        payment_page: response.data.payment_page,
+        role: userRoles,
+        balance: response.data?.balance || 0,
+        branches: response.data?.branches,
+        active_branch: response.data.active_branch
+      })
+      setLoading(false)
+      auth.initAuth()
+    } catch (err: any) {
+      if (err?.response?.data) {
+        Object.keys(err.response.data).forEach((key: any) => {
+          setError(key, {
             type: 'manual',
-            message: resp?.response?.data[el]
+            message: err.response.data[key]
           })
         })
       } else {
         toast.error('Network Error!', { position: 'top-center' })
       }
+      setLoading(false)
+    }
+  }
+
+  const onSubmit = async (data: FormData) => {
+    setLoading(true)
+
+    await handleLogin({
+      phone: reversePhone(data.phone),
+      password: data.password
     })
   }
 
@@ -117,15 +180,16 @@ const LoginPage = () => {
 
       <Zoom in timeout={500}>
         <Box className='content-right' sx={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-          {data && (
-            <Box sx={{ maxWidth: '600px', width: '100%', p: 10, backgroundColor: 'rgba(255, 255, 255)', borderRadius: 1, boxShadow: 'rgba(0, 0, 0, 0.09) 0px 3px 12px' }}>
+          {public_settings && (
+            <div className='login-card'>
               <Box sx={{ mb: 6, textAlign: 'center' }}>
-                {data?.logo && (
-                  <Image src={data?.logo} alt='Brand logo' width={100} height={80} style={{ objectFit: 'scale-down' }} />
+                {public_settings?.logo && (
+                  <Image src={public_settings?.logo} alt='Brand logo' width={100} height={80} style={{ objectFit: 'scale-down' }} />
                 )}
-                {data ? (
+
+                {public_settings ? (
                   <TypographyStyled variant='h5'>{`${
-                    data?.training_center_name || themeConfig.templateName
+                    public_settings?.training_center_name || themeConfig.templateName
                   }! ga Xush kelibsiz 👋🏻`}</TypographyStyled>
                 ) : (
                   <TypographyStyled variant='h5'>Xush kelibsiz 👋🏻</TypographyStyled>
@@ -180,7 +244,7 @@ const LoginPage = () => {
                           endAdornment={
                             <InputAdornment position='end'>
                               <IconButton onClick={() => setShowPassword(!showPassword)}>
-                                <Icon icon={showPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'} fontSize={20} />
+                                <Eye />
                               </IconButton>
                             </InputAdornment>
                           }
@@ -195,7 +259,7 @@ const LoginPage = () => {
                   Kirish
                 </LoadingButton>
               </form>
-            </Box>
+            </div>
           )}
         </Box>
       </Zoom>
