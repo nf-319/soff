@@ -77,13 +77,20 @@ export const LidsHeader = () => {
         </Button>
       </form>
 
-      <Box display='flex' flexDirection='row-reverse' alignItems='center' justifyContent='center' gap={4}>
+      <Box
+        width={isMobile ? '100%' : 'auto'}
+        display={isMobile ? '' : 'flex'}
+        flexDirection='row-reverse'
+        alignItems='center'
+        justifyContent='center'
+        gap={4}
+      >
         {isMobile ? (
           <Button
             fullWidth
             onClick={() => dispatch(setOpen('add-department'))}
             sx={{ minWidth: '300px', my: 4 }}
-            size='small'
+            size='medium'
             variant='contained'
             startIcon={<Plus />}
           >
@@ -101,7 +108,9 @@ export const LidsHeader = () => {
           </Button>
         )}
 
-        <VideoHeader item={videoUrls.leads} />
+        <Box>
+          <VideoHeader item={videoUrls.leads} />
+        </Box>
       </Box>
     </Box>
   )
