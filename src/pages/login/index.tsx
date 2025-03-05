@@ -1,39 +1,43 @@
-import { useState, ReactNode, useEffect, useContext } from 'react'
+'use client'
+
+import { useState, ReactNode, useEffect } from 'react'
 import InputLabel from '@mui/material/InputLabel'
 import IconButton from '@mui/material/IconButton'
-import Box, { BoxProps } from '@mui/material/Box'
+import Box from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
 import OutlinedInput from '@mui/material/OutlinedInput'
-import { styled } from '@mui/material/styles'
 import FormHelperText from '@mui/material/FormHelperText'
 import InputAdornment from '@mui/material/InputAdornment'
-import Typography, { TypographyProps } from '@mui/material/Typography'
-import Icon from '../../components/icon'
+import Typography from '@mui/material/Typography'
+import themeConfig from 'src/configs/themeConfig'
 import * as yup from 'yup'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useAuth } from 'src/hooks/useAuth'
-import themeConfig from 'src/configs/themeConfig'
 import BlankLayout from 'src/@core/layouts/BlankLayout'
-import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 import LoadingButton from '@mui/lab/LoadingButton'
-import useResponsive from 'src/@core/hooks/useResponsive'
 import toast from 'react-hot-toast'
 import PhoneInput from '../../components/phone-input'
 import { useTranslation } from 'react-i18next'
 import { reversePhone } from '../../components/phone-input/format-phone-number'
 import api from 'src/@core/utils/api'
-import { setPublicSettings, toggleModal } from 'src/store/apps/page'
-import { useAppDispatch } from 'src/store'
+import { RootState, useAppDispatch } from 'src/store'
+import Image from 'next/image'
+import Cookie from 'js-cookie'
+import { styled } from '@mui/material/styles'
+import { TypographyProps } from '@mui/material'
+import Zoom from '@mui/material/Zoom'
+import authConfig from 'src/configs/auth'
+import { setCompanyInfo, setRoles } from '../../store/apps/user'
 import { useRouter } from 'next/router'
+import { useSelector } from 'react-redux'
+import { Eye } from 'lucide-react'
+import { setPublicSettings } from '../../store/apps/page'
 
-const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
-  padding: theme.spacing(20),
-  paddingRight: '0 !important',
-  [theme.breakpoints.down('lg')]: {
-    padding: theme.spacing(0)
-  }
-}))
+const schema = yup.object().shape({
+  phone: yup.string().required('Telefon raqam kiriting'),
+  password: yup.string().min(1).required('Parol kiriting')
+})
 
 const TypographyStyled = styled(Typography)<TypographyProps>(({ theme }) => ({
   fontWeight: 600,
@@ -42,17 +46,13 @@ const TypographyStyled = styled(Typography)<TypographyProps>(({ theme }) => ({
   [theme.breakpoints.down('md')]: { marginTop: theme.spacing(8) }
 }))
 
-const schema = yup.object().shape({
-  phone: yup.string().required('Telefon raqam kiriting'),
-  password: yup.string().min(1).required('Parol kiriting')
-})
 
 const defaultValues = {
   phone: '',
   password: ''
 }
 
-interface FormData {
+type FormData = {
   phone: string
   password: string
 }
@@ -60,30 +60,11 @@ interface FormData {
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
-  const [data, setData] = useState<any>(null)
   const dispatch = useAppDispatch()
   const auth = useAuth()
+  const { public_settings }  = useSelector((item: RootState) => item.page)
   const router = useRouter()
-  const { isMobile } = useResponsive()
   const { t } = useTranslation()
-
-  const pageLoad = async () => {
-    try {
-      const response = await api.get('common/public-settings/')
-
-      if (response.status == 200) {
-        dispatch(setPublicSettings(response.data))
-        localStorage.setItem('school_type', response.data?.type)
-        setData(response.data)
-      }
-    } catch {
-      toast.error("Markaz ma'lumotini olib bo'lmadi")
-    }
-  }
-
-  useEffect(() => {
-    pageLoad()
-  }, [])
 
   const {
     control,
@@ -96,135 +77,197 @@ const LoginPage = () => {
     resolver: yupResolver(schema)
   })
 
-  const onSubmit = async (data: FormData) => {
-    setLoading(true)
-    const { phone, password } = data
-    await auth.login({ phone: reversePhone(phone), password }, (resp: any) => {
-      if (resp?.response) {
-        setLoading(false)
-        Object.keys(resp?.response?.data).map((el: any) => {
-          return setError(el, {
+  useEffect(() => {
+    const pageLoad = async () => {
+      try {
+        const response = await api.get('common/public-settings/')
+        if (response.status === 200) {
+          dispatch(setPublicSettings(response.data))
+          localStorage.setItem('school_type', response.data?.type)
+          dispatch(setPublicSettings(response.data))
+        }
+      } catch {
+        toast.error("Markaz ma'lumotini olib bo'lmadi")
+      }
+    }
+    void pageLoad()
+  }, [dispatch])
+
+  const handleLogin = async (params: { phone: string, password: string }) => {
+    try {
+      setLoading(true)
+
+      const response = await api.post(authConfig.loginEndpoint, params)
+      Cookie.set('token', response.data.tokens.access)
+      Cookie.set('roles', JSON.stringify(response.data.roles))
+      window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.tokens.access)
+      window.localStorage.setItem('userData', JSON.stringify({ ...response.data }))
+
+
+      const userRoles = response.data.roles
+        .filter((el: any) => el.exists)
+        .map((el: any) => el.name?.toLowerCase())
+
+      dispatch(setRoles(userRoles))
+
+      if (
+        !window.location.hostname.split('.').includes('c-panel') &&
+        !window.location.hostname.split('.').includes('localhost')
+      ) {
+        const resp = await api.get('common/settings/list/')
+        dispatch(setCompanyInfo(resp.data[0]))
+      }
+
+      const isMarketable = userRoles.includes('marketolog')
+      const returnUrl = router.query.returnUrl
+      const redirectURL = isMarketable
+        ? '/lids'
+        : (returnUrl && returnUrl !== '/' ? returnUrl : '/')
+
+      await router.push(redirectURL as string)
+
+      dispatch(setRoles(userRoles))
+      auth.setUser({
+        last_login: response.data?.last_login,
+        phone: response.data.phone,
+        gpa: response.data?.gpa,
+        id: response.data.id,
+        fullName: response.data.first_name,
+        username: response.data.phone,
+        password: 'null',
+        avatar: response.data.image,
+        payment_page: response.data.payment_page,
+        role: userRoles,
+        balance: response.data?.balance || 0,
+        branches: response.data?.branches,
+        active_branch: response.data.active_branch
+      })
+      setLoading(false)
+      auth.initAuth()
+    } catch (err: any) {
+      if (err?.response?.data) {
+        Object.keys(err.response.data).forEach((key: any) => {
+          setError(key, {
             type: 'manual',
-            message: resp?.response?.data[el]
+            message: err.response.data[key]
           })
         })
       } else {
-        setLoading(false)
         toast.error('Network Error!', { position: 'top-center' })
       }
+      setLoading(false)
+    }
+  }
+
+  const onSubmit = async (data: FormData) => {
+    setLoading(true)
+
+    await handleLogin({
+      phone: reversePhone(data.phone),
+      password: data.password
     })
   }
 
   return (
-    <Box className='content-right'>
-      {data && (
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            position: 'relative',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%'
-          }}
-        >
-          <LoginIllustrationWrapper sx={{ maxWidth: isMobile ? '300px' : '450px' }}>
-            <Box
-              sx={{ mb: 6, display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}
-            >
-              {data && (
-                <Box style={{ width: 'auto', height: '80px', marginBottom: '10px' }}>
-                  <img src={data?.logo} alt='' style={{ width: '100%', height: '100%', objectFit: 'scale-down' }} />
-                </Box>
-              )}
-              {data ? (
-                <TypographyStyled variant='h5'>{`${
-                  data?.training_center_name || themeConfig.templateName
-                }! ga Xush kelibsiz 👋🏻`}</TypographyStyled>
-              ) : (
-                <TypographyStyled variant='h5'>{`Xush kelibsiz 👋🏻`}</TypographyStyled>
-              )}
-              <Typography variant='body2'>Iltimos tizimga kirish uchun shaxsiy malumotlaringizni kiriting</Typography>
-            </Box>
+      <Box sx={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+        <Image
+          src='/images/request-form-bg.webp'
+          alt='Login Background'
+          fill
+          style={{objectFit: "cover"}}
+          priority
+        />
 
-            <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
-              <FormControl fullWidth sx={{ mb: 4 }}>
-                <InputLabel error={Boolean(errors.phone)} htmlFor='login-input'>
-                  {t('phone')}
-                </InputLabel>
-                <Controller
-                  name='phone'
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field: { value, onChange, onBlur } }) => (
-                    <PhoneInput
-                      id='login-input'
-                      size='medium'
-                      label='Telefon raqam'
-                      value={value}
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      error={Boolean(errors.phone)}
-                    />
-                  )}
-                />
-                {errors.phone && <FormHelperText sx={{ color: 'error.main' }}>{errors.phone.message}</FormHelperText>}
-              </FormControl>
-
-              <FormControl fullWidth>
-                <InputLabel htmlFor='auth-login-v2-password' error={Boolean(errors.password)}>
-                  Parol
-                </InputLabel>
-                <Controller
-                  name='password'
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field: { value, onChange, onBlur } }) => (
-                    <OutlinedInput
-                      value={value}
-                      onBlur={onBlur}
-                      label='Parol'
-                      onChange={onChange}
-                      id='auth-login-v2-password'
-                      error={Boolean(errors.password)}
-                      type={showPassword ? 'text' : 'password'}
-                      endAdornment={
-                        <InputAdornment position='end'>
-                          <IconButton
-                            edge='end'
-                            onMouseDown={e => e.preventDefault()}
-                            onClick={() => setShowPassword(!showPassword)}
-                          >
-                            <Icon icon={showPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'} fontSize={20} />
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                    />
-                  )}
-                />
-                {errors.password && (
-                  <FormHelperText sx={{ color: 'error.main' }} id=''>
-                    {errors.password.message}
-                  </FormHelperText>
+      <Zoom in timeout={500}>
+        <Box className='content-right' sx={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          {public_settings && (
+            <div className='login-card'>
+              <Box sx={{ mb: 6, textAlign: 'center' }}>
+                {public_settings?.logo && (
+                  <Image src={public_settings?.logo} alt='Brand logo' width={100} height={80} style={{ objectFit: 'scale-down' }} />
                 )}
-              </FormControl>
-              <Box
-                sx={{ mb: 4, display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}
-              ></Box>
-              <LoadingButton loading={loading} fullWidth size='large' type='submit' variant='contained' sx={{ mb: 7 }}>
-                Kirish
-              </LoadingButton>
-            </form>
-          </LoginIllustrationWrapper>
-          <FooterIllustrationsV2 />
+
+                {public_settings ? (
+                  <TypographyStyled variant='h5'>{`${
+                    public_settings?.training_center_name || themeConfig.templateName
+                  }! ga Xush kelibsiz 👋🏻`}</TypographyStyled>
+                ) : (
+                  <TypographyStyled variant='h5'>Xush kelibsiz 👋🏻</TypographyStyled>
+                )}
+                <Typography variant='body2'>Iltimos tizimga kirish uchun shaxsiy malumotlaringizni kiriting</Typography>
+              </Box>
+
+              <form noValidate autoComplete='off' style={{ display: "grid", gap: 20 }} onSubmit={handleSubmit(onSubmit)}>
+                <Box display="grid" gap={5}>
+                  <FormControl fullWidth>
+                    <InputLabel error={Boolean(errors.phone)} htmlFor='login-input'>
+                      {t('phone')}
+                    </InputLabel>
+
+                    <Controller
+                      name='phone'
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange, onBlur } }) => (
+                        <PhoneInput
+                          id='login-input'
+                          size='medium'
+                          label='Telefon raqam'
+                          value={value}
+                          onBlur={onBlur}
+                          onChange={onChange}
+                          error={Boolean(errors.phone)}
+                        />
+                      )}
+                    />
+                    {errors.phone && <FormHelperText error>{errors.phone.message}</FormHelperText>}
+                  </FormControl>
+
+                  <FormControl fullWidth>
+                    <InputLabel htmlFor='auth-login-v2-password' error={Boolean(errors.password)}>
+                      Parol
+                    </InputLabel>
+
+                    <Controller
+                      name='password'
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange, onBlur } }) => (
+                        <OutlinedInput
+                          value={value}
+                          onBlur={onBlur}
+                          label='Parol'
+                          onChange={onChange}
+                          id='auth-login-v2-password'
+                          error={Boolean(errors.password)}
+                          type={showPassword ? 'text' : 'password'}
+                          endAdornment={
+                            <InputAdornment position='end'>
+                              <IconButton onClick={() => setShowPassword(!showPassword)}>
+                                <Eye />
+                              </IconButton>
+                            </InputAdornment>
+                          }
+                        />
+                      )}
+                    />
+                    {errors.password && <FormHelperText error>{errors.password.message}</FormHelperText>}
+                  </FormControl>
+                </Box>
+
+                <LoadingButton loading={loading} fullWidth size='large' type='submit' variant='contained'>
+                  Kirish
+                </LoadingButton>
+              </form>
+            </div>
+          )}
         </Box>
-      )}
+      </Zoom>
     </Box>
   )
 }
 
 LoginPage.getLayout = (page: ReactNode) => <BlankLayout>{page}</BlankLayout>
-
 LoginPage.guestGuard = true
-
+LoginPage.displayName = 'LoginPage'
 export default LoginPage

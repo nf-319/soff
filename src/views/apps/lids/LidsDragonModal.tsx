@@ -51,6 +51,12 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value }) => {
   const { settings } = useSettings()
   return (
     <div
+      style={{ cursor: 'pointer' }}
+      onClick={() => {
+        if (label === 'Telefon raqami') {
+          window.location.href = `tel:${value}`
+        }
+      }}
       className={`d-flex align-items-center p-3 ${
         settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'
       } rounded-3 shadow-sm hover:bg-secondary transition-all duration-200`}

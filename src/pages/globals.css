@@ -103,9 +103,17 @@ code[class*='language-'] {
   width: 35px !important;
 }
 
+.login-card {
+  max-width: clamp(21.875rem, 37.092vw + 13.761rem, 37.5rem);
+  width: 100%;
+  height: auto;
+  background-color: #fcfcfc;
+  box-shadow: rgba(0, 0, 0, 0.09) 0 3px 12px;
+  border-radius: 10px;
+  padding: clamp(1.25rem, 4.144vw + 0.473rem, 3.125rem) clamp(1.25rem, 2.762vw + 0.732rem, 2.5rem);
+}
 
 .kanban {
-
   &__section {
       width: 100%;
       background-color: #383838;

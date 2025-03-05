@@ -55,7 +55,7 @@ const UserView = ({ tab, student }: any) => {
           <UserViewLeft userData={studentData} />
         </Grid>
         <Grid item xs={12} md={7} lg={8}>
-          <UserViewRight groupData={studentData} tab={url} invoiceData={[]} />
+          <UserViewRight studentData={studentData} tab={url} invoiceData={[]} />
         </Grid>
       </Grid>
     </div>

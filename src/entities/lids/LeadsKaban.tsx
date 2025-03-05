@@ -321,7 +321,25 @@ export const LeadsKaban: FC<Props> = ({ defaultId }) => {
 
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                                   <Phone width={18} height={18} color='blue' />
-                                  <Typography fontSize={12}>{lead?.phone}</Typography>
+                                  <Typography
+                                    fontSize={12}
+                                    sx={{
+                                      cursor: 'pointer',
+                                      padding: '4px 8px',
+                                      transition: 'background-color 0.3s ease',
+                                      '&:hover': {
+                                        backgroundColor: '#f0f0f0',
+                                        borderRadius: '4px'
+                                      }
+                                    }}
+                                    onClick={() => {
+                                      if (lead?.phone) {
+                                        window.location.href = `tel:${lead.phone}`
+                                      }
+                                    }}
+                                  >
+                                    {lead?.phone}
+                                  </Typography>
                                 </div>
                               </div>
 

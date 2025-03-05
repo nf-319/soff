@@ -44,6 +44,6 @@ export const pageSlice = createSlice({
   }
 })
 
-export const {setPublicSettings, disablePage,toggleAmoModal,toggleQrCodeModal ,toggleModal, toggleBotStatus, setCurrentDate, setSoffBotText } = pageSlice.actions
+export const {setPublicSettings, disablePage,toggleAmoModal,toggleQrCodeModal ,toggleModal, setSoffBotText } = pageSlice.actions
 
 export default pageSlice.reducer

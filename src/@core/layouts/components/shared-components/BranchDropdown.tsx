@@ -1,28 +1,21 @@
-// ** Icon Imports
 import Icon from '../../../../components/icon'
-
-// ** Custom Components Imports
 import OptionsMenu from '../../../../components/option-menu'
-
-// ** Type Import
 import { Typography } from '@mui/material'
 import api from 'src/@core/utils/api'
-
 import { useContext } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
 
 const BranchDropdown = () => {
-  // ** Hook
   const { user, initAuth } = useContext(AuthContext)
 
   const handleLangItemClick = async (id: number) => {
     try {
       if (user?.active_branch !== id) {
         await api.post('auth/branch-update/', { branch: id })
-        await initAuth()
+        initAuth()
       }
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 
