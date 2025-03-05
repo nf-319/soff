@@ -90,7 +90,7 @@ export const LidsHeader = () => {
             fullWidth
             onClick={() => dispatch(setOpen('add-department'))}
             sx={{ minWidth: '300px', my: 4 }}
-            size='small'
+            size='medium'
             variant='contained'
             startIcon={<Plus />}
           >
