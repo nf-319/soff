@@ -35,7 +35,7 @@ const Tab = styled(MuiTab)<TabProps>(({ theme }) => ({
   }
 }))
 
-const UserViewRight = ({ tab, invoiceData, groupData, rerender }: any) => {
+const UserViewRight = ({ tab, studentData }: any) => {
   const [activeTab, setActiveTab] = useState<string>(tab)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const { t } = useTranslation()
@@ -50,7 +50,7 @@ const UserViewRight = ({ tab, invoiceData, groupData, rerender }: any) => {
     router
       .push({
         pathname: path,
-        query: { student: groupData.id }
+        query: { student: studentData.id }
       }).finally(() => setIsLoading(false))
   }
 
@@ -61,10 +61,10 @@ const UserViewRight = ({ tab, invoiceData, groupData, rerender }: any) => {
   }, [tab])
 
   useEffect(() => {
-    if (groupData) {
+    if (studentData) {
       setIsLoading(false)
     }
-  }, [groupData])
+  }, [studentData])
 
   return (
     <TabContext value={activeTab}>
@@ -92,7 +92,7 @@ const UserViewRight = ({ tab, invoiceData, groupData, rerender }: any) => {
               <UserViewSecurity/>
             </TabPanel>
             <TabPanel sx={{ p: 0 }} value='comments'>
-              <UserViewOverview data={groupData?.comments || []} />
+              <UserViewOverview data={studentData?.comments || []} />
             </TabPanel>
             <TabPanel sx={{ p: 0 }} value='sms'>
               <UserSmsList />

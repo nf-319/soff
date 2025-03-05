@@ -21,7 +21,7 @@ export default function DashboardPage() {
   return (
     <Box display='flex' flexDirection='column' gap={5}>
       <Box display={!isMobile ? 'flex' : 'block'} alignItems='center' gap={5} justifyContent='flex-end'>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <Box sx={{mb:isMobile?3:0, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <Button
             fullWidth={isMobile}
             onClick={() => dispatch(updateEyeVisible(!eyeVisible))}
