@@ -132,7 +132,7 @@ export default function TeacherGroupsModal() {
                 <TableCell sx={headerStyle}>O'tilgan darslar soni</TableCell>
                 <TableCell sx={headerStyle}>Jarimalar soni</TableCell>
                 <TableCell sx={headerStyle}>Kurs narxi</TableCell>
-                <TableCell sx={headerStyle}>O'quvchilardan to'lov</TableCell>
+                <TableCell sx={headerStyle}>Ulushsiz summa</TableCell>
                 <TableCell sx={headerStyle}>O'qituvchi ulushi</TableCell>
                 <TableCell sx={headerStyle}>Hisoblangan sana</TableCell>
                 <TableCell sx={headerStyle}></TableCell>
@@ -184,7 +184,7 @@ export default function TeacherGroupsModal() {
                                   <TableCell>FIO</TableCell>
                                   <TableCell>Darslar</TableCell>
                                   <TableCell>Jarima</TableCell>
-                                  <TableCell>To'langan summa</TableCell>
+                                  <TableCell>Ulushsiz summa</TableCell>
                                   <TableCell>O'qituvchi ulushi</TableCell>
                                   <TableCell>O'chirish</TableCell>
                                 </TableRow>
@@ -198,7 +198,7 @@ export default function TeacherGroupsModal() {
                                       {student.attended_lessons}/{student.allowed_lessons}
                                     </TableCell>
                                     <TableCell>
-                                      {student.fines_count ? `${student.fines_count.toLocaleString()} UZS` : "Yo'q"}
+                                      {student.fines_count ? `${student.fines_count.toLocaleString()} ta` : "Yo'q"}
                                     </TableCell>
                                     <TableCell>{student.original_amount.toLocaleString()} UZS</TableCell>
                                     <TableCell>{student.condition.toLocaleString()} UZS</TableCell>
