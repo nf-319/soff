@@ -25,7 +25,7 @@ import {
 import CustomAvatar from '../../../../components/mui/avatar'
 
 import { Edit, MessageSquare, Plus, RefreshCw, Wallet } from 'lucide-react'
-import { ReactElement, useState } from 'react'
+import { ReactElement, useRef, useState } from 'react'
 import { getInitials } from 'src/@core/utils/get-initials'
 import useBranches from 'src/hooks/useBranch'
 import Form from '../../../../components/form'
@@ -46,7 +46,8 @@ import { fetchSmsList } from 'src/store/apps/settings'
 import useStudent from 'src/hooks/useStudents'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { Icon } from '@iconify/react'
-import { TeacherAvatar } from '../../mentors/AddMentorsModal'
+import { TeacherAvatar, VisuallyHiddenInput } from '../../mentors/AddMentorsModal'
+import { reversePhone } from 'src/components/phone-input/format-phone-number'
 
 interface StudentCardProps {
   photo?: string
@@ -86,9 +87,12 @@ export default function StudentCard({
   const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<any>({})
+  const profilePhoto: any = useRef(null)
+
   const { mergeStudentToGroup, getGroupShort, groupShort } = useGroups()
   const [isDiscount, setIsDiscount] = useState<boolean>(false)
   const router = useRouter()
+  const [image, setImage] = useState<any>(null)
   const { updateStudent, studentData } = useStudent()
   const [groupDate, setGroupDate] = useState<any>(null)
   const school_type = localStorage.getItem('school_type')
@@ -104,14 +108,6 @@ export default function StudentCard({
       student: userData.id,
       groups: [+value.group]
     }
-
-    // const discountConfig = {
-    //   amount: value?.fixed_price,
-    //   discount_count: 100,
-    //   description: 'kurs oxirigacha',
-    //   group: value?.group,
-    //   student: userData?.id
-    // }
 
     try {
       const discountConfig = {
@@ -143,11 +139,32 @@ export default function StudentCard({
     document.body.removeChild(link)
   }
 
-  const handleEditSubmit = async (value: any) => {
+  const handleEditSubmit = async (values: any) => {
     setLoading(true)
+    const newValues = new FormData()
+
+    for (const [key, value] of Object.entries(values)) {
+      if (!['image'].includes(key)) {
+        if (key === 'phone') {
+          newValues.append(key, reversePhone(value as any))
+        } else if (key === 'school') {
+          newValues.append(key, String(value))
+        } else if (Array.isArray(value) || typeof value === 'object') {
+          newValues.append(key, JSON.stringify(value))
+        } else {
+          newValues.append(key, value as any)
+        }
+      }
+    }
+
+    if (image) {
+      newValues.append('image', image)
+    } else {
+      console.error('Invalid image type:', image)
+    }
 
     try {
-      await updateStudent(userData?.id, value)
+      await updateStudent(userData?.id, newValues)
       setLoading(false)
       setOpenEdit(null)
       await dispatch(fetchStudentDetail(userData.id))
@@ -169,6 +186,7 @@ export default function StudentCard({
     setOpenEdit(value)
   }
 
+  console.log(userData)
 
   return (
     <StyledCard>
@@ -472,6 +490,32 @@ export default function StudentCard({
               onSubmit={handleEditSubmit}
               id='edit-fwe-fwefwfweepay'
             >
+              <TeacherAvatar
+                onClick={() => profilePhoto?.current?.click()}
+                skin='light'
+                color={'info'}
+                variant='rounded'
+                sx={{ cursor: 'pointer', margin: '0 auto 10px' }}
+              >
+                {profilePhoto.current?.files?.[0] || userData?.image ? (
+                  <img
+                    width={100}
+                    height={100}
+                    style={{ objectFit: 'cover', objectPosition: 'center' }}
+                    src={image ? URL.createObjectURL(image) : userData?.image ? userData?.image : ''}
+                    alt=''
+                  />
+                ) : (
+                  <IconifyIcon fontSize={40} icon={'material-symbols-light:add-a-photo-outline'} />
+                )}
+                <VisuallyHiddenInput
+                  ref={profilePhoto}
+                  name='image'
+                  onChange={e => setImage(e.target?.files?.[0])}
+                  type='file'
+                  accept='.png, .jpg, .jpeg, .webp, .HEIC, .heic'
+                />
+              </TeacherAvatar>
               <FormControl sx={{ width: '100%' }}>
                 <TextField
                   size='small'
