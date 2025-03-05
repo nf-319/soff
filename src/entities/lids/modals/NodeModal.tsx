@@ -3,16 +3,20 @@ import { Dispatch, FC, SetStateAction } from 'react'
 import { useTranslation } from 'react-i18next'
 import IconifyIcon from '../../../components/icon'
 import AddNoteAnonimUser from 'src/views/apps/lids/anonimUser/AddNoteAnonimUser'
-import { MenuOpenType } from '../LeadsKaban'
+import { MenuOpenType } from '../LeadsKanban'
+import { setAddSource, setOpenLid, setSectionId } from '../../../store/apps/leads'
+import { useAppDispatch } from '../../../store'
 
 type Props = {
   open: string | null
   setOpen: Dispatch<SetStateAction<MenuOpenType>>
   leadId: string | null
+  onClose?: boolean
 }
 
-export const LeadNoteModal: FC<Props> = ({ open, setOpen, leadId }) => {
+export const LeadNoteModal: FC<Props> = ({ open, setOpen, onClose, leadId }) => {
   const { t } = useTranslation()
+  const dispatch = useAppDispatch()
 
   return (
     <Dialog open={open === 'note'} onClose={() => setOpen(null)}>
@@ -25,7 +29,18 @@ export const LeadNoteModal: FC<Props> = ({ open, setOpen, leadId }) => {
       </DialogTitle>
 
       <DialogContent sx={{ minWidth: '300px' }}>
-        <AddNoteAnonimUser user={leadId} closeModal={() => setOpen(null)} />
+        <AddNoteAnonimUser
+          user={leadId}
+          closeModal={() => {
+            setOpen(null);
+
+            if(onClose) {
+              dispatch(setOpenLid(null))
+              dispatch(setAddSource(false))
+              dispatch(setSectionId(null))
+            }
+          }}
+          />
       </DialogContent>
     </Dialog>
   )
