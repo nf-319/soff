@@ -1,4 +1,15 @@
-import { Box, Button, Chip, IconButton, Pagination, Typography, Select, MenuItem } from '@mui/material'
+import {
+  Box,
+  Button,
+  Chip,
+  IconButton,
+  Pagination,
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
+} from '@mui/material'
 import { useContext, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatCurrency } from 'src/@core/utils/format-currency'
@@ -29,9 +40,6 @@ function Slug() {
   const { t } = useTranslation()
   const { isMobile } = useResponsive()
 
-    console.log(year,month);
-    
-    
   useEffect(() => {
     if (
       !user?.role.includes('ceo') &&
@@ -42,8 +50,11 @@ function Slug() {
       toast.error('Sahifaga kirish huquqingiz yoq!')
       router.push('/')
     }
-    const queryString = new URLSearchParams({ ...queryParams, page: `1`,date_year:`${year}-${month}-01`,date_month:`${year}-${month}-01` }).toString()
-    dispatch(getAdvanceList(queryString))
+    dispatch(updateParams({ ...queryParams, date_year: `${year}-${month}-01`, date_month: `${year}-${month}-01` }))
+    const queryString = new URLSearchParams(
+      Object.fromEntries(Object.entries(queryParams).map(([key, value]) => [key, String(value)]))
+    )
+    dispatch(getAdvanceList(String(queryString)))
     dispatch(getStaffs())
   }, [])
 
@@ -112,18 +123,22 @@ function Slug() {
               </MenuItem>
             ))}
           </Select>
-          <Select
-            value={month}
-            onChange={e => handleYearDate(e.target.value, 'm')}
-            size='small'
-            sx={{ width: isMobile ? 'auto' : 224, order: 4 }}
-          >
-            {monthItems.map(item => (
-              <MenuItem key={item.value} value={item.value}>
-                {item.label}
-              </MenuItem>
-            ))}
-          </Select>
+          <FormControl size='small' sx={{ width: isMobile ? 'auto' : 224, order: 4 }}>
+            <InputLabel id='month-select-label'>Oy kiriting</InputLabel>
+            <Select
+              labelId='month-select-label'
+              label='Oy kiriting'
+              value={month}
+              onChange={e => handleYearDate(e.target.value, 'm')}
+            >
+              {monthItems.map(item => (
+                <MenuItem key={item.value} value={item.value}>
+                  {item.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <Typography
             sx={{
               fontSize: '14px',
