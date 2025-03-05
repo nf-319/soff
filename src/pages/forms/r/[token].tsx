@@ -131,7 +131,7 @@ export function CreatedComponent({
   }
 }
 
-function RequestForm({ uuid }: InferGetStaticPropsType<typeof getServerSideProps>) {
+function RequestForm() {
   const [loading, setLoading] = useState<boolean>(false)
   const [isSend, setIsSend] = useState<boolean>(false)
   const [error, setError] = useState<any>(null)
@@ -179,20 +179,7 @@ function RequestForm({ uuid }: InferGetStaticPropsType<typeof getServerSideProps
     }
   }
 
-  const getFormData = async () => {
-    try {
-      const resp = await api.get(`leads/forms/get/${uuid}/`)
-      setComponents(resp.data?.response?.[0]?.questions)
-      setFormData(resp.data?.response?.[0])
-        setSuccessText(resp.data.response?.[0].success_text)
-
-    } catch (err: any) {
-      console.log(err)
-    }
-  }
-
   useEffect(() => {
-    // getFormData()
     setError({ 21: 'Kiritish majburiy' })
   }, [])
 
@@ -202,12 +189,16 @@ function RequestForm({ uuid }: InferGetStaticPropsType<typeof getServerSideProps
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100vh',
-        backgroundImage: `url('/images/request-form-bg.svg')`,
-        backgroundRepeat: 'repeat-y',
-        overflowY: 'scroll',
-        paddingTop: '200px'
+        minHeight: '100vh',
+        width: '100%',
+        backgroundImage: `url('/images/request-form-bg.webp')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        overflowY: 'auto',
+        paddingTop: '200px',
       }}
+
     >
       <Box
         sx={{

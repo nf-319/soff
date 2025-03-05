@@ -28,4 +28,5 @@ const BlankLayout = ({ children }: BlankLayoutProps) => (
   </BlankLayoutWrapper>
 )
 
+BlankLayout.displayName = 'BlankLayout'
 export default BlankLayout
