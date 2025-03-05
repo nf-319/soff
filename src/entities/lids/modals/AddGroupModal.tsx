@@ -1,24 +1,28 @@
 import { Close } from '@mui/icons-material'
 import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material'
-import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
+import { QueryObserverResult, RefetchOptions, useQueryClient } from '@tanstack/react-query'
 import { Dispatch, FC, SetStateAction, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AddToGroupForm from 'src/views/apps/lids/anonimUser/AddToGroupForm'
 import { LeadsType } from '../model'
-import { LeadsResult, MenuOpenType } from '../LeadsKaban'
+import { LeadsResult, MenuOpenType } from '../LeadsKanban'
 import { useGet } from 'src/hooks/useApi'
+import { setAddSource, setOpenLid, setSectionId } from '../../../store/apps/leads'
+import { useAppDispatch } from '../../../store'
 
 type Props = {
   open: string | null
   setOpen: Dispatch<SetStateAction<MenuOpenType>>
   leadId: string
-  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
+  onClose?: boolean
 }
 
-export const AddGroup: FC<Props> = ({ open, leadId, setOpen, refetch }) => {
+export const AddGroup: FC<Props> = ({ open, leadId, onClose, setOpen }) => {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
   const [loading, setLoading] = useState<boolean>(false)
-  const { data, isLoading } = useGet('common/group-check-list/')
+  const { data } = useGet('common/group-check-list/')
+  const dispatch = useAppDispatch()
 
   return (
     <Dialog open={open === 'add-group'} onClose={() => setOpen(null)}>
@@ -29,11 +33,17 @@ export const AddGroup: FC<Props> = ({ open, leadId, setOpen, refetch }) => {
           <Close onClick={() => setOpen(null)} />
         </IconButton>
       </DialogTitle>
+
       <DialogContent>
         <AddToGroupForm
           item={{ id: leadId }}
           reRender={() => {
-            refetch()
+            if (onClose) {
+              dispatch(setOpenLid(null))
+              dispatch(setAddSource(false))
+              dispatch(setSectionId(null))
+            }
+            queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
             setOpen(null)
           }}
           groups={data && data}

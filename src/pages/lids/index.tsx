@@ -13,7 +13,7 @@ import CreateDepartmentDialog from 'src/views/apps/lids/department/create-dialog
 import EditDepartmentDialog from 'src/views/apps/lids/department/edit-dialog'
 import { LidsDeleteModal } from 'src/entities/lids/modals/DeleteModal'
 import { useGet } from 'src/hooks/useApi'
-import { LeadsKaban, LeadsType, LidsHeader } from 'src/entities/lids'
+import { LeadsKanban, LeadsType, LidsHeader } from 'src/entities/lids'
 import { useAuth } from 'src/hooks/useAuth'
 import { LidsEditModal } from 'src/entities/lids/modals'
 
@@ -139,7 +139,7 @@ const Lids = () => {
         </Box>
       </Box>
 
-      <LeadsKaban defaultId={currentData?.id} />
+      <LeadsKanban defaultId={currentData?.id} />
 
       <EditDepartmentDialog id={Number(currentDepartmentId)} name={(currentData && currentData.name) || ''} />
       <CreateDepartmentDialog />

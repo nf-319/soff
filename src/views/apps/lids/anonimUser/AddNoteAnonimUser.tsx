@@ -7,6 +7,7 @@ import { FormControl, FormHelperText, TextField } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import api from 'src/@core/utils/api'
+import { toast } from 'react-hot-toast'
 
 type Props = {
   user: any
@@ -35,6 +36,7 @@ export default function AddNoteAnonimUser({ user, closeModal }: Props) {
         })
         setLoading(false)
         closeModal()
+        toast.success("Lid Node mofaqityatli yatarildi")
         formik.resetForm()
       } catch {
         setLoading(false)
