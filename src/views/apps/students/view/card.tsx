@@ -20,7 +20,8 @@ import {
   FormHelperText,
   MenuItem,
   TextField,
-  DialogActions
+  DialogActions,
+  IconButton
 } from '@mui/material'
 import CustomAvatar from '../../../../components/mui/avatar'
 
@@ -203,53 +204,60 @@ export default function StudentCard({
         }
       />
       <CardContent>
-        <Box display='flex' gap={2} mb={3}>
-          {userData?.image ? (
-            <TeacherAvatar skin='light' color={'info'} variant='rounded' sx={{ width: 70, height: 70 }}>
-              <img style={{ width: '100%', height: '100%', objectFit: 'cover' }} src={userData?.image} alt='user' />
-            </TeacherAvatar>
-          ) : (
-            name && (
-              <CustomAvatar
-                skin='light'
-                variant='rounded'
-                color={'primary'}
-                sx={{ width: 70, height: 70, fontWeight: 600, mb: 1, fontSize: '2rem' }}
-              >
-                {getInitials(name)}
-              </CustomAvatar>
-            )
-          )}
-          <Box>
-            <Typography variant='h6' component='h3' gutterBottom>
-              {name}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-              <Chip
-                color='error'
-                label={`Baho: ${gpa?.toFixed(2)}`}
-                variant='outlined'
-                size='small'
-                sx={{
-                  color: Number(gpa) >= 4 ? 'green' : Number(gpa) >= 3 ? 'orange' : 'red',
-                  borderColor: Number(gpa) >= 4 ? 'green' : Number(gpa) >= 3 ? 'orange' : 'red'
-                }}
-              />
-              {userData?.qr_code && (
-                <img
-                  src={userData?.qr_code}
-                  alt=''
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setOpenModal(true)}
-                  width={50}
-                  height={50}
+        <Box display={'flex'} justifyContent={'space-between'} alignItems={'start'}>
+          <Box display='flex' gap={2} mb={3}>
+            {userData?.image ? (
+              <TeacherAvatar skin='light' color={'info'} variant='rounded' sx={{ width: 70, height: 70 }}>
+                <img style={{ width: '100%', height: '100%', objectFit: 'cover' }} src={userData?.image} alt='user' />
+              </TeacherAvatar>
+            ) : (
+              name && (
+                <CustomAvatar
+                  skin='light'
+                  variant='rounded'
+                  color={'primary'}
+                  sx={{ width: 70, height: 70, fontWeight: 600, mb: 1, fontSize: '2rem' }}
+                >
+                  {getInitials(name)}
+                </CustomAvatar>
+              )
+            )}
+            <Box>
+              <Typography variant='h6' component='h3' gutterBottom>
+                {name}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+                <Chip
+                  color='error'
+                  label={`Baho: ${gpa?.toFixed(2)}`}
+                  variant='outlined'
+                  size='small'
+                  sx={{
+                    color: Number(gpa) >= 4 ? 'green' : Number(gpa) >= 3 ? 'orange' : 'red',
+                    borderColor: Number(gpa) >= 4 ? 'green' : Number(gpa) >= 3 ? 'orange' : 'red'
+                  }}
                 />
-              )}
+                {userData?.qr_code && (
+                  <img
+                    src={userData?.qr_code}
+                    alt=''
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setOpenModal(true)}
+                    width={50}
+                    height={50}
+                  />
+                )}
+              </Box>
+              <Typography variant='body2' color='text.secondary' mt={1}>
+                ID: {id}
+              </Typography>
             </Box>
-            <Typography variant='body2' color='text.secondary' mt={1}>
-              ID: {id}
-            </Typography>
           </Box>
+          <div>
+            <IconButton size='small' onClick={() => {}}>
+              <IconifyIcon icon='mdi:dots-vertical' />
+            </IconButton>
+          </div>
         </Box>
 
         <Grid container spacing={2}>
