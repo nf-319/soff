@@ -7,22 +7,30 @@ import EditAnonimUserForm from './EditAnonimUserForm'
 import { FC } from 'react'
 import { QueryObserverResult, RefetchOptions, useQueryClient } from '@tanstack/react-query'
 import { LeadsType } from 'src/entities/lids'
-import { LeadsResult } from 'src/entities/lids/LeadsKaban'
+import { LeadsResult } from '../../../../entities/lids/LeadsKanban'
+import { setAddSource, setOpenLid, setSectionId } from '../../../../store/apps/leads'
+import { useAppDispatch } from '../../../../store'
 
 type Props = {
   open: any
   setOpen: any
   department?: any
   lead: any
-  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
+  onClose?: boolean
 }
 
-export const EditAnonimDialogDialog: FC<Props> = ({ department, refetch, lead, open, setOpen }) => {
+export const EditAnonimDialogDialog: FC<Props> = ({ department, onClose, lead, open, setOpen }) => {
   const { t } = useTranslation()
+  const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
 
   const closeCreateLid = async () => {
-    await refetch()
+    await  queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
+    if (onClose) {
+      dispatch(setOpenLid(null))
+      dispatch(setAddSource(false))
+      dispatch(setSectionId(null))
+    }
     setOpen(null)
   }
 
@@ -42,7 +50,7 @@ export const EditAnonimDialogDialog: FC<Props> = ({ department, refetch, lead, o
         <EditAnonimUserForm
           onClose={() => {
             setOpen(null)
-            refetch()
+            queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
           }}
           laed
           department={department}

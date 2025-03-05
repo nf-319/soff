@@ -1,29 +1,34 @@
 import { Close } from '@mui/icons-material'
 import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material'
-import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
+import { QueryObserverResult, RefetchOptions, useQueryClient } from '@tanstack/react-query'
 import MergeToDepartment from 'src/views/apps/lids/anonimUser/MergeForm'
 import { LeadsType } from '../model'
-import { LeadsResult, MenuOpenType } from '../LeadsKaban'
+import { LeadsResult, MenuOpenType } from '../LeadsKanban'
 import { Dispatch, FC, SetStateAction } from 'react'
 import { useTranslation } from 'react-i18next'
+import { setAddSource, setOpenLid, setSectionId } from '../../../store/apps/leads'
+import { useAppDispatch } from '../../../store'
 
 type Props = {
   open: string | null
   setOpen: Dispatch<SetStateAction<MenuOpenType>>
   leadId: string
   currentId: string
-  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
+  onClose?: boolean
 }
 
-export const AddDepartmantModal: FC<Props> = ({ currentId, open, setOpen, leadId, refetch }) => {
+export const AddDepartmantModal: FC<Props> = ({ onClose, currentId, open, setOpen, leadId }) => {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const dispatch = useAppDispatch()
 
   return (
     <Dialog open={open === 'merge-to' || open === 'merge-to-amo'} onClose={() => setOpen(null)}>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography>{t(open == 'merge-to' ? "Boshqa bo'limga o'tkazish" : "Soff crmga o'tkazish")}</Typography>
-        <IconButton>
-          <Close onClick={() => setOpen(null)} />
+
+        <IconButton onClick={() => setOpen(null)}>
+          <Close />
         </IconButton>
       </DialogTitle>
 
@@ -34,7 +39,14 @@ export const AddDepartmantModal: FC<Props> = ({ currentId, open, setOpen, leadId
           open={open}
           is_amocrm={false}
           item={{ id: leadId }}
-          reRender={() => refetch()}
+          reRender={async () => {
+            await queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
+            if (onClose) {
+              dispatch(setOpenLid(null))
+              dispatch(setAddSource(false))
+              dispatch(setSectionId(null))
+            }
+          }}
         />
       </DialogContent>
     </Dialog>

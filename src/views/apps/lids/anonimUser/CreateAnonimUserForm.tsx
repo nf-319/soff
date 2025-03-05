@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
-import { FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from '@mui/material'
+import { FormControl, FormHelperText, IconButton, InputLabel, MenuItem, Select, TextField } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -18,24 +18,25 @@ import IconifyIcon from '../../../../components/icon'
 import PhoneInput from '../../../../components/phone-input'
 import { reversePhone } from '../../../../components/phone-input/format-phone-number'
 import Router, { useRouter } from 'next/router'
-import KanbanItem from '../../../../components/card-statistics/kanban-item'
 import api from 'src/@core/utils/api'
 import { useGet } from 'src/hooks/useApi'
-import { LeadsResult } from 'src/entities/lids/LeadsKaban'
+import { LeadsResult } from '../../../../entities/lids/LeadsKanban'
 import { LeadsType } from 'src/entities/lids'
 import { useAuth } from 'src/hooks/useAuth'
-import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
+import { Ellipsis } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { LeadKanbanItem } from '../../../../entities/lids/LeadKanbanItem'
 
 type Props = {
   source?: any
   defaultId?: string
-  refetch?: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
 }
 
-export default function CreateAnonimUserForm({ source, defaultId, refetch }: Props) {
+export default function CreateAnonimUserForm({ source, defaultId }: Props) {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { user } = useAuth()
   const query = window.location?.search?.split('?slug=')[1]
 
@@ -87,7 +88,7 @@ export default function CreateAnonimUserForm({ source, defaultId, refetch }: Pro
     } catch (err) {
       console.error('Error fetching leads:', err)
     } finally {
-      if (refetch) await refetch()
+      await  queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
       dispatch(setDragonLoading(false))
     }
   }
@@ -103,7 +104,7 @@ export default function CreateAnonimUserForm({ source, defaultId, refetch }: Pro
       } else {
         formik.resetForm()
         dispatch(setSectionId(null))
-        if (refetch) await refetch()
+        await  queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
         await handleGetLealdItems()
         await dispatch(fetchDepartmentList())
       }
@@ -149,7 +150,9 @@ export default function CreateAnonimUserForm({ source, defaultId, refetch }: Pro
           <MenuItem sx={{ fontWeight: 600 }} onClick={() => dispatch(setOpenItem(openLid))}>
             {t('Yangi yaratish')}
 
-            <IconifyIcon icon={'ion:add-sharp'} />
+            <IconButton>
+              <Ellipsis />
+            </IconButton>
           </MenuItem>
         </Select>
         {!!errors.department && touched.department && (
@@ -220,13 +223,9 @@ export default function CreateAnonimUserForm({ source, defaultId, refetch }: Pro
       </FormControl>
 
       {errors?.user && (
-        <KanbanItem
-          id={newErrors.user.id}
-          phone={newErrors.user.phone}
-          last_activity={newErrors.last_activity}
-          status='new'
-          title={newErrors.user.first_name}
-          is_view
+        <LeadKanbanItem
+          onClose
+          lead={newErrors.user}
         />
       )}
 
