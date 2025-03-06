@@ -26,9 +26,14 @@ const DashboardStats = () => {
 
   const { data: stats, isLoading, refetch } = useGet('common/dashboard/statistic-list/')
 
-  useEffect(async () => {
-    await refetch()
-  },[user?.active_branch])
+  useEffect(() => {
+    const fetchData = async () => {
+      await refetch()
+    }
+
+    void fetchData()
+  }, [user?.active_branch])
+
 
   function click(link: string) {
     if (link === 'debtors_amount') {
