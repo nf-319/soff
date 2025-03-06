@@ -1,14 +1,14 @@
 import { Box, Dialog, DialogContent, FormControl, TextField, Typography } from '@mui/material'
-import { Dispatch, FC, SetStateAction, useState } from 'react'
-import { LeadsResult, MenuOpenType } from '../LeadsKaban'
+import { Dispatch, FC, SetStateAction } from 'react'
+import { MenuOpenType } from '../LeadsKanban'
 import { useTranslation } from 'react-i18next'
 import * as Yup from 'yup'
 import { LoadingButton } from '@mui/lab'
 import { useFormik } from 'formik'
 import api from 'src/@core/utils/api'
-import { useRouter } from 'next/router'
-import { QueryObserverResult, RefetchOptions, useQueryClient } from '@tanstack/react-query'
-import { LeadsType } from '../model'
+import { setAddSource, setOpenLid, setSectionId } from '../../../store/apps/leads'
+import { useAppDispatch } from '../../../store'
+import { useQueryClient } from '@tanstack/react-query'
 
 type Props = {
   open: string | null
@@ -16,11 +16,13 @@ type Props = {
   leadId: string
   leadFirstName: string
   leadPhone: string
-  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
+  onClose?: boolean
 }
 
-export const LeadDeleteModal: FC<Props> = ({ open, setOpen, refetch, leadId, leadFirstName, leadPhone }) => {
+export const LeadDeleteModal: FC<Props> = ({ open, onClose, setOpen, leadId, leadFirstName, leadPhone }) => {
   const { t } = useTranslation()
+  const dispatch = useAppDispatch()
+
   const query = useQueryClient()
   const formik = useFormik({
     initialValues: {
@@ -48,7 +50,12 @@ export const LeadDeleteModal: FC<Props> = ({ open, setOpen, refetch, leadId, lea
     }
     try {
       const resp = await api.patch(`leads/anonim-user/update/${id}/`, newValues)
-      await refetch()
+      if (onClose) {
+        dispatch(setOpenLid(null))
+        dispatch(setAddSource(false))
+        dispatch(setSectionId(null))
+      }
+      await  query.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
       return Promise.resolve(resp)
     } catch (err: any) {
       return Promise.reject(err)

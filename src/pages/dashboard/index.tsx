@@ -19,13 +19,13 @@ const AppCalendar = () => {
       !user?.role.includes('watcher') &&
       !user?.role.includes('marketolog')
     ) {
-      router.push('/')
+      void router.push('/')
       toast.error('Sahifaga kirish huquqingiz yoq!')
     }
   }
 
   useEffect(() => {
-    pageLoad()
+    void pageLoad()
   }, [])
 
   return user?.currentRole === 'teacher' || (user?.role.length === 1 && user.role.includes('teacher')) ? (

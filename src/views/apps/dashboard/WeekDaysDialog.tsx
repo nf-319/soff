@@ -7,7 +7,7 @@ import FormControl from '@mui/material/FormControl'
 import Button from '@mui/material/Button'
 import IconifyIcon from '../../../components/icon'
 import { useAppDispatch, useAppSelector } from "src/store"
-import { handleOpen, handleChangeWeeks } from 'src/store/apps/dashboard'
+import { handleOpen, handleChangeWeeks } from '../../../store/apps/dashboard'
 import { TranslateWeekName } from "src/pages/groups"
 import useResponsive from "src/@core/hooks/useResponsive"
 

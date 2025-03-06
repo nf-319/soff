@@ -21,8 +21,7 @@ type Props = {
   loading?: boolean
 }
 
-const UserSuspendDialog = (props: Props) => {
-  const { open, setOpen, handleOk, okText, loading } = props
+const UserSuspendDialog = ({ open, setOpen, handleOk, okText, loading }: Props) => {
   const { t } = useTranslation()
 
   const [userInput, setUserInput] = useState<string>('yes')

@@ -108,7 +108,6 @@ const AppBarContent = (props: Props) => {
         </Box>
 
         <VideoModal />
-        <Box></Box>
 
         {!isMobile && (
           <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -194,7 +193,7 @@ const AppBarContent = (props: Props) => {
       </Box>
       {isMobile && user?.role.join(', ') !== 'student' && (
         <Autocomplete
-          sx={{ padding: 5 }}
+          sx={{ paddingY: 5 }}
           disablePortal
           onClose={() => {
             setEmployees([])
