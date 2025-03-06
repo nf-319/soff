@@ -4,12 +4,10 @@ import Tab from '@mui/material/Tab'
 import TabList from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { handleTabValue, handleOpen, fetchLessons, updateInterval } from 'src/store/apps/dashboard'
+import { handleTabValue, handleOpen, updateInterval } from 'src/store/apps/dashboard'
 import { useTranslation } from 'react-i18next'
 import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material'
 import { FC } from 'react'
-import { useGet } from 'src/hooks/useApi'
-import { useState } from 'react'
 import useResponsive from 'src/@core/hooks/useResponsive'
 
 type Props = {
@@ -42,7 +40,6 @@ const CalendarTabs: FC<Props> = ({ handleUpdateWeekDays }) => {
 
   async function handleChangeInterval(interval: string) {
     dispatch(updateInterval(interval))
-    // await dispatch(fetchLessons({ queryWeeks: weeks, interval: interval }))
   }
 
   return (

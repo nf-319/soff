@@ -16,7 +16,7 @@ import { AuthContext } from 'src/context/AuthContext'
 import { useContext, useEffect } from 'react'
 
 const DashboardStats = () => {
-  const { statsData, isStatsLoading } = useAppSelector(state => state.dashboard)
+  const { statsData } = useAppSelector(state => state.dashboard)
 
   const dispatch = useAppDispatch()
   const { isMobile, isTablet } = useResponsive()
@@ -26,8 +26,8 @@ const DashboardStats = () => {
 
   const { data: stats, isLoading, refetch } = useGet('common/dashboard/statistic-list/')
 
-  useEffect(() => {
-    refetch()
+  useEffect(async () => {
+    await refetch()
   },[user?.active_branch])
 
   function click(link: string) {
@@ -51,7 +51,7 @@ const DashboardStats = () => {
       return push('/students')
     }
 
-    push(link)
+    void push(link)
   }
 
   const tooltip = {
@@ -60,9 +60,8 @@ const DashboardStats = () => {
     active_debts_count: `Umumiy qarzdor o'quvchilar soni : ${stats?.debtor_users} ta, arxivdagi o'quvchilar soni : ${stats?.active_debts_count} ta (1 ta o'quvchi 2 va undan ortiq guruhda o'qishi mumkin)`,
     active_debts_amount: `Umumiy o'quvchilar qarzdorligi : ${formatCurrency(stats?.debtors_amount) + " so'm"}
     ${
-      stats?.archive_debts_amount < 0
-        ? `Arxivdagi o'quvchilar qarzdorligi : ${formatCurrency(stats.archive_debts_amount) + " so'm"}`
-        : ''
+      stats?.archive_debts_amount < 0 &&
+      `Arxivdagi o'quvchilar qarzdorligi : ${formatCurrency(stats.archive_debts_amount) + " so'm"}`
     }
     `,
     leads_count: "Kurslarga ro'yxatdan o'tgan faol lidlar soni",
@@ -81,32 +80,31 @@ const DashboardStats = () => {
         gridTemplateColumns: `repeat(${isMobile ? 3 : isTablet ? 4 : 9}, 1fr)`
       }}
     >
-      {isLoading
-        ? statsData.map((_, index) => (
-            <Box key={`${_.key}-${index}`} className='' sx={{ cursor: 'pointer' }} onClick={() => click(_.link)}>
-              <Skeleton
-                sx={{ bgcolor: 'grey.300' }}
-                variant='rectangular'
-                width={'100%'}
-                height={'140px'}
-                style={{ borderRadius: '10px' }}
-                animation='wave'
-              />
-            </Box>
-          ))
-        : ''}
+      {isLoading &&
+        statsData.map((_, index) => (
+          <Box key={`${_.key}-${index}`} className='' sx={{ cursor: 'pointer' }} onClick={() => click(_.link)}>
+            <Skeleton
+              sx={{ bgcolor: 'grey.300' }}
+              variant='rectangular'
+              width={'100%'}
+              height={'140px'}
+              style={{ borderRadius: '10px' }}
+              animation='wave'
+            />
+          </Box>
+        ))}
 
       {stats && !isLoading
         ? stats?.payment_approaching
-          ? statsData.map((_, index) => (
-              <Tooltip key={`${_.key}-${index}`} arrow title={tooltip[_.key]}>
-                <Box sx={{ cursor: 'pointer' }} onClick={() => click(_.link)}>
+          ? statsData.map((item, index) => (
+              <Tooltip key={`${item.key}-${index}`} arrow title={tooltip[item.key]}>
+                <Box sx={{ cursor: 'pointer' }} onClick={() => click(item.link)}>
                   <CardStatsVertical
-                    data_key={_.key}
-                    title={stats?.[_.key]}
-                    stats={t(_.title)}
-                    icon={<IconifyIcon fontSize={'4rem'} icon={_.icon} />}
-                    color={_.color}
+                    data_key={item.key}
+                    title={stats?.[item.key]}
+                    stats={t(item.title)}
+                    icon={<IconifyIcon fontSize={'4rem'} icon={item.icon} />}
+                    color={item.color}
                   />
                 </Box>
               </Tooltip>
@@ -131,4 +129,5 @@ const DashboardStats = () => {
   )
 }
 
+DashboardStats.displayName = 'DashboardStats'
 export default DashboardStats

@@ -10,7 +10,7 @@ import email from 'src/store/apps/email'
 import invoice from 'src/store/apps/invoice'
 import calendar from 'src/store/apps/calendar'
 import permissions from 'src/store/apps/permissions'
-import dashboard from 'src/store/apps/dashboard'
+import dashboard from './apps/dashboard'
 import leads from 'src/store/apps/leads'
 import groups from 'src/store/apps/groups'
 import mentors from 'src/store/apps/mentors'
@@ -52,7 +52,7 @@ export const store = configureStore({
     logs,
     attendance,
     investmentSlice
-    
+
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
