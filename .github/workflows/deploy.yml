@@ -34,6 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test' || github.ref == 'refs/heads/development' }}
 
+    env:
+      SERVER_HOST: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/test' && secrets.TEST_SERVER_HOST || secrets.DEV_SERVER_HOST }}
+
     steps:
       - name: Repositoryni klon qilish
         uses: actions/checkout@v4
@@ -46,9 +49,9 @@ jobs:
 
       - name: `.env` faylini yaratish
         run: |
-          if [[ $GITHUB_REF_NAME == "main" ]]; then
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "${{ secrets.PROD_ENV_FILE }}" > .env
-          elif [[ $GITHUB_REF_NAME == "test" ]]; then
+          elif [[ "${{ github.ref }}" == "refs/heads/test" ]]; then
             echo "${{ secrets.TEST_ENV_FILE }}" > .env
           else
             echo "${{ secrets.DEV_ENV_FILE }}" > .env
@@ -62,9 +65,9 @@ jobs:
       - name: Deploy qilish uchun serverga bog'lanish
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ github.ref_name == 'main' && secrets.PROD_SERVER_HOST || github.ref_name == 'test' && secrets.TEST_SERVER_HOST || secrets.DEV_SERVER_HOST }}
-          username: ${{ github.ref_name == 'main' && secrets.PROD_SERVER_USER || github.ref_name == 'test' && secrets.TEST_SERVER_USER || secrets.DEV_SERVER_USER }}
-          key: ${{ github.ref_name == 'main' && secrets.PROD_SERVER_SSH_KEY || github.ref_name == 'test' && secrets.TEST_SERVER_SSH_KEY || secrets.DEV_SERVER_SSH_KEY }}
+          host: ${{ env.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             set -e
             PROJECT_DIR="/projects/frontend/${{ github.ref_name }}"
@@ -80,18 +83,18 @@ jobs:
       - name: Build fayllarni yuborish
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ github.ref_name == 'main' && secrets.PROD_SERVER_HOST || github.ref_name == 'test' && secrets.TEST_SERVER_HOST || secrets.DEV_SERVER_HOST }}
-          username: ${{ github.ref_name == 'main' && secrets.PROD_SERVER_USER || github.ref_name == 'test' && secrets.TEST_SERVER_USER || secrets.DEV_SERVER_USER }}
-          key: ${{ github.ref_name == 'main' && secrets.PROD_SERVER_SSH_KEY || github.ref_name == 'test' && secrets.TEST_SERVER_SSH_KEY || secrets.DEV_SERVER_SSH_KEY }}
+          host: ${{ env.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
           source: '.next/,public/,package.json,package-lock.json,next.config.js,.env'
           target: '/projects/frontend/${{ github.ref_name }}'
 
       - name: Application'ni restart qilish
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ github.ref_name == 'main' && secrets.PROD_SERVER_HOST || github.ref_name == 'test' && secrets.TEST_SERVER_HOST || secrets.DEV_SERVER_HOST }}
-          username: ${{ github.ref_name == 'main' && secrets.PROD_SERVER_USER || github.ref_name == 'test' && secrets.TEST_SERVER_USER || secrets.DEV_SERVER_USER }}
-          key: ${{ github.ref_name == 'main' && secrets.PROD_SERVER_SSH_KEY || github.ref_name == 'test' && secrets.TEST_SERVER_SSH_KEY || secrets.DEV_SERVER_SSH_KEY }}
+          host: ${{ env.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             set -e
             cd /projects/frontend/${{ github.ref_name }}
