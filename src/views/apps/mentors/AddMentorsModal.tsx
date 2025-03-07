@@ -178,7 +178,7 @@ const AddMentorsModal = () => {
             <IconifyIcon fontSize={40} icon={'material-symbols-light:add-a-photo-outline'} />
           )}
           <VisuallyHiddenInput
-            onChange={e => setImage(e.target?.files?.[0])}
+            onChange={(e: any) => setImage(e.target?.files?.[0])}
             ref={profilePhoto}
             type='file'
             accept='.png, .jpg, .jpeg, .webp, .HEIC, .heic'

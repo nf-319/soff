@@ -3,15 +3,17 @@ name: NextJS Frontend CI/CD Workflow
 on:
   push:
     branches:
-      # - main
+      - main
       - test
+      - development
 
 jobs:
   lint-and-test:
-    name: create dotenv
+    name: Lint va Test
     runs-on: ubuntu-latest
+
     steps:
-      - name: Repository clone qilish
+      - name: Repositoryni klon qilish
         uses: actions/checkout@v4
 
       - name: Node.js o'rnatish
@@ -20,18 +22,23 @@ jobs:
           node-version: '20.x'
           cache: 'npm'
 
-      - name: .env faylini yaratish
-        run: |
-          echo "${{ secrets.ENV_FILE }}" > .env
+      - name: `.env` faylini yaratish
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Paketlarni o'rnatish
+        run: npm ci
 
   build-and-deploy:
     name: Build va Deploy
     needs: lint-and-test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/development')
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test' || github.ref == 'refs/heads/development'
+
+    env:
+      SERVER_HOST: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/test' && secrets.TEST_SERVER_HOST || secrets.DEV_SERVER_HOST }}
 
     steps:
-      - name: Repository clone qilish
+      - name: Repositoryni klon qilish
         uses: actions/checkout@v4
 
       - name: Node.js o'rnatish
@@ -40,88 +47,71 @@ jobs:
           node-version: '20.x'
           cache: 'npm'
 
-      - name: Environment o'zgaruvchilarini tayyorlash
+      - name: `.env` faylini yaratish
         run: |
-          if [[ $GITHUB_REF == refs/heads/main ]]; then
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "${{ secrets.PROD_ENV_FILE }}" > .env
-          elif [[ $GITHUB_REF == refs/heads/staging ]]; then
-            echo "${{ secrets.STAGING_ENV_FILE }}" > .env
+          elif [[ "${{ github.ref }}" == "refs/heads/test" ]]; then
+            echo "${{ secrets.TEST_ENV_FILE }}" > .env
           else
             echo "${{ secrets.DEV_ENV_FILE }}" > .env
           fi
 
       - name: Build yaratish
-        run: npm run build
+        run: |
+          npm ci
+          npm run build
 
       - name: Deploy qilish uchun serverga bog'lanish
         uses: appleboy/ssh-action@v1.0.0
-        env:
-          BRANCH_NAME: ${{ github.ref_name }}
         with:
-          host: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_HOST || secrets.DEV_SERVER_HOST }}
-          username: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_USER || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_USER || secrets.DEV_SERVER_USER }}
-          key: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_SSH_KEY || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_SSH_KEY || secrets.DEV_SERVER_SSH_KEY }}
-          script_stop: true
-          envs: BRANCH_NAME
+          host: ${{ env.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             set -e
-            # Loyiha papkasini yaratish
-            PROJECT_DIR="/projects/frontend/${BRANCH_NAME}"
+            PROJECT_DIR="/projects/frontend/${{ github.ref_name }}"
             mkdir -p $PROJECT_DIR
 
-            # Joriy sana bilan backup papkasini yaratish
-            BACKUP_DIR="${PROJECT_DIR}_backup_$(date +%Y%m%d_%H%M%S)"
-
-            # Agar avvalgi versiya mavjud bo'lsa backup qilish
+            # Avvalgi versiyani backup qilish
             if [ -d "${PROJECT_DIR}/.next" ]; then
+              BACKUP_DIR="${PROJECT_DIR}_backup_$(date +%Y%m%d_%H%M%S)"
               mkdir -p $BACKUP_DIR
               cp -r ${PROJECT_DIR}/.next ${PROJECT_DIR}/package.json ${PROJECT_DIR}/package-lock.json $BACKUP_DIR
             fi
 
-            # Yangi build fayllarni yuborish
-            echo "Build fayllarni yuborish boshlanmoqda..."
-
       - name: Build fayllarni yuborish
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_HOST || secrets.DEV_SERVER_HOST }}
-          username: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_USER || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_USER || secrets.DEV_SERVER_USER }}
-          key: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_SSH_KEY || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_SSH_KEY || secrets.DEV_SERVER_SSH_KEY }}
+          host: ${{ env.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
           source: '.next/,public/,package.json,package-lock.json,next.config.js,.env'
           target: '/projects/frontend/${{ github.ref_name }}'
-          strip_components: 0
 
       - name: Application'ni restart qilish
         uses: appleboy/ssh-action@v1.0.0
-        env:
-          BRANCH_NAME: ${{ github.ref_name }}
-          APP_NAME: ${{ secrets.APP_NAME || 'nextjs-app' }}
         with:
-          host: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_HOST || secrets.DEV_SERVER_HOST }}
-          username: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_USER || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_USER || secrets.DEV_SERVER_USER }}
-          key: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_SSH_KEY || github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER_SSH_KEY || secrets.DEV_SERVER_SSH_KEY }}
-          script_stop: true
-          envs: BRANCH_NAME,APP_NAME
+          host: ${{ env.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             set -e
-            cd /projects/frontend/${BRANCH_NAME}
+            cd /projects/frontend/${{ github.ref_name }}
 
-            # Node.js versiyasini o'rnatish
+            # Node.js versiyasini tanlash
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             nvm use 20 || nvm install 20
 
-            # PM2 bilan serviceni boshqarish
-            SERVICE_NAME="${APP_NAME}-${BRANCH_NAME}"
+            # PM2 bilan servisni boshqarish
+            SERVICE_NAME="nextjs-app-${{ github.ref_name }}"
 
             if pm2 list | grep -q "$SERVICE_NAME"; then
-              echo "Servisni qayta ishga tushirish: $SERVICE_NAME"
               pm2 restart "$SERVICE_NAME"
             else
-              echo "Yangi servisni yaratish: $SERVICE_NAME"
               pm2 start npm --name "$SERVICE_NAME" -- start
             fi
 
             pm2 save
-
-            echo "Deploy muvaffaqiyatli yakunlandi!"
+            echo "✅ Deploy muvaffaqiyatli yakunlandi!"

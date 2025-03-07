@@ -35,86 +35,79 @@ const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const dispatch = useAppDispatch()
 
   const initAuth = async (): Promise<void> => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)!
-    if (storedToken) {
-      const settings: any = window.localStorage.getItem('settings')
-      await i18n.changeLanguage(JSON.parse(settings)?.locale || 'uz')
+    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
-      setLoading(true)
-      await api
-        .get(authConfig.meEndpoint, {
-          headers: {
-            Authorization: `Bearer ${storedToken}`
-          }
-        })
-        .then(async response => {
-          setLoading(false)
-          if (response?.data) {
-            dispatch(
-              setRoles(response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()))
-            )
-          }
-
-          setUser({
-            phone: response.data.phone,
-            last_login: response.data?.last_login,
-            gpa: response.data.gpa,
-            id: response.data.id,
-            fullName: response.data.first_name,
-            username: response.data.phone,
-            password: 'null',
-            currentRole: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase())[0],
-            avatar: response.data.image,
-            payment_page: response.data.payment_page,
-            role: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()),
-            balance: response.data?.balance || 0,
-            branches: response.data.branches,
-            active_branch: response.data.active_branch,
-            qr_code: response.data.qr_code
-          })
-        })
-        .catch(error => {
-          console.error('Auth Error:', error)
-          localStorage.clear()
-          setUser(null)
-          setLoading(false)
-          if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
-            router.push('/login')
-          }
-        })
-
-      if (
-        !window.location.hostname.split('.').includes('c-panel') &&
-        !window.location.hostname.split('.').includes('localhost')
-      ) {
-        const resp = await api.get('common/settings/list/')
-        dispatch(setCompanyInfo(resp.data[0]))
-      }
-    } else {
+    if (!storedToken) {
       setLoading(false)
       window.localStorage.removeItem('accessToken')
       window.localStorage.removeItem('userData')
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const settings: any = window.localStorage.getItem('settings')
+      await i18n.changeLanguage(JSON.parse(settings)?.locale || 'uz')
+
+      const response = await api.get(authConfig.meEndpoint, {
+        headers: { Authorization: `Bearer ${storedToken}` }
+      })
+
+      if (response?.data) {
+        dispatch(
+          setRoles(response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()))
+        )
+
+        setUser({
+          phone: response.data.phone,
+          last_login: response.data?.last_login,
+          gpa: response.data.gpa,
+          id: response.data.id,
+          fullName: response.data.first_name,
+          username: response.data.phone,
+          password: 'null',
+          currentRole: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase())[0],
+          avatar: response.data.image,
+          payment_page: response.data.payment_page,
+          role: response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase()),
+          balance: response.data?.balance || 0,
+          branches: response.data.branches,
+          active_branch: response.data.active_branch,
+          qr_code: response.data.qr_code
+        })
+      }
+    } catch (error) {
+      console.error('Auth Error:', error)
+      localStorage.clear()
+      setUser(null)
+      if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
+        void router.push('/login')
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
-  useEffect(() => {
-    const fetchAuth = async () => {
-      await initAuth()
-    }
 
-    void fetchAuth()
+  useEffect(() => {
+    void initAuth()
   }, [])
 
   useEffect(() => {
-    void router.push({ pathname, query }, asPath)
+    if (router.locale !== i18n.language) {
+      void router.replace({ pathname, query }, asPath, { locale: i18n.language })
+    }
   }, [i18n.language])
 
   const handleLogout = () => {
     setUser(null)
     localStorage.clear()
     sessionStorage.clear()
-    Object.keys(Cookie.get()).forEach(cookie => Cookie.remove(cookie))
-    router.push('/login')
+
+    Object.keys(Cookie.get()).forEach(cookie => Cookie.remove(cookie, { path: '/' })) // <-- path bilan o‘chirish
+
+    void router.push('/login')
   }
 
   const handleRegister = (params: RegisterParams, errorCallback?: ErrCallbackType) => {
