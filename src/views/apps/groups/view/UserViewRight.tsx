@@ -1,31 +1,29 @@
-// ** React Imports
-import { SyntheticEvent, useState, useEffect, useContext } from 'react'
+'use client'
 
-// ** Next Import
+import { SyntheticEvent, useState, useEffect, useContext, FC } from 'react'
 import { useRouter } from 'next/router'
-
-// ** MUI Imports
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import ButtonGroup from '@mui/material/ButtonGroup'
 import TabList from '@mui/lab/TabList'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
 import { styled } from '@mui/material/styles'
 import MuiTab, { TabProps } from '@mui/material/Tab'
-import Icon from '../../../../components/icon'
+import Icon from 'src/components/icon'
 import UserViewBilling from 'src/views/apps/groups/view/UserViewBilling'
 import UserViewOverview from 'src/views/apps/groups/view/GroupsNotes/UserViewOverview'
 import UserViewSecurity from 'src/views/apps/groups/view/UserViewSecurity'
 import GroupExamsList from './GroupExamList/GroupExamsList'
 import { useTranslation } from 'react-i18next'
 import { AuthContext } from 'src/context/AuthContext'
-import { getAttendance, getAttendanceTeacher, setDays, setResultId } from 'src/store/apps/groupDetails'
+import { getAttendanceTeacher, setResultId } from 'src/store/apps/groupDetails'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import GroupStudentGrades from './GroupStudentGrades/GroupStudentGradesList'
 import AttendanceTable from './GroupAttandance'
-import { Button, ButtonGroup } from '@mui/material'
 import dayjs from 'dayjs'
 
-interface Props {
+type Props = {
   tab: string
 }
 
@@ -38,7 +36,7 @@ const Tab = styled(MuiTab)<TabProps>(({ theme }) => ({
   }
 }))
 
-const UserViewRight = ({ tab }: Props) => {
+const UserViewRight: FC<Props> = ({ tab }) => {
   const [activeTab, setActiveTab] = useState<string>(tab)
   const { t } = useTranslation()
   const { user } = useContext(AuthContext)
@@ -47,18 +45,20 @@ const UserViewRight = ({ tab }: Props) => {
   const [buttonActive, setButtonActive] = useState(true)
   const today = dayjs().format('YYYY-MM-DD')
   const { attendance } = useAppSelector(state => state.groupDetails)
+
   const handleChange = (event: SyntheticEvent, value: string) => {
     setActiveTab(value)
     const path = router.route.replace('[tab]', value.toLowerCase())
     dispatch(setResultId(null))
-    router.push({
+
+    void router.push({
       pathname: path,
       query: { id: router.query.id, month: router.query.month }
     })
   }
 
-  async function handleChangeButton(status: boolean) {
-    if (status === false) {
+  const handleChangeButton = async (status: boolean) => {
+    if (!status) {
       dispatch(
         getAttendanceTeacher({ date: today, group: router.query.id, queryString: 'status=active&is_teacher=true' })
       )
@@ -72,31 +72,33 @@ const UserViewRight = ({ tab }: Props) => {
     }
   }, [tab])
 
-
-
   return (
     <TabContext value={activeTab}>
       <Box>
-        {/* {user?.role.length == 1 && user.role.includes('teacher') && (
-          <ButtonGroup fullWidth aria-label='Basic button group'>
-            <Button
-              variant={buttonActive ? 'contained' : 'outlined'}
-              onClick={() => {
-                handleChangeButton(true), setActiveTab('security')
-              }}
-            >
-              Oylik
-            </Button>
-            <Button
-              variant={!buttonActive ? 'contained' : 'outlined'}
-              onClick={() => {
-                handleChangeButton(false), setActiveTab('attendance')
-              }}
-            >
-              Kunlik
-            </Button>
-          </ButtonGroup>
-        )} */}
+        {/*{user?.currentRole === 'teacher' && user.role.includes('teacher') && (*/}
+        {/*  <ButtonGroup fullWidth aria-label='Basic button group'>*/}
+        {/*    <Button*/}
+        {/*      variant={buttonActive ? 'contained' : 'outlined'}*/}
+        {/*      onClick={() => {*/}
+        {/*        void handleChangeButton(true)*/}
+        {/*        setActiveTab('security')*/}
+        {/*      }}*/}
+        {/*    >*/}
+        {/*      Oylik*/}
+        {/*    </Button>*/}
+
+        {/*    <Button*/}
+        {/*      variant={!buttonActive ? 'contained' : 'outlined'}*/}
+        {/*      onClick={() => {*/}
+        {/*        void handleChangeButton(false)*/}
+        {/*        setActiveTab('attendance')*/}
+        {/*      }}*/}
+        {/*    >*/}
+        {/*      Kunlik*/}
+        {/*    </Button>*/}
+        {/*  </ButtonGroup>*/}
+        {/*)}*/}
+
         <TabList
           variant='scrollable'
           scrollButtons='auto'
@@ -116,24 +118,30 @@ const UserViewRight = ({ tab }: Props) => {
           )}
         </TabList>
       </Box>
+
       <Box sx={{ mt: 2 }}>
-        <TabPanel sx={{ p: 0 }} value='security'>
+        <TabPanel sx={{ p: 0, width: '100%' }} value='security'>
           <UserViewSecurity />
         </TabPanel>
+
         {!buttonActive && (
           <TabPanel sx={{ p: 0 }} value='attendance'>
             <AttendanceTable attendance={attendance} />
           </TabPanel>
         )}
+
         <TabPanel sx={{ p: 0 }} value='grade'>
           <GroupStudentGrades />
         </TabPanel>
+
         <TabPanel sx={{ p: 0 }} value='exams'>
           <GroupExamsList />
         </TabPanel>
+
         <TabPanel sx={{ p: 0 }} value='notes'>
           <UserViewOverview />
         </TabPanel>
+
         <TabPanel sx={{ p: 0 }} value='discount'>
           <UserViewBilling />
         </TabPanel>
@@ -142,4 +150,5 @@ const UserViewRight = ({ tab }: Props) => {
   )
 }
 
+UserViewRight.displayName = 'UserViewRight'
 export default UserViewRight

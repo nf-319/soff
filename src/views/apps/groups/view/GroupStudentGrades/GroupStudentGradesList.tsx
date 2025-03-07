@@ -1,31 +1,29 @@
-import { Box, Button, Chip, ClickAwayListener, MenuItem, Select, TextField, Typography } from '@mui/material'
+'use client'
+
+import { Box, Button, Chip, TextField, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
-import IconifyIcon from '../../../../../components/icon'
-import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip'
-import { useEffect, useState } from 'react'
+import IconifyIcon from 'src/components/icon'
+import Tooltip from '@mui/material/Tooltip'
+import { FC, useEffect, useState } from 'react'
 import api from 'src/@core/utils/api'
 import getMontName, { getMontNumber } from 'src/@core/utils/gwt-month-name'
-import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
-import { EmptyContent } from '../../../../../components/empty-content'
+import { EmptyContent } from 'src/components/empty-content'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { getDays, getStudentsGrades, updateGradeParams } from 'src/store/apps/groupDetails'
 import { toast } from 'react-hot-toast'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import SubLoader from 'src/views/apps/loaders/SubLoader'
 import dayjs from 'dayjs'
+import { usePost } from 'src/hooks/useApi'
+import useDebounce from 'src/hooks/useDebounce'
 
 type Result = {
   date: string
   year: string
 }
-const Item = ({
-  defaultValue,
-  userId,
-  date,
-  opened_id,
-  setOpenedId
-}: {
+
+type Props =   {
   currentDate: any
   defaultValue: any
   groupId?: any
@@ -33,114 +31,90 @@ const Item = ({
   date?: any
   opened_id: any
   setOpenedId: any
-}) => {
+}
+
+const Item: FC<Props> = ({ defaultValue, userId, date, setOpenedId }) => {
   const [value, setValue] = useState<number>(defaultValue)
-  const [open, setOpen] = useState<boolean>(false)
-  const dispatch = useAppDispatch()
-  const { query } = useRouter()
-  const handleGradeClick = async (grade: number) => {
-    // if (grade < 1 || grade >= 100) {
-    //   toast.error('1 dan 100 gacha bo‘lgan sonlarni tanlashingiz mumkin')
-    //   return
-    // }
 
-    setOpenedId(null)
-
-    if (value !== grade) {
-      setValue(grade)
-      const data = {
-        group_student: userId,
-        date: date,
-        score: grade || 0
-      }
-
-      try {
-        await api.post(`common/group-student/rating/create/`, data)
-        // await dispatch(getStudentsGrades({ id: query?.id, queryString: '' }))
-      } catch (e: any) {
-        toast.error(e.response?.data.msg || 'Bahoni saqlab bo‘lmadi, qayta urinib ko‘ring')
-        setValue(defaultValue)
-      }
-    }
-
-    setOpen(false)
-  }
+  const { mutate } = usePost()
+  const gradeDebounce = useDebounce(String(value), 600)
 
   useEffect(() => {
-    if (`${userId}-${date}` === opened_id) {
-      setOpen(true)
-    } else {
-      setOpen(false)
+    if (gradeDebounce && Number(gradeDebounce) !== defaultValue) {
+      mutate(`common/group-student/rating/create/`, {
+        group_student: userId,
+        date: date,
+        score: Number(gradeDebounce)
+      })
     }
-  }, [opened_id])
+  }, [gradeDebounce])
+
+  const handleGradeChange = (e: any) => {
+    const inputValue = e.target.value.replace(/[^\d]/g, '')
+
+    let newGrade = Number(inputValue)
+
+    if (inputValue === '') {
+      newGrade = 0
+    } else if (newGrade > 100) {
+      newGrade = 100
+      e.target.value = '100'
+    }
+
+    setValue(newGrade)
+    setOpenedId(null)
+  }
 
   return (
     <Box sx={{ position: 'relative' }}>
       {value != null ? (
-        <ClickAwayListener onClickAway={() => setOpen(false)}>
-          <Box sx={{ position: 'relative' }}>
-            <TextField
-              variant='outlined'
-              value={value}
-              onChange={(e: any) => handleGradeClick(e.target.value)}
-              onClick={() => setOpen(true)}
-              size='small'
-              // inputProps={{ readOnly: true }}
-              sx={{
-                width: '50px',
-                display: 'flex',
-                justifyContent: 'center',
-                textAlign: 'center',
-                cursor: 'pointer',
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px',
-                  backgroundColor: '#fff',
-                  borderColor: '#ccc'
+        <Box sx={{ position: 'relative' }}>
+          <TextField
+            variant='outlined'
+            value={value}
+            onChange={(e: any) => handleGradeChange(e)}
+            size='small'
+            type='text'
+            inputProps={{
+              inputMode: 'numeric',
+              pattern: '[0-9]*',
+              maxLength: 3,
+              min: 0,
+              max: 100
+            }}
+            onKeyDown={(e: React.KeyboardEvent) => {
+              if (
+                (value === 100 || (value >= 10 && value < 100)) &&
+                e.key !== 'Backspace' &&
+                e.key !== 'Delete' &&
+                e.key !== 'ArrowLeft' &&
+                e.key !== 'ArrowRight' &&
+                e.key !== 'Tab' &&
+                !/^\d$/.test(e.key)
+              ) {
+                const newValue = String(value) + e.key.replace(/[^\d]/g, '')
+                if (Number(newValue) > 100) {
+                  e.preventDefault()
                 }
-              }}
-            />
-            {/* {open && (
-              <Tooltip
-                open
-                title={
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      textAlign: 'center',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    {[1, 2, 3, 4, 5].map(grade => (
-                      <Typography
-                        key={grade}
-                        variant='body2'
-                        onClick={() => handleGradeClick(grade)}
-                        sx={{
-                          textAlign: 'center',
-                          color: 'white',
-                          cursor: 'pointer',
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          '&:hover': {
-                            backgroundColor: 'gray'
-                          }
-                        }}
-                      >
-                        {grade}
-                      </Typography>
-                    ))}
-                  </Box>
-                }
-                arrow
-                placement='bottom'
-              >
-                <span />
-              </Tooltip>
-            )} */}
-          </Box>
-        </ClickAwayListener>
+              }
+            }}
+            sx={{
+              width: '50px',
+              display: 'flex',
+              justifyContent: 'center',
+              textAlign: 'center',
+              cursor: 'pointer',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+                backgroundColor: '#fff',
+                borderColor: '#ccc'
+              },
+              '& input': {
+                textAlign: 'center'
+              }
+            }}
+          />
+        </Box>
       ) : (
         <Tooltip title="Yopiq baho (o'zgartirib bo'lmaydi)" arrow>
           <span>
