@@ -32,7 +32,7 @@ jobs:
     name: Build va Deploy
     needs: lint-and-test
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test' || github.ref == 'refs/heads/development' }}
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test' || github.ref == 'refs/heads/development'
 
     env:
       SERVER_HOST: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/test' && secrets.TEST_SERVER_HOST || secrets.DEV_SERVER_HOST }}
