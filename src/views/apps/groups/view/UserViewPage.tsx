@@ -25,12 +25,14 @@ import {
 import { setRoomsData, setTeacherData } from 'src/store/apps/groups'
 import UserViewLeft from 'src/views/apps/groups/view/GroupViewLeft/UserViewLeft'
 import UserViewRight from 'src/views/apps/groups/view/UserViewRight'
+import useResponsive from 'src/@core/hooks/useResponsive'
 
 const UserView = () => {
   const router = useRouter()
   const url = `${router.query.tab}`
   const { queryParams } = useAppSelector(state => state.groupDetails)
   const { user } = useContext(AuthContext)
+  const { isMobile } = useResponsive()
   const dispatch = useAppDispatch()
 
   const getTeachers = async () => {
@@ -94,9 +96,9 @@ const UserView = () => {
 
   return (
     <div>
-      <Box display={'flex'} justifyContent={'end'} gap={5}>
+      <Box mb={isMobile ? 3 : 0} display={isMobile ? '' : 'flex'} justifyContent={'end'} gap={5}>
         <Box sx={{ marginBottom: '10px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-          <ExcelGrades url={`/common/ratings/export/${router.query.id}`} />
+          <ExcelGrades width={isMobile ? '100%' : 'auto'} url={`/common/ratings/export/${router.query.id}`} />
         </Box>
 
         <VideoHeader item={videoUrls.group} />

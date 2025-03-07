@@ -41,7 +41,7 @@ export type customTableProps = {
   render?: (source: any) => any | undefined
 }
 
-export default function GroupsPage() {
+export default function StudentsPage() {
   const { t } = useTranslation()
   const router = useRouter()
   const { isMobile } = useResponsive()
@@ -266,7 +266,7 @@ export default function GroupsPage() {
         </Box>
       )}
 
-      {!isMobile && <StudentsFilter isMobile={isMobile} />}
+      {!isMobile && <StudentsFilter students={data?.results} isMobile={isMobile} />}
 
       <DataTable
         color

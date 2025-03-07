@@ -33,11 +33,12 @@ import ceoConfigs from 'src/configs/ceo'
 
 type StudentsFilterProps = {
   isMobile: boolean
+  students?:any[]
 }
 
-const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
+const StudentsFilter = ({ isMobile,students }: StudentsFilterProps) => {
   const dispatch = useAppDispatch()
-  const { students, queryParams } = useAppSelector(state => state.students)
+  const {  queryParams } = useAppSelector(state => state.students)
   const { schools } = useAppSelector(state => state.settings)
   const [key, setKey] = useState<string>('')
   const { getCourses, courses } = useCourses()
@@ -49,7 +50,7 @@ const StudentsFilter = ({ isMobile }: StudentsFilterProps) => {
   const { smsTemps, getSMSTemps } = useSMS()
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<any>({})
-  const studentIds = students.map(student => student.id)
+  const studentIds = students?.map(student => student.id)
   const handleEditClickOpen = (value: ModalTypes) => {
     setOpenEdit(value)
   }

@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react'
+import { FC, ReactNode, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import type { ACLObj, AppAbility } from '../../configs/acl'
 import { AbilityContext } from '../../layouts/components/acl/Can'
@@ -7,27 +7,36 @@ import NotAuthorized from '../../pages/401'
 import BlankLayout from '../../@core/layouts/BlankLayout'
 import { useAuth } from '../../hooks/useAuth'
 
-type AclGuardProps = {
+type Props = {
   children: ReactNode
   guestGuard: boolean
   aclAbilities: ACLObj
 }
 
-const AclGuard = (props: AclGuardProps) => {
-  const { aclAbilities, children, guestGuard } = props
-  const [ability, setAbility] = useState<AppAbility | undefined>(undefined)
+const AclGuard: FC<Props> = ({ aclAbilities, children, guestGuard }) => {
+  const [ability, setAbility] = useState<AppAbility | null>(null)
   const auth = useAuth()
   const router = useRouter()
 
-  if (guestGuard || router.route === '/404' || router.route === '/500' || router.route === '/') {
+  useEffect(() => {
+    if (auth.user?.role) {
+      setAbility(buildAbilityFor(auth.user.role, aclAbilities.subject))
+    }
+  }, [auth.user, aclAbilities.subject])
+
+  if (guestGuard || ['/404', '/500', '/'].includes(router.route)) {
     return <>{children}</>
   }
 
-  if (auth.user && auth.user.role && !ability) {
-    setAbility(buildAbilityFor(auth.user.role, aclAbilities.subject))
+  if (!auth.user) {
+    return null
   }
 
-  if (ability && ability.can(aclAbilities.action, aclAbilities.subject)) {
+  if (!ability) {
+    return <>{children}</>
+  }
+
+  if (ability.can(aclAbilities.action, aclAbilities.subject)) {
     return <AbilityContext.Provider value={ability}>{children}</AbilityContext.Provider>
   }
 
@@ -38,4 +47,5 @@ const AclGuard = (props: AclGuardProps) => {
   )
 }
 
+AclGuard.displayName = 'AclGuard'
 export default AclGuard

@@ -114,7 +114,7 @@ export default function SalaryConfirm({}: Props) {
       if (status === 'frozen') {
         await dispatch(fetchModerationSalaries(''))
       } else {
-        push('/finance')
+        void push('/finance')
       }
     } catch (err) {
       console.log(err)

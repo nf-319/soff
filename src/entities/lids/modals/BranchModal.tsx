@@ -11,8 +11,7 @@ import {
   Typography
 } from '@mui/material'
 import { Dispatch, FC, SetStateAction, useState } from 'react'
-import IconifyIcon from '../../../components/icon'
-import { LeadsResult, MenuOpenType } from '../LeadsKaban'
+import { LeadsResult, MenuOpenType } from '../LeadsKanban'
 import { useTranslation } from 'react-i18next'
 import Form from '../../../components/form'
 import { LoadingButton } from '@mui/lab'
@@ -21,25 +20,29 @@ import showResponseError from 'src/@core/utils/show-response-error'
 import ceoConfigs from 'src/configs/ceo'
 import api from 'src/@core/utils/api'
 import { useRouter } from 'next/router'
-import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
-import { LeadsType } from '../model'
+import { useQueryClient } from '@tanstack/react-query'
+import { Close } from '@mui/icons-material'
+import { setAddSource, setOpenLid, setSectionId } from '../../../store/apps/leads'
+import { useAppDispatch } from '../../../store'
 
 type Props = {
   open: string | null
   setOpen: Dispatch<SetStateAction<MenuOpenType>>
   leadId: string | null
   leadFirstName: string
-  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<LeadsType<LeadsResult[]>, any>>
   phone: string
+  onClose?: boolean
 }
 
-export const BranchModal: FC<Props> = ({ open, setOpen, refetch, leadId, leadFirstName, phone }) => {
+export const BranchModal: FC<Props> = ({ open, onClose, setOpen, leadId, leadFirstName, phone }) => {
   const { t } = useTranslation()
   const [loading, setLoading] = useState<boolean>(false)
   const [departmentData, setDepartmentData] = useState<any[] | null>()
   const [branchData, setBranchData] = useState<any[] | null>()
   const [error, setError] = useState<any>({})
+  const dispatch = useAppDispatch()
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const { data: branches, isLoading } = useGet(ceoConfigs.barnchs)
 
@@ -85,7 +88,12 @@ export const BranchModal: FC<Props> = ({ open, setOpen, refetch, leadId, leadFir
     try {
       await handleEditLead(leadId, { first_name: leadFirstName, phone, ...values })
       setLoading(false)
-      await refetch()
+      if(onClose) {
+        dispatch(setOpenLid(null))
+        dispatch(setAddSource(false))
+        dispatch(setSectionId(null))
+      }
+      await queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
       setOpen(null)
     } catch (err: any) {
       setLoading(false)
@@ -99,12 +107,6 @@ export const BranchModal: FC<Props> = ({ open, setOpen, refetch, leadId, leadFir
     setBranchData(data.data.results)
   }
 
-  const handleClose = () => {
-    setOpen(null)
-    setDepartmentData(null)
-    setBranchData(null)
-  }
-
   const handleDepartmentChild = async (department: string) => {
     const data = await api.get(`leads/department/child/?parent=${department}`)
 
@@ -116,10 +118,11 @@ export const BranchModal: FC<Props> = ({ open, setOpen, refetch, leadId, leadFir
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography>{t('Boshqa Filialga')}</Typography>
 
-        <IconButton>
-          <IconifyIcon icon={'material-symbols:close'} onClick={() => setOpen(null)} />
+        <IconButton onClick={() => setOpen(null)}>
+          <Close />
         </IconButton>
       </DialogTitle>
+
       <DialogContent>
         <Form
           id='ddsdwqdasdasdasddwqd'

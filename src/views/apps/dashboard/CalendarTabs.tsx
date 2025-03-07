@@ -4,12 +4,11 @@ import Tab from '@mui/material/Tab'
 import TabList from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { handleTabValue, handleOpen, fetchLessons, updateInterval } from 'src/store/apps/dashboard'
+import { handleTabValue, handleOpen, updateInterval } from 'src/store/apps/dashboard'
 import { useTranslation } from 'react-i18next'
 import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material'
 import { FC } from 'react'
-import { useGet } from 'src/hooks/useApi'
-import { useState } from 'react'
+import useResponsive from 'src/@core/hooks/useResponsive'
 
 type Props = {
   handleUpdateWeekDays: (item: string[]) => void
@@ -17,6 +16,7 @@ type Props = {
 
 const CalendarTabs: FC<Props> = ({ handleUpdateWeekDays }) => {
   const dispatch = useAppDispatch()
+  const { isMobile } = useResponsive()
   const { tabValue, weeks } = useAppSelector(state => state.dashboard)
   const { t } = useTranslation()
 
@@ -40,19 +40,18 @@ const CalendarTabs: FC<Props> = ({ handleUpdateWeekDays }) => {
 
   async function handleChangeInterval(interval: string) {
     dispatch(updateInterval(interval))
-    // await dispatch(fetchLessons({ queryWeeks: weeks, interval: interval }))
   }
 
   return (
     <TabContext value={tabValue}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Box sx={{ display: isMobile ? '' : 'flex', justifyContent: 'space-between' }}>
         <TabList onChange={(_, value: string) => dispatch(handleTabValue(value))} aria-label='centered tabs example'>
           {tabs.map(({ value, name, onClick }) => (
             <Tab key={value} value={value} label={t(name)} sx={{ fontSize: '12px' }} onClick={onClick} />
           ))}
         </TabList>
 
-        <FormControl size='small' sx={{ margin: 2 }}>
+        <FormControl fullWidth={isMobile} size='small' sx={{ margin: 2 }}>
           <InputLabel id='time-interval-label'>Vaqt intervali</InputLabel>
 
           <Select

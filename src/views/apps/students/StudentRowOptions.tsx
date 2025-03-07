@@ -55,7 +55,7 @@ export default function StudentRowOptions({ id }: Props) {
   const handleActive = async () => {
     setLoading(true)
     dispatch(disablePage(true))
-    await dispatch(updateStudent({ id, status: 'active' }))
+    await dispatch(updateStudent({ id, data: { status: 'active' } }))
     dispatch(disablePage(false))
     toast.success("O'quvchi muvaffaqiyatli aktivlashtirildi")
     dispatch(updateStudentParams({ status: 'active' }))

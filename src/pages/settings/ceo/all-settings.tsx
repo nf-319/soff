@@ -1172,9 +1172,32 @@ export default function AllSettings() {
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                    <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-                      {t('Qarzdorlarni ogohlantirish')}:{' '}
-                    </Typography>
+                    <Box display={'flex'}>
+                      <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
+                        {t('Qarzdorlarni ogohlantirish')}:{' '}
+                      </Typography>
+                      <Tooltip
+                        title={
+                          <Typography
+                            color='white'
+                            sx={{
+                              minWidth: isMobile ? '90px' : '180px',
+                              fontSize: isMobile ? '10px' : '13px'
+                            }}
+                          >
+                            {t("O'quvchi qarzdor bo'lgan kuni 1 marta ogohlantirish boradi")}
+                          </Typography>
+                        }
+                        arrow
+                      >
+                        <span style={{ cursor: 'pointer' }}>
+                          <Icon
+                            icon='mdi:help-circle-outline'
+                            style={{ fontSize: isMobile ? '16px' : '20px', marginLeft: '5px' }}
+                          />
+                        </span>
+                      </Tooltip>
+                    </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       {loading === 'debtor' ? (
                         <CircularProgress disableShrink size={'20px'} sx={{ margin: '10px 0', marginLeft: '15px' }} />

@@ -100,9 +100,7 @@ export default function EditStudentForm() {
         console.error('Invalid image type:', image)
       }
 
-      for (let pair of newValues.entries()) {
-        console.log(pair[0], pair[1])
-      }
+      
 
       const resp = await dispatch(updateStudent({ data: newValues, id: studentData?.id }))
 

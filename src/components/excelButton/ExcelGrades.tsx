@@ -7,6 +7,7 @@ import Link from 'next/link'
 
 interface ExcelProps {
   queryString?: string
+  width?: string | number
   url: string
   variant?: 'text' | 'outlined' | 'contained'
   color?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning'
@@ -18,6 +19,7 @@ export default function ExcelGrades({
   queryString = '',
   variant = 'outlined',
   color = 'success',
+  width = 370,
   size = 'small',
   url,
   ...args
@@ -41,10 +43,9 @@ export default function ExcelGrades({
     setLoading(false)
   }
 
-    return (
-
-        <LoadingButton
-            sx={{width:370}}
+  return (
+    <LoadingButton
+      sx={{ width: width }}
       loading={loading}
       onClick={handleDownload}
       startIcon={!loading && <VscodeIconsFileTypeExcel2 />}

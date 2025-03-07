@@ -14,7 +14,7 @@ import {
 } from 'src/store/apps/leads'
 import toast from 'react-hot-toast'
 import { useGet } from 'src/hooks/useApi'
-import { LeadsResult } from 'src/entities/lids/LeadsKaban'
+import { LeadsResult } from '../../../../entities/lids/LeadsKanban'
 import { LeadsType } from 'src/entities/lids'
 import { useAuth } from 'src/hooks/useAuth'
 
