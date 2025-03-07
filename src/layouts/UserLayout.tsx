@@ -1,4 +1,6 @@
-import { FC, PropsWithChildren, ReactNode, useContext, useEffect } from 'react'
+'use client'
+
+import { FC, PropsWithChildren, useContext } from 'react'
 import { Theme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Layout from 'src/@core/layouts/Layout'
@@ -18,7 +20,7 @@ type Props = {
 
 const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed }) => {
   const { settings, saveSettings } = useSettings()
-  const { user, setUser } = useContext(AuthContext)
+  const { user } = useContext(AuthContext)
   const { t } = useTranslation()
 
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
