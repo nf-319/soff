@@ -31,7 +31,7 @@ jobs:
     name: Build va Deploy
     needs: lint-and-test
     runs-on: ubuntu-latest
-    if: contains('refs/heads/main refs/heads/test refs/heads/development', github.ref)
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test' || github.ref == 'refs/heads/development'
 
     steps:
       - name: Repositoryni klon qilish
