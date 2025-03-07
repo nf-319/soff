@@ -1,9 +1,7 @@
-import { Button } from '@mui/material'
 import { VscodeIconsFileTypeExcel2 } from './ExcelIcon'
-import api from '../../@core/utils/api'
+import api from 'src/@core/utils/api'
 import { LoadingButton } from '@mui/lab'
 import { useState } from 'react'
-import Link from 'next/link'
 
 interface ExcelProps {
   queryString?: string
@@ -25,13 +23,13 @@ export default function ExcelGrades({
   ...args
 }: ExcelProps) {
   const [loading, setLoading] = useState(false)
-  const [link, setLink] = useState('')
+
   const handleDownload = async () => {
     setLoading(true)
     try {
       const response = await api.get(`${url}`)
       const { download_url } = response.data
-      setLink(download_url)
+
       if (download_url) {
         window.open('https://' + download_url, '_blank')
       } else {
@@ -46,6 +44,7 @@ export default function ExcelGrades({
   return (
     <LoadingButton
       sx={{ width: width }}
+      size="medium"
       loading={loading}
       onClick={handleDownload}
       startIcon={!loading && <VscodeIconsFileTypeExcel2 />}

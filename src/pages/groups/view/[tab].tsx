@@ -1,10 +1,7 @@
-import dynamic from 'next/dynamic';
-import { GetServerSidePropsContext, InferGetStaticPropsType } from 'next/types';
+import { GetServerSidePropsContext } from 'next/types';
+import UserViewPage from 'src/views/apps/groups/view/UserViewPage'
 
-const UserViewPage = dynamic(() => import('src/views/apps/groups/view/UserViewPage'), { ssr: false });
-
-const UserView = ({ tab, month, id }: InferGetStaticPropsType<typeof getServerSideProps>) => {
-
+const UserView = () => {
   return <UserViewPage />
 }
 

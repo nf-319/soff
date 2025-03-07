@@ -1,10 +1,7 @@
-// ** React Imports
+'use client'
+
 import { SyntheticEvent, useState, useEffect, Fragment } from 'react'
-
-// ** Next Import
 import { useRouter } from 'next/router'
-
-// ** MUI Imports
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Fade from '@mui/material/Fade'
@@ -15,38 +12,25 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import { styled, useTheme } from '@mui/material/styles'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import MuiListItem, { ListItemProps } from '@mui/material/ListItem'
-
-// ** Third Party Imports
 import clsx from 'clsx'
 import { usePopper } from 'react-popper'
-
-// ** Icon Imports
-import Icon from '../../../../../components/icon'
-
-// ** Theme Config Import
+import Icon from 'src/components/icon'
 import themeConfig from 'src/configs/themeConfig'
-
-// ** Types
 import { NavGroup } from 'src/@core/layouts/types'
 import { Settings } from 'src/@core/context/settingsContext'
-
-// ** Custom Components Imports
 import HorizontalNavItems from './HorizontalNavItems'
 import UserIcon from 'src/layouts/components/UserIcon'
 import Translations from 'src/layouts/components/Translations'
 import CanViewNavGroup from 'src/layouts/components/acl/CanViewNavGroup'
-
-// ** Utils
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 import { hasActiveChild } from 'src/@core/layouts/utils'
 
-interface Props {
+type Props = {
   item: NavGroup
   settings: Settings
   hasParent?: boolean
 }
 
-// ** Styled Components
 const ListItem = styled(MuiListItem)<ListItemProps>(({ theme }) => ({
   cursor: 'pointer',
   paddingTop: theme.spacing(2.25),
@@ -84,10 +68,7 @@ const NavigationMenu = styled(Paper)(({ theme }) => ({
 }))
 
 const HorizontalNavGroup = (props: Props) => {
-  // ** Props
   const { item, hasParent, settings } = props
-
-  // ** Hooks & Vars
   const theme = useTheme()
   const router = useRouter()
   const currentURL = router.asPath
@@ -98,7 +79,6 @@ const HorizontalNavGroup = (props: Props) => {
   const popperPlacement = direction === 'rtl' ? 'bottom-end' : 'bottom-start'
   const popperPlacementSubMenu = direction === 'rtl' ? 'left-start' : 'right-start'
 
-  // ** States
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
   const [popperElement, setPopperElement] = useState(null)
   const [anchorEl, setAnchorEl] = useState<Element | null>(null)
@@ -145,7 +125,6 @@ const HorizontalNavGroup = (props: Props) => {
 
   useEffect(() => {
     handleGroupClose()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.asPath])
 
   const icon = item.icon ? item.icon : navSubItemIcon

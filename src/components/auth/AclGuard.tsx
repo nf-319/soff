@@ -6,6 +6,7 @@ import { buildAbilityFor } from '../../configs/acl'
 import NotAuthorized from '../../pages/401'
 import BlankLayout from '../../@core/layouts/BlankLayout'
 import { useAuth } from '../../hooks/useAuth'
+import { Loading } from '../Loading'
 
 type Props = {
   children: ReactNode
@@ -33,7 +34,7 @@ const AclGuard: FC<Props> = ({ aclAbilities, children, guestGuard }) => {
   }
 
   if (!ability) {
-    return <>{children}</>
+    return <Loading />
   }
 
   if (ability.can(aclAbilities.action, aclAbilities.subject)) {
