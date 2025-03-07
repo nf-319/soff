@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+import { CSSTransition } from 'react-transition-group';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
@@ -6,73 +8,50 @@ import CustomAvatar from '../../mui/avatar';
 import { CardStatsVerticalProps } from '../types';
 import useResponsive from '../../../@core/hooks/useResponsive';
 import { formatCurrency } from '../../../@core/utils/format-currency';
-import { Icon } from '@iconify/react';
-import { updateEyeVisible } from '../../../store/apps/dashboard';
-import { useAppDispatch, useAppSelector } from '../../../store';
+import { useAppSelector } from '../../../store';
 
-const CardStatsVertical = (props: CardStatsVerticalProps) => {
-
-  const { eyeVisible} = useAppSelector(state => state.dashboard)
-  const handleEyeChange = (event: React.MouseEvent) => {
-
-    const dispatch = useAppDispatch()
-    event.stopPropagation(); // Prevents the event from propagating to parent elements
-    dispatch(updateEyeVisible(!eyeVisible))
-  };
-
-  const { title, color, icon, stats, data_key } = props;
+const CardStatsVertical = ({ title, color, icon, stats }: CardStatsVerticalProps) => {
+  const { eyeVisible } = useAppSelector(state => state.dashboard);
   const { isMobile, isTablet } = useResponsive();
 
   return (
-    <Card sx={{ width: '100%' }}>
+    <Card sx={{ width: '100%', height: '100%' }}>
       <CardContent
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          padding: isMobile ? '10px 0px !important' : '15px 10px !important',
+          justifyContent: 'space-between',
+          height: '100%',
+          gap: '5px',
+          alignItems: 'center',
+          p: isMobile ? '10px 0px !important' : '15px 10px !important'
         }}
       >
-        <Box sx={{ width: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', mb: 2 }}>
-          <CustomAvatar
-            sx={{ width: isMobile ? '30px' : '30px', height: isMobile ? '30px' : '30px', p: 1 }}
-            className="text-center fs-2"
-            skin="light"
-            variant="rounded"
-            color={color}
-          >
-            {icon}
-          </CustomAvatar>
-        </Box>
-        <Typography
-          className="text-center"
-          variant="caption"
-          sx={{ mb: 2, fontSize: isMobile ? '12px !important' : isTablet ? '14px !important' : '16px !important' }}
-        >
-          {stats}
-        </Typography>
-          {/* <Typography className="text-center" variant="h4" sx={{ mb: 0, fontSize: '16px !important' }}>
-            {formatCurrency(title)}
-          </Typography> */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 1,
-            }}
-          >
-            {/* <Icon
-              icon={!eyeVisible ? 'mdi:eye-off' : 'mdi:eye'}
-              style={{
-                fontSize: '20px',
-                cursor: 'pointer',
-              }}
-              // onClick={handleEyeChange}
-            /> */}
-            <Typography className="text-center" variant="h4" sx={{ mb: 0, fontSize: '16px !important' }}>
-              {eyeVisible ? formatCurrency(title) : '****'}
-            </Typography>
+        <Box display='grid' alignItems='center' gap={2}>
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <CustomAvatar
+              sx={{ width: '30px', height: '30px', p: 1 }}
+              skin='light'
+              variant='rounded'
+              color={color}
+            >
+              {icon}
+            </CustomAvatar>
           </Box>
+
+          <Typography
+            variant='caption'
+            sx={{ fontSize: isMobile ? '12px !important' : isTablet ? '14px !important' : '16px !important', textAlign: 'center' }}
+          >
+            {stats}
+          </Typography>
+        </Box>
+
+        <CSSTransition in={eyeVisible} timeout={300} classNames='fade'>
+          <Typography variant='h4' sx={{ fontSize: '16px !important', textAlign: 'center' }}>
+            {eyeVisible ? formatCurrency(title) : '****'}
+          </Typography>
+        </CSSTransition>
       </CardContent>
     </Card>
   );

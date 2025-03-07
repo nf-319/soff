@@ -14,14 +14,20 @@ export const PublicGuard: FC<PropsWithChildren> = ({ children }) => {
   }
 
   useEffect(() => {
-    if (!router.isReady) {
-      return
-    }
+    if (!router.isReady) return
 
-    if (window.localStorage.getItem('userData')) {
-      router.replace('/')
+    const storedUser = window.localStorage.getItem('userData')
+
+    try {
+      const userData = storedUser ? JSON.parse(storedUser) : null
+      if (userData && typeof userData === 'object') {
+        void router.push('/')
+      }
+    } catch (error) {
+      window.localStorage.removeItem('userData')
     }
-  }, [router.route])
+  }, [router.isReady])
+
 
   if (auth.loading || (!auth.loading && auth.user !== null)) {
     return <Loading />

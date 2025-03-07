@@ -33,7 +33,7 @@ const UserSmsList = () => {
   const [data, setData] = useState<null | []>(null)
   const { t } = useTranslation()
   const { query } = useRouter()
-  const { smsTemps, getSMSTemps } = useSMS()
+  const { getSMSTemps } = useSMS()
   const [loading, setLoading] = useState(false)
   const { smschild_list, sms_list } = useAppSelector(state => state.settings)
   const [parent_id, setParentId] = useState<number | null>(null)
@@ -57,8 +57,7 @@ const UserSmsList = () => {
     try {
       const resp = await api.get(`auth/sms-history/?user=${query.student}`)
       setData(resp.data?.results)
-      console.log(resp);
-      
+
       setLoading(false)
       setOpen(false)
       formik.resetForm()
@@ -70,13 +69,11 @@ const UserSmsList = () => {
     }
   }
 
-  
-
   const handleAddNote = async (value: any) => {
     setLoading(true)
     try {
       await api.post('common/send-message-user/', { users: [Number(query.student)], ...value })
-      getSmsList()
+      void getSmsList()
       setLoading(false)
       setOpen(false)
     } catch (err: any) {
@@ -86,21 +83,29 @@ const UserSmsList = () => {
   }
 
   useEffect(() => {
-    // dispatch(fetchSmsList())
-    getSmsList()
+    void getSmsList()
   }, [])
+
   useEffect(() => {
     if (parent_id) {
       dispatch(fetchSmsListQuery(parent_id))
     }
   }, [parent_id])
 
+  const handleClose = () => {
+    setOpen(false)
+    formik.resetForm()
+  }
+
   return (
     <Box>
       <Box sx={{ width: '100%', display: 'flex' }}>
         <Button
           startIcon={<IconifyIcon icon='ic:baseline-add' />}
-          onClick={() => (setOpen(true), getSMSTemps())}
+          onClick={() => {
+            setOpen(true);
+            void getSMSTemps()
+          }}
           sx={{ marginLeft: 'auto' }}
           variant='contained'
           size='small'
@@ -123,7 +128,7 @@ const UserSmsList = () => {
       </Box>
       <Dialog
         open={open}
-        onClose={() => (setOpen(false), formik.resetForm())}
+        onClose={handleClose}
         aria-labelledby='user-view-edit'
         sx={{ '& .MuiPaper-root': { width: '100%', maxWidth: 450, p: [1, 3] } }}
         aria-describedby='user-view-edit-description'
@@ -149,7 +154,7 @@ const UserSmsList = () => {
               >
                 {sms_list.map((el: any) => (
                   <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
-                    <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>
+                    <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '12px' }}>
                       {el.description}
                     </span>
                   </MenuItem>
@@ -174,7 +179,7 @@ const UserSmsList = () => {
                 >
                   {smschild_list.map((el: any) => (
                     <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
-                      <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>
+                      <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '12px' }}>
                         {el.description}
                       </span>
                     </MenuItem>
