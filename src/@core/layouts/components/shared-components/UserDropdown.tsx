@@ -1,10 +1,5 @@
-// ** React Imports
-import { useState, SyntheticEvent, Fragment, useContext, useEffect } from 'react'
-
-// ** Next Import
+import { useState, SyntheticEvent, useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
-
-// ** MUI Imports
 import Box from '@mui/material/Box'
 import Menu from '@mui/material/Menu'
 import Badge from '@mui/material/Badge'
@@ -13,14 +8,8 @@ import Divider from '@mui/material/Divider'
 import MenuItem from '@mui/material/MenuItem'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
-
-// ** Icon Imports
-import Icon from '../../../../components/icon'
-
-// ** Context
+import Icon from 'src/components/icon'
 import { useAuth } from 'src/hooks/useAuth'
-
-// ** Type Imports
 import { Settings } from 'src/@core/context/settingsContext'
 import { AuthContext } from 'src/context/AuthContext'
 import { useTranslation } from 'react-i18next'
@@ -36,7 +25,6 @@ type Props = {
   settings: Settings
 }
 
-// ** Styled Components
 const BadgeContentSpan = styled('span')(({ theme }) => ({
   width: 8,
   height: 8,
@@ -45,10 +33,8 @@ const BadgeContentSpan = styled('span')(({ theme }) => ({
   boxShadow: `0 0 0 2px ${theme.palette.background.paper}`
 }))
 
-// Rollarni rang bo'yicha ketma-ketligi
 const roleHierarchy = ['student', 'teacher', 'marketolog', 'watcher', 'casher', 'admin', 'ceo']
 
-// Eng katta roleni aniqlash uchun funksiya
 const getHighestRole = (roles: string[]): string => {
   let highestRoleIndex = -1
   let highestRole = ''
@@ -66,7 +52,6 @@ const getHighestRole = (roles: string[]): string => {
 
 const UserDropdown = (props: Props) => {
   const [imageSrc, setImageSrc] = useState('')
-
   const { settings } = props
   const [open, setOpen] = useState(false)
   const { t } = useTranslation()
@@ -97,7 +82,7 @@ const UserDropdown = (props: Props) => {
 
   const handleDropdownClose = (url?: string) => {
     if (url) {
-      router.push(url)
+      void router.push(url)
     }
     setAnchorEl(null)
   }
@@ -129,10 +114,7 @@ const UserDropdown = (props: Props) => {
     document.body.removeChild(anchor)
   }
 
-  // Kirish vaqtida bir marta eng katta roleni o'rnatish
   useEffect(() => {
-    // LocalStorage'da role saqlangan bo'lsa, o'sha ishlatiladi
-    // Aks holda user rollaridan eng kattasi aniqlanadi
     const savedRole = localStorage.getItem('currentRole')
 
     if (!savedRole && user?.role && user.role.length > 0) {
@@ -154,14 +136,13 @@ const UserDropdown = (props: Props) => {
     }))
   }, [role, setUser])
 
-  // Roleni o'zgartirish va tegishli sahifaga yo'naltirish
   const handleRole = (role: string) => {
     setRole(role)
     if (role == 'teacher') {
-      router.push('dashboard')
+      void router.push('/dashboard')
     }
     if (role == 'casher') {
-      router.push('finance')
+      void router.push('/finance')
     }
     localStorage.setItem('currentRole', role)
     setAnchorEl(null)

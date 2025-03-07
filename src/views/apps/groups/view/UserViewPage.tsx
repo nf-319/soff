@@ -1,16 +1,13 @@
+'use client'
+
 import { Box } from '@mui/material'
 import Grid from '@mui/material/Grid'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
-import Excel from '../../../../components/excelButton/Excel'
-import ExcelGrades from '../../../../components/excelButton/ExcelGrades'
-import ExcelStudents from '../../../../components/excelButton/ExcelStudents'
-import VideoHeader, { videoUrls } from '../../../../components/video-header/video-header'
-import api from 'src/@core/utils/api'
+import ExcelGrades from 'src/components/excelButton/ExcelGrades'
+import VideoHeader, { videoUrls } from 'src/components/video-header/video-header'
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
-import ceoConfigs from 'src/configs/ceo'
 import { AuthContext } from 'src/context/AuthContext'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import {
@@ -22,48 +19,25 @@ import {
   setGettingAttendance,
   setGettingGroupDetails
 } from 'src/store/apps/groupDetails'
-import { setRoomsData, setTeacherData } from 'src/store/apps/groups'
 import UserViewLeft from 'src/views/apps/groups/view/GroupViewLeft/UserViewLeft'
 import UserViewRight from 'src/views/apps/groups/view/UserViewRight'
 import useResponsive from 'src/@core/hooks/useResponsive'
 
 const UserView = () => {
   const router = useRouter()
-  const url = `${router.query.tab}`
+  const url = String(router.query.tab)
   const { queryParams } = useAppSelector(state => state.groupDetails)
   const { user } = useContext(AuthContext)
   const { isMobile } = useResponsive()
   const dispatch = useAppDispatch()
 
-  const getTeachers = async () => {
-    await api
-      .get(`${ceoConfigs.employee_checklist}?role=teacher`)
-      .then(data => {
-        dispatch(setTeacherData(data.data))
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  }
-  const getRooms = async () => {
-    await api
-      .get('common/room-check-list/')
-      .then(data => dispatch(setRoomsData(data.data)))
-      .catch(error => {
-        console.log(error)
-      })
-  }
-  useEffect(() => {
-    getTeachers()
-    getRooms()
-  }, [])
-
   useEffect(() => {
     if (user?.role.includes('student') && !user?.role.includes('watcher')) {
-      router.push('/')
+      void router.push('/')
       toast.error('Sahifaga kirish huquqingiz yoq!')
     }
-    ;(async function () {
+
+    (async function () {
       const queryString = new URLSearchParams(queryParams).toString()
       dispatch(setGettingAttendance(true))
       dispatch(setGettingGroupDetails(true))
@@ -89,17 +63,16 @@ const UserView = () => {
       dispatch(setGettingAttendance(false))
       dispatch(setGettingGroupDetails(false))
     })()
+
     return () => {
       dispatch(resetStore())
     }
   }, [])
 
   return (
-    <div>
+    <Box display='flex' flexDirection='column' gap={4}>
       <Box mb={isMobile ? 3 : 0} display={isMobile ? '' : 'flex'} justifyContent={'end'} gap={5}>
-        <Box sx={{ marginBottom: '10px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-          <ExcelGrades width={isMobile ? '100%' : 'auto'} url={`/common/ratings/export/${router.query.id}`} />
-        </Box>
+        <ExcelGrades width={isMobile ? '100%' : 'auto'} url={`/common/ratings/export/${router.query.id}`} />
 
         <VideoHeader item={videoUrls.group} />
       </Box>
@@ -113,8 +86,9 @@ const UserView = () => {
           <UserViewRight tab={url} />
         </Grid>
       </Grid>
-    </div>
+    </Box>
   )
 }
 
+UserView.displayName = 'UserView'
 export default UserView
