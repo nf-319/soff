@@ -11,6 +11,7 @@ jobs:
   lint-and-test:
     name: Lint va Test
     runs-on: ubuntu-latest
+
     steps:
       - name: Repositoryni klon qilish
         uses: actions/checkout@v4
@@ -31,7 +32,7 @@ jobs:
     name: Build va Deploy
     needs: lint-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test' || github.ref == 'refs/heads/development'
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test' || github.ref == 'refs/heads/development' }}
 
     steps:
       - name: Repositoryni klon qilish
@@ -110,4 +111,4 @@ jobs:
             fi
 
             pm2 save
-            echo "Deploy muvaffaqiyatli yakunlandi!"
+            echo "✅ Deploy muvaffaqiyatli yakunlandi!"
