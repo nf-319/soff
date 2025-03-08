@@ -552,7 +552,7 @@ const UserViewSecurity = () => {
                           {group?.lesson_days?.map((day: any) => (
                             <Typography
                               sx={{
-                                backgroundColor: 'lightgrey',
+                                backgroundColor: "#f5f5f5",
                                 borderRadius: 10,
                                 color: 'black',
                                 paddingX: 3,

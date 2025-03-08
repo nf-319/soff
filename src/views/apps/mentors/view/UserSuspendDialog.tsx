@@ -15,7 +15,7 @@ import { OctagonAlert } from 'lucide-react'
 
 type Props = {
   open: boolean
-  setOpen: (val: boolean) => void
+  setOpen: (val: any) => void
   handleOk?: () => any
   okText?: string | undefined
   loading?: boolean

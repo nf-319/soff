@@ -68,17 +68,50 @@ const GroupExamsList = () => {
     {
       xs: 0.3,
       title: t('Topshirish sanasi'),
-      dataIndex: 'date'
+      dataIndex: 'date',
+      renderId: (id, date) => {
+        return (
+          <div
+            onClick={() => {
+              handleOpenExamResult(id)
+            }}
+          >
+            {date}
+          </div>
+        )
+      }
     },
     {
       xs: 0.2,
       title: t("O'tish bali"),
-      dataIndex: 'min_score'
+      dataIndex: 'min_score',
+      renderId: (id, min_score) => {
+        return (
+          <div
+            onClick={() => {
+              handleOpenExamResult(id)
+            }}
+          >
+            {min_score}
+          </div>
+        )
+      }
     },
     {
       xs: 0.3,
       title: t('Maksimal bal'),
-      dataIndex: 'max_score'
+      dataIndex: 'max_score',
+      renderId: (id, max_score) => {
+        return (
+          <div
+            onClick={() => {
+              handleOpenExamResult(id)
+            }}
+          >
+            {max_score}
+          </div>
+        )
+      }
     },
     {
       xs: 0.12,
