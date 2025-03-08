@@ -120,7 +120,7 @@ export default function StudentProfile() {
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <Typography variant='body2' color='text.secondary'>
-                  Telefon raqam :
+                  Telefon raqam:
                 </Typography>
                 <Typography variant='body1'>{user?.username}</Typography>
               </Grid>
