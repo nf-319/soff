@@ -84,6 +84,9 @@ const UserSmsList = () => {
 
   useEffect(() => {
     void getSmsList()
+    if (open) {
+      dispatch(fetchSmsList())
+    }
   }, [])
 
   useEffect(() => {
@@ -103,7 +106,7 @@ const UserSmsList = () => {
         <Button
           startIcon={<IconifyIcon icon='ic:baseline-add' />}
           onClick={() => {
-            setOpen(true);
+            setOpen(true)
             void getSMSTemps()
           }}
           sx={{ marginLeft: 'auto' }}

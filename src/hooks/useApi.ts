@@ -47,7 +47,7 @@ export const putRequest = <T>(
     url: string,
     payload: T,
     config?: AxiosRequestConfig,
-) => api.put(`/${url}/`, payload, config).then((res) => res.data)
+) => api.put(`/${url}`, payload, config).then((res) => res.data)
 
 export const patchRequest = <T>(
     url: string,
