@@ -20,12 +20,14 @@ import {
   FormHelperText,
   MenuItem,
   TextField,
-  DialogActions
+  DialogActions,
+  IconButton,
+  Skeleton
 } from '@mui/material'
 import CustomAvatar from '../../../../components/mui/avatar'
-
-import { Edit, MessageSquare, Plus, RefreshCw, Wallet } from 'lucide-react'
-import { ReactElement, useState } from 'react'
+import * as Yup from 'yup'
+import { Edit, Edit2Icon, MessageSquare, Plus, RefreshCw, Wallet } from 'lucide-react'
+import { ReactElement, useEffect, useRef, useState } from 'react'
 import { getInitials } from 'src/@core/utils/get-initials'
 import useBranches from 'src/hooks/useBranch'
 import Form from '../../../../components/form'
@@ -46,7 +48,15 @@ import { fetchSmsList } from 'src/store/apps/settings'
 import useStudent from 'src/hooks/useStudents'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { Icon } from '@iconify/react'
-import { TeacherAvatar } from '../../mentors/AddMentorsModal'
+import { TeacherAvatar, VisuallyHiddenInput } from '../../mentors/AddMentorsModal'
+import { reversePhone } from 'src/components/phone-input/format-phone-number'
+import api from 'src/@core/utils/api'
+import { Add, Delete, Remove } from '@mui/icons-material'
+import { useDelete, useGet, usePatch, usePost, usePut } from 'src/hooks/useApi'
+import toast from 'react-hot-toast'
+import { useQueryClient } from '@tanstack/react-query'
+import UserSuspendDialog from '../../mentors/view/UserSuspendDialog'
+import { useFormik } from 'formik'
 
 interface StudentCardProps {
   photo?: string
@@ -86,16 +96,80 @@ export default function StudentCard({
   const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<any>({})
+  const profilePhoto: any = useRef(null)
+  const [open, setOpen] = useState(false)
   const { mergeStudentToGroup, getGroupShort, groupShort } = useGroups()
   const [isDiscount, setIsDiscount] = useState<boolean>(false)
   const router = useRouter()
+  const [image, setImage] = useState<any>(null)
   const { updateStudent, studentData } = useStudent()
   const [groupDate, setGroupDate] = useState<any>(null)
   const school_type = localStorage.getItem('school_type')
   const [openModal, setOpenModal] = useState(false)
   const { t } = useTranslation()
-
+  const [inputs, setInputs] = useState([{ key: '', value: '' }])
   const dispatch = useAppDispatch()
+  const { mutate, isPending } = usePost()
+  const { mutate: deleteMutate, isPending: deletePending } = useDelete()
+  const [deletDetailModal, setDeleteDetailModal] = useState<string | number | null>(null)
+  const [editItem, setEditItem] = useState<{ key: string; value: string; id: number } | null>(null)
+  const queryClient = useQueryClient()
+  const { mutate: editMutate, isPending: editPending } = usePatch()
+  const { data: studentDetails, isLoading: studentDetailLoading } = useGet(`student/extradata/list/${userData.id}/`, {
+    deps: ['student-data']
+  })
+
+  const formik = useFormik({
+    initialValues: {
+      key: editItem?.key || '',
+      value: editItem?.value || ''
+    },
+    validationSchema: Yup.object({
+      key: Yup.string().required("Ma'lumot nomini kiritish shart"),
+      value: Yup.string().required("Ma'lumotni kiritish shart")
+    }),
+    onSubmit: values => {
+      console.log(values)
+      editMutate(`student/extradata/update/${editItem?.id}/`, values, {
+        onSuccess: () => {
+          toast.success("Ma'lumot o'zgartirildi")
+          setEditItem(null)
+          queryClient.invalidateQueries({ queryKey: [`student/extradata/list/${userData.id}/`, 'student-data'] })
+        },
+        onError: err => {
+          toast.error(err.response.data)
+        }
+      })
+      // onClose()
+    }
+  })
+
+  useEffect(() => {
+    if (editItem) {
+      formik.setFieldValue('key', editItem.key)
+      formik.setFieldValue('value', editItem.value)
+    }
+  }, [editItem])
+
+  const handleAddInput = () => {
+    setInputs([...inputs, { key: '', value: '' }])
+  }
+
+  const handleChange = (index: number, field: 'key' | 'value', value: string) => {
+    const newInputs = [...inputs]
+    newInputs[index][field] = value
+    setInputs(newInputs)
+  }
+
+  const onClose = () => {
+    setOpen(false)
+    setInputs([{ key: '', value: '' }])
+  }
+
+  const handleRemoveInput = (index: any) => {
+    const newInputs = inputs.filter((_, i) => i !== index)
+    setInputs(newInputs)
+  }
 
   const handleMergeToGroup = async (value: any) => {
     setLoading(true)
@@ -104,14 +178,6 @@ export default function StudentCard({
       student: userData.id,
       groups: [+value.group]
     }
-
-    // const discountConfig = {
-    //   amount: value?.fixed_price,
-    //   discount_count: 100,
-    //   description: 'kurs oxirigacha',
-    //   group: value?.group,
-    //   student: userData?.id
-    // }
 
     try {
       const discountConfig = {
@@ -134,6 +200,23 @@ export default function StudentCard({
       setLoading(false)
     }
   }
+
+  async function handleSave() {
+    mutate(
+      `student/extradata/create/`,
+      { user_id: userData.id, extra_data: inputs },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [`student/extradata/list/${userData.id}/`, 'student-data'] })
+          onClose()
+        },
+        onError: err => {
+          toast.error(err.response.data)
+        }
+      }
+    )
+  }
+
   const handleDownload = () => {
     const link = document.createElement('a')
     link.href = userData?.qr_code
@@ -143,11 +226,32 @@ export default function StudentCard({
     document.body.removeChild(link)
   }
 
-  const handleEditSubmit = async (value: any) => {
+  const handleEditSubmit = async (values: any) => {
     setLoading(true)
+    const newValues = new FormData()
+
+    for (const [key, value] of Object.entries(values)) {
+      if (!['image'].includes(key)) {
+        if (key === 'phone') {
+          newValues.append(key, reversePhone(value as any))
+        } else if (key === 'school') {
+          newValues.append(key, String(value))
+        } else if (Array.isArray(value) || typeof value === 'object') {
+          newValues.append(key, JSON.stringify(value))
+        } else {
+          newValues.append(key, value as any)
+        }
+      }
+    }
+
+    if (image) {
+      newValues.append('image', image)
+    } else {
+      console.error('Invalid image type:', image)
+    }
 
     try {
-      await updateStudent(userData?.id, value)
+      await updateStudent(userData?.id, newValues)
       setLoading(false)
       setOpenEdit(null)
       await dispatch(fetchStudentDetail(userData.id))
@@ -155,6 +259,20 @@ export default function StudentCard({
       setLoading(false)
       setError(err?.response?.data)
     }
+  }
+
+  function handleDeleteDetail() {
+    deleteMutate(`student/extradata/destroy/${deletDetailModal}/`, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [`student/extradata/list/${userData.id}/`, 'student-data'] })
+
+        toast.success("Muvaffaqiyatli o'chirildi")
+        setDeleteDetailModal(null)
+      },
+      onError: err => {
+        toast.error(err.response.data)
+      }
+    })
   }
 
   const handleEditClose = () => {
@@ -168,7 +286,6 @@ export default function StudentCard({
     }
     setOpenEdit(value)
   }
-
 
   return (
     <StyledCard>
@@ -185,52 +302,54 @@ export default function StudentCard({
         }
       />
       <CardContent>
-        <Box display='flex' gap={2} mb={3}>
-          {userData?.image ? (
-            <TeacherAvatar skin='light' color={'info'} variant='rounded' sx={{ width: 70, height: 70 }}>
-              <img style={{ width: '100%', height: '100%', objectFit: 'cover' }} src={userData?.image} alt='user' />
-            </TeacherAvatar>
-          ) : (
-            name && (
-              <CustomAvatar
-                skin='light'
-                variant='rounded'
-                color={'primary'}
-                sx={{ width: 70, height: 70, fontWeight: 600, mb: 1, fontSize: '2rem' }}
-              >
-                {getInitials(name)}
-              </CustomAvatar>
-            )
-          )}
-          <Box>
-            <Typography variant='h6' component='h3' gutterBottom>
-              {name}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-              <Chip
-                color='error'
-                label={`Baho: ${gpa?.toFixed(2)}`}
-                variant='outlined'
-                size='small'
-                sx={{
-                  color: Number(gpa) >= 4 ? 'green' : Number(gpa) >= 3 ? 'orange' : 'red',
-                  borderColor: Number(gpa) >= 4 ? 'green' : Number(gpa) >= 3 ? 'orange' : 'red'
-                }}
-              />
-              {userData?.qr_code && (
-                <img
-                  src={userData?.qr_code}
-                  alt=''
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setOpenModal(true)}
-                  width={50}
-                  height={50}
+        <Box display={'flex'} justifyContent={'space-between'} alignItems={'start'}>
+          <Box display='flex' gap={2} mb={3}>
+            {userData?.image ? (
+              <TeacherAvatar skin='light' color={'info'} variant='rounded' sx={{ width: 70, height: 70 }}>
+                <img style={{ width: '100%', height: '100%', objectFit: 'cover' }} src={userData?.image} alt='user' />
+              </TeacherAvatar>
+            ) : (
+              name && (
+                <CustomAvatar
+                  skin='light'
+                  variant='rounded'
+                  color={'primary'}
+                  sx={{ width: 70, height: 70, fontWeight: 600, mb: 1, fontSize: '2rem' }}
+                >
+                  {getInitials(name)}
+                </CustomAvatar>
+              )
+            )}
+            <Box>
+              <Typography variant='h6' component='h3' gutterBottom>
+                {name}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+                <Chip
+                  color='error'
+                  label={`Baho: ${gpa?.toFixed(2)}`}
+                  variant='outlined'
+                  size='small'
+                  sx={{
+                    color: Number(gpa) >= 4 ? 'green' : Number(gpa) >= 3 ? 'orange' : 'red',
+                    borderColor: Number(gpa) >= 4 ? 'green' : Number(gpa) >= 3 ? 'orange' : 'red'
+                  }}
                 />
-              )}
+                {userData?.qr_code && (
+                  <img
+                    src={userData?.qr_code}
+                    alt=''
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setOpenModal(true)}
+                    width={50}
+                    height={50}
+                  />
+                )}
+              </Box>
+              <Typography variant='body2' color='text.secondary' mt={1}>
+                ID: {id}
+              </Typography>
             </Box>
-            <Typography variant='body2' color='text.secondary' mt={1}>
-              ID: {id}
-            </Typography>
           </Box>
         </Box>
 
@@ -241,6 +360,52 @@ export default function StudentCard({
             </Typography>
             <Typography variant='body1'>{phone}</Typography>
           </Grid>
+          {userData?.birth_date && (
+            <Grid item xs={6}>
+              <Typography variant='body2' color='text.secondary'>
+                Tug'ilgan sanasi :
+              </Typography>
+              <Typography variant='body1'>{userData?.birth_date}</Typography>
+            </Grid>
+          )}
+          {studentDetailLoading ? (
+            <Skeleton width={'100%'} height={70} />
+          ) : (
+            studentDetails?.length !== 0 && (
+              <Grid item xs={12}>
+                {studentDetails?.map((item: { key: string; value: string; id: number }) => (
+                  <Box gap={2} display={'flex'} alignItems={'center'}>
+                    <Box
+                      width='100%'
+                      mb={2}
+                      display={'flex'}
+                      justifyContent={'space-between'}
+                      alignItems={'center'}
+                      sx={{ backgroundColor: '#f5f5f5', borderRadius: '8px', padding: 2 }}
+                      gap={2}
+                    >
+                      <div>
+                        <Typography variant='body2' color='text.secondary'>
+                          {item.key}:
+                        </Typography>
+                        <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
+                          {item.value}
+                        </Typography>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <IconButton onClick={() => setEditItem(item)}>
+                          <Edit2Icon width={17} height={17} />
+                        </IconButton>
+                        <IconButton onClick={() => setDeleteDetailModal(item.id)} style={{ cursor: 'pointer' }}>
+                          <Delete sx={{ width: 17, height: 17 }} color='error' />
+                        </IconButton>
+                      </div>
+                    </Box>
+                  </Box>
+                ))}
+              </Grid>
+            )
+          )}
 
           {school && (
             <Grid item xs={6}>
@@ -251,6 +416,7 @@ export default function StudentCard({
             </Grid>
           )}
         </Grid>
+
         {school_type == 'private_school' && (
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 5 }}>
             <Box>
@@ -280,6 +446,9 @@ export default function StudentCard({
         }}
       >
         <Box width='100%' gap={1}>
+          <Button onClick={() => setOpen(true)} variant='outlined' fullWidth sx={{ marginBottom: 2 }}>
+            O'quvchiga qo'shimcha ma'lumot qo'shish
+          </Button>
           <Box display='flex' width='100%' marginBottom={2} gap={2}>
             <Button
               variant='contained'
@@ -472,6 +641,32 @@ export default function StudentCard({
               onSubmit={handleEditSubmit}
               id='edit-fwe-fwefwfweepay'
             >
+              <TeacherAvatar
+                onClick={() => profilePhoto?.current?.click()}
+                skin='light'
+                color={'info'}
+                variant='rounded'
+                sx={{ cursor: 'pointer', margin: '0 auto 10px' }}
+              >
+                {profilePhoto.current?.files?.[0] || userData?.image ? (
+                  <img
+                    width={100}
+                    height={100}
+                    style={{ objectFit: 'cover', objectPosition: 'center' }}
+                    src={image ? URL.createObjectURL(image) : userData?.image ? userData?.image : ''}
+                    alt=''
+                  />
+                ) : (
+                  <IconifyIcon fontSize={40} icon={'material-symbols-light:add-a-photo-outline'} />
+                )}
+                <VisuallyHiddenInput
+                  ref={profilePhoto}
+                  name='image'
+                  onChange={e => setImage(e.target?.files?.[0])}
+                  type='file'
+                  accept='.png, .jpg, .jpeg, .webp, .HEIC, .heic'
+                />
+              </TeacherAvatar>
               <FormControl sx={{ width: '100%' }}>
                 <TextField
                   size='small'
@@ -536,6 +731,96 @@ export default function StudentCard({
         openEdit={openEdit}
         setOpenEdit={setOpenEdit}
         userData={userData}
+      />
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
+        <DialogTitle>Yangi Ma'lumot Qo'shish</DialogTitle>
+        <DialogContent>
+          {inputs.map((input, index) => (
+            <div key={index} className='flex items-center gap-2 mb-2 mt-2'>
+              <Box display={'flex'} alignItems={'center'}>
+                <Box display={'flex'} width={'100%'} flexDirection={'column'} gap={2} mb={4}>
+                  <TextField
+                    size='small'
+                    fullWidth
+                    label="Ma'lumot nomi"
+                    value={input.key}
+                    onChange={e => handleChange(index, 'key', e.target.value)}
+                  />
+                  {input.key && (
+                    <TextField
+                      size='small'
+                      fullWidth
+                      label="Ma'lumot"
+                      value={input.value}
+                      onChange={e => handleChange(index, 'value', e.target.value)}
+                    />
+                  )}
+                </Box>
+                {index > 0 && (
+                  <IconButton sx={{ width: 40, height: 40 }} onClick={() => handleRemoveInput(index)}>
+                    <Delete />
+                  </IconButton>
+                )}
+              </Box>
+            </div>
+          ))}
+          <Button fullWidth variant='outlined' startIcon={<Add />} onClick={handleAddInput}>
+            Yangi Qo'shish
+          </Button>
+        </DialogContent>
+        <DialogActions>
+          <Button variant='contained' onClick={onClose} color='error'>
+            Bekor qilish
+          </Button>
+          <LoadingButton loading={isPending} onClick={handleSave} color='primary' variant='contained'>
+            Saqlash
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={Boolean(editItem)} onClose={() => setEditItem(null)} fullWidth maxWidth='sm'>
+        <DialogTitle>Ma'lumotni tahrirlash</DialogTitle>
+        <DialogContent>
+          <form onSubmit={formik.handleSubmit}>
+            <TextField
+              fullWidth
+              margin='dense'
+              label="Ma'lumot nomi"
+              name='key'
+              value={formik.values.key}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.key && Boolean(formik.errors.key)}
+              helperText={formik.touched.key && formik.errors.key}
+            />
+
+            <TextField
+              fullWidth
+              margin='dense'
+              label="Ma'lumot"
+              name='value'
+              value={formik.values.value}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.value && Boolean(formik.errors.value)}
+              helperText={formik.touched.value && formik.errors.value}
+            />
+
+            <DialogActions>
+              <Button onClick={() => setEditItem(null)} color='error' variant='contained'>
+                Bekor qilish
+              </Button>
+              <LoadingButton loading={editPending} variant='contained' color='primary' type='submit'>
+                Saqlash
+              </LoadingButton>
+            </DialogActions>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <UserSuspendDialog
+        open={Boolean(deletDetailModal)}
+        setOpen={setDeleteDetailModal}
+        handleOk={handleDeleteDetail}
+        loading={deletePending}
       />
     </StyledCard>
   )

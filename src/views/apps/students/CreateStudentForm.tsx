@@ -50,6 +50,7 @@ import { revereAmount } from '../../../components/amount-input'
 import api from 'src/@core/utils/api'
 import ceoConfigs from 'src/configs/ceo'
 import { useQueryClient } from '@tanstack/react-query'
+import { fetchSchoolsList } from 'src/store/apps/settings'
 
 export default function CreateStudentForm() {
   // ** Hooks
@@ -179,14 +180,12 @@ export default function CreateStudentForm() {
     setChecked(event.target.checked)
   }
 
-
-
   const handleSearch = useCallback(
     debounce(async (val: string) => {
-      await dispatch(fetchGroupCheckList(val));
+      await dispatch(fetchGroupCheckList(val))
     }, 500),
     []
-  );
+  )
   return (
     <form
       onSubmit={formik.handleSubmit}
@@ -377,16 +376,16 @@ export default function CreateStudentForm() {
           </Select>
           {errors.school && <FormHelperText error={!!errors.school}>{errors.school}</FormHelperText>}
 
-          <TextField
+          {/* <TextField
             size='small'
-            label={t("Qo'shilish sanasi")}
+            label={t("Guruhga Qo'shilish sanasi")}
             name='start_at'
             type='date'
             error={!!errors.start_at && touched.start_at}
             value={values.start_at}
             onChange={handleChange}
             onBlur={handleBlur}
-          />
+          /> */}
           <FormHelperText error={true}>{errors.start_at}</FormHelperText>
         </FormControl>
       )}
@@ -427,7 +426,7 @@ export default function CreateStudentForm() {
 
           <TextField
             size='small'
-            label={t("Qo'shilish sanasi")}
+            label={t("Guruhga Qo'shilish sanasi")}
             name='start_at'
             type='date'
             error={!!errors.start_at && touched.start_at}
@@ -439,49 +438,31 @@ export default function CreateStudentForm() {
         </FormControl>
       )}
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-        {!isGroup && (
-          <Button
-            fullWidth
-            onClick={async () => setIsGroup(true)}
-            type='button'
-            variant='outlined'
-            size='small'
-            startIcon={<IconifyIcon icon={'material-symbols:add'} />}
-          >
-            {t("Guruhga qo'shish")}
-          </Button>
-        )}
-      </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-        {!isParent && (
-          <Button
-            fullWidth
-            onClick={async () => setIsParent(true)}
-            type='button'
-            variant='outlined'
-            size='small'
-            startIcon={<IconifyIcon icon={'material-symbols:add'} />}
-          >
-            {t("Ota-ona telefon raqami qo'shish")}
-          </Button>
-        )}
-      </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-        {!isSchool && (
-          <Button
-            fullWidth
-            color='warning'
-            onClick={async () => setIsSchool(true)}
-            type='button'
-            variant='outlined'
-            size='small'
-            startIcon={<IconifyIcon icon={'material-symbols:add'} />}
-          >
-            {t("Maktab qo'shish")}
-          </Button>
-        )}
-      </Box>
+      <FormControl fullWidth>
+        <InputLabel size='small' id='user-view-language-label'>
+          {t("O'quvchini qo'shimch ma'lumotlari")}
+        </InputLabel>
+        <Select
+          onChange={e => {
+            const selectedValue = e.target.value
+            if (selectedValue === 'group') setIsGroup(true)
+            if (selectedValue === 'parent') setIsParent(true)
+            if (selectedValue === 'school') {
+              setIsSchool(true)
+              dispatch(fetchSchoolsList())
+            }
+          }}
+          displayEmpty
+          size='small'
+          id='user-view-language-label'
+          labelId='user-view-language-label'
+          label="O'quvchini qo'shimch ma'lumotlari"
+        >
+          <MenuItem value='group'>{t("Guruhga qo'shish")}</MenuItem>
+          <MenuItem value='parent'>{t("Ota-ona telefon raqami qo'shish")}</MenuItem>
+          <MenuItem value='school'>{t("Maktab qo'shish")}</MenuItem>
+        </Select>
+      </FormControl>
 
       {isGroup && values?.group && (
         <Box className='w-100'>
