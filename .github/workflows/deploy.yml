@@ -50,11 +50,10 @@ jobs:
             mkdir -p ~/CRMFrondEnd/${{ secrets.REPO_NAME }}
             cd ~/CRMFrondEnd/${{ secrets.REPO_NAME }}
 
-            if [ -d ".git" ]; then
-              git reset --hard
-              git pull origin main
+            if [ ! -d ".git" ]; then
+                git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
             else
-              git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
+                git pull origin main
             fi
 
             echo "${{ secrets.PROD_ENV_CONTENT }}" > .env
