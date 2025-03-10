@@ -70,8 +70,8 @@ jobs:
             # npm run export # Next.js static export uchun
 
             # PM2 orqali jarayonlarni boshqarish
-            pm2 restart ${{ secrets.REPO_NAME }}-prod || pm2 start npm --name="${{ secrets.REPO_NAME }}-prod" -- run start
-            # pm2 save
+            pm2 restart ${{ secrets.REPO_NAME }}-prod || pm2 start npm --name ${{ secrets.REPO_NAME }}-prod -- start
+            pm2 save
 
       - name: Deploy to development server (for test branch)
         if: github.ref == 'refs/heads/test'
@@ -107,5 +107,5 @@ jobs:
             npm run build
 
             # PM2 orqali jarayonlarni boshqarish
-            pm2 restart ${{ secrets.REPO_NAME }}-dev || pm2 start npm --name="${{ secrets.REPO_NAME }}-dev" -- run start
+            pm2 restart ${{ secrets.REPO_NAME }}-test || pm2 start npm --name ${{ secrets.REPO_NAME }}-test -- start
             pm2 save
