@@ -1,15 +1,20 @@
-import { useState, useEffect } from 'react'
+'use client'
+
+import { useState, useEffect, useCallback } from 'react'
 import toast from 'react-hot-toast'
-import api from '../../@core/utils/api'
+import api from 'src/@core/utils/api'
 
 export default function QRCodeScanner() {
-  const [scannedCode, setScannedCode] = useState('')
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [scannedCode, setScannedCode] = useState<string>('')
+  const [isProcessing, setIsProcessing] = useState<boolean>(false)
 
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-  const handleSendQrCode = async (code: string) => {
-    if (!uuidRegex.test(code)) return
+  const handleSendQrCode = useCallback(async (code: string): Promise<void> => {
+    if (!uuidRegex.test(code)) {
+      toast.error("Xato format")
+      return
+    }
 
     try {
       setIsProcessing(true)
@@ -21,7 +26,7 @@ export default function QRCodeScanner() {
       }
     } catch (err: any) {
       console.error(err)
-      if (err.response?.status === 404) {
+      if (err?.response?.status === 404) {
         toast.error("Ma'lumot topilmadi")
       } else {
         toast.error(err.response?.data?.msg || 'Xatolik yuz berdi')
@@ -30,44 +35,45 @@ export default function QRCodeScanner() {
       setScannedCode('')
       setIsProcessing(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
-    let timer: NodeJS.Timeout
+    let timer: NodeJS.Timeout | null = null
 
-    const handleKeyPress = (event: KeyboardEvent) => {
+    const handleKeyPress = (event: KeyboardEvent): void => {
       if (isProcessing) return
-      const key = event.key
 
+      const key = event.key
       if (key === 'Enter') {
-        if (uuidRegex.test(scannedCode)) {
+        if (scannedCode && uuidRegex.test(scannedCode)) {
           void handleSendQrCode(scannedCode)
         } else {
           setScannedCode('')
         }
-      } else {
-        setScannedCode(prev => prev + key)
-
-        clearTimeout(timer)
-        timer = setTimeout(() => {
-          if (uuidRegex.test(scannedCode)) {
-            void handleSendQrCode(scannedCode)
-          } else {
-            setScannedCode('')
-          }
-        }, 500)
+        return
       }
+
+      const newCode = scannedCode + key
+      setScannedCode(newCode)
+
+      if (timer) clearTimeout(timer)
+
+      timer = setTimeout(() => {
+        if (uuidRegex.test(newCode)) {
+          void handleSendQrCode(newCode)
+        } else if (newCode.length >= 36) {
+          setScannedCode('')
+        }
+      }, 500)
     }
 
     window.addEventListener('keypress', handleKeyPress)
 
     return () => {
       window.removeEventListener('keypress', handleKeyPress)
-      clearTimeout(timer)
+      if (timer) clearTimeout(timer)
     }
-  }, [scannedCode, isProcessing])
+  }, [scannedCode, isProcessing, handleSendQrCode])
 
-  return <div>
-
-  </div>
+  return <div />
 }
