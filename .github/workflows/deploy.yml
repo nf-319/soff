@@ -54,7 +54,7 @@ jobs:
             cd /projects/crm-front/${{ secrets.REPO_NAME }}
 
             if [ ! -d ".git" ]; then
-                git clone --branch main https://soff-hub:${{ secrets.TOKEN_GITHUB }}@github.com/soff-hub/${{ secrets.REPO_NAME }}.git .
+                git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
             else
                 git pull origin main
             fi
