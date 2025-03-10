@@ -1,117 +1,111 @@
-name: NextJS Frontend CI/CD Workflow
+name: CI and Deploy to Server
 
 on:
   push:
     branches:
-      - main
       - test
-      - development
+      - main
 
 jobs:
-  lint-and-test:
-    name: Lint va Test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Repositoryni klon qilish
-        uses: actions/checkout@v4
-
-      - name: Node.js o'rnatish
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'npm'
-
-      - name: `.env` faylini yaratish
-        run: echo "${{ secrets.ENV_FILE }}" > .env
-
-      - name: Paketlarni o'rnatish
-        run: npm ci
-
   build-and-deploy:
-    name: Build va Deploy
-    needs: lint-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test' || github.ref == 'refs/heads/development'
-
-    env:
-      SERVER_HOST: ${{ github.ref == 'refs/heads/main' && secrets.PROD_SERVER_HOST || github.ref == 'refs/heads/test' && secrets.TEST_SERVER_HOST || secrets.DEV_SERVER_HOST }}
 
     steps:
-      - name: Repositoryni klon qilish
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Node.js o'rnatish
-        uses: actions/setup-node@v4
+      - name: Set up Node.js (local runner)
+        uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
-          cache: 'npm'
+          node-version: 'v20.12.2'
 
-      - name: `.env` faylini yaratish
+      - name: Install dependencies (local runner)
+        run: npm install
+
+      - name: create env file
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "${{ secrets.PROD_ENV_FILE }}" > .env
-          elif [[ "${{ github.ref }}" == "refs/heads/test" ]]; then
-            echo "${{ secrets.TEST_ENV_FILE }}" > .env
-          else
-            echo "${{ secrets.DEV_ENV_FILE }}" > .env
-          fi
+          touch .env
+          echo "${{ secrets.TEST_ENV_CONTENT }}" >> .env
+          touch .env
+          echo "${{ secrets.PROD_ENV_CONTENT }}" >> .env
 
-      - name: Build yaratish
-        run: |
-          npm ci
-          npm run build
+      - name: Build project (local runner)
+        run: npm run build
 
-      - name: Deploy qilish uchun serverga bog'lanish
-        uses: appleboy/ssh-action@v1.0.0
+      - name: Deploy to production server (for main branch)
+        if: github.ref == 'refs/heads/main'
+        uses: appleboy/ssh-action@v0.1.2
         with:
-          host: ${{ env.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
+          host: ${{ secrets.PROD_SERVER_IP }}
+          username: ubuntu
+          password: ${{ secrets.PROD_SERVER_PASSWORD }}
           script: |
-            set -e
-            PROJECT_DIR="/projects/frontend/${{ github.ref_name }}"
-            mkdir -p $PROJECT_DIR
-
-            # Avvalgi versiyani backup qilish
-            if [ -d "${PROJECT_DIR}/.next" ]; then
-              BACKUP_DIR="${PROJECT_DIR}_backup_$(date +%Y%m%d_%H%M%S)"
-              mkdir -p $BACKUP_DIR
-              cp -r ${PROJECT_DIR}/.next ${PROJECT_DIR}/package.json ${PROJECT_DIR}/package-lock.json $BACKUP_DIR
-            fi
-
-      - name: Build fayllarni yuborish
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ env.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          source: '.next/,public/,package.json,package-lock.json,next.config.js,.env'
-          target: '/projects/frontend/${{ github.ref_name }}'
-
-      - name: Application'ni restart qilish
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ env.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            set -e
-            cd /projects/frontend/${{ github.ref_name }}
-
-            # Node.js versiyasini tanlash
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            nvm use 20 || nvm install 20
-
-            # PM2 bilan servisni boshqarish
-            SERVICE_NAME="nextjs-app-${{ github.ref_name }}"
-
-            if pm2 list | grep -q "$SERVICE_NAME"; then
-              pm2 restart "$SERVICE_NAME"
+            # NVM o'rnatilganligini tekshirish va kerakli Node.js versiyasini tanlash
+            if [ ! -d "$HOME/.nvm" ]; then
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+              source ~/.nvm/nvm.sh
             else
-              pm2 start npm --name "$SERVICE_NAME" -- start
+              source ~/.nvm/nvm.sh
+            fi
+            nvm use 20.10.0
+
+            # Loyihaning joylashuvini yaratish va loyihani olish
+            mkdir -p /ubuntu/CRMFrondEnd/${{ secrets.REPO_NAME }}
+            cd /ubuntu/CRMFrondEnd/${{ secrets.REPO_NAME }}
+
+            if [ ! -d ".git" ]; then
+                git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
+            else
+                git pull origin main
             fi
 
+            # .env faylini yuklash
+            echo "${{ secrets.PROD_ENV_CONTENT }}" > .env
+
+            # Kerakli kutubxonalarni o'rnatish va loyihani build qilish
+            npm install
+            npm run build
+
+            # # Next.js loyihasini static fayllarga build qilish
+            # npm run export # Next.js static export uchun
+
+            # PM2 orqali jarayonlarni boshqarish
+            pm2 restart ${{ secrets.REPO_NAME }}-prod || pm2 start npm --name ${{ secrets.REPO_NAME }}-prod -- start
             pm2 save
-            echo "✅ Deploy muvaffaqiyatli yakunlandi!"
+
+      - name: Deploy to development server (for test branch)
+        if: github.ref == 'refs/heads/test'
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{ secrets.TEST_SERVER_IP }}
+          username: root
+          password: ${{ secrets.TEST_SERVER_PASSWORD }}
+          script: |
+            # NVM o'rnatilganligini tekshirish va kerakli Node.js versiyasini tanlash
+            if [ ! -d "$HOME/.nvm" ]; then
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+              source ~/.nvm/nvm.sh
+            else
+              source ~/.nvm/nvm.sh
+            fi
+            nvm use 20.10.0
+
+            # Loyihaning joylashuvini yaratish va loyihani olish
+            mkdir -p /projects/crm-front/${{ secrets.REPO_NAME }}
+            cd /projects/crm-front/${{ secrets.REPO_NAME }}
+            if [ ! -d ".git" ]; then
+                git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
+            else
+                git pull origin test
+            fi
+
+            # .env faylini yuklash
+            echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
+
+            # Kerakli kutubxonalarni o'rnatish va loyihani build qilish
+            npm install
+            npm run build
+
+            # PM2 orqali jarayonlarni boshqarish
+            pm2 restart ${{ secrets.REPO_NAME }}-test || pm2 start npm --name ${{ secrets.REPO_NAME }}-test -- start
+            pm2 save

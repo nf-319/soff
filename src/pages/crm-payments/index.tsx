@@ -145,7 +145,7 @@ export default function PaymentsList() {
       !user?.role.includes('watcher') &&
       !user?.role.includes('marketolog')
     ) {
-      router.push('/')
+      void router.push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
     }
     (async function () {
@@ -168,7 +168,7 @@ export default function PaymentsList() {
     if (userData.payment_page) {
       window.localStorage.removeItem('userData')
       window.localStorage.removeItem(authConfig.storageTokenKeyName)
-      router.push('/login')
+      void router.push('/login')
     } else router.back()
   }
 
@@ -189,9 +189,12 @@ export default function PaymentsList() {
             <IconButton color='primary'>
               <IconifyIcon icon={'ep:back'} style={{ cursor: 'pointer' }} onClick={() => handleLogout()} />
             </IconButton>
+
             <Typography variant='h6'>{t("O'quv markaz to'lovlari")}</Typography>
+
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <IconifyIcon color='orange' icon={'fa-solid:sms'} style={{ cursor: 'pointer' }} />
+
               {clientOwnPayments?.sms_data}
             </Box>
           </Stack>

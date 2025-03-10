@@ -103,10 +103,7 @@ const LoginPage = () => {
       window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.tokens.access)
       window.localStorage.setItem('userData', JSON.stringify({ ...response.data }))
 
-
-      const userRoles = response.data.roles
-        .filter((el: any) => el.exists)
-        .map((el: any) => el.name?.toLowerCase())
+      const userRoles = response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase())
 
       dispatch(setRoles(userRoles))
 
@@ -119,10 +116,16 @@ const LoginPage = () => {
       }
 
       const isMarketable = userRoles.includes('marketolog')
+      const paymentPage = response.data.payment_page
       const returnUrl = router.query.returnUrl
       const redirectURL = isMarketable
         ? '/lids'
-        : (returnUrl && returnUrl !== '/' ? returnUrl : '/')
+        : paymentPage
+        ? '/crm-payments'
+        : returnUrl && returnUrl !== '/'
+        ? returnUrl
+        : '/'
+
 
       await router.push(redirectURL as string)
 
