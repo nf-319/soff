@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - test
-      - main
+#      - main
 
 jobs:
   build-and-deploy:
@@ -73,8 +73,8 @@ jobs:
             pm2 restart ${{ secrets.REPO_NAME }}-prod || pm2 start npm --name="${{ secrets.REPO_NAME }}-prod" -- run start
             # pm2 save
 
-      - name: Deploy to development server (for dev branch)
-        if: github.ref == 'refs/heads/dev'
+      - name: Deploy to development server (for test branch)
+        if: github.ref == 'refs/heads/test'
         uses: appleboy/ssh-action@v0.1.2
         with:
           host: ${{ secrets.TEST_SERVER_IP }}
