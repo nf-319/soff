@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start -p 3131",
     "lint": "echo Lint tekshiruvi o‘chirildi",
-    "postinstall": "npx browserslist@latest --update-db",
+    "types": "tsc --noEmit",
+    "typecheck": "tsc --noEmit --incremental false",
+    "postinstall": "npx browserslist@latest --update-db && husky",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "format:check": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "build:icons": "tsc -b src/iconify-bundle && node src/iconify-bundle/bundle-icons-react.js"
@@ -129,6 +131,7 @@
     "eslint-import-resolver-alias": "1.1.2",
     "eslint-import-resolver-typescript": "3.5.2",
     "eslint-plugin-import": "2.26.0",
+    "husky": "9.1.7",
     "next-transpile-modules": "9.1.0",
     "prettier": "2.7.1",
     "react-hot-loader": "^4.13.1",
