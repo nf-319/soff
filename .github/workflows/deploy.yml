@@ -40,36 +40,27 @@ jobs:
           username: ubuntu
           password: ${{ secrets.PROD_SERVER_PASSWORD }}
           script: |
-            # NVM o'rnatilganligini tekshirish va kerakli Node.js versiyasini tanlash
-            if [ ! -d "$HOME/.nvm" ]; then
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
-              source ~/.nvm/nvm.sh
-            else
-              source ~/.nvm/nvm.sh
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            if ! nvm ls 20.10.0; then
+              nvm install 20.10.0
             fi
             nvm use 20.10.0
 
-            # Loyihaning joylashuvini yaratish va loyihani olish
-            mkdir -p /ubuntu/CRMFrondEnd/${{ secrets.REPO_NAME }}
-            cd /ubuntu/CRMFrondEnd/${{ secrets.REPO_NAME }}
+            mkdir -p ~/CRMFrondEnd/${{ secrets.REPO_NAME }}
+            cd ~/CRMFrondEnd/${{ secrets.REPO_NAME }}
 
-            if [ ! -d ".git" ]; then
-                git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
+            if [ -d ".git" ]; then
+              git reset --hard
+              git pull origin main
             else
-                git pull origin main
+              git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
             fi
 
-            # .env faylini yuklash
             echo "${{ secrets.PROD_ENV_CONTENT }}" > .env
-
-            # Kerakli kutubxonalarni o'rnatish va loyihani build qilish
             npm install
             npm run build
 
-            # # Next.js loyihasini static fayllarga build qilish
-            # npm run export # Next.js static export uchun
-
-            # PM2 orqali jarayonlarni boshqarish
             pm2 restart subdomain-soffcrm-uz-3131 || pm2 start npm --name subdomain-soffcrm-uz-3131 -- start
             pm2 save
 
