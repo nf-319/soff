@@ -69,7 +69,7 @@ interface StudentCardProps {
   school?: string
 }
 
-const StyledCard = styled(Card)(({ theme }) => ({
+const StyledCard = styled(Card)(() => ({
   width: '100%',
   overflow: 'hidden'
 }))
@@ -102,7 +102,7 @@ export default function StudentCard({
   const [isDiscount, setIsDiscount] = useState<boolean>(false)
   const router = useRouter()
   const [image, setImage] = useState<any>(null)
-  const { updateStudent, studentData } = useStudent()
+  const { updateStudent } = useStudent()
   const [groupDate, setGroupDate] = useState<any>(null)
   const school_type = localStorage.getItem('school_type')
   const [openModal, setOpenModal] = useState(false)
@@ -111,7 +111,7 @@ export default function StudentCard({
   const dispatch = useAppDispatch()
   const { mutate, isPending } = usePost()
   const { mutate: deleteMutate, isPending: deletePending } = useDelete()
-  const [deletDetailModal, setDeleteDetailModal] = useState<string | number | null>(null)
+  const [deleteDetailModal, setDeleteDetailModal] = useState<string | number | null>(null)
   const [editItem, setEditItem] = useState<{ key: string; value: string; id: number } | null>(null)
   const queryClient = useQueryClient()
   const { mutate: editMutate, isPending: editPending } = usePatch()
@@ -140,7 +140,6 @@ export default function StudentCard({
           toast.error(err.response.data)
         }
       })
-      // onClose()
     }
   })
 
@@ -262,7 +261,7 @@ export default function StudentCard({
   }
 
   function handleDeleteDetail() {
-    deleteMutate(`student/extradata/destroy/${deletDetailModal}/`, {
+    deleteMutate(`student/extradata/destroy/${deleteDetailModal}/`, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [`student/extradata/list/${userData.id}/`, 'student-data'] })
 
@@ -817,7 +816,7 @@ export default function StudentCard({
         </DialogContent>
       </Dialog>
       <UserSuspendDialog
-        open={Boolean(deletDetailModal)}
+        open={Boolean(deleteDetailModal)}
         setOpen={setDeleteDetailModal}
         handleOk={handleDeleteDetail}
         loading={deletePending}

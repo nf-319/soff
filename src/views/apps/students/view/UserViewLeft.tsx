@@ -1,8 +1,6 @@
-// ** React Imports
-import { useEffect, useState } from 'react'
+'use client'
 
-// ** MUI Imports
-import Box from '@mui/material/Box'
+import { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import Dialog from '@mui/material/Dialog'
@@ -17,28 +15,18 @@ import DialogTitle from '@mui/material/DialogTitle'
 import FormControl from '@mui/material/FormControl'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-
-// ** Custom Components
-import CustomAvatar from '../../../../components/mui/avatar'
-
-// ** Utils Import
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from '../../../../components/icon'
-
-import { ButtonGroup, Checkbox, Chip, FormHelperText, Radio, RadioGroup, Skeleton, Tooltip } from '@mui/material'
-import Form from '../../../../components/form'
-import { addPeriodToThousands } from 'src/pages/settings/office/courses'
+import IconifyIcon from 'src/components/icon'
+import {  Checkbox, FormHelperText, Skeleton } from '@mui/material'
+import Form from 'src/components/form'
 import UserViewStudentsList from './UserViewStudentsList'
 import useStudent, { StudentTypes } from 'src/hooks/useStudents'
-import { getInitials } from 'src/@core/utils/get-initials'
 import useGroups from 'src/hooks/useGroups'
 import LoadingButton from '@mui/lab/LoadingButton'
 import useBranches from 'src/hooks/useBranch'
 import showResponseError from 'src/@core/utils/show-response-error'
-import usePayment from 'src/hooks/usePayment'
 import api from 'src/@core/utils/api'
-import useSMS from 'src/hooks/useSMS'
-import { today } from '../../../../components/card-statistics/kanban-item'
+import { today } from 'src/components/card-statistics/kanban-item'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchStudentDetail, fetchStudentGroups, fetchStudentPayment } from 'src/store/apps/students'
 import StudentPaymentForm from './StudentPaymentForm'
@@ -48,13 +36,12 @@ import * as Yup from 'yup'
 import StudentParentList from './StudentParentList'
 import StudentWithDrawForm from './StudentWithdrawForm'
 import toast from 'react-hot-toast'
-import { fetchSmsList, fetchSmsListQuery } from 'src/store/apps/settings'
+import { fetchSmsListQuery } from 'src/store/apps/settings'
 import StudentCard from './card'
 
 export type ModalTypes = 'group' | 'withdraw' | 'payment' | 'sms' | 'delete' | 'edit' | 'notes' | 'parent'
 
 const UserViewLeft = ({ userData }: { userData: any }) => {
-  // ** States
   const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
   const [data, setData] = useState<StudentTypes | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
@@ -65,9 +52,7 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
   const { t } = useTranslation()
   const { mergeStudentToGroup, getGroupShort, groupShort } = useGroups()
   const { updateStudent, studentData } = useStudent()
-  const { getBranches, branches } = useBranches()
-  const {} = usePayment()
-  const { smsTemps, getSMSTemps } = useSMS()
+  const { branches } = useBranches()
   const dispatch = useAppDispatch()
   const router = useRouter()
 
@@ -83,14 +68,6 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
       student: userData?.id,
       groups: [+value.group]
     }
-
-    // const discountConfig = {
-    //   amount: value?.fixed_price,
-    //   discount_count: 100,
-    //   description: 'kurs oxirigacha',
-    //   group: value?.group,
-    //   student: userData?.id
-    // }
 
     try {
       const discountConfig = {
@@ -179,6 +156,7 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
           )}
           <StudentParentList />
         </Grid>
+
         <Dialog
           open={openEdit === 'group'}
           onClose={handleEditClose}
