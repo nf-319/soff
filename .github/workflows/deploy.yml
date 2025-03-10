@@ -70,7 +70,7 @@ jobs:
             # npm run export # Next.js static export uchun
 
             # PM2 orqali jarayonlarni boshqarish
-            pm2 restart ${{ secrets.REPO_NAME }}-prod || pm2 start npm --name ${{ secrets.REPO_NAME }}-prod -- start
+            pm2 restart subdomain-soffcrm-uz-3131 || pm2 start npm --name subdomain-soffcrm-uz-3131 -- start
             pm2 save
 
       - name: Deploy to development server (for test branch)
