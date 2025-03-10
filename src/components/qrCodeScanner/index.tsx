@@ -41,7 +41,7 @@ export default function QRCodeScanner() {
 
       if (key === 'Enter') {
         if (uuidRegex.test(scannedCode)) {
-          handleSendQrCode(scannedCode)
+          void handleSendQrCode(scannedCode)
         } else {
           setScannedCode('')
         }
@@ -51,7 +51,7 @@ export default function QRCodeScanner() {
         clearTimeout(timer)
         timer = setTimeout(() => {
           if (uuidRegex.test(scannedCode)) {
-            handleSendQrCode(scannedCode)
+            void handleSendQrCode(scannedCode)
           } else {
             setScannedCode('')
           }
@@ -67,5 +67,7 @@ export default function QRCodeScanner() {
     }
   }, [scannedCode, isProcessing])
 
-  return <div />
+  return <div>
+
+  </div>
 }

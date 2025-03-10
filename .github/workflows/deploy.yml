@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - test
-#      - main
+      - main
 
 jobs:
   build-and-deploy:
@@ -37,7 +37,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.2
         with:
           host: ${{ secrets.PROD_SERVER_IP }}
-          username: root
+          username: ubuntu
           password: ${{ secrets.PROD_SERVER_PASSWORD }}
           script: |
             # NVM o'rnatilganligini tekshirish va kerakli Node.js versiyasini tanlash
@@ -50,8 +50,8 @@ jobs:
             nvm use 20.10.0
 
             # Loyihaning joylashuvini yaratish va loyihani olish
-            mkdir -p /projects/crm-front/${{ secrets.REPO_NAME }}
-            cd /projects/crm-front/${{ secrets.REPO_NAME }}
+            mkdir -p /ubuntu/CRMFrondEnd/${{ secrets.REPO_NAME }}
+            cd /ubuntu/CRMFrondEnd/${{ secrets.REPO_NAME }}
 
             if [ ! -d ".git" ]; then
                 git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
