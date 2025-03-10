@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 import Dialog from '@mui/material/Dialog'
 import Button from '@mui/material/Button'
@@ -22,7 +24,6 @@ import { fetchStudentDetail, fetchStudentGroups, fetchStudentPayment } from 'src
 import AmountInput, { revereAmount } from '../../../../components/amount-input'
 import IconifyIcon from '../../../../components/icon'
 import { getStudents } from 'src/store/apps/groupDetails'
-import api from 'src/@core/utils/api'
 
 type Props = {
   openEdit: any
@@ -32,7 +33,7 @@ type Props = {
   active_id?: any
 }
 
-export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, group, active_id }: Props) {
+export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, group }: Props) {
   const [loading, setLoading] = useState<boolean>(false)
   const [showWarning, setShowWarning] = useState<boolean>(false)
   const { studentsQueryParams } = useAppSelector(state => state.groupDetails)
@@ -50,7 +51,6 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
     description: Yup.string(),
     payment_date: Yup.string().required('Tanlash majburiy')
   })
-
 
   const initialValues = {
     payment_type: '',
@@ -85,7 +85,6 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
           await dispatch(getStudents({ id: query.id, queryString: queryString }))
         }
       } catch (err: any) {
-        // showResponseError(err.response.data, setError)
         setLoading(false)
       }
     }
@@ -122,7 +121,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
 
   useEffect(() => {
     if (openEdit === 'payment' && paymentMethods.length === 0) {
-      getPaymentMethod()
+      void getPaymentMethod()
     }
   }, [openEdit])
 
@@ -130,8 +129,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
     <div>
       <Dialog
         open={openEdit === 'payment'}
-        // onClose={handleEditClose}
-        onClose={(event, reason) => {
+        onClose={(_, reason) => {
           if (reason !== 'backdropClick') {
             handleEditClose()
           }
@@ -197,9 +195,13 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
                 onChange={handleChange}
                 onBlur={handleBlur}
               >
-                {groupsChecklist?.map((group: any) => (
-                  <MenuItem key={group.id} value={group.id}>
-                    {`${group.name + ` , ${group?.total_payments || '0'} so'm`}`}
+                {groupsChecklist?.length === 0 ? (
+                  <MenuItem>
+                    Guruhga biriktirilmagan
+                  </MenuItem>
+                ) : groupsChecklist?.map((group: any) => (
+                  <MenuItem key={group.id} value={group.id} sx={{ whiteSpace: 'normal', lineHeight: 1.2 }}>
+                    {`${group.name} , ${group?.total_payments ? group.total_payments.toLocaleString() : '0'} so'm`}
                   </MenuItem>
                 ))}
               </Select>
@@ -211,7 +213,6 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
                 label={t('Summa')}
                 size='small'
                 name='amount'
-                defaultValue={''}
                 error={!!errors.amount && touched.amount}
                 value={values.amount}
                 onChange={handleChange}
