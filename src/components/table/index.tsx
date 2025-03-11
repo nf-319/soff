@@ -50,6 +50,7 @@ const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidt
           borderRadius: '8px',
           display: 'flex',
           alignItems: 'center',
+          border: '1px solid #d3d3d3',
           gap: 1,
           width: '100%',
           cursor: 'pointer',
