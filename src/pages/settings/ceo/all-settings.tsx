@@ -1,3 +1,5 @@
+'use client'
+
 import { useContext, useEffect, useRef, useState } from 'react'
 import {
   Box,
@@ -9,8 +11,6 @@ import {
   Dialog,
   DialogContent,
   FormControlLabel,
-  Grid,
-  IconButton,
   Skeleton,
   Switch,
   Tab,
@@ -19,7 +19,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material'
-import IconifyIcon from '../../../components/icon'
+import IconifyIcon from 'src/components/icon'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import usePayment from 'src/hooks/usePayment'
 import useBranches from 'src/hooks/useBranch'
@@ -31,13 +31,12 @@ import { useTranslation } from 'react-i18next'
 import showResponseError from 'src/@core/utils/show-response-error'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { AuthContext } from 'src/context/AuthContext'
-import VideoHeader, { videoUrls } from '../../../components/video-header/video-header'
+import VideoHeader, { videoUrls } from 'src/components/video-header/video-header'
 import { toast } from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import { Icon } from '@iconify/react'
 
 const VisuallyHiddenInput = styled('input')({
-  clip: 'rect(0 0 0 0)',
   clipPath: 'inset(50%)',
   height: 1,
   overflow: 'hidden',
@@ -96,11 +95,6 @@ export default function AllSettings() {
   const [settinsLoading, setSettingsLoading] = useState(false)
   const { setUser, user } = useContext(AuthContext)
   const [tabIndex, setTabIndex] = useState(0)
-  // const birthday_text = localStorage.getItem('birthday_text')
-  // const absent_text = localStorage.getItem('absent_text')
-  // const payment_text = localStorage.getItem('payment_text')
-  // const score_text = localStorage.getItem('score_text')
-  // const attend_text = localStorage.getItem('attend_text')
 
   async function getSettingsList() {
     setSettingsLoading(true)
@@ -992,6 +986,7 @@ export default function AllSettings() {
                   </Box>
                 </CardContent>
               </Card>
+
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
@@ -1343,7 +1338,6 @@ export default function AllSettings() {
                             value={companyInfo?.auto_sms?.score_text}
                             size='small'
                             placeholder={t('Boshlanish vaqti')}
-                            // onBlur={e => console.log(e.target.value)}
                           />
                           <IconifyIcon
                             icon={'basil:edit-outline'}
