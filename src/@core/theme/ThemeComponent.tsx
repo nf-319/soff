@@ -1,25 +1,27 @@
-import { FC, PropsWithChildren } from 'react'
+import { ReactNode } from 'react'
 import { deepmerge } from '@mui/utils'
 import { Theme } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import GlobalStyles from '@mui/material/GlobalStyles'
-import { ThemeProvider as MuiThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles'
+import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles'
 import { Settings } from 'src/@core/context/settingsContext'
 import themeConfig from 'src/configs/themeConfig'
-import overrides from '../@core/theme/overrides'
-import typography from '../@core/theme/typography'
-import themeOptions from '../@core/theme/ThemeOptions'
-import UserThemeOptions from 'src/layouts/UserThemeOptions'
-import GlobalStyling from '../@core/theme/globalStyles'
 import { Direction } from 'src/layouts/components/Direction'
+import overrides from './overrides'
+import typography from './typography'
+import themeOptions from './ThemeOptions'
+import UserThemeOptions from 'src/layouts/UserThemeOptions'
+import GlobalStyling from './globalStyles'
 
-type Props = {
+interface Props {
   settings: Settings
+  children: ReactNode
 }
 
-export const ThemeProvider: FC<PropsWithChildren<Props>> = ({ settings, children }) => {
-  const coreThemeConfig = themeOptions(settings)
+const ThemeComponent = (props: Props) => {
+  const { settings, children } = props
 
+  const coreThemeConfig = themeOptions(settings)
   let theme = createTheme(coreThemeConfig)
 
   const mergeComponentOverrides = (theme: Theme, settings: Settings) =>
@@ -37,16 +39,14 @@ export const ThemeProvider: FC<PropsWithChildren<Props>> = ({ settings, children
   }
 
   return (
-    <MuiThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <Direction direction={settings.direction}>
         <CssBaseline />
-
         <GlobalStyles styles={() => GlobalStyling(theme) as any} />
-
         {children}
       </Direction>
-    </MuiThemeProvider>
+    </ThemeProvider>
   )
 }
 
-ThemeProvider.displayName = 'ThemeProvider'
+export default ThemeComponent
