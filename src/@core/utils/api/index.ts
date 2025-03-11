@@ -12,10 +12,15 @@ api.interceptors.request.use(
       process.env.NODE_ENV === 'development'
         ? process.env.NEXT_PUBLIC_TEST_BASE_URL
         : subdomain.length < 3
-        ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-        : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
+          ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
+          : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
 
     config.baseURL = baseURL
+
+    const version = process.env.NEXT_PUBLIC_API_VERSION || '1.0.0'
+    const params = new URLSearchParams(config.params || {})
+    params.append('version', version)
+    config.params = params
 
     if (storedToken) {
       config.headers['Authorization'] = `Bearer ${storedToken}`
@@ -29,7 +34,7 @@ api.interceptors.request.use(
     }
     return config
   },
-  err => err
+  err => Promise.reject(err)
 )
 
 api.interceptors.response.use(
