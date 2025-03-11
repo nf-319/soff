@@ -47,8 +47,8 @@ jobs:
             nvm use 20.10.0
 
             # Loyihaning joylashuvini yaratish va loyihani olish
-            mkdir -p /projects/crm-front/${{ secrets.REPO_NAME }}
-            cd /projects/crm-front/${{ secrets.REPO_NAME }}
+            mkdir -p ~/CRMFrondEnd/cicd/${{ secrets.REPO_NAME }}
+            cd ~/CRMFrondEnd/cicd/${{ secrets.REPO_NAME }}
             if [ ! -d ".git" ]; then
                 git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
             else
@@ -63,7 +63,7 @@ jobs:
             npm run build
 
             # PM2 orqali jarayonlarni boshqarish
-            pm2 restart ${{ secrets.REPO_NAME }}-production || pm2 start npm --name ${{ secrets.REPO_NAME }}-production -- start
+            pm2 restart subdomain-soffcrm-uz-3132 || pm2 start npm --name subdomain-soffcrm-uz-3132 -- start
             pm2 save
 
       - name: Deploy to development server (for test branch)
