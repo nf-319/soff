@@ -1,6 +1,6 @@
 import { Icon } from '@iconify/react'
 import { Box, CardContent, Chip, CircularProgress, Switch, TextField, Tooltip, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Card } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 import useResponsive from 'src/@core/hooks/useResponsive'
@@ -19,7 +19,7 @@ const SmsSettings = () => {
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const { t } = useTranslation()
   const [birthday_text, setBirthday_text] = useState(companyInfo?.auto_sms?.birthday_text)
-
+  const textFieldRef = useRef<HTMLTextAreaElement | null>(null);
   const [editable, setEditable] = useState<
     | null
     | 'title'
@@ -278,23 +278,25 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t('SMS Matni')}:
             </Typography>
-            <Box display={'flex'} gap={2}>
-              <div onClick={() => setBirthday_text((prev: any) => prev + 'Ism familiya')}>
-                <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
-              </div>
-              <div>
-                <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
-              </div>
-              <div>
-                <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
-              </div>
-              <div>
-                <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
-              </div>
-              <div>
-                <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
-              </div>
-            </Box>
+            {editable === 'birthdate' && (
+              <Box display={'flex'} gap={2}>
+                <div onClick={() => setBirthday_text((prev: any) => prev + '${first_name}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
+                </div>
+                <div onClick={() => setBirthday_text((prev: any) => prev + '${date}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
+                </div>
+                <div onClick={() => setBirthday_text((prev: any) => prev + '${amount}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
+                </div>
+                <div onClick={() => setBirthday_text((prev: any) => prev + '${group}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
+                </div>
+                <div onClick={() => setBirthday_text((prev: any) => prev + '${grade}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
+                </div>
+              </Box>
+            )}
 
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'birthdate' ? (
