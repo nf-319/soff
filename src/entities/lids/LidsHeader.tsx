@@ -25,6 +25,11 @@ export const LidsHeader = () => {
   const searchVal = useDebounce(search, 800)
 
   useEffect(() => {
+    const searchQuery = Array.isArray(query.search) ? query.search[0] : query.search || '';
+    setSearch(searchQuery);
+  }, [query.search]);
+
+  useEffect(() => {
     const updatedQuery = { ...query }
 
     if (searchVal && searchVal.trim().length > 0) {
