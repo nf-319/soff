@@ -1,5 +1,4 @@
 import {
-  Badge,
   Box,
   Chip,
   Dialog,
@@ -20,6 +19,8 @@ import { Icon } from '@iconify/react'
 import useResponsive from '../../@core/hooks/useResponsive'
 import { Done } from '@mui/icons-material'
 import useDebounce from '../../hooks/useDebounce'
+
+const isEnglish = (text: string) => /^[A-Za-z0-9-]*$/.test(text)
 
 const QrCodeModal = () => {
   const { isQrCodeModalOpen } = useAppSelector(state => state.page)
@@ -79,6 +80,16 @@ const QrCodeModal = () => {
     }
   }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value
+    if (!isEnglish(text)) {
+      setErrorText("Faqat ingliz harflari va raqamlari kiritilishi kerak!")
+    } else {
+      setErrorText('')
+      setStudentId(text)
+    }
+  }
+
   useEffect(() => {
     if (debouncedStudentId) {
       handleSendQrCode(debouncedStudentId)
@@ -111,8 +122,8 @@ const QrCodeModal = () => {
           error={Boolean(errorText)}
           sx={{ marginTop: 1.2 }}
           value={studentId}
-          label={t('Qr code ')}
-          onChange={e => setStudentId(e.target.value)}
+          label={t('Qr code')}
+          onChange={handleChange}
           placeholder='Scan or enter QR code'
         />
 
