@@ -120,7 +120,7 @@ const UserViewRight: FC<Props> = ({ tab }) => {
       </Box>
 
       <Box sx={{ mt: 2 }}>
-        <TabPanel sx={{ p: 0, width: '100%' }} value='security'>
+        <TabPanel sx={{ p: 0 }} value='security'>
           <UserViewSecurity />
         </TabPanel>
 
