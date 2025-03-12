@@ -266,7 +266,7 @@ const Item = ({
 }
 
 const UserViewSecurity = () => {
-  const { queryParams, attendance, isGettingDays, isGettingAttendance, days, groupData, month_list } = useAppSelector(
+  const { queryParams, attendance, isGettingAttendance, days, groupData, month_list } = useAppSelector(
     state => state.groupDetails
   )
   const dispatch = useAppDispatch()
@@ -286,6 +286,15 @@ const UserViewSecurity = () => {
   const [updateTopic, setUpdateTopic] = useState(false)
   const [topicId, setTopicId] = useState<number | null>(null)
   const { t } = useTranslation()
+
+  const isDatePast = (dateString: string): boolean => {
+    const inputDate = new Date(dateString)
+    const currentDate = new Date()
+
+    return inputDate < currentDate
+  }
+
+  const isPast = isDatePast(groupData?.end_date)
 
   const handleDateChange = async () => {
     setChangeDateLoader(true)
@@ -476,6 +485,8 @@ const UserViewSecurity = () => {
     fetchAttendance()
   }, [queryParams.status, attendanceDate, queryString])
 
+  console.log(groupData?.end_date)
+
   return isGettingAttendance ? (
     <SubLoader />
   ) : (
@@ -508,190 +519,194 @@ const UserViewSecurity = () => {
           </li>
         ))}
       </ul>
-      <Box sx={{ display: 'flex', width: '100%', paddingBottom: 3, maxWidth: '100%', overflowX: 'auto' }}>
-        <Box>
-          <table>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #c3cccc' }}>
-                <td
-                  style={{
-                    position: 'sticky',
-                    left: 0,
-                    background: settings.mode == 'dark' ? '#282A42' : '#ffffff', // Dark mode background
-                    color: settings.mode == 'dark' ? '#f0f0f0' : '#000000', // Dark mode text color
-                    zIndex: 1,
-                    padding: '8px 20px',
-                    textAlign: 'start',
-                    fontSize: '14px',
-                    borderRight: `1px solid ${settings.mode == 'dark' ? '#444' : '#c3cccc'}` // Dark mode border color
-                  }}
-                >
-                  <Typography>{t('Mavzular')}</Typography>
-                </td>
-                {attendance &&
-                  days?.map((hour: any) => (
-                    <td
-                      key={hour.date}
-                      style={{
-                        textAlign: 'center',
-                        width: '60px',
-                        padding: '8px 0',
-                        cursor: 'pointer',
-                        backgroundColor: hour.exam ? '#96f3a5' : hour.lesson ? '#a7c0fb' : 'transparent'
-                      }}
-                    >
-                      <div>
-                        {hour.exam ? (
-                          <HtmlTooltip
-                            PopperProps={{
-                              disablePortal: true
-                            }}
-                            onClose={() => setOpenTooltip(null)}
-                            open={openTooltip === hour.date}
-                            disableFocusListener
-                            disableHoverListener
-                            disableTouchListener
-                            arrow
-                            title={
-                              <div>
-                                <p style={{ margin: '0', marginBottom: '4px' }}>{hour.exam.title}</p>
-                                <p style={{ margin: '0', marginBottom: '4px' }}>
-                                  Ball: {hour.exam.min_score} / {hour.exam.max_score}
-                                </p>
-                              </div>
-                            }
-                          >
-                            <Box
-                              sx={{
-                                padding: '5px',
-                                width: '60px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                textWrap: 'nowrap'
-                              }}
-                              onClick={() => setOpenTooltip(c => (c === hour.date ? null : hour.date))}
-                            >
-                              {hour.exam?.title}
-                            </Box>
-                          </HtmlTooltip>
-                        ) : hour.lesson ? (
-                          <HtmlTooltip
-                            PopperProps={{
-                              disablePortal: true
-                            }}
-                            onClose={() => setOpenTooltip(null)}
-                            open={openTooltip === hour.date}
-                            arrow
-                            title={
-                              <div>
-                                <p style={{ margin: '0', marginBottom: '4px' }}>{hour.lesson.topic}</p>
-                              </div>
-                            }
-                          >
-                            <Box
-                              sx={{
-                                padding: '5px',
-                                width: '60px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
 
-                                cursor: 'pointer'
+      <Box sx={{ display: 'flex', width: '100%', paddingBottom: 3, maxWidth: '100%', overflowX: 'auto' }}>
+        <Box style={{ width: '100%' }}>
+          <table>
+            {!isPast && (
+              <thead>
+                <tr style={{ borderBottom: '1px solid #c3cccc' }}>
+                  <td
+                    style={{
+                      position: 'sticky',
+                      left: 0,
+                      background: settings.mode == 'dark' ? '#282A42' : '#ffffff', // Dark mode background
+                      color: settings.mode == 'dark' ? '#f0f0f0' : '#000000', // Dark mode text color
+                      zIndex: 1,
+                      padding: '8px 20px',
+                      textAlign: 'start',
+                      fontSize: '14px',
+                      borderRight: `1px solid ${settings.mode == 'dark' ? '#444' : '#c3cccc'}` // Dark mode border color
+                    }}
+                  >
+                    <Typography>{t('Mavzular')}</Typography>
+                  </td>
+                  {attendance &&
+                    days?.map((hour: any) => (
+                      <td
+                        key={hour.date}
+                        style={{
+                          textAlign: 'center',
+                          width: '60px',
+                          padding: '8px 0',
+                          cursor: 'pointer',
+                          backgroundColor: hour.exam ? '#96f3a5' : hour.lesson ? '#a7c0fb' : 'transparent'
+                        }}
+                      >
+                        <div>
+                          {hour.exam ? (
+                            <HtmlTooltip
+                              PopperProps={{
+                                disablePortal: true
                               }}
-                              onMouseEnter={() => setOpenTooltip(hour.date)}
-                              onMouseLeave={() => setOpenTooltip(null)}
+                              onClose={() => setOpenTooltip(null)}
+                              open={openTooltip === hour.date}
+                              disableFocusListener
+                              disableHoverListener
+                              disableTouchListener
+                              arrow
+                              title={
+                                <div>
+                                  <p style={{ margin: '0', marginBottom: '4px' }}>{hour.exam.title}</p>
+                                  <p style={{ margin: '0', marginBottom: '4px' }}>
+                                    Ball: {hour.exam.min_score} / {hour.exam.max_score}
+                                  </p>
+                                </div>
+                              }
+                            >
+                              <Box
+                                sx={{
+                                  padding: '5px',
+                                  width: '60px',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  textWrap: 'nowrap'
+                                }}
+                                onClick={() => setOpenTooltip(c => (c === hour.date ? null : hour.date))}
+                              >
+                                {hour.exam?.title}
+                              </Box>
+                            </HtmlTooltip>
+                          ) : hour.lesson ? (
+                            <HtmlTooltip
+                              PopperProps={{
+                                disablePortal: true
+                              }}
+                              onClose={() => setOpenTooltip(null)}
+                              open={openTooltip === hour.date}
+                              arrow
+                              title={
+                                <div>
+                                  <p style={{ margin: '0', marginBottom: '4px' }}>{hour.lesson.topic}</p>
+                                </div>
+                              }
+                            >
+                              <Box
+                                sx={{
+                                  padding: '5px',
+                                  width: '60px',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+
+                                  cursor: 'pointer'
+                                }}
+                                onMouseEnter={() => setOpenTooltip(hour.date)}
+                                onMouseLeave={() => setOpenTooltip(null)}
+                              >
+                                <span
+                                  onClick={() => {
+                                    setUpdateTopic(true), setTopicId(hour.lesson.id), setTopic(hour.lesson.topic)
+                                  }}
+                                >
+                                  {hour.lesson.topic}
+                                </span>
+                              </Box>
+                            </HtmlTooltip>
+                          ) : (
+                            <HtmlTooltip
+                              PopperProps={{
+                                disablePortal: true
+                              }}
+                              onClose={() => setOpenTooltip(null)}
+                              open={openTooltip === hour.date}
+                              disableFocusListener
+                              disableHoverListener
+                              disableTouchListener
+                              arrow
+                              title={
+                                <form
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'stretch',
+                                    width: '100%',
+                                    padding: '5px',
+                                    flexDirection: 'column',
+                                    gap: '3px'
+                                  }}
+                                  onSubmit={async e => {
+                                    e.preventDefault()
+                                    handleTopicSubmit(hour)
+                                  }}
+                                >
+                                  <TextField
+                                    autoComplete='off'
+                                    onChange={e => setTopic(e.target.value)}
+                                    size='small'
+                                    placeholder='Mavzu..'
+                                  />
+                                  <Button type='submit'>{t('Saqlash')}</Button>
+                                </form>
+                              }
                             >
                               <span
-                                onClick={() => {
-                                  setUpdateTopic(true), setTopicId(hour.lesson.id), setTopic(hour.lesson.topic)
-                                }}
-                              >
-                                {hour.lesson.topic}
-                              </span>
-                            </Box>
-                          </HtmlTooltip>
-                        ) : (
-                          <HtmlTooltip
-                            PopperProps={{
-                              disablePortal: true
-                            }}
-                            onClose={() => setOpenTooltip(null)}
-                            open={openTooltip === hour.date}
-                            disableFocusListener
-                            disableHoverListener
-                            disableTouchListener
-                            arrow
-                            title={
-                              <form
                                 style={{
-                                  display: 'flex',
-                                  alignItems: 'stretch',
-                                  width: '100%',
-                                  padding: '5px',
-                                  flexDirection: 'column',
-                                  gap: '3px'
+                                  padding: '15px',
+                                  minWidth: '60px',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  textWrap: 'nowrap'
                                 }}
-                                onSubmit={async e => {
-                                  e.preventDefault()
-                                  handleTopicSubmit(hour)
-                                }}
+                                onClick={() => setOpenTooltip(c => (c === hour.date ? null : hour.date))}
                               >
-                                <TextField
-                                  autoComplete='off'
-                                  onChange={e => setTopic(e.target.value)}
-                                  size='small'
-                                  placeholder='Mavzu..'
-                                />
-                                <Button type='submit'>{t('Saqlash')}</Button>
-                              </form>
-                            }
-                          >
-                            <span
-                              style={{
-                                padding: '15px',
-                                minWidth: '60px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                textWrap: 'nowrap'
-                              }}
-                              onClick={() => setOpenTooltip(c => (c === hour.date ? null : hour.date))}
-                            >
-                              <IconifyIcon icon={'iconamoon:file-add-light'} />
-                            </span>
-                          </HtmlTooltip>
-                        )}
-                      </div>
-                    </td>
-                  ))}
-              </tr>
-              <tr style={{ borderBottom: '1px solid #c3cccc' }}>
-                <td
-                  style={{
-                    position: 'sticky',
-                    left: 0,
-                    background: settings.mode == 'dark' ? '#282A42' : '#ffffff', // Dark mode background
-                    color: settings.mode == 'dark' ? '#f0f0f0' : '#000000', // Dark mode text color
-                    zIndex: 1,
-                    padding: '8px 20px',
-                    textAlign: 'start',
-                    fontSize: '14px',
-                    borderRight: `1px solid ${settings.mode == 'dark' ? '#444' : '#c3cccc'}` // Dark mode border color
-                  }}
-                >
-                  <Typography>{t("O'quvchilar")}</Typography>
-                </td>
-                {attendance &&
-                  days?.map((hour: any) => (
-                    <th
-                      key={hour.date}
-                      style={{ textAlign: 'center', width: '60px', padding: '8px 0', cursor: 'pointer' }}
-                      onClick={() => handleDayClick(hour.date)} // Open dialog on click
-                    >
-                      <Typography>{`${hour.date.split('-')[2]}`}</Typography>
-                    </th>
-                  ))}
-              </tr>
-            </thead>
+                                <IconifyIcon icon={'iconamoon:file-add-light'} />
+                              </span>
+                            </HtmlTooltip>
+                          )}
+                        </div>
+                      </td>
+                    ))}
+                </tr>
+                <tr style={{ borderBottom: '1px solid #c3cccc' }}>
+                  <td
+                    style={{
+                      position: 'sticky',
+                      left: 0,
+                      background: settings.mode == 'dark' ? '#282A42' : '#ffffff', // Dark mode background
+                      color: settings.mode == 'dark' ? '#f0f0f0' : '#000000', // Dark mode text color
+                      zIndex: 1,
+                      padding: '8px 20px',
+                      textAlign: 'start',
+                      fontSize: '14px',
+                      borderRight: `1px solid ${settings.mode == 'dark' ? '#444' : '#c3cccc'}` // Dark mode border color
+                    }}
+                  >
+                    <Typography>{t("O'quvchilar")}</Typography>
+                  </td>
+                  {attendance &&
+                    days?.map((hour: any) => (
+                      <th
+                        key={hour.date}
+                        style={{ textAlign: 'center', width: '60px', padding: '8px 0', cursor: 'pointer' }}
+                        onClick={() => handleDayClick(hour.date)} // Open dialog on click
+                      >
+                        <Typography>{`${hour.date.split('-')[2]}`}</Typography>
+                      </th>
+                    ))}
+                </tr>
+              </thead>
+            )}
+
             {attendance?.students?.length > 0 ? (
               <tbody>
                 {attendance &&
@@ -800,6 +815,12 @@ const UserViewSecurity = () => {
                     </tr>
                   ))}
               </tbody>
+            ) : isPast ? (
+              <tr>
+                <td colSpan={14} style={{ width: '100%' }}>
+                  <EmptyContent title={'Guruh yopilgan'} />
+                </td>
+              </tr>
             ) : (
               <tr>
                 <td colSpan={14}>
