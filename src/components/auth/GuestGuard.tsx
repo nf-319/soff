@@ -1,11 +1,6 @@
-// ** React Imports
 import { ReactNode, ReactElement, useEffect } from 'react'
-
-// ** Next Import
 import { useRouter } from 'next/router'
-
-// ** Hooks Import
-import { useAuth } from '../../hooks/useAuth'
+import { useAuth } from 'src/hooks/useAuth'
 
 interface GuestGuardProps {
   children: ReactNode
@@ -27,11 +22,11 @@ const GuestGuard = (props: GuestGuardProps) => {
     }
 
     if (window.localStorage.getItem('userData')) {
-      router.replace('/')
+      void router.push('/')
     }
   }, [router.route])
 
-  if (auth.loading) {
+  if (auth.loading || (!auth.loading && auth.user !== null)) {
     return fallback
   }
 

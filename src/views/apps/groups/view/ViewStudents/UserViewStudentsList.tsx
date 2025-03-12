@@ -378,6 +378,7 @@ export default function UserViewStudentsList() {
       render: actions => user?.role[0] != 'teacher' && <GroupDetailRowOptions id={actions} />
     }
   ]
+
   const formik = useFormik({
     initialValues: { status: updateStatusModal?.status },
     validationSchema: () =>
@@ -464,6 +465,7 @@ export default function UserViewStudentsList() {
         >
           {!showBalance ? 'Balansni yopish' : "Balansni ko'rish"}
         </Button>
+
         <StudentsDataTable loading={isGettingStudents} columns={columns} data={students || []} />
 
         <Dialog open={updateStatusModal != null} onClose={() => dispatch(setUpdateStatusModal(null))}>

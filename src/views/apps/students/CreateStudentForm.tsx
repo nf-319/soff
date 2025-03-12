@@ -69,18 +69,11 @@ export default function CreateStudentForm() {
 
   const [loading, setLoading] = useState<boolean>(false)
   const [isDiscount, setIsDiscount] = useState<boolean>(false)
-  const [checked, setChecked] = useState(false)
   const queryClient = useQueryClient()
-  const [parents, setParents] = useState([])
   const school_type = localStorage.getItem('school_type')
-  const getGroups = async () => {
-    await dispatch(fetchGroupCheckList())
-  }
 
-  async function fetchParentsCheckList(search?: string) {
-    api.get(`${ceoConfigs.parents_checklist}?search=${search || ''}`).then(res => {
-      setParents(res.data)
-    })
+  const getGroups = async () => {
+    await dispatch(fetchGroupCheckList(""))
   }
 
   const validationSchema = Yup.object({
@@ -113,13 +106,6 @@ export default function CreateStudentForm() {
       setLoading(true)
       dispatch(disablePage(true))
 
-      const discountConfig = {
-        discount_amount: values?.fixed_price,
-        discount_count: 100,
-        discount_description: 'kurs oxirigacha',
-        is_discount: isDiscount
-      }
-
       const newValues = new FormData()
 
       for (const [key, value] of Object.entries({ ...values })) {
@@ -142,17 +128,6 @@ export default function CreateStudentForm() {
       if (resp.meta.requestStatus === 'rejected') {
         formik.setErrors(resp.payload)
       } else {
-        // if (isDiscount) {
-        //   const discountConfig = {
-        //     amount: values?.fixed_price,
-        //     discount_count: 100,
-        //     description: 'kurs oxirigacha',
-        //     group: values?.group,
-        //     student: resp.payload.id
-        //   }
-        //   await api.post(`common/personal-payment/`, discountConfig)
-        // }
-
         toast.success("O'quvchi muvaffaqiyatli yaratildi")
         await dispatch(updateStudentParams({ status: 'active' }))
         queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
@@ -172,13 +147,11 @@ export default function CreateStudentForm() {
 
   useEffect(() => {
     getGroups()
+
     return () => {
       formik.resetForm()
     }
   }, [])
-  const handleChangeCheck = (event: any) => {
-    setChecked(event.target.checked)
-  }
 
   const handleSearch = useCallback(
     debounce(async (val: string) => {

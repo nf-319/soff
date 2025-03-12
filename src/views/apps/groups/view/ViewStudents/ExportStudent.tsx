@@ -110,6 +110,7 @@ export default function ExportStudent({
       <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
         {t("O'quvchini boshqa guruhga ko'chirish")}
       </DialogTitle>
+
       <DialogContent>
         <form style={{ marginTop: 10 }} onSubmit={formik.handleSubmit}>
           <FormControl sx={{ maxWidth: '100%', mb: 3 }} fullWidth>
@@ -134,17 +135,23 @@ export default function ExportStudent({
               {groupChecklist
                 ?.filter(el => el.id !== groupData?.id)
                 ?.map((el: any) => (
-                  <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
-                    <span style={{ maxWidth: '250px', wordBreak: 'break-word' }}>
-                      {el.name}{' '}
-                      {`[${el.start_at?.split(':').slice(0, 2).join(':')} - ${el.end_at
-                        ?.split(':')
-                        .slice(0, 2)
-                        .join(':')}]`}
-                    </span>
+                  <MenuItem
+                    key={el.id}
+                    value={el.id}
+                    sx={{
+                      wordBreak: 'normal',
+                      whiteSpace: 'normal',
+                      borderBottom: '1px solid #e0e0e0',
+                      '&:last-of-type': {
+                        borderBottom: 'none',
+                      },
+                    }}
+                  >
+                    <span>{el.name}</span>
                   </MenuItem>
                 ))}
             </Select>
+
             <FormHelperText error>
               {!!formik.errors.new_group && formik.touched.new_group && formik.errors.new_group}
             </FormHelperText>
