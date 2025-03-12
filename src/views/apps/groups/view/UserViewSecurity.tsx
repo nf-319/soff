@@ -522,7 +522,7 @@ const UserViewSecurity = () => {
 
       <Box sx={{ display: 'flex', width: '100%', paddingBottom: 3, maxWidth: '100%', overflowX: 'auto' }}>
         <Box style={{ width: '100%' }}>
-          <table style={{ width: '100%' }}>
+          <table>
             {!isPast && (
               <thead>
                 <tr style={{ borderBottom: '1px solid #c3cccc' }}>
