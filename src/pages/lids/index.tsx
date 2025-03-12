@@ -70,7 +70,7 @@ const Lids = () => {
       setCurrentData(firstDept)
       setSelectedTab(0)
     }
-  }, [leadData, id])
+  }, [leadData, id, router.query.search])
 
   const handleTabChange = (event: SelectChangeEvent<number>) => {
     if (!leadData || !leadData.results[event.target.value as number]) return
@@ -85,6 +85,8 @@ const Lids = () => {
   }
 
   const currentDepartmentId = currentData?.id ? String(currentData.id) : null
+
+  console.log(currentData?.id)
 
   return (
     <div>
