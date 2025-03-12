@@ -69,12 +69,27 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
   const { id, search, is_active } = router.query
   const { mutate, isPending } = usePatch()
 
+  const apiParams = {
+    is_active: is_active ?? true
+  };
+
+  if (id || defaultId) {
+    // @ts-ignore
+    apiParams.parent = id || defaultId;
+  }
+
+  if (search && search !== 'undefined') {
+    // @ts-ignore
+    apiParams.search = search;
+  }
+
+
   const {
     data: leadData,
     isLoading,
     refetch
   } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
-    params: { parent: id || defaultId, search, is_active: is_active ?? true },
+    params: apiParams,
     deps: ['departments-leads']
   })
 
