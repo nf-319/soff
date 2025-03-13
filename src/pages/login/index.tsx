@@ -23,16 +23,15 @@ import { reversePhone } from '../../components/phone-input/format-phone-number'
 import api from 'src/@core/utils/api'
 import { RootState, useAppDispatch } from 'src/store'
 import Image from 'next/image'
-import Cookie from 'js-cookie'
 import { styled } from '@mui/material/styles'
 import { TypographyProps } from '@mui/material'
 import Zoom from '@mui/material/Zoom'
 import authConfig from 'src/configs/auth'
-import { setCompanyInfo, setRoles } from '../../store/apps/user'
+import { setCompanyInfo, setRoles } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
 import { useSelector } from 'react-redux'
 import { Eye } from 'lucide-react'
-import { setPublicSettings } from '../../store/apps/page'
+import { setPublicSettings } from 'src/store/apps/page'
 
 const schema = yup.object().shape({
   phone: yup.string().required('Telefon raqam kiriting'),
@@ -98,8 +97,6 @@ const LoginPage = () => {
       setLoading(true)
 
       const response = await api.post(authConfig.loginEndpoint, params)
-      Cookie.set('token', response.data.tokens.access)
-      Cookie.set('roles', JSON.stringify(response.data.roles))
       window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.tokens.access)
       window.localStorage.setItem('userData', JSON.stringify({ ...response.data }))
 
