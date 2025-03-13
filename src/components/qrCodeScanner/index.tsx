@@ -9,10 +9,16 @@ export default function QRCodeScanner() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
 
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  const englishCharsRegex = /^[a-zA-Z0-9-]*$/
 
   const handleSendQrCode = useCallback(async (code: string): Promise<void> => {
     if (!uuidRegex.test(code)) {
-      toast.error("Xato format")
+      toast.error("Noto'g'ri format")
+      return
+    }
+
+    if (!englishCharsRegex.test(code)) {
+      toast.error("Faqat ingliz tili belgilari ruxsat etilgan")
       return
     }
 
@@ -46,10 +52,20 @@ export default function QRCodeScanner() {
       const key = event.key
       if (key === 'Enter') {
         if (scannedCode && uuidRegex.test(scannedCode)) {
+          if (!englishCharsRegex.test(scannedCode)) {
+            toast.error("Faqat ingliz tili belgilari ruxsat etilgan")
+            setScannedCode('')
+            return
+          }
           void handleSendQrCode(scannedCode)
         } else {
           setScannedCode('')
         }
+        return
+      }
+
+      if (!englishCharsRegex.test(key)) {
+        toast.error("Faqat ingliz tili belgilari ruxsat etilgan")
         return
       }
 
@@ -60,6 +76,11 @@ export default function QRCodeScanner() {
 
       timer = setTimeout(() => {
         if (uuidRegex.test(newCode)) {
+          if (!englishCharsRegex.test(newCode)) {
+            toast.error("Faqat ingliz tili belgilari ruxsat etilgan")
+            setScannedCode('')
+            return
+          }
           void handleSendQrCode(newCode)
         } else if (newCode.length >= 36) {
           setScannedCode('')
