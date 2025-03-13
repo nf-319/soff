@@ -291,7 +291,7 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t('SMS Matni')}:
             </Typography>
-            {editable === 'birthdate' && (
+            {/* {editable === 'birthdate' && (
               <Box display={'flex'} gap={2}>
                 <div onClick={() => setBirthday_text((prev: any) => prev + '${first_name}')}>
                   <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
@@ -309,7 +309,7 @@ const SmsSettings = () => {
                   <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
                 </div>
               </Box>
-            )}
+            )} */}
 
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'birthdate' ? (
@@ -388,7 +388,7 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t(`SMS matnini kiriting (kelmagan o'quvchiga ertasi kuni yuboriladi)`)}
             </Typography>
-            {editable === 'absend' && (
+            {/* {editable === 'absend' && (
               <Box display={'flex'} gap={2}>
                 <div onClick={() => setAbsent_text((prev: any) => prev + '${first_name}')}>
                   <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
@@ -406,7 +406,7 @@ const SmsSettings = () => {
                   <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
                 </div>
               </Box>
-            )}
+            )} */}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'absend' ? (
                 <>
@@ -483,7 +483,7 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t(`SMS matnini kiriting (kelgan o'quvchiga ertasi kuni yuboriladi)`)}
             </Typography>
-            {editable === 'attend' && (
+            {/* {editable === 'attend' && (
               <Box display={'flex'} gap={2}>
                 <div onClick={() => setAttend_text((prev: any) => prev + '${first_name}')}>
                   <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
@@ -501,7 +501,7 @@ const SmsSettings = () => {
                   <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
                 </div>
               </Box>
-            )}
+            )} */}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'attend' ? (
                 <>
@@ -605,7 +605,7 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t('SMS Matni')}:
             </Typography>
-            {editable === 'payment' && (
+            {/* {editable === 'payment' && (
               <Box display={'flex'} gap={2}>
                 <div onClick={() => setPayment_text((prev: any) => prev + '${first_name}')}>
                   <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
@@ -623,7 +623,7 @@ const SmsSettings = () => {
                   <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
                 </div>
               </Box>
-            )}
+            )} */}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'payment' ? (
                 <>
@@ -729,7 +729,7 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t('SMS Matni')}:
             </Typography>
-            {editable === 'debtor' && (
+            {/* {editable === 'debtor' && (
               <Box display={'flex'} gap={2}>
                 <div onClick={() => setDebt_text((prev: any) => prev + '${first_name}')}>
                   <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
@@ -747,7 +747,7 @@ const SmsSettings = () => {
                   <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
                 </div>
               </Box>
-            )}
+            )} */}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'debtor' ? (
                 <>
@@ -832,7 +832,7 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t(`SMS matnini kiriting (kelmagan o'quvchiga ertasi kuni yuboriladi)`)}
             </Typography>
-            {editable === 'score' && (
+            {/* {editable === 'score' && (
               <Box display={'flex'} gap={2}>
                 <div onClick={() => setScore_text((prev: any) => prev + '${first_name}')}>
                   <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
@@ -850,7 +850,7 @@ const SmsSettings = () => {
                   <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
                 </div>
               </Box>
-            )}
+            )} */}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'score' ? (
                 <>
