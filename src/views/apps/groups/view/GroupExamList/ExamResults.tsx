@@ -111,7 +111,7 @@ export default function ExamResults() {
             try {
                 await api[findedStudent.result.score > 0 ? 'patch' : 'post'](`common/exam/student/${findedStudent.result.score > 0 ? `update/${findedStudent.result.score > 0 ? findedStudent.result.result_id : examStudentId}` : 'create/'}`, {
                     student: examStudentId,
-                    description: values.description,
+                    description: values.description || '',
                     score: values.score,
                     exam: resultId
                 })
@@ -185,7 +185,7 @@ export default function ExamResults() {
                             multiline
                             minRows={4}
                             name='description'
-                            value={formik.values?.description}
+                            value={formik.values?.description || ''}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             error={!!formik.errors.description && !!formik.touched.description}
