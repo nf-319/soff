@@ -2,16 +2,12 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getValidSubdomain } from './@core/utils/getValidSubdomain'
 
-const PUBLIC_FILE = /\.(.*)$/
-
 export function middleware(req: NextRequest) {
   const token = req.cookies.get('token')
   const rolesCookie = req.cookies.get('roles')
   const roles: { id: number; name: string; exists: boolean }[] = rolesCookie ? JSON.parse(rolesCookie) : []
 
   const url = req.nextUrl.clone()
-
-  if (PUBLIC_FILE.test(url.pathname) || url.pathname.includes('_next')) return
 
   const studentRole = roles.find(role => role.name === 'STUDENT' && role.exists)
   const financeRole = roles.find(role => role.name === 'CASHER' && role.exists)
