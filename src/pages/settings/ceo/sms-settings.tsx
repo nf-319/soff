@@ -19,7 +19,8 @@ const SmsSettings = () => {
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const { t } = useTranslation()
   const [birthday_text, setBirthday_text] = useState(companyInfo?.auto_sms?.birthday_text)
-  const [absent_text, setAbsent_text] = useState(companyInfo?.auto_sms?.absend_text)
+  const [absent_text, setAbsent_text] = useState(companyInfo?.auto_sms?.absent_text)
+  const [attend_text, setAttend_text] = useState(companyInfo?.auto_sms?.attend_text)
 
   const [editable, setEditable] = useState<
     | null
@@ -330,6 +331,7 @@ const SmsSettings = () => {
                     fullWidth
                     multiline
                     rows={4}
+                    disabled
                     type='text'
                     value={birthday_text}
                     size='small'
@@ -422,6 +424,7 @@ const SmsSettings = () => {
               ) : (
                 <>
                   <TextField
+                    disabled
                     fullWidth
                     multiline
                     rows={4}
@@ -477,7 +480,7 @@ const SmsSettings = () => {
                     rows={4}
                     size='small'
                     focused
-                    defaultValue={companyInfo?.auto_sms?.attend_text}
+                    value={companyInfo?.auto_sms?.attend_text}
                     onBlur={e => {
                       updateSettings('attend_text', e.target.value)
                     }}
