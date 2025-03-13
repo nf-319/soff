@@ -68,7 +68,7 @@ export default function EditGroupModal() {
     teacher: Yup.string().required(t("O'qituvchini tanlang")),
     room: Yup.string().required(t('Xonani tanlang')),
     start_date: Yup.string().required(t('Boshlanish sanasini tanlang')),
-    end_date: Yup.string().required(t('Tugash sanasini tanlang')),
+    // end_date: Yup.string().required(t('Tugash sanasini tanlang')),
 
     start_at: Yup.string().required(t('Boshlanish vaqtini tanlang')),
     day_of_week: Yup.string().required(t('Dars kunlarini tanlang')),
@@ -461,21 +461,22 @@ export default function EditGroupModal() {
                     {!!formik.errors.start_date && formik.touched.start_date && formik.errors.start_date}
                   </FormHelperText>
                   </FormControl>
-                  <FormControl sx={{ width: '100%' }}>
-                  <TextField
-                    size='small'
-                    type='date'
-                    label={t('Tugash sanasi')}
-                    name='end_date'
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.end_date}
-                    error={!!formik.errors.end_date && formik.touched.end_date}
-                  />
-                  <FormHelperText error={!!formik.errors.end_date && formik.touched.end_date}>
-                    {!!formik.errors.end_date && formik.touched.end_date && formik.errors.end_date}
-                  </FormHelperText>
-                </FormControl>
+
+                {/*  <FormControl sx={{ width: '100%' }}>*/}
+                {/*  <TextField*/}
+                {/*    size='small'*/}
+                {/*    type='date'*/}
+                {/*    label={t('Tugash sanasi')}*/}
+                {/*    name='end_date'*/}
+                {/*    onChange={formik.handleChange}*/}
+                {/*    onBlur={formik.handleBlur}*/}
+                {/*    value={formik.values.end_date}*/}
+                {/*    error={!!formik.errors.end_date && formik.touched.end_date}*/}
+                {/*  />*/}
+                {/*  <FormHelperText error={!!formik.errors.end_date && formik.touched.end_date}>*/}
+                {/*    {!!formik.errors.end_date && formik.touched.end_date && formik.errors.end_date}*/}
+                {/*  </FormHelperText>*/}
+                {/*</FormControl>*/}
 
                 <FormControl sx={{ width: '100%' }}>
                   <TextField
