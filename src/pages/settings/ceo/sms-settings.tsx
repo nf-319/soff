@@ -21,6 +21,9 @@ const SmsSettings = () => {
   const [birthday_text, setBirthday_text] = useState(companyInfo?.auto_sms?.birthday_text)
   const [absent_text, setAbsent_text] = useState(companyInfo?.auto_sms?.absent_text)
   const [attend_text, setAttend_text] = useState(companyInfo?.auto_sms?.attend_text)
+  const [payment_text, setPayment_text] = useState(companyInfo?.auto_sms?.payment_text)
+  const [debt_text, setDebt_text] = useState(companyInfo?.auto_sms?.debt_text)
+  const [score_text, setScore_text] = useState(companyInfo?.auto_sms?.score_text)
 
   const [editable, setEditable] = useState<
     | null
@@ -85,7 +88,7 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'birthday_text') {
           setLoading('birthdate')
-          formData.append('on_birthday', true)
+          formData.append('on_birthday', companyInfo?.auto_sms?.on_birthday)
           formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
           formData.append('absent_text', companyInfo?.auto_sms?.absent_text)
           formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
@@ -137,7 +140,7 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'score_text') {
           setLoading('score')
-          formData.append('on_score', true)
+          formData.append('on_score', companyInfo?.auto_sms?.on_score)
           formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
           formData.append('payment_text', companyInfo?.auto_sms?.payment_text)
           formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
@@ -150,6 +153,8 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'on_attend') {
           setLoading('attend')
+          // formData.append('on_attend', !companyInfo?.auto_sms?.on_attend)
+
           formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
           formData.append('payment_text', companyInfo?.auto_sms?.payment_text)
           formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
@@ -157,12 +162,14 @@ const SmsSettings = () => {
           formData.append('on_birthday', companyInfo?.auto_sms?.on_birthday)
           formData.append('birthday_text', companyInfo?.auto_sms?.birthday_text)
           formData.append('score_text', companyInfo?.auto_sms?.score_text)
+          formData.append('on_score', companyInfo?.auto_sms?.on_score)
+
           formData.append('attend_text', companyInfo?.auto_sms?.attend_text)
           formData.append('for_debtor', companyInfo?.auto_sms?.for_debtor)
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'attend_text') {
           setLoading('attend')
-          formData.append('on_attend', true)
+          formData.append('on_attend', companyInfo?.auto_sms?.on_attend)
           formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
           formData.append('payment_text', companyInfo?.auto_sms?.payment_text)
           formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
@@ -174,6 +181,8 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'for_debtor') {
           setLoading('debtor')
+          formData.append('for_debtor', !companyInfo?.auto_sms?.for_debtor)
+
           formData.append('debt_text', companyInfo?.auto_sms?.attend_text)
           formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
           formData.append('payment_text', companyInfo?.auto_sms?.payment_text)
@@ -182,11 +191,13 @@ const SmsSettings = () => {
           formData.append('on_birthday', companyInfo?.auto_sms?.on_birthday)
           formData.append('birthday_text', companyInfo?.auto_sms?.birthday_text)
           formData.append('score_text', companyInfo?.auto_sms?.score_text)
+          formData.append('on_score', companyInfo?.auto_sms?.on_score)
+
           formData.append('attend_text', companyInfo?.auto_sms?.attend_text)
           formData.append('on_attend', companyInfo?.auto_sms?.on_attend)
         } else if (key === 'debt_text') {
           setLoading('debtor')
-          formData.append('for_debtor', true)
+          formData.append('for_debtor', companyInfo?.auto_sms?.for_debtor)
           formData.append('on_attend', companyInfo?.auto_sms?.on_attend)
           formData.append('attend_text', companyInfo?.auto_sms?.attend_text)
           formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
@@ -214,7 +225,7 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else {
           setLoading('absend')
-          formData.append('on_absent', true)
+          formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
           formData.append('on_birthday', companyInfo?.auto_sms?.on_birthday)
           formData.append('birthday_text', companyInfo?.auto_sms?.birthday_text)
           formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
@@ -472,6 +483,25 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t(`SMS matnini kiriting (kelgan o'quvchiga ertasi kuni yuboriladi)`)}
             </Typography>
+            {editable === 'attend' && (
+              <Box display={'flex'} gap={2}>
+                <div onClick={() => setAttend_text((prev: any) => prev + '${first_name}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
+                </div>
+                <div onClick={() => setAttend_text((prev: any) => prev + '${date}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
+                </div>
+                <div onClick={() => setAttend_text((prev: any) => prev + '${amount}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
+                </div>
+                <div onClick={() => setAttend_text((prev: any) => prev + '${group}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
+                </div>
+                <div onClick={() => setAttend_text((prev: any) => prev + '${grade}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
+                </div>
+              </Box>
+            )}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'attend' ? (
                 <>
@@ -480,12 +510,12 @@ const SmsSettings = () => {
                     rows={4}
                     size='small'
                     focused
-                    value={companyInfo?.auto_sms?.attend_text}
-                    onBlur={e => {
-                      updateSettings('attend_text', e.target.value)
-                    }}
+                    value={attend_text}
+                    // onBlur={e => {
+                    //   updateSettings('attend_text', e.target.value)
+                    // }}
                     onChange={e => {
-                      setName(e.target.value)
+                      setAttend_text(e.target.value)
                     }}
                     fullWidth
                   />
@@ -493,7 +523,7 @@ const SmsSettings = () => {
                     icon={loading === 'attend' ? 'line-md:loading-loop' : 'ic:baseline-check'}
                     style={{ cursor: 'pointer' }}
                     onClick={() => {
-                      updateSettings('attend_text', name)
+                      updateSettings('attend_text', attend_text)
                     }}
                   />
                 </>
@@ -501,10 +531,11 @@ const SmsSettings = () => {
                 <>
                   <TextField
                     fullWidth
+                    disabled
                     multiline
                     rows={4}
                     type='text'
-                    value={companyInfo?.auto_sms?.attend_text || 'Text'}
+                    value={attend_text}
                     size='small'
                     placeholder={t('Boshlanish vaqti')}
                     // onBlur={e => console.log(e.target.value)}
@@ -574,6 +605,25 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t('SMS Matni')}:
             </Typography>
+            {editable === 'payment' && (
+              <Box display={'flex'} gap={2}>
+                <div onClick={() => setPayment_text((prev: any) => prev + '${first_name}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
+                </div>
+                <div onClick={() => setPayment_text((prev: any) => prev + '${date}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
+                </div>
+                <div onClick={() => setPayment_text((prev: any) => prev + '${amount}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
+                </div>
+                <div onClick={() => setPayment_text((prev: any) => prev + '${group}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
+                </div>
+                <div onClick={() => setPayment_text((prev: any) => prev + '${grade}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
+                </div>
+              </Box>
+            )}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'payment' ? (
                 <>
@@ -582,12 +632,12 @@ const SmsSettings = () => {
                     rows={4}
                     size='small'
                     focused
-                    defaultValue={companyInfo?.auto_sms?.payment_text || ''}
-                    onBlur={e => {
-                      updateSettings('payment_text', e.target.value)
-                    }}
+                    value={payment_text}
+                    // onBlur={e => {
+                    //   updateSettings('payment_text', e.target.value)
+                    // }}
                     onChange={e => {
-                      setName(e.target.value)
+                      setPayment_text(e.target.value)
                     }}
                     fullWidth
                   />
@@ -595,7 +645,7 @@ const SmsSettings = () => {
                     icon={loading === 'payment' ? 'line-md:loading-loop' : 'ic:baseline-check'}
                     style={{ cursor: 'pointer' }}
                     onClick={() => {
-                      updateSettings('payment_text', name)
+                      updateSettings('payment_text', payment_text)
                     }}
                   />
                 </>
@@ -604,9 +654,10 @@ const SmsSettings = () => {
                   <TextField
                     fullWidth
                     multiline
+                    disabled
                     rows={4}
                     type='text'
-                    value={`${companyInfo?.auto_sms?.payment_text}`}
+                    value={payment_text}
                     size='small'
                     placeholder={t('SMS Matni')}
                     // onBlur={e => console.log(e.target.value)}
@@ -678,6 +729,25 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t('SMS Matni')}:
             </Typography>
+            {editable === 'debtor' && (
+              <Box display={'flex'} gap={2}>
+                <div onClick={() => setDebt_text((prev: any) => prev + '${first_name}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
+                </div>
+                <div onClick={() => setDebt_text((prev: any) => prev + '${date}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
+                </div>
+                <div onClick={() => setDebt_text((prev: any) => prev + '${amount}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
+                </div>
+                <div onClick={() => setDebt_text((prev: any) => prev + '${group}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
+                </div>
+                <div onClick={() => setDebt_text((prev: any) => prev + '${grade}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
+                </div>
+              </Box>
+            )}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'debtor' ? (
                 <>
@@ -686,12 +756,12 @@ const SmsSettings = () => {
                     rows={4}
                     size='small'
                     focused
-                    defaultValue={companyInfo?.auto_sms?.debt_text || ''}
-                    onBlur={e => {
-                      updateSettings('debt_text', e.target.value)
-                    }}
+                    value={debt_text}
+                    // onBlur={e => {
+                    //   updateSettings('debt_text', e.target.value)
+                    // }}
                     onChange={e => {
-                      setName(e.target.value)
+                      setDebt_text(e.target.value)
                     }}
                     fullWidth
                   />
@@ -699,7 +769,7 @@ const SmsSettings = () => {
                     icon={loading === 'debtor' ? 'line-md:loading-loop' : 'ic:baseline-check'}
                     style={{ cursor: 'pointer' }}
                     onClick={() => {
-                      updateSettings('debt_text', name)
+                      updateSettings('debt_text', debt_text)
                     }}
                   />
                 </>
@@ -708,9 +778,10 @@ const SmsSettings = () => {
                   <TextField
                     fullWidth
                     multiline
+                    disabled
                     rows={4}
                     type='text'
-                    value={companyInfo?.auto_sms?.debt_text || 'Text'}
+                    value={debt_text || 'Text'}
                     size='small'
                     placeholder={t('SMS Matni')}
                     // onBlur={e => console.log(e.target.value)}
@@ -761,6 +832,25 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t(`SMS matnini kiriting (kelmagan o'quvchiga ertasi kuni yuboriladi)`)}
             </Typography>
+            {editable === 'score' && (
+              <Box display={'flex'} gap={2}>
+                <div onClick={() => setScore_text((prev: any) => prev + '${first_name}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
+                </div>
+                <div onClick={() => setScore_text((prev: any) => prev + '${date}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
+                </div>
+                <div onClick={() => setScore_text((prev: any) => prev + '${amount}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
+                </div>
+                <div onClick={() => setScore_text((prev: any) => prev + '${group}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
+                </div>
+                <div onClick={() => setScore_text((prev: any) => prev + '${grade}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
+                </div>
+              </Box>
+            )}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'score' ? (
                 <>
@@ -769,12 +859,12 @@ const SmsSettings = () => {
                     rows={4}
                     size='small'
                     focused
-                    defaultValue={companyInfo?.auto_sms?.score_text}
-                    onBlur={e => {
-                      updateSettings('score_text', e.target.value)
-                    }}
+                    value={score_text}
+                    // onBlur={e => {
+                    //   updateSettings('score_text', e.target.value)
+                    // }}
                     onChange={e => {
-                      setName(e.target.value)
+                      setScore_text(e.target.value)
                     }}
                     fullWidth
                   />
@@ -782,7 +872,7 @@ const SmsSettings = () => {
                     icon={loading === 'score' ? 'line-md:loading-loop' : 'ic:baseline-check'}
                     style={{ cursor: 'pointer' }}
                     onClick={() => {
-                      updateSettings('score_text', name)
+                      updateSettings('score_text', score_text)
                     }}
                   />
                 </>
@@ -792,8 +882,9 @@ const SmsSettings = () => {
                     fullWidth
                     multiline
                     rows={4}
+                    disabled
                     type='text'
-                    value={companyInfo?.auto_sms?.score_text}
+                    value={score_text}
                     size='small'
                     placeholder={t('Boshlanish vaqti')}
                     // onBlur={e => console.log(e.target.value)}
