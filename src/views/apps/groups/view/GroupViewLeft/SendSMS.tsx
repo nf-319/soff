@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { fetchSmsList, fetchSmsListQuery } from 'src/store/apps/settings'
+import { useRouter } from 'next/router'
 
 export default function SendSMS() {
   const [isLoading, setLoading] = useState(false)
@@ -26,6 +27,8 @@ export default function SendSMS() {
 
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
+  const router = useRouter()
+  const { id } = router.query
   const [parent_id, setParentId] = useState<number | null>(null)
 
   const formik: any = useFormik({
@@ -41,6 +44,7 @@ export default function SendSMS() {
       try {
         await api.post(`common/send-message-user/`, {
           users: students?.map((el: any) => Number(el.student.id)),
+          group: id,
           message: values.message
         })
         toast.success(`SMS muvaffaqiyatli jo'natildi!`, {
