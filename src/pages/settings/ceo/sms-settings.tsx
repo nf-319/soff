@@ -19,7 +19,8 @@ const SmsSettings = () => {
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const { t } = useTranslation()
   const [birthday_text, setBirthday_text] = useState(companyInfo?.auto_sms?.birthday_text)
-  const textFieldRef = useRef<HTMLTextAreaElement | null>(null);
+  const [absent_text, setAbsent_text] = useState(companyInfo?.auto_sms?.absend_text)
+
   const [editable, setEditable] = useState<
     | null
     | 'title'
@@ -330,7 +331,7 @@ const SmsSettings = () => {
                     multiline
                     rows={4}
                     type='text'
-                    value={companyInfo?.auto_sms?.birthday_text}
+                    value={birthday_text}
                     size='small'
                     placeholder={t('SMS Matni')}
                     // onBlur={e => console.log(e.target.value)}
@@ -374,6 +375,25 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t(`SMS matnini kiriting (kelmagan o'quvchiga ertasi kuni yuboriladi)`)}
             </Typography>
+            {editable === 'absend' && (
+              <Box display={'flex'} gap={2}>
+                <div onClick={() => setAbsent_text((prev: any) => prev + '${first_name}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
+                </div>
+                <div onClick={() => setAbsent_text((prev: any) => prev + '${date}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
+                </div>
+                <div onClick={() => setAbsent_text((prev: any) => prev + '${amount}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
+                </div>
+                <div onClick={() => setAbsent_text((prev: any) => prev + '${group}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
+                </div>
+                <div onClick={() => setAbsent_text((prev: any) => prev + '${grade}')}>
+                  <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
+                </div>
+              </Box>
+            )}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'absend' ? (
                 <>
@@ -382,12 +402,12 @@ const SmsSettings = () => {
                     rows={4}
                     size='small'
                     focused
-                    defaultValue={companyInfo?.auto_sms?.absent_text}
-                    onBlur={e => {
-                      updateSettings('absent_text', e.target.value)
-                    }}
+                    value={absent_text}
+                    // onBlur={e => {
+                    //   updateSettings('absent_text', e.target.value)
+                    // }}
                     onChange={e => {
-                      setName(e.target.value)
+                      setAbsent_text(e.target.value)
                     }}
                     fullWidth
                   />
@@ -395,7 +415,7 @@ const SmsSettings = () => {
                     icon={loading === 'absend' ? 'line-md:loading-loop' : 'ic:baseline-check'}
                     style={{ cursor: 'pointer' }}
                     onClick={() => {
-                      updateSettings('absent_text', name)
+                      updateSettings('absent_text', absent_text)
                     }}
                   />
                 </>
@@ -406,7 +426,7 @@ const SmsSettings = () => {
                     multiline
                     rows={4}
                     type='text'
-                    value={`${companyInfo?.auto_sms?.absent_text}`}
+                    value={absent_text}
                     size='small'
                     placeholder={t('Boshlanish vaqti')}
                     // onBlur={e => console.log(e.target.value)}
