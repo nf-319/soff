@@ -79,7 +79,7 @@ const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     } catch (error) {
       console.error('Auth Error:', error)
-      localStorage.clear()
+      handleLogout()
       setUser(null)
       if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
         void router.push('/login')

@@ -55,6 +55,7 @@ const UserViewLeft = () => {
             </div>
 
             <UserViewStudentsList />
+
             {!isGettingStudents && (
               <Box sx={{ width: '100%', display: 'flex', pt: '10px' }}>
                 <Button

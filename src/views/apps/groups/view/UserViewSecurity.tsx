@@ -266,7 +266,7 @@ const Item = ({
 }
 
 const UserViewSecurity = () => {
-  const { queryParams, attendance, isGettingDays, isGettingAttendance, days, groupData, month_list } = useAppSelector(
+  const { queryParams, attendance, isGettingAttendance, days, groupData, month_list } = useAppSelector(
     state => state.groupDetails
   )
   const dispatch = useAppDispatch()
@@ -286,6 +286,15 @@ const UserViewSecurity = () => {
   const [updateTopic, setUpdateTopic] = useState(false)
   const [topicId, setTopicId] = useState<number | null>(null)
   const { t } = useTranslation()
+
+  const isDatePast = (dateString: string): boolean => {
+    const inputDate = new Date(dateString)
+    const currentDate = new Date()
+
+    return inputDate < currentDate
+  }
+
+  const isPast = isDatePast(groupData?.end_date)
 
   const handleDateChange = async () => {
     setChangeDateLoader(true)
@@ -476,6 +485,8 @@ const UserViewSecurity = () => {
     fetchAttendance()
   }, [queryParams.status, attendanceDate, queryString])
 
+  console.log(groupData?.end_date)
+
   return isGettingAttendance ? (
     <SubLoader />
   ) : (
@@ -508,8 +519,9 @@ const UserViewSecurity = () => {
           </li>
         ))}
       </ul>
+
       <Box sx={{ display: 'flex', width: '100%', paddingBottom: 3, maxWidth: '100%', overflowX: 'auto' }}>
-        <Box>
+        <Box style={{ width: '100%' }}>
           <table>
             <thead>
               <tr style={{ borderBottom: '1px solid #c3cccc' }}>
@@ -692,6 +704,7 @@ const UserViewSecurity = () => {
                   ))}
               </tr>
             </thead>
+
             {attendance?.students?.length > 0 ? (
               <tbody>
                 {attendance &&
@@ -800,6 +813,12 @@ const UserViewSecurity = () => {
                     </tr>
                   ))}
               </tbody>
+            ) : isPast ? (
+              <tr>
+                <td colSpan={14} style={{ width: '100%' }}>
+                  <EmptyContent title={'Guruh yopilgan'} />
+                </td>
+              </tr>
             ) : (
               <tr>
                 <td colSpan={14}>

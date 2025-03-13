@@ -41,10 +41,10 @@ export default function StudentsDataTable({
   const handleClick = (id: any,item:any) => {
     rowClick?.(id,item)
   }
-    useEffect(() => {
-        dispatch(fetchDepartmentList())
+  useEffect(() => {
+    dispatch(fetchDepartmentList())
+  }, [])
 
-    }, [])
 
   return (
     <div style={{ maxWidth: '100%', overflowX: 'auto', padding: '0 5px' }}>
@@ -59,8 +59,7 @@ export default function StudentsDataTable({
           alignItems: 'center',
           gap: 1,
           width: '100%',
-          cursor: 'pointer',
-          // maxWidth: maxWidth || null
+          cursor: 'pointer'
         }}
       >
         {columns.map((el, i) => (
@@ -69,6 +68,7 @@ export default function StudentsDataTable({
           </Box>
         ))}
       </Box>
+
       {loading ? (
         <SubLoader />
       ) : data?.length > 0 ? (
@@ -122,7 +122,7 @@ export default function StudentsDataTable({
               {rowClick && (
                 <Box
                   sx={{ width: '75%', zIndex: 1, height: '36px', position: 'absolute' }}
-                  onClick={() => handleClick(item.id,item)}
+                  onClick={() => handleClick(item.id, item)}
                 ></Box>
               )}
             </Box>

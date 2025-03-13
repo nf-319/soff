@@ -31,6 +31,7 @@ import CostRowActions from 'src/views/apps/finance/CostRowOptions'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { AuthContext } from 'src/context/AuthContext'
 import { toast } from 'react-hot-toast'
+import { useAppSelector } from 'src/store'
 
 function Slug(props: { slug: string }) {
   const { query, push } = useRouter()
@@ -46,13 +47,15 @@ function Slug(props: { slug: string }) {
   const [date, setDate] = useState<any>('')
   const { isMobile } = useResponsive()
   const { user } = useContext(AuthContext)
-  const [selectedMonth, setSelectedMonth] = useState<string>(String(new Date().getMonth() + 1).padStart(2, '0'))
+  const { allNumbersParams } = useAppSelector(state => state.finance)
+  const [selectedMonth, setSelectedMonth] = useState<string>(allNumbersParams.date_month)
+  const [selectedYear, setSelectedYear] = useState<string>(allNumbersParams.date_year.split('-')[0])
+  const formattedDate = `${selectedYear}-${selectedMonth}-01`
 
-  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString())
   const updateCategory = async () => {
     try {
       await api.patch(`finance/budget-category/update/${query?.slug}/`, { name })
-      getExpense(``)
+      getExpense(`date_year=${formattedDate}&date_month=${formattedDate}`)
       setEditable(false)
     } catch (err) {
       console.log(err)
@@ -72,7 +75,6 @@ function Slug(props: { slug: string }) {
     const find = data.find(el => el.id === id)
     setOpen(find)
   }
-
 
   const columns: customTableDataProps[] = [
     {
@@ -100,14 +102,20 @@ function Slug(props: { slug: string }) {
       xs: 0.05,
       title: '',
       dataIndex: 'id',
-      render: id => <CostRowActions reRender={() => getExpense(``)} id={Number(id)} onEdit={onEdit} />
+      render: id => (
+        <CostRowActions
+          reRender={() => getExpense(`date_year=${formattedDate}&date_month=${formattedDate}`)}
+          id={Number(id)}
+          onEdit={onEdit}
+        />
+      )
     }
   ]
 
   const handleYearChange = async (event: any) => {
     const year = event.target.value
-      setSelectedYear(year)
-      setDate('')
+    setSelectedYear(year)
+    setDate('')
 
     const formattedDate = `${year}-${selectedMonth}-01`
     await getExpense(`date_year=${formattedDate}&date_month=${formattedDate}`)
@@ -213,7 +221,7 @@ function Slug(props: { slug: string }) {
             onChange={handleChangeDate}
             translate={'yes'}
             size='sm'
-            value={date||''}
+            value={date || ''}
           />
           <Box sx={{ display: 'flex', gap: 2 }}>
             <FormControl sx={{ minWidth: 120 }}>
@@ -294,14 +302,25 @@ function Slug(props: { slug: string }) {
       <Dialog open={open === 'create'} onClose={() => setOpen(null)}>
         <DialogTitle sx={{ textAlign: 'center' }}>{t('Xarajat kiritish')}</DialogTitle>
         <DialogContent sx={{ minWidth: '320px' }}>
-          <CreateCostForm slug={props.slug} setOpen={setOpen} reRender={() => getExpense('')} />
+          <CreateCostForm
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+            slug={props.slug}
+            setOpen={setOpen}
+            reRender={() => getExpense(`date_year=${formattedDate}&date_month=${formattedDate}`)}
+          />
         </DialogContent>
       </Dialog>
 
       <Dialog open={open?.id} onClose={() => setOpen(null)}>
         <DialogTitle sx={{ textAlign: 'center' }}>{t('Xarajatni tahrirlash')}</DialogTitle>
         <DialogContent sx={{ minWidth: '320px' }}>
-          <EditCostForm slug={props.slug} setOpen={setOpen} reRender={() => getExpense('')} initials={open} />
+          <EditCostForm
+            slug={props.slug}
+            setOpen={setOpen}
+            reRender={() => getExpense(`date_year=${formattedDate}&date_month=${formattedDate}`)}
+            initials={open}
+          />
         </DialogContent>
       </Dialog>
     </Box>
