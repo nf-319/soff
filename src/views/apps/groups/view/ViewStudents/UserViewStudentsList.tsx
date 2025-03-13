@@ -80,6 +80,8 @@ export default function UserViewStudentsList() {
   const { query, push } = useRouter()
   const [showBalance, setShowBalance] = useState(false)
 
+  
+
   const columns: customTableProps[] = [
     {
       xs: 0.5,
@@ -375,7 +377,7 @@ export default function UserViewStudentsList() {
       xs: 0.8,
       dataIndex: 'id',
       title: t('Harakatlar'),
-      render: actions => user?.role[0] != 'teacher' && <GroupDetailRowOptions id={actions} />
+      render: actions => !(user?.role?.length == 1 && user?.role.includes('teacher')) && <GroupDetailRowOptions id={actions} />
     }
   ]
 
