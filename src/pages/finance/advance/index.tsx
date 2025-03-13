@@ -34,6 +34,7 @@ function Slug() {
   const [year, setYear] = useState<number>(Number(allNumbersParams.date_year.split('-')[0]))
   const [month, setMonth] = useState<string>(allNumbersParams.date_month)
 
+
   const { user } = useContext(AuthContext)
   const router = useRouter()
 
@@ -54,9 +55,11 @@ function Slug() {
     const queryString = new URLSearchParams(
       Object.fromEntries(Object.entries(queryParams).map(([key, value]) => [key, String(value)]))
     )
-    dispatch(getAdvanceList(String(queryString)))
+    const formattedDate = `${year}-${month}-01`
+
+    dispatch(getAdvanceList(`page=1&date_year=${formattedDate}&date_month=${formattedDate}`))
     dispatch(getStaffs())
-  }, [])
+  }, [year, month])
 
   const handlePagination = async (page: number) => {
     const queryString = new URLSearchParams({ ...queryParams, page: String(page) }).toString()
