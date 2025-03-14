@@ -40,6 +40,7 @@ const UserViewLeft = () => {
       <Grid item xs={12}>
         <GroupDetails />
       </Grid>
+
       {user?.currentRole !== 'teacher' && (
         <Grid item xs={12}>
           <CardContent sx={{ p: 0 }}>

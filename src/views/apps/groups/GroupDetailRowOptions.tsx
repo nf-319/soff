@@ -60,9 +60,8 @@ export type ModalTypes = 'group' | 'withdraw' | 'payment' | 'sms' | 'delete' | '
 export default function GroupDetailRowOptions({ id }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const { push, query } = useRouter()
-  const { students, studentsQueryParams, isGettingStudents, queryParams, openLeadModal, updateStatusModal } =
+  const { students, studentsQueryParams, queryParams, openLeadModal } =
     useAppSelector(state => state.groupDetails)
-
   const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const { t } = useTranslation()
@@ -78,7 +77,7 @@ export default function GroupDetailRowOptions({ id }: Props) {
   const dispatch = useAppDispatch()
 
   const rowOptionsOpen = Boolean(anchorEl)
-  const { getBranches, branches } = useBranches()
+  const { getBranches } = useBranches()
   const [activate, setActivate] = useState<boolean>(false)
 
   const handleClose = (value: 'none' | 'left' | 'payment' | 'notes' | 'sms' | 'export') => {
@@ -133,16 +132,6 @@ export default function GroupDetailRowOptions({ id }: Props) {
       }
       setOpenLeft(false)
     }
-  }
-
-  const handleActive = async () => {
-    setLoading(true)
-    dispatch(disablePage(true))
-    await dispatch(updateStudent({ id, status: 'active' }))
-    dispatch(disablePage(false))
-    toast.success("O'quvchi muvaffaqiyatli aktivlashtirildi")
-    await dispatch(fetchStudentsList({ status: 'archive' }))
-    setLoading(false)
   }
 
   async function getGroups() {

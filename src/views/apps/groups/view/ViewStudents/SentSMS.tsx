@@ -4,7 +4,7 @@ import api from 'src/@core/utils/api'
 import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import {
   Button,
   Dialog,
@@ -20,22 +20,28 @@ import {
 import { toast } from 'react-hot-toast'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchSmsListQuery } from 'src/store/apps/settings'
+import { useRouter } from 'next/router'
 
-export default function SentSMS({
-  id,
-  modalRef,
-  setModalRef
-}: {
+type Props = {
   id: string
   modalRef: string | null
   setModalRef: any
   smsTemps: null | any[]
-}) {
+}
+
+const SentSMS: FC<Props> = ({
+  id,
+  modalRef,
+  setModalRef
+})  =>{
   const [isLoading, setLoading] = useState(false)
   const { t } = useTranslation()
   const { smschild_list, sms_list } = useAppSelector(state => state.settings)
   const [parent_id, setParentId] = useState<number | null>(null)
+  const router = useRouter()
   const dispatch = useAppDispatch()
+  const groupId = router.query.id
+
   const formik: any = useFormik({
     initialValues: { message: '' },
     validationSchema: () =>
@@ -45,7 +51,7 @@ export default function SentSMS({
     onSubmit: async values => {
       setLoading(true)
       try {
-        const response = await api.post('common/send-message-user/', { users: [id], ...values })
+        await api.post('common/send-message-user/', { users: [id], group: groupId, ...values })
         toast.success("Xabar o'quvchiga yuborildi")
         setLoading(false)
         setModalRef(null)
@@ -155,3 +161,6 @@ export default function SentSMS({
     </Dialog>
   )
 }
+
+export default SentSMS
+

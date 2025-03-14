@@ -8,11 +8,16 @@ export default function QRCodeScanner() {
   const [scannedCode, setScannedCode] = useState<string>('')
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
 
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  const isEnglish = (text: string) => /^[A-Za-z0-9-]*$/.test(text)
+  const uuidRegex = /^.{8}-.{4}-.{4}-.{4}-.{12}$/
 
   const handleSendQrCode = useCallback(async (code: string): Promise<void> => {
     if (!uuidRegex.test(code)) {
-      toast.error("Xato format")
+      return
+    }
+
+    if (!isEnglish(code)) {
+      toast.error("Komputer tilini English tiliga o'tqazing!")
       return
     }
 
@@ -45,10 +50,16 @@ export default function QRCodeScanner() {
 
       const key = event.key
       if (key === 'Enter') {
-        if (scannedCode && uuidRegex.test(scannedCode)) {
-          void handleSendQrCode(scannedCode)
-        } else {
-          setScannedCode('')
+        if (scannedCode) {
+          if (uuidRegex.test(scannedCode)) {
+            if (!isEnglish(scannedCode)) {
+              toast.error("Komputer tilini English tiliga o'tqazing!")
+              setScannedCode('')
+              return
+            } else {
+              void handleSendQrCode(scannedCode)
+            }
+          }
         }
         return
       }
@@ -60,6 +71,12 @@ export default function QRCodeScanner() {
 
       timer = setTimeout(() => {
         if (uuidRegex.test(newCode)) {
+          if (!isEnglish(newCode)) {
+            toast.error("Komputer tilini English tiliga o'tqazing!")
+            setScannedCode('')
+            return
+          }
+
           void handleSendQrCode(newCode)
         } else if (newCode.length >= 36) {
           setScannedCode('')
@@ -77,3 +94,4 @@ export default function QRCodeScanner() {
 
   return <div />
 }
+
