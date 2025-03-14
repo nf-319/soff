@@ -23,8 +23,6 @@ import { useAppDispatch, useAppSelector } from "src/store";
 import { getResults, setOpen, setResultEdit, setResultId } from "src/store/apps/groupDetails";
 import * as Yup from "yup";
 
-
-
 export default function ExamResults() {
     const { resultId, isGettingExamsResults, examStudentId, open, results } = useAppSelector(state => state.groupDetails)
     const { query } = useRouter()
@@ -134,67 +132,90 @@ export default function ExamResults() {
         formik.setFieldValue("description", findedStudent?.result?.description)
     }, [examStudentId])
 
-    return (
-        <Box sx={{ display: "flex", flexDirection: "column", }}>
-            <Button sx={{ alignSelf: "end" }} onClick={() => dispatch(setResultId(null))} size="small" variant="contained" startIcon={<IconifyIcon icon={'ep:back'} />}>{t("Orqaga")}</Button>
-            <DataTable loading={isGettingExamsResults} maxWidth="100%" minWidth="450px" data={results} columns={columnsResult} />
-            <Drawer open={open === 'result'} anchor='right' variant='persistent'>
-                <Box
-                    className='customizer-header'
-                    sx={{
-                        position: 'relative',
-                        p: theme => theme.spacing(3.5, 5),
-                        borderBottom: theme => `1px solid ${theme.palette.divider}`,
-                        width: isMobile ? '320px' : '400px'
-                    }}
-                    onClick={handleClose}
-                >
-                    <Typography variant='h6' sx={{ fontWeight: 600 }}>
-                        {t("Natija")}
-                    </Typography>
-                    <IconButton
-                        sx={{
-                            right: 20,
-                            top: '50%',
-                            position: 'absolute',
-                            color: 'text.secondary',
-                            transform: 'translateY(-50%)'
-                        }}
-                    >
-                        <IconifyIcon icon='mdi:close' fontSize={20} />
-                    </IconButton>
-                </Box>
-                <form onSubmit={formik.handleSubmit} style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    <FormControl>
-                        <TextField
-                            size='small'
-                            type="number"
-                            name='score'
-                            label={t("Natija")}
-                            value={formik.values?.score}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={!!formik.errors.score && !!formik.touched.score}
-                        />
-                        <FormHelperText error>{!!formik.errors.score && !!formik.touched.score && formik.errors.score}</FormHelperText>
-                    </FormControl>
-                    <FormControl>
-                        <TextField
-                            size='small'
-                            label={t("Izoh")}
-                            multiline
-                            minRows={4}
-                            name='description'
-                            value={formik.values?.description || ''}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={!!formik.errors.description && !!formik.touched.description}
-                        />
-                        <FormHelperText error>{!!formik.errors.description && !!formik.touched.description && formik.errors.description}</FormHelperText>
-                    </FormControl>
-                    <LoadingButton loading={loading} variant="outlined" type="submit">Saqlash</LoadingButton>
-                </form>
-            </Drawer>
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Button
+        sx={{ alignSelf: 'end' }}
+        onClick={() => dispatch(setResultId(null))}
+        size='small'
+        variant='contained'
+        startIcon={<IconifyIcon icon={'ep:back'} />}
+      >
+        {t('Orqaga')}
+      </Button>
+      <DataTable
+        loading={isGettingExamsResults}
+        maxWidth='100%'
+        minWidth='450px'
+        data={results}
+        columns={columnsResult}
+      />
+      <Drawer open={open === 'result'} anchor='right' variant='persistent'>
+        <Box
+          className='customizer-header'
+          sx={{
+            position: 'relative',
+            p: theme => theme.spacing(3.5, 5),
+            borderBottom: theme => `1px solid ${theme.palette.divider}`,
+            width: isMobile ? '320px' : '400px'
+          }}
+          onClick={handleClose}
+        >
+          <Typography variant='h6' sx={{ fontWeight: 600 }}>
+            {t('Natija')}
+          </Typography>
+          <IconButton
+            sx={{
+              right: 20,
+              top: '50%',
+              position: 'absolute',
+              color: 'text.secondary',
+              transform: 'translateY(-50%)'
+            }}
+          >
+            <IconifyIcon icon='mdi:close' fontSize={20} />
+          </IconButton>
         </Box>
-    )
+        <form
+          onSubmit={formik.handleSubmit}
+          style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: 12 }}
+        >
+          <FormControl>
+            <TextField
+              size='small'
+              type='number'
+              name='score'
+              label={t('Natija')}
+              value={formik.values?.score}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={!!formik.errors.score && !!formik.touched.score}
+            />
+            <FormHelperText error>
+              {!!formik.errors.score && !!formik.touched.score && formik.errors.score}
+            </FormHelperText>
+          </FormControl>
+          <FormControl>
+            <TextField
+              size='small'
+              label={t('Izoh')}
+              multiline
+              minRows={4}
+              name='description'
+              value={formik.values?.description || ''}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={!!formik.errors.description && !!formik.touched.description}
+            />
+            <FormHelperText error>
+              {!!formik.errors.description && !!formik.touched.description && formik.errors.description}
+            </FormHelperText>
+          </FormControl>
+          <LoadingButton loading={loading} variant='outlined' type='submit'>
+            Saqlash
+          </LoadingButton>
+        </form>
+      </Drawer>
+    </Box>
+  )
 }
