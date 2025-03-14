@@ -9,7 +9,7 @@
     "lint": "echo Lint tekshiruvi o‘chirildi",
     "types": "tsc --noEmit",
     "typecheck": "tsc --noEmit --incremental false",
-    "postinstall": "npx browserslist@latest --update-db && husky",
+    "postinstall": "husky",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "format:check": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "build:icons": "tsc -b src/iconify-bundle && node src/iconify-bundle/bundle-icons-react.js"
