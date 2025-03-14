@@ -83,7 +83,7 @@ const QrCodeModal = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value
     if (!isEnglish(text)) {
-      setErrorText("Faqat ingliz harflari va raqamlari kiritilishi kerak!")
+      setErrorText("Komputer tilini English tiliga o'tqazing!")
     } else {
       setErrorText('')
       setStudentId(text)
