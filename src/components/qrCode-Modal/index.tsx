@@ -161,4 +161,5 @@ const QrCodeModal = () => {
   )
 }
 
+QrCodeModal.displayName = 'QrCodeModal'
 export default QrCodeModal
