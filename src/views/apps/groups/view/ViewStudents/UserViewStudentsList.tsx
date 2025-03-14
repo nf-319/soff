@@ -80,8 +80,6 @@ export default function UserViewStudentsList() {
   const { query, push } = useRouter()
   const [showBalance, setShowBalance] = useState(false)
 
-  
-
   const columns: customTableProps[] = [
     {
       xs: 0.5,
@@ -93,7 +91,6 @@ export default function UserViewStudentsList() {
     },
     {
       xs: 1.4,
-
       title: t('first_name'),
       dataIndex: 'id',
       renderItem: (student: any) => {
@@ -290,7 +287,6 @@ export default function UserViewStudentsList() {
         )
       }
     },
-
     {
       xs: 1.0,
       title: t('Status'),
@@ -398,6 +394,7 @@ export default function UserViewStudentsList() {
         const queryStringAttendance = new URLSearchParams(queryParams).toString()
         dispatch(setGettingAttendance(true))
         await dispatch(getStudents({ id: query.id, queryString: queryString }))
+
         if (query.month && query?.id) {
           await dispatch(
             getAttendance({
@@ -436,10 +433,6 @@ export default function UserViewStudentsList() {
     dispatch(getStudents({ id: query.id, queryString }))
     dispatch(studentsUpdateParams({ search: debounce }))
   }, [queryString])
-
-  const rowClick = (id: any, item: any) => {
-    push(`/students/view/security/?student=${item?.student?.id}`)
-  }
 
   return (
     <Box width='100%'>

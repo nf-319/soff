@@ -2,6 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 // ** Components
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Autocomplete,
   Box,
   Button,
@@ -51,6 +54,8 @@ import api from 'src/@core/utils/api'
 import ceoConfigs from 'src/configs/ceo'
 import { useQueryClient } from '@tanstack/react-query'
 import { fetchSchoolsList } from 'src/store/apps/settings'
+import { ButtonGroup, Dropdown, Button as ButtonBootstrap } from 'react-bootstrap'
+import { Add, Remove } from '@mui/icons-material'
 
 export default function CreateStudentForm() {
   // ** Hooks
@@ -61,7 +66,11 @@ export default function CreateStudentForm() {
   const { schools } = useAppSelector(state => state.settings)
   const [image, setImage] = useState<any>(null)
   const profilePhoto: any = useRef(null)
+  const [selected, setSelected] = useState<any[]>([])
 
+  const toggleSelection = (item: any) => {
+    setSelected(prev => (prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]))
+  }
   const { isMobile } = useResponsive()
   const [isSchool, setIsSchool] = useState(false)
   const [isGroup, setIsGroup] = useState<boolean>(false)
@@ -73,7 +82,7 @@ export default function CreateStudentForm() {
   const school_type = localStorage.getItem('school_type')
 
   const getGroups = async () => {
-    await dispatch(fetchGroupCheckList(""))
+    await dispatch(fetchGroupCheckList(''))
   }
 
   const validationSchema = Yup.object({
@@ -81,6 +90,7 @@ export default function CreateStudentForm() {
     phone: Yup.string().required('Telefon raqam kiriting'),
     birth_date: Yup.string(),
     parent_phone: Yup.string().nullable(),
+    parent_first_name:Yup.string().nullable(),
     gender: Yup.string().required('Jinsini tanlang'),
     password: Yup.string(),
     fixed_price: Yup.number().required("To'ldiring")
@@ -89,6 +99,7 @@ export default function CreateStudentForm() {
   const initialValues: CreateStudentDto = {
     first_name: '',
     phone: '',
+    parent_first_name:'',
     image: '',
     school: '',
     parent_phone: '',
@@ -294,77 +305,17 @@ export default function CreateStudentForm() {
         </RadioGroup>
       </FormControl>
 
-      {isParent && (
-        <>
-          <FormControl sx={{ width: '100%' }}>
-            <InputLabel htmlFor='outlined-adornment-phone'>{t('Ota-ona telefon raqami')}</InputLabel>
-            <PhoneInput
-              id='outlined-adornment-phone'
-              label={t('Ota-ona telefon raqami')}
-              name='parent_phone'
-              value={values.parent_phone}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-          </FormControl>
-          <FormControl sx={{ width: '100%' }}>
-            <TextField
-              size='small'
-              label={t('Ota-ona ismi')}
-              name='parent_first_name'
-              error={!!errors.parent_first_name && touched.parent_first_name}
-              value={values.parent_first_name}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-          </FormControl>
-        </>
-      )}
+      
 
-      {isSchool && (
-        <FormControl fullWidth>
-          <InputLabel size='small' id='user-view-language-label'>
-            {t('Maktab')}
-          </InputLabel>
-          <Select
-            size='small'
-            error={!!errors.school && touched.school}
-            label={t('Maktab')}
-            id='user-view-language'
-            labelId='user-view-language-label'
-            name='school'
-            onChange={handleChange}
-            value={values.school || ''}
-            sx={{ mb: 3 }}
-          >
-            {schools.map((school: { id: number | string; name: string }) => (
-              <MenuItem key={school.id} value={Number(school.id)}>
-                {school.name}
-              </MenuItem>
-            ))}
-            <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router.push('/settings/office/schools')}>
-              {t('Yangi yaratish')}
-              <IconifyIcon icon={'ion:add-sharp'} />
-            </MenuItem>
-          </Select>
-          {errors.school && <FormHelperText error={!!errors.school}>{errors.school}</FormHelperText>}
-
-          {/* <TextField
-            size='small'
-            label={t("Guruhga Qo'shilish sanasi")}
-            name='start_at'
-            type='date'
-            error={!!errors.start_at && touched.start_at}
-            value={values.start_at}
-            onChange={handleChange}
-            onBlur={handleBlur}
-          /> */}
-          <FormHelperText error={true}>{errors.start_at}</FormHelperText>
-        </FormControl>
-      )}
-
-      {isGroup && (
-        <FormControl fullWidth>
+     
+      <FormControl fullWidth>
+        <Box>
+          <Accordion variant='outlined' expanded={selected.includes('group')} onChange={() => toggleSelection('group')}>
+            <AccordionSummary expandIcon={selected.includes('group') ? <Remove /> : <Add />}>
+              Guruhga qo'shish
+            </AccordionSummary>
+            <AccordionDetails>
+            <FormControl fullWidth>
           <InputLabel size='small' id='user-view-language-label'>
             {t('Guruhlar')}
           </InputLabel>
@@ -409,33 +360,82 @@ export default function CreateStudentForm() {
           />
           <FormHelperText error={true}>{errors.start_at}</FormHelperText>
         </FormControl>
-      )}
+            </AccordionDetails>
+          </Accordion>
 
-      <FormControl fullWidth>
-        <InputLabel size='small' id='user-view-language-label'>
-          {t("O'quvchini qo'shimch ma'lumotlari")}
-        </InputLabel>
-        <Select
-          onChange={e => {
-            const selectedValue = e.target.value
-            if (selectedValue === 'group') setIsGroup(true)
-            if (selectedValue === 'parent') setIsParent(true)
-            if (selectedValue === 'school') {
-              setIsSchool(true)
-              dispatch(fetchSchoolsList())
-            }
-          }}
-          displayEmpty
-          size='small'
-          id='user-view-language-label'
-          labelId='user-view-language-label'
-          label="O'quvchini qo'shimch ma'lumotlari"
-        >
-          <MenuItem value='group'>{t("Guruhga qo'shish")}</MenuItem>
-          <MenuItem value='parent'>{t("Ota-ona telefon raqami qo'shish")}</MenuItem>
-          <MenuItem value='school'>{t("Maktab qo'shish")}</MenuItem>
-        </Select>
+          <Accordion variant='outlined' expanded={selected.includes('parent')} onChange={() => toggleSelection('parent')}>
+            <AccordionSummary expandIcon={selected.includes('parent') ? <Remove /> : <Add />}>
+              Ota-ona telefon raqamini qo'shish
+            </AccordionSummary>
+            <AccordionDetails>
+            <>
+          <FormControl sx={{ width: '100%' ,mb:2}}>
+            <InputLabel htmlFor='outlined-adornment-phone'>{t('Ota-ona telefon raqami')}</InputLabel>
+            <PhoneInput
+              id='outlined-adornment-phone'
+              label={t('Ota-ona telefon raqami')}
+              name='parent_phone'
+              value={values.parent_phone}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+          </FormControl>
+          <FormControl sx={{ width: '100%' }}>
+            <TextField
+              size='small'
+              label={t('Ota-ona ismi')}
+              name='parent_first_name'
+              error={!!errors.parent_first_name && touched.parent_first_name}
+              value={values.parent_first_name}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+          </FormControl>
+        </>
+            </AccordionDetails>
+          </Accordion>
+
+          <Accordion variant='outlined' expanded={selected.includes('school')} onChange={() => toggleSelection('school')}>
+            <AccordionSummary expandIcon={selected.includes('school') ? <Remove /> : <Add />}>
+              Maktab qo'shish
+            </AccordionSummary>
+            <AccordionDetails>
+            <FormControl fullWidth>
+          <InputLabel size='small' id='user-view-language-label'>
+            {t('Maktab')}
+          </InputLabel>
+          <Select
+            size='small'
+            error={!!errors.school && touched.school}
+            label={t('Maktab')}
+            id='user-view-language'
+            labelId='user-view-language-label'
+            name='school'
+            onChange={handleChange}
+            value={values.school || ''}
+            sx={{ mb: 3 }}
+          >
+            {schools.map((school: { id: number | string; name: string }) => (
+              <MenuItem key={school.id} value={Number(school.id)}>
+                {school.name}
+              </MenuItem>
+            ))}
+            <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router.push('/settings/office/schools')}>
+              {t('Yangi yaratish')}
+              <IconifyIcon icon={'ion:add-sharp'} />
+            </MenuItem>
+          </Select>
+          {errors.school && <FormHelperText error={!!errors.school}>{errors.school}</FormHelperText>}
+
+         
+          <FormHelperText error={true}>{errors.start_at}</FormHelperText>
+        </FormControl>
+            </AccordionDetails>
+          </Accordion>
+        </Box>
       </FormControl>
+
+     
 
       {isGroup && values?.group && (
         <Box className='w-100'>
