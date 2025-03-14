@@ -29,7 +29,8 @@ type DataTableProps = {
 
 const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidth, maxWidth, rowClick }) => {
   const { query } = useRouter()
-  function extractColors(str: string) {
+
+  const extractColors = (str: string) => {
     if (str) {
       return str?.split(',').map(color => color.trim())
     }
