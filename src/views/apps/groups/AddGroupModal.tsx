@@ -5,8 +5,6 @@ import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import LoadingButton from '@mui/lab/LoadingButton'
 import {
-  createGroup,
-  fetchGroups,
   getDashboardLessons,
   handleOpenAddModal,
   resetFormParams,
@@ -14,7 +12,7 @@ import {
 } from 'src/store/apps/groups'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { useTranslation } from 'react-i18next'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import Calendar from './Calendar'
@@ -27,7 +25,7 @@ import ceoConfigs from 'src/configs/ceo'
 import { useQueryClient } from '@tanstack/react-query'
 
 export default function AddGroupModal() {
-  const { isOpenAddGroup, teachersData, roomsData, courses, formParams, queryParams, initialValues } = useAppSelector(
+  const { isOpenAddGroup, teachersData, roomsData, courses, formParams, initialValues } = useAppSelector(
     state => state.groups
   )
   const dispatch = useAppDispatch()
