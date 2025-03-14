@@ -23,14 +23,14 @@ const Avatar = styled(CustomAvatar)<AvatarProps>(({ theme }) => ({
 
 const CardStatsHorizontal = (props: CardStatsHorizontalProps) => {
   // ** Props
-  const { title, icon,iconplus, stats,bgColor, trendNumber, color = 'primary', trend = 'positive' } = props
-
-
+  const { title, icon, iconplus, stats, bgColor, trendNumber, color = 'primary', trend = 'positive' } = props
 
   return (
-    <Card className={bgColor}>
-      <CardContent sx={{display:'flex', justifyContent:'space-between', py: theme => `${theme.spacing(4.125)} !important` }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+    <Card sx={{ height: '100%' }} className={bgColor}>
+      <CardContent
+        sx={{height:'100%', display: 'flex',justifyContent: 'space-between',alignItems:'center', py: theme => `${theme.spacing(4.125)} !important` }}
+      >
+        <Box sx={{height:'100%', display: 'flex', alignItems: 'center', gap: '30px' }}>
           <Avatar skin='light' color={color} variant='rounded' sx={{ margin: '0' }}>
             {icon}
           </Avatar>
@@ -46,13 +46,12 @@ const CardStatsHorizontal = (props: CardStatsHorizontalProps) => {
                 </Typography> */}
               </Box>
             </Box>
-            <Typography sx={{ fontSize: '14px' }} variant='caption'>{title}</Typography>
+            <Typography sx={{ fontSize: '14px' }} variant='caption'>
+              {title}
+            </Typography>
           </Box>
-
         </Box>
-        <Box>
-        {iconplus?.props?.icon && <Icon icon={`${iconplus.props.icon}`} />}
-          </Box>
+        <Box>{iconplus?.props?.icon && <Icon icon={`${iconplus.props.icon}`} />}</Box>
       </CardContent>
     </Card>
   )
