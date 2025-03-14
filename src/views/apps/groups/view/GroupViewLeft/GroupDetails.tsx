@@ -16,6 +16,7 @@ import api from 'src/@core/utils/api'
 import { LoadingButton } from '@mui/lab'
 import { Router, useRouter } from 'next/router'
 import toast from 'react-hot-toast'
+import dayjs from 'dayjs'
 
 interface ColorsType {
   [key: string]: ThemeColor
@@ -29,21 +30,16 @@ const roleColors: ColorsType = {
 }
 
 export default function GroupDetails() {
-  const { groupData, isGettingGroupDetails ,onlineLessonLoading} = useAppSelector(state => state.groupDetails)
+  const { groupData, isGettingGroupDetails, onlineLessonLoading } = useAppSelector(state => state.groupDetails)
   const dispatch = useAppDispatch()
-  const [url, setUrl] = useState('')
   const { user } = useContext(AuthContext)
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   const router = useRouter()
-  const { id,month } = router.query
-
 
   const handleOpenSendSMSModal = async () => {
     dispatch(handleEditClickOpen('send-sms'))
     await dispatch(getSMSTemp())
   }
-
-
 
   const handleEdit = async (id: any) => {
     dispatch(handleOpenEdit(true))
@@ -63,7 +59,6 @@ export default function GroupDetails() {
       .then(res => {
         if (res.data.url) {
           router.push(res.data.url)
-
         }
       })
       .catch(err => {
@@ -72,6 +67,15 @@ export default function GroupDetails() {
       })
     dispatch(setOnlineLessonLoading(false))
   }
+
+  const endDate = groupData?.end_date
+  const today = dayjs()
+  const endDateObj = dayjs(endDate)
+  const daysLeft = endDateObj.diff(today, 'day')
+
+  const formattedDate = endDate?.split('-').reverse().join('.')
+
+  const textColor = daysLeft <= 2 ? 'red' : 'inherit'
 
   return (
     <Card sx={{ position: 'relative' }}>
@@ -171,7 +175,9 @@ export default function GroupDetails() {
             <Box sx={{ display: 'flex', gap: '5px' }}>
               <Typography sx={{ mr: 2 }}>{t('Kurs davomiyligi (oy)')}:</Typography>
               <Typography>{groupData?.start_date?.split('-').reverse().join('.')}</Typography> -
-              <Typography>{groupData?.end_date?.split('-').reverse().join('.')}</Typography>
+              <Typography style={{ color: textColor }}>
+                {formattedDate}
+              </Typography>
             </Box>
           </Box>
         )}
@@ -266,8 +272,8 @@ export default function GroupDetails() {
             <Skeleton variant='rounded' animation='wave' width={70} height={40} />
           ) : (
             <Tooltip title={t('Online dars')} placement='top'>
-                <LoadingButton
-                  loading={onlineLessonLoading}
+              <LoadingButton
+                loading={onlineLessonLoading}
                 color='success'
                 variant='outlined'
                 onClick={() => {
