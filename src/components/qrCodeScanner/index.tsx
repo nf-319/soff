@@ -17,7 +17,7 @@ export default function QRCodeScanner() {
     }
 
     if (!isEnglish(code)) {
-      toast.error("Komputer tilini English tiliga o'tqazing!")
+      toast.error("Qurilmangiz tili Ingliz tilida ekanligini tekshiring!")
       return
     }
 
@@ -53,7 +53,7 @@ export default function QRCodeScanner() {
         if (scannedCode) {
           if (uuidRegex.test(scannedCode)) {
             if (!isEnglish(scannedCode)) {
-              toast.error("Komputer tilini English tiliga o'tqazing!")
+              toast.error("Qurilmangiz tili Ingliz tilida ekanligini tekshiring!")
               setScannedCode('')
               return
             } else {
@@ -72,7 +72,7 @@ export default function QRCodeScanner() {
       timer = setTimeout(() => {
         if (uuidRegex.test(newCode)) {
           if (!isEnglish(newCode)) {
-            toast.error("Komputer tilini English tiliga o'tqazing!")
+            toast.error("Qurilmangiz tili Ingliz tilida ekanligini tekshiring!")
             setScannedCode('')
             return
           }
