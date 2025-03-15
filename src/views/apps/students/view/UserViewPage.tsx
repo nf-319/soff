@@ -1,15 +1,12 @@
-// ** MUI Imports
 import Grid from '@mui/material/Grid'
 import { useRouter } from 'next/router'
 import { useContext, useEffect, useMemo } from 'react'
 import { toast } from 'react-hot-toast'
-import VideoHeader, { videoUrls } from '../../../../components/video-header/video-header'
+import VideoHeader, { videoUrls } from 'src/components/video-header/video-header'
 import api from 'src/@core/utils/api'
 import { AuthContext } from 'src/context/AuthContext'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { fetchStudentDetail, setGroupChecklist, setStudentId } from 'src/store/apps/students'
-
-// ** Demo Components Imports
+import { fetchStudentDetail, setGroupChecklist } from 'src/store/apps/students'
 import UserViewLeft from 'src/views/apps/students/view/UserViewLeft'
 import UserViewRight from 'src/views/apps/students/view/UserViewRight'
 

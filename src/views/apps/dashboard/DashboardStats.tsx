@@ -83,7 +83,7 @@ const DashboardStats = () => {
         gap: '10px',
         width: '100%',
         mb: 5,
-        gridTemplateColumns: `repeat(${isMobile ? 3 : isTablet ? 4 : statsData.length - 1}, 1fr)`
+        gridTemplateColumns: `repeat(${isMobile ? 3 : isTablet ? 4 : statsData.length}, 1fr)`
       }}
     >
       {isLoading &&
