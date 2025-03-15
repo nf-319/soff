@@ -1,14 +1,15 @@
+'use client'
+
 import { Close } from '@mui/icons-material'
 import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material'
-import { QueryObserverResult, RefetchOptions, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { Dispatch, FC, SetStateAction, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AddToGroupForm from 'src/views/apps/lids/anonimUser/AddToGroupForm'
-import { LeadsType } from '../model'
-import { LeadsResult, MenuOpenType } from '../LeadsKanban'
+import { MenuOpenType } from '../LeadsKanban'
 import { useGet } from 'src/hooks/useApi'
-import { setAddSource, setOpenLid, setSectionId } from '../../../store/apps/leads'
-import { useAppDispatch } from '../../../store'
+import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
+import { useAppDispatch } from 'src/store'
 
 type Props = {
   open: string | null

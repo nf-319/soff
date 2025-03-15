@@ -216,6 +216,7 @@ export default function AddGroupModal() {
                 <InputLabel size='small' id='user-view-language-label'>
                   {t('Hafta kunlari')}
                 </InputLabel>
+
                 <Select
                   size='small'
                   label={t('Hafta kunlari')}
@@ -232,6 +233,7 @@ export default function AddGroupModal() {
                   <MenuItem value={`tuesday,thursday,saturday,monday,wednesday,friday`}>{t('Har kuni')}</MenuItem>
                   <MenuItem value={'0'}>{t('Boshqa')}</MenuItem>
                 </Select>
+
                 <FormHelperText error={!!formik.errors.day_of_week && !!formik.touched.day_of_week}>
                   {!!formik.errors.day_of_week && !!formik.touched.day_of_week && formik.errors.day_of_week}
                 </FormHelperText>
@@ -340,14 +342,16 @@ export default function AddGroupModal() {
               <FormControl sx={{ width: '100%' }}>
                 <TextField
                   size='small'
-                  type='time'
+                  type="time"
                   label={t('Boshlanish vaqti')}
                   name='start_at'
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={!!formik.errors.start_at && !!formik.touched.start_at}
                   value={formik.values.start_at}
+                  InputLabelProps={{ shrink: true }}
                 />
+
                 <FormHelperText error={!!formik.errors.start_at && !!formik.touched.start_at}>
                   {!!formik.errors.start_at && !!formik.touched.start_at && formik.errors.start_at}
                 </FormHelperText>
@@ -363,6 +367,7 @@ export default function AddGroupModal() {
                   onBlur={formik.handleBlur}
                   error={!!formik.errors.end_at && !!formik.touched.end_at}
                   value={formik.values.end_at}
+                  InputLabelProps={{ shrink: true }}
                 />
                 <FormHelperText error={!!formik.errors.end_at && !!formik.touched.end_at}>
                   {!!formik.errors.end_at && !!formik.touched.end_at && formik.errors.end_at}

@@ -16,7 +16,7 @@ import { useFormik } from "formik";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import IconifyIcon from "../../../../../components/icon";
+import IconifyIcon from "src/components/icon";
 import useResponsive from "src/@core/hooks/useResponsive";
 import api from "src/@core/utils/api";
 import { useAppDispatch, useAppSelector } from "src/store";
@@ -26,7 +26,7 @@ import * as Yup from "yup";
 
 
 export default function EditExam() {
-  const { open, editData, exams } = useAppSelector(state => state.groupDetails)
+  const { open, editData } = useAppSelector(state => state.groupDetails)
   const { query } = useRouter()
   const dispatch = useAppDispatch()
   const [exams2, setExams2] = useState<ExamType[]>([])

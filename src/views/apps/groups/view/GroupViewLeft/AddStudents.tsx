@@ -8,8 +8,6 @@ import {
   handleEditClickOpen,
   setGettingAttendance
 } from 'src/store/apps/groupDetails'
-
-// ** MUI Imports
 import LoadingButton from '@mui/lab/LoadingButton'
 import Dialog from '@mui/material/Dialog'
 import Button from '@mui/material/Button'
@@ -18,7 +16,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import FormControl from '@mui/material/FormControl'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-import { Box, FormHelperText } from '@mui/material'
+import { FormHelperText } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -106,7 +104,11 @@ export default function AddStudents() {
   return (
     <Dialog
       open={openEdit === 'add-student'}
-      onClose={() => (dispatch(handleEditClickOpen(null)), formik.resetForm(), setSelectedStudents(null))}
+      onClose={() => {
+        dispatch(handleEditClickOpen(null))
+        formik.resetForm()
+        setSelectedStudents(null)
+      }}
       aria-labelledby='user-view-edit'
       sx={{ '& .MuiPaper-root': { width: '100%', maxWidth: 450, p: [1, 2] } }}
       aria-describedby='user-view-edit-description'
