@@ -1,14 +1,14 @@
 import LoadingButton from "@mui/lab/LoadingButton";
 import {
-    Box,
-    Button,
-    Drawer,
-    FormControl,
-    FormHelperText,
-    IconButton,
-    TextField,
-    Typography,
-} from "@mui/material";
+  Box,
+  Button, Chip,
+  Drawer,
+  FormControl,
+  FormHelperText,
+  IconButton,
+  TextField,
+  Typography
+} from '@mui/material'
 import { useFormik } from "formik";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -22,6 +22,16 @@ import { customTableProps } from "src/pages/groups";
 import { useAppDispatch, useAppSelector } from "src/store";
 import { getResults, setOpen, setResultEdit, setResultId } from "src/store/apps/groupDetails";
 import * as Yup from "yup";
+
+const statusColors = {
+  boshlanmagan: 'default',
+  yiqildi: 'error',
+  '-': 'warning',
+  yaxshi: 'success',
+  "A'lo": 'primary',
+}
+
+type ChipColorProps = 'error' | 'default' | 'warning' | 'success' | 'primary' | 'secondary' | 'info'
 
 export default function ExamResults() {
     const { resultId, isGettingExamsResults, examStudentId, open, results } = useAppSelector(state => state.groupDetails)
@@ -39,59 +49,73 @@ export default function ExamResults() {
         formik.resetForm()
     }
 
-    const columnsResult: customTableProps[] = [
-        {
-            xs: 0.03,
-            title: t("#"),
-            dataIndex: 'index',
-        },
-        {
-            xs: 0.3,
-            title: t("first_name"),
-            dataIndex: 'result',
-            render: (result: any) => result.first_name
-        },
-        {
-            xs: 0.12,
-            title: t("Natija"),
-            dataIndex: 'result',
-            render: (result: any) => result.score
-        },
-        {
-            xs: 0.3,
-            title: t("Maksimal bal"),
-            dataIndex: 'result',
-            render: (result: any) => result.max_score
-        },
-        {
-            xs: 0.2,
-            title: t("Holati"),
-            dataIndex: 'result',
-            render: (result: any) => !result.status ? "boshlanmagan" : result.status === "bad" ? "yiqildi" : result.status === "new" ? "kelmagan" : result.status === "good" ? "yaxshi" : "A'lo"
-        },
-        {
-            xs: 0.6,
-            title: t("Izoh"),
-            dataIndex: 'result',
-            render: (result: any) => result.description
-        },
-        {
-            xs: 0.12,
-            title: t("Amallar"),
-            dataIndex: 'result',
-            render: (result: any) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    {
-                        result.score > 0 ? (
-                            <IconifyIcon icon='mdi:edit' fontSize={20} onClick={() => (dispatch(setResultEdit(result.id)), dispatch(setOpen('result')))} />
-                        ) : (
-                            <IconifyIcon icon='fluent:add-32-regular' fontSize={20} onClick={() => (dispatch(setResultEdit(result.id)), dispatch(setOpen('result')))} />
-                        )
-                    }
-                </div>
-            ),
-        },
-    ]
+  const columnsResult: customTableProps[] = [
+    {
+      xs: 0.03,
+      title: t('#'),
+      dataIndex: 'index'
+    },
+    {
+      xs: 0.3,
+      title: t('first_name'),
+      dataIndex: 'result',
+      render: (result: any) => result.first_name
+    },
+    {
+      xs: 0.12,
+      title: t('Natija'),
+      dataIndex: 'result',
+      render: (result: any) => result.score
+    },
+    {
+      xs: 0.3,
+      title: t('Maksimal bal'),
+      dataIndex: 'result',
+      render: (result: any) => result.max_score
+    },
+    {
+      xs: 0.2,
+      title: t('Holati'),
+      dataIndex: 'result',
+      render: (result: any) => {
+        const statusText = !result.status
+          ? 'boshlanmagan'
+          : result.status === 'bad'
+            ? 'yiqildi'
+            : result.status === 'new'
+              ? '-'
+              : result.status === 'good'
+                ? 'yaxshi'
+                : 'A\'lo'
+
+        return <Chip label={statusText} variant='outlined' color={statusColors[statusText] as ChipColorProps || 'default'} />
+      }
+    },
+    {
+      xs: 0.6,
+      title: t('Izoh'),
+      dataIndex: 'result',
+      render: (result: any) => result.description
+    },
+    {
+      xs: 0.12,
+      title: t('Amallar'),
+      dataIndex: 'result',
+      render: (result: any) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          {
+            result.score > 0 ? (
+              <IconifyIcon icon="mdi:edit" fontSize={20}
+                           onClick={() => (dispatch(setResultEdit(result.id)), dispatch(setOpen('result')))} />
+            ) : (
+              <IconifyIcon icon="fluent:add-32-regular" fontSize={20}
+                           onClick={() => (dispatch(setResultEdit(result.id)), dispatch(setOpen('result')))} />
+            )
+          }
+        </div>
+      )
+    }
+  ]
 
 
     const formik: any = useFormik({
@@ -101,7 +125,7 @@ export default function ExamResults() {
         },
         validationSchema: () => Yup.object({
             score: Yup.string().required("Natijasini kiriting"),
-            description: Yup.string(),
+            description: Yup.string().nullable(),
         }),
         onSubmit: async (values) => {
             setLoading(true)

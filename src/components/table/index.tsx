@@ -8,7 +8,7 @@ import { EmptyContent } from '../empty-content'
 
 export type customTableDataProps = {
   xs: number
-  title: string | React.ReactNode
+  title: ReactNode
   dataIndex?: string | ReactNode
   renderItem?: (source: any) => any | undefined
   render?: (source: string) => any | undefined

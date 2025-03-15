@@ -23,7 +23,7 @@ import { useAppDispatch, useAppSelector } from "src/store";
 import { getExams, setOpen } from "src/store/apps/groupDetails";
 import { ExamType } from "./GroupExamsList";
 import * as Yup from "yup";
-import { today } from "../../../../../components/card-statistics/kanban-item";
+import { today } from "src/components/card-statistics/kanban-item";
 
 
 export default function AddExam() {
