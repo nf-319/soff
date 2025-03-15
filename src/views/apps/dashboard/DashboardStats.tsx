@@ -81,8 +81,9 @@ const DashboardStats = () => {
       sx={{
         display: 'grid',
         gap: '10px',
+        width: '100%',
         mb: 5,
-        gridTemplateColumns: `repeat(${isMobile ? 3 : isTablet ? 4 : 9}, 1fr)`
+        gridTemplateColumns: `repeat(${isMobile ? 3 : isTablet ? 4 : statsData.length - 1}, 1fr)`
       }}
     >
       {isLoading &&
@@ -92,7 +93,7 @@ const DashboardStats = () => {
               sx={{ bgcolor: 'grey.300' }}
               variant='rectangular'
               width={'100%'}
-              height={'140px'}
+              heighat={'140px'}
               style={{ borderRadius: '10px' }}
               animation='wave'
             />
@@ -103,7 +104,7 @@ const DashboardStats = () => {
         ? stats?.payment_approaching
           ? statsData.map((item, index) => (
               <Tooltip key={`${item.key}-${index}`} arrow title={tooltip[item.key]}>
-                <Box sx={{ cursor: 'pointer' }} onClick={() => click(item.link)}>
+                <Box sx={{ cursor: 'pointer', width: "100%" }} onClick={() => click(item.link)}>
                   <CardStatsVertical
                     data_key={item.key}
                     title={stats?.[item.key]}
@@ -118,7 +119,7 @@ const DashboardStats = () => {
               ?.filter(el => el.key !== 'payment_approaching')
               .map((_, index) => (
                 <Tooltip key={`${_.key}-${index}`} arrow title={tooltip[_.key]}>
-                  <Box sx={{ cursor: 'pointer' }} onClick={() => click(_.link)}>
+                  <Box sx={{ cursor: 'pointer', width: "100%" }} onClick={() => click(_.link)}>
                     <CardStatsVertical
                       key={_.key}
                       title={stats?.[_.key]}
