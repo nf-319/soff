@@ -12,13 +12,13 @@ import {
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import api from '../../@core/utils/api'
-import { useAppSelector } from '../../store'
-import { toggleQrCodeModal } from '../../store/apps/page'
+import api from 'src/@core/utils/api'
+import { useAppSelector } from 'src/store'
+import { toggleQrCodeModal } from 'src/store/apps/page'
 import { Icon } from '@iconify/react'
-import useResponsive from '../../@core/hooks/useResponsive'
+import useResponsive from 'src/@core/hooks/useResponsive'
 import { Done } from '@mui/icons-material'
-import useDebounce from '../../hooks/useDebounce'
+import useDebounce from 'src/hooks/useDebounce'
 
 const isEnglish = (text: string) => /^[A-Za-z0-9-]*$/.test(text)
 
@@ -83,7 +83,7 @@ const QrCodeModal = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value
     if (!isEnglish(text)) {
-      setErrorText("Komputer tilini English tiliga o'tqazing!")
+      setErrorText("Qurilmangiz tili Ingliz tilida ekanligini tekshiring!")
     } else {
       setErrorText('')
       setStudentId(text)

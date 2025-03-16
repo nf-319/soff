@@ -234,6 +234,11 @@ const UserViewSecurity = () => {
       dataIndex: 'description'
     },
     {
+      xs: 1,
+      title: 'Yaratilgan vaqt',
+      dataIndex: 'created_at',
+    },
+    {
       xs: 0.8,
       title: t("To'lov turi"),
       dataIndex: 'payment_type_name'
@@ -340,7 +345,6 @@ const UserViewSecurity = () => {
                   '&:hover': {
                     color: 'gray',
                     backgroundColor: '#f0f0f0'
-                    // Change to your preferred hover background color
                   }
                 }}
                 onClick={e =>
@@ -622,10 +626,10 @@ const UserViewSecurity = () => {
         maxWidth='100%'
         minWidth='450px'
         data={payments.map(el => ({
-          ...el,
-          color: Number(el.amount) >= 0 ? 'transparent' : 'rgba(227, 18, 18, 0.1)',
-          is_debtor: Number(el.amount) >= 0
-        }))}
+            ...el,
+            color: Number(el.amount) >= 0 ? 'transparent' : 'rgba(227, 18, 18, 0.1)',
+            is_debtor: Number(el.amount) >= 0,
+          }))}
         columns={columns}
       />
 

@@ -19,7 +19,7 @@ export default function DashboardPage() {
   const dispatch = useAppDispatch()
 
   return (
-    <Box display='flex' flexDirection='column' gap={5}>
+    <Box display='flex' flexDirection='column' gap={5} width='100%'>
       <Box display={!isMobile ? 'flex' : 'block'} alignItems='center' gap={5} justifyContent='flex-end'>
         <Box sx={{mb:isMobile?3:0, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <Button
