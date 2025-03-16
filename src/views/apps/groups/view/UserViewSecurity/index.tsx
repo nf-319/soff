@@ -178,29 +178,60 @@ const UserViewSecurity = () => {
   }, [query?.year, query?.month])
 
   useEffect(() => {
+    const fetchData = async () => {
+      if (!query?.month || !query?.id || isGettingAttendance) return
+
+      dispatch(setGettingAttendance(true))
+
+      try {
+        const year = query?.year || new Date().getFullYear()
+        const monthNumber = getMontNumber(query?.month)
+        const attendanceDate = `${year}-${monthNumber}`
+
+        await Promise.all([
+          dispatch(getDays({ date: attendanceDate, group: query?.id })),
+          dispatch(getAttendance({ date: attendanceDate, group: query?.id, queryString }))
+        ])
+      } catch (error) {
+        console.error("Error fetching data:", error)
+      } finally {
+        dispatch(setGettingAttendance(false))
+      }
+    }
+
+    void fetchData()
+  }, [query?.month, query?.id, queryString, dispatch])
+
+  useEffect(() => {
     if (!initialized.current && month_list.length > 0) {
-      initialized.current = true
+      initialized.current = true;
 
       const initializeData = async () => {
         if (query?.month) {
-          const index = month_list.findIndex((item) => getMontName(Number(item.date.split("-")[1])) === query.month)
+          const index = month_list.findIndex((item) => getMontName(Number(item.date.split("-")[1])) === query.month);
           if (index !== -1) {
-            setCurrentMonth(index)
-            dispatch(setGettingAttendance(true))
-            await dispatch(getDays({ date: month_list[index].date, group: query?.id }))
+            setCurrentMonth(index);
+            dispatch(setGettingAttendance(true));
+            await dispatch(getDays({ date: month_list[index].date, group: query?.id }));
             await dispatch(getAttendance({
               date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
               group: query?.id,
               queryString: queryString
-            }))
-            dispatch(setGettingAttendance(false))
+            }));
+            dispatch(setGettingAttendance(false));
+          } else if (month_list.length > 0) {
+            const lastMonthIndex = month_list.length - 1;
+            setCurrentMonth(lastMonthIndex);
           }
+        } else if (month_list.length > 0) {
+          const lastMonthIndex = month_list.length - 1;
+          setCurrentMonth(lastMonthIndex);
         }
-      }
+      };
 
-      void initializeData()
+      void initializeData();
     }
-  }, [month_list, query.month, query?.id, queryString, dispatch])
+  }, [month_list, query.month, query?.id, queryString, dispatch]);
 
   useEffect(() => {
     const fetchAttendance = async () => {
@@ -346,4 +377,3 @@ const UserViewSecurity = () => {
 }
 
 export default UserViewSecurity
-

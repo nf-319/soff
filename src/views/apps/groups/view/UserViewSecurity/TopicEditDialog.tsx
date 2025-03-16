@@ -59,7 +59,7 @@ export const TopicEditDialog = ({
       PaperProps={{
         style: {
           borderRadius: '8px',
-          backgroundColor: '#fff' // Force light mode for dialog
+          backgroundColor: '#fff'
         }
       }}
     >
