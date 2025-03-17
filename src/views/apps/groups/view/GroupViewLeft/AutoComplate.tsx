@@ -45,6 +45,7 @@ const StudentAutoComplete = ({ formik, setSelectedStudents, selectedStudent }: A
 
   return (
     <Autocomplete
+      size='small'
       open={!(search === '' || selectedStudent)}
       onChange={(
         event: SyntheticEvent,
