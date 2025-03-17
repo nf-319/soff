@@ -1,15 +1,14 @@
 import React from 'react'
-import UserViewSecurity from 'src/views/apps/groups/view/UserViewSecurity'
 import StudentGroupDetail from 'src/views/apps/student-profile/StudentGroupDetail'
 
 
 function Groups(props: any) {
+  return (
 
-    return (
-        <div>
-            <StudentGroupDetail {...props} />
-        </div>
-    )
+    <div>
+      <StudentGroupDetail {...props} />
+    </div>
+  )
 }
 
 export function getServerSideProps(context: any) {

@@ -151,11 +151,15 @@ export default function AddStudents() {
                       name='discount_amount'
                       type='number'
                       error={!!formik.errors.discount_amount && formik.touched.discount_amount}
-                      value={formik.values.discount_amount}
+                      value={formik.values.discount_amount ? new Intl.NumberFormat("uz-UZ", {
+                        style: "currency",
+                        currency: "UZS",
+                        minimumFractionDigits: 0,
+                      }).format(Number(formik.values.discount_amount)) : ''}
                       onChange={e => {
-                        const value = e.target.value
-                        if (/^\d*$/.test(value) || value === '') {
-                          formik.setFieldValue('discount_amount', value)
+                        const rawValue = e.target.value.replace(/\D/g, '')
+                        if (/^\d*$/.test(rawValue)) {
+                          formik.setFieldValue('discount_amount', rawValue)
                         }
                       }}
                       onKeyDown={e => {

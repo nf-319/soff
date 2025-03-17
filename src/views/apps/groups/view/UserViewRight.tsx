@@ -3,17 +3,14 @@
 import { SyntheticEvent, useState, useEffect, useContext, FC } from 'react'
 import { useRouter } from 'next/router'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import ButtonGroup from '@mui/material/ButtonGroup'
 import TabList from '@mui/lab/TabList'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
 import { styled } from '@mui/material/styles'
 import MuiTab, { TabProps } from '@mui/material/Tab'
-import Icon from 'src/components/icon'
 import UserViewBilling from 'src/views/apps/groups/view/UserViewBilling'
 import UserViewOverview from 'src/views/apps/groups/view/GroupsNotes/UserViewOverview'
-import UserViewSecurity from 'src/views/apps/groups/view/UserViewSecurity'
+import UserViewSecurity from './UserViewSecurity'
 import GroupExamsList from './GroupExamList/GroupExamsList'
 import { useTranslation } from 'react-i18next'
 import { AuthContext } from 'src/context/AuthContext'
@@ -22,6 +19,7 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import GroupStudentGrades from './GroupStudentGrades/GroupStudentGradesList'
 import AttendanceTable from './GroupAttandance'
 import dayjs from 'dayjs'
+import { BadgePercent, BellPlus, Flag, GraduationCap, UserRoundCheck } from 'lucide-react'
 
 type Props = {
   tab: string
@@ -106,15 +104,15 @@ const UserViewRight: FC<Props> = ({ tab }) => {
           aria-label='forced scroll tabs example'
           sx={{ borderBottom: theme => `1px solid ${theme.palette.divider}` }}
         >
-          {buttonActive && <Tab value='security' label={t('Davomat')} icon={<Icon icon='tabler:user-check' />} />}
-          {!buttonActive && <Tab value='attendance' label={t('Davomatlar')} icon={<Icon icon='tabler:user-check' />} />}
-          {buttonActive && <Tab value='grade' label={t('Baho')} icon={<Icon icon='mdi:school' />} />}
+          {buttonActive && <Tab value='security' label={t('Davomat')} icon={<UserRoundCheck />} />}
+          {!buttonActive && <Tab value='attendance' label={t('Davomatlar')} icon={<UserRoundCheck />} />}
+          {buttonActive && <Tab value='grade' label={t('Baho')} icon={<GraduationCap />} />}
           {!(user?.role.length === 1 && user?.role.includes('teacher')) && (
-            <Tab value='notes' label={t('Eslatmalar')} icon={<Icon icon='fluent:note-add-48-regular' />} />
+            <Tab value='notes' label={t('Eslatmalar')} icon={<BellPlus />} />
           )}
-          {<Tab value='exams' label={t('Imtixon')} icon={<Icon icon='maki:racetrack' />} />}
+          {<Tab value='exams' label={t('Imtixon')} icon={<Flag />} />}
           {!(user?.role.length === 1 && user?.role.includes('teacher')) && (
-            <Tab value='discount' label={t('Chegirmalar')} icon={<Icon icon='mdi:sale' />} />
+            <Tab value='discount' label={t('Chegirmalar')} icon={<BadgePercent />} />
           )}
         </TabList>
       </Box>
