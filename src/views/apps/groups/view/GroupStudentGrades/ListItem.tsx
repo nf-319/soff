@@ -85,7 +85,6 @@ export const ListItem: FC<Props> = ({ defaultValue, userId, date, setOpenedId, r
             type="text"
             inputProps={{
               inputMode: "numeric",
-              pattern: "[-0-9]*",
               maxLength: 3,
               max: 100,
             }}
