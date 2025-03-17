@@ -12,7 +12,7 @@ import {
   DialogTitle,
   IconButton
 } from '@mui/material'
-import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
+import { ReactNode, useContext, useEffect, useState } from 'react'
 import DataTable from '../../components/table'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
@@ -21,7 +21,7 @@ import CreateStudentModal from 'src/views/apps/students/CreateStudentModal'
 import EditStudentModal from 'src/views/apps/students/EditStudentModal'
 import StudentRowOptions from 'src/views/apps/students/StudentRowOptions'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { fetchStudentsList, resetStudentsState, setStudentId, updateStudentParams } from 'src/store/apps/students'
+import { setStudentId, updateStudentParams } from 'src/store/apps/students'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { setOpenEdit } from 'src/store/apps/students'
 import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
@@ -50,12 +50,21 @@ export default function StudentsPage() {
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
 
-  const { queryParams, total_debts } = useAppSelector(state => state.students)
+  const { queryParams } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
-  const queryString = new URLSearchParams({ ...queryParams } as Record<string, string>).toString()
+  const querySearch = new URLSearchParams(window.location.search).get('q')
+  const { search, ...filteredParams } = queryParams
+  const queryString = new URLSearchParams(
+    Object.fromEntries(
+      Object.entries({ ...filteredParams, ...(querySearch ? { search: querySearch } : { search: '' }) })
+        .filter(([, value]) => value !== undefined && value !== null)
+        .map(([key, value]) => [key, String(value)])
+    )
+  ).toString()
+
   const { data, isLoading } = useGet('student/new-list/', {
     deps: ['students-list'],
-    params: queryParams as Record<string, unknown>
+    params: { ...filteredParams, ...(querySearch ? { search: querySearch } : {}) } as Record<string, unknown>
   })
 
   const columns: customTableProps[] = [
@@ -182,24 +191,22 @@ export default function StudentsPage() {
     setRowsPerPage(value)
 
     dispatch(updateStudentParams({ limit: value, offset: 0 }))
-    // await dispatch(fetchStudentsList({ ...queryParams, limit: String(value), offset: '0' }))
   }
 
   const handlePagination = async (page: string | number) => {
     const adjustedPage: any = (Number(page) - 1) * rowsPerPage
-    // await dispatch(fetchStudentsList({ ...queryParams, limit: String(rowsPerPage), offset: adjustedPage }))
     dispatch(updateStudentParams({ offset: adjustedPage }))
   }
 
   const rowClick = (id: any) => {
     dispatch(setStudentId(id))
-    router.push(`/students/view/security?student=${id}`)
+    void router.push(`/students/view/security?student=${id}`)
   }
 
   useEffect(() => {
     const initialize = async () => {
       if (!user?.role.includes('ceo') && !user?.role.includes('admin') && !user?.role.includes('watcher')) {
-        router.push('/')
+        void router.push('/')
         toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
         return
       }
@@ -207,7 +214,7 @@ export default function StudentsPage() {
       // await dispatch(fetchStudentsList({ ...queryParams }))
     }
 
-    initialize()
+    void initialize()
 
     return () => {
       dispatch(setOpenEdit(null))
