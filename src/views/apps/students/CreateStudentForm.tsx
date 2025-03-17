@@ -1,14 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+'use client'
 
-// ** Components
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Autocomplete,
   Box,
   Button,
-  Checkbox,
   debounce,
   FormControl,
   FormControlLabel,
@@ -21,46 +19,32 @@ import {
   Select,
   TextField
 } from '@mui/material'
-import IconifyIcon from '../../../components/icon'
+import IconifyIcon from 'src/components/icon'
 import LoadingButton from '@mui/lab/LoadingButton'
-
-// ** Assets
 import { useTranslation } from 'react-i18next'
-import { today } from '../../../components/card-statistics/kanban-item'
-
-// ** Packs
+import { today } from 'src/components/card-statistics/kanban-item'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { CreateStudentDto } from 'src/types/apps/studentsTypes'
 import {
   createStudent,
   fetchGroupCheckList,
-  fetchStudentGroups,
-  fetchStudentsList,
   setOpenEdit,
   updateStudentParams
 } from 'src/store/apps/students'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import useGroups from 'src/hooks/useGroups'
 import useResponsive from 'src/@core/hooks/useResponsive'
-import PhoneInput from '../../../components/phone-input'
-import { reversePhone } from '../../../components/phone-input/format-phone-number'
+import PhoneInput from 'src/components/phone-input'
+import { reversePhone } from 'src/components/phone-input/format-phone-number'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
 import Router from 'next/router'
 import { TeacherAvatar, VisuallyHiddenInput } from '../mentors/AddMentorsModal'
-import { revereAmount } from '../../../components/amount-input'
-import api from 'src/@core/utils/api'
-import ceoConfigs from 'src/configs/ceo'
 import { useQueryClient } from '@tanstack/react-query'
-import { fetchSchoolsList } from 'src/store/apps/settings'
-import { ButtonGroup, Dropdown, Button as ButtonBootstrap } from 'react-bootstrap'
 import { Add, Remove } from '@mui/icons-material'
 
 export default function CreateStudentForm() {
-  // ** Hooks
   const { t } = useTranslation()
-  const error: any = {}
   const dispatch = useAppDispatch()
   const { groups } = useAppSelector(state => state.students)
   const { schools } = useAppSelector(state => state.settings)
@@ -72,9 +56,7 @@ export default function CreateStudentForm() {
     setSelected(prev => (prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]))
   }
   const { isMobile } = useResponsive()
-  const [isSchool, setIsSchool] = useState(false)
   const [isGroup, setIsGroup] = useState<boolean>(false)
-  const [isParent, setIsParent] = useState<boolean>(false)
 
   const [loading, setLoading] = useState<boolean>(false)
   const [isDiscount, setIsDiscount] = useState<boolean>(false)
@@ -93,7 +75,12 @@ export default function CreateStudentForm() {
     parent_first_name:Yup.string().nullable(),
     gender: Yup.string().required('Jinsini tanlang'),
     password: Yup.string(),
-    fixed_price: Yup.number().required("To'ldiring")
+    is_discount: Yup.boolean(),
+    discount_amount: Yup.number().when('is_discount', {
+      is: true,
+      then: Yup.number().required("Chegirma miqdorini kiriting"),
+      otherwise: Yup.number().nullable(),
+    }),
   })
 
   const initialValues: CreateStudentDto = {
@@ -107,7 +94,8 @@ export default function CreateStudentForm() {
     birth_date: today,
     gender: 'male',
     start_at: today,
-    fixed_price: '0'
+    is_discount: false,
+    discount_amount: 0,
   }
 
   const formik = useFormik({
@@ -119,10 +107,8 @@ export default function CreateStudentForm() {
 
       const newValues = new FormData()
 
-      for (const [key, value] of Object.entries({ ...values })) {
-        if (key === 'phone') {
-          newValues.append(key, reversePhone(value as any))
-        } else if (key === 'parent_phone') {
+      for (const [key, value] of Object.entries({ ...values, is_discount: isDiscount })) {
+        if (key === 'phone' || key === 'parent_phone') {
           if (String(value).length > 5) {
             newValues.append(key, reversePhone(value as any))
           }
@@ -130,6 +116,11 @@ export default function CreateStudentForm() {
           newValues.append(key, value as any)
         }
       }
+
+      if (isDiscount) {
+        newValues.append('discount_amount', String(values.discount_amount))
+      }
+
       if (image) {
         newValues.append('image', image)
       }
@@ -145,11 +136,8 @@ export default function CreateStudentForm() {
         dispatch(setOpenEdit(null))
         formik.resetForm()
         setIsGroup(false)
-        setIsSchool(false)
-        setIsParent(false)
       }
       dispatch(disablePage(false))
-      setIsDiscount(false)
       setLoading(false)
     }
   })
@@ -157,7 +145,7 @@ export default function CreateStudentForm() {
   const { values, errors, touched, handleBlur, handleChange } = formik
 
   useEffect(() => {
-    getGroups()
+    void getGroups()
 
     return () => {
       formik.resetForm()
@@ -236,15 +224,7 @@ export default function CreateStudentForm() {
         />
         {errors.phone && touched.phone && <FormHelperText error={true}>{errors.phone}</FormHelperText>}
       </FormControl>
-      {/* {formik.errors?.phone == '"phone" foydalanuvchi allaqachon mavjud.' && (
-        <FormControl>
-          <FormControlLabel
-            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            control={<Checkbox checked={checked} onChange={handleChangeCheck} />}
-            label='Aka ukami'
-          />
-        </FormControl>
-      )} */}
+
       {school_type == 'private_school' && (
         <FormControl sx={{ width: '100%' }}>
           <TextField
@@ -305,9 +285,6 @@ export default function CreateStudentForm() {
         </RadioGroup>
       </FormControl>
 
-      
-
-     
       <FormControl fullWidth>
         <Box>
           <Accordion variant='outlined' expanded={selected.includes('group')} onChange={() => toggleSelection('group')}>
@@ -315,160 +292,183 @@ export default function CreateStudentForm() {
               Guruhga qo'shish
             </AccordionSummary>
             <AccordionDetails>
-            <FormControl fullWidth>
-          <InputLabel size='small' id='user-view-language-label'>
-            {t('Guruhlar')}
-          </InputLabel>
+              <FormControl style={{ display: "grid", gap: '5px' }} fullWidth>
+                <InputLabel size='small' id='user-view-language-label'>
+                  {t('Guruhlar')}
+                </InputLabel>
 
-          <Select
-            size='small'
-            error={!!errors.group && touched.group}
-            label={t('Guruhlar')}
-            id='user-view-language'
-            labelId='user-view-language-label'
-            name='group'
-            onChange={handleChange}
-            value={values.group || ''}
-            sx={{ mb: 3 }}
-          >
-            <MenuItem className='hover:bg-gray-100 cursor-not-allowed' sx={{ width: '500px' }}>
-              <TextField onChange={e => handleSearch(e.target.value)} label={'Qidiruv'} fullWidth size='small' />
-            </MenuItem>
+                <Select
+                  size='small'
+                  error={!!errors.group && touched.group}
+                  label={t('Guruhlar')}
+                  id='user-view-language'
+                  labelId='user-view-language-label'
+                  name='group'
+                  onChange={handleChange}
+                  value={values.group || ''}
+                  sx={{ mb: 3 }}
+                >
+                  <MenuItem className='hover:bg-gray-100 cursor-not-allowed' sx={{ width: '500px' }}>
+                    <TextField onChange={e => handleSearch(e.target.value)} label={'Qidiruv'} fullWidth size='small' />
+                  </MenuItem>
 
-            {groups.map((group: any) => (
-              <MenuItem key={group.id} value={Number(group.id)} sx={{ width: '500px' }}>
-                {group.name}
-              </MenuItem>
-            ))}
+                  {groups.map((group: any) => (
+                    <MenuItem key={group.id} onClick={() => setIsGroup(true)} value={Number(group.id)} sx={{ width: '500px' }}>
+                      {group.name}
+                    </MenuItem>
+                  ))}
 
-            <MenuItem sx={{ fontWeight: 600, width: '500px' }} onClick={() => Router.push('/groups')}>
-              <IconifyIcon icon={'ion:add-sharp'} />
-              {t('Yangi yaratish')}
-            </MenuItem>
-          </Select>
-          {errors.group && <FormHelperText error={!!errors.group}>{errors.group}</FormHelperText>}
+                  <MenuItem sx={{ fontWeight: 600, width: '500px' }} onClick={() => Router.push('/groups')}>
+                    <IconifyIcon icon={'ion:add-sharp'} />
+                    {t('Yangi yaratish')}
+                  </MenuItem>
+                </Select>
+                {errors.group && <FormHelperText error={!!errors.group}>{errors.group}</FormHelperText>}
 
-          <TextField
-            size='small'
-            label={t("Guruhga Qo'shilish sanasi")}
-            name='start_at'
-            type='date'
-            error={!!errors.start_at && touched.start_at}
-            value={values.start_at}
-            onChange={handleChange}
-            onBlur={handleBlur}
-          />
-          <FormHelperText error={true}>{errors.start_at}</FormHelperText>
-        </FormControl>
+                <TextField
+                  size='small'
+                  label={t("Guruhga Qo'shilish sanasi")}
+                  name='start_at'
+                  type='date'
+                  error={!!errors.start_at && touched.start_at}
+                  value={values.start_at}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+                <FormHelperText error={true}>{errors.start_at}</FormHelperText>
+              </FormControl>
+
+              {isGroup && values?.group && (
+                <Box className='w-full'>
+                  {isDiscount && (
+                    <div>
+                      <TextField
+                        size="small"
+                        label={t('Alohida narx')}
+                        name="discount_amount"
+                        type="text"
+                        error={!!errors.discount_amount}
+                        value={
+                          formik.values.discount_amount
+                            ? new Intl.NumberFormat("uz-UZ", {
+                              style: "currency",
+                              currency: "UZS",
+                              minimumFractionDigits: 0,
+                            }).format(Number(formik.values.discount_amount))
+                            : ""
+                        }
+                        onChange={e => {
+                          const rawValue = e.target.value.replace(/\D/g, '')
+                          formik.setFieldValue('discount_amount', rawValue)
+                        }}
+                        onBlur={handleBlur}
+                        fullWidth
+                      />
+                      <FormHelperText className="mb-2" error={true}>
+                        {errors.discount_amount}
+                      </FormHelperText>
+
+                      <FormHelperText className='mb-2' error={true}>
+                        {errors.discount_amount}
+                      </FormHelperText>
+                    </div>
+                  )}
+
+                  <Button
+                    onClick={() => setIsDiscount(true)}
+                    type='button'
+                    variant='outlined'
+                    size='small'
+                    color='warning'
+                    sx={{ width: '100%' }}
+                  >
+                    {isDiscount ? "Alohida narxni o'chirish" : 'Alohida narx kiritish'}
+                  </Button>
+                </Box>
+              )}
             </AccordionDetails>
           </Accordion>
 
-          <Accordion variant='outlined' expanded={selected.includes('parent')} onChange={() => toggleSelection('parent')}>
+          <Accordion
+            variant='outlined'
+            expanded={selected.includes('parent')}
+            onChange={() => toggleSelection('parent')}
+          >
             <AccordionSummary expandIcon={selected.includes('parent') ? <Remove /> : <Add />}>
               Ota-ona telefon raqamini qo'shish
             </AccordionSummary>
             <AccordionDetails>
-            <>
-          <FormControl sx={{ width: '100%' ,mb:2}}>
-            <InputLabel htmlFor='outlined-adornment-phone'>{t('Ota-ona telefon raqami')}</InputLabel>
-            <PhoneInput
-              id='outlined-adornment-phone'
-              label={t('Ota-ona telefon raqami')}
-              name='parent_phone'
-              value={values.parent_phone}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-          </FormControl>
-          <FormControl sx={{ width: '100%' }}>
-            <TextField
-              size='small'
-              label={t('Ota-ona ismi')}
-              name='parent_first_name'
-              error={!!errors.parent_first_name && touched.parent_first_name}
-              value={values.parent_first_name}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-          </FormControl>
-        </>
+              <>
+                <FormControl sx={{ width: '100%', mb: 2 }}>
+                  <InputLabel htmlFor='outlined-adornment-phone'>{t('Ota-ona telefon raqami')}</InputLabel>
+                  <PhoneInput
+                    id='outlined-adornment-phone'
+                    label={t('Ota-ona telefon raqami')}
+                    name='parent_phone'
+                    value={values.parent_phone}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                </FormControl>
+                <FormControl sx={{ width: '100%' }}>
+                  <TextField
+                    size='small'
+                    label={t('Ota-ona ismi')}
+                    name='parent_first_name'
+                    error={!!errors.parent_first_name && touched.parent_first_name}
+                    value={values.parent_first_name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                </FormControl>
+              </>
             </AccordionDetails>
           </Accordion>
 
-          <Accordion variant='outlined' expanded={selected.includes('school')} onChange={() => toggleSelection('school')}>
+          <Accordion
+            variant='outlined'
+            expanded={selected.includes('school')}
+            onChange={() => toggleSelection('school')}
+          >
             <AccordionSummary expandIcon={selected.includes('school') ? <Remove /> : <Add />}>
               Maktab qo'shish
             </AccordionSummary>
             <AccordionDetails>
-            <FormControl fullWidth>
-          <InputLabel size='small' id='user-view-language-label'>
-            {t('Maktab')}
-          </InputLabel>
-          <Select
-            size='small'
-            error={!!errors.school && touched.school}
-            label={t('Maktab')}
-            id='user-view-language'
-            labelId='user-view-language-label'
-            name='school'
-            onChange={handleChange}
-            value={values.school || ''}
-            sx={{ mb: 3 }}
-          >
-            {schools.map((school: { id: number | string; name: string }) => (
-              <MenuItem key={school.id} value={Number(school.id)}>
-                {school.name}
-              </MenuItem>
-            ))}
-            <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router.push('/settings/office/schools')}>
-              {t('Yangi yaratish')}
-              <IconifyIcon icon={'ion:add-sharp'} />
-            </MenuItem>
-          </Select>
-          {errors.school && <FormHelperText error={!!errors.school}>{errors.school}</FormHelperText>}
+              <FormControl fullWidth>
+                <InputLabel size='small' id='user-view-language-label'>
+                  {t('Maktab')}
+                </InputLabel>
+                <Select
+                  size='small'
+                  error={!!errors.school && touched.school}
+                  label={t('Maktab')}
+                  id='user-view-language'
+                  labelId='user-view-language-label'
+                  name='school'
+                  onChange={handleChange}
+                  value={values.school || ''}
+                  sx={{ mb: 3 }}
+                >
+                  {schools.map((school: { id: number | string; name: string }) => (
+                    <MenuItem key={school.id} value={Number(school.id)}>
+                      {school.name}
+                    </MenuItem>
+                  ))}
+                  <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router.push('/settings/office/schools')}>
+                    {t('Yangi yaratish')}
+                    <IconifyIcon icon={'ion:add-sharp'} />
+                  </MenuItem>
+                </Select>
+                {errors.school && <FormHelperText error={!!errors.school}>{errors.school}</FormHelperText>}
 
-         
-          <FormHelperText error={true}>{errors.start_at}</FormHelperText>
-        </FormControl>
+                <FormHelperText error={true}>{errors.start_at}</FormHelperText>
+              </FormControl>
             </AccordionDetails>
           </Accordion>
         </Box>
       </FormControl>
 
-     
 
-      {isGroup && values?.group && (
-        <Box className='w-100'>
-          {isDiscount && (
-            <div>
-              <TextField
-                size='small'
-                label={t('Alohida narx')}
-                name='fixed_price'
-                type='number'
-                error={!!errors.fixed_price}
-                value={values.fixed_price}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                fullWidth
-              />
-              <FormHelperText className='mb-2' error={true}>
-                {errors.fixed_price}
-              </FormHelperText>
-            </div>
-          )}
-
-          <Button
-            onClick={() => setIsDiscount(!isDiscount)}
-            type='button'
-            variant='outlined'
-            size='small'
-            color='warning'
-          >
-            {isDiscount ? "Alohida narxni o'chirish" : 'Alohida narx kiritish'}
-          </Button>
-        </Box>
-      )}
       <LoadingButton loading={loading} variant='contained' type='submit' fullWidth>
         {t('Saqlash')}
       </LoadingButton>

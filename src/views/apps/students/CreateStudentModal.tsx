@@ -1,15 +1,9 @@
-import React, { useEffect } from 'react'
-
-// ** Components
+import { useEffect } from 'react'
 import MuiDrawer, { DrawerProps } from '@mui/material/Drawer'
 import { Box, IconButton, Typography, styled } from '@mui/material'
 import IconifyIcon from 'src/components/icon'
 import CreateStudentForm from './CreateStudentForm'
-
-// ** Assets
 import { useTranslation } from 'react-i18next'
-
-// ** Packs
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setOpenEdit } from 'src/store/apps/students'
 
@@ -21,19 +15,17 @@ const Drawer = styled(MuiDrawer)<DrawerProps>(({ theme }) => ({
   },
   '& .MuiDrawer-paper': {
     border: 0,
-    // width: '100%',
     zIndex: theme.zIndex.modal,
     boxShadow: theme.shadows[9]
   }
 }))
 
 export default function CreateStudentModal() {
-  // ** Hooks
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const { openEdit } = useAppSelector(state => state.students)
 
-  function onClose() {
+  const onClose = () => {
     dispatch(setOpenEdit(null))
   }
 
@@ -56,6 +48,7 @@ export default function CreateStudentModal() {
         <Typography variant='h6' sx={{ fontWeight: 600 }}>
           {t("O'quvchi qo'shish")}
         </Typography>
+
         <IconButton
           onClick={onClose}
           sx={{
@@ -69,6 +62,7 @@ export default function CreateStudentModal() {
           <IconifyIcon icon='mdi:close' fontSize={20} />
         </IconButton>
       </Box>
+
       <Box width={'100%'}>{openEdit === 'create' && <CreateStudentForm />}</Box>
     </Drawer>
   )
