@@ -119,7 +119,6 @@ export default function CreateStudentForm() {
 
       if (isDiscount) {
         newValues.append('discount_amount', String(values.discount_amount))
-        newValues.append('description', "Chedirma bilan yaraitildi")
       }
 
       if (image) {
