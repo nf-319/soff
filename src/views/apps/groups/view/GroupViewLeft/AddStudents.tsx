@@ -16,17 +16,17 @@ import DialogTitle from '@mui/material/DialogTitle'
 import FormControl from '@mui/material/FormControl'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-import { FormHelperText } from '@mui/material'
+import { FormHelperText, FormLabel } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { useRouter } from 'next/router'
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
-import AutoComplete from './AutoComplate'
 import toast from 'react-hot-toast'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import StudentAutoComplete from './AutoComplate'
 
 export default function AddStudents() {
   const [isLoading, setLoading] = useState(false)
@@ -50,7 +50,8 @@ export default function AddStudents() {
           .nullable()
           .matches(/^(?!0\d).*$/, 'Son 0 bilan boshlanmasligi kerak!'),
         body: Yup.string(),
-        start_date: Yup.string().required("Guruhga qo'shilish sanasi")
+        start_date: Yup.string().required("Guruhga qo'shilish sanasi"),
+        // student:Yup.number().required("O'quvchini tanlang")
       }),
     onSubmit: async values => {
       setLoading(true)
@@ -99,7 +100,9 @@ export default function AddStudents() {
       }
     }
   })
-
+  console.log(formik.values,selectedStudents);
+  
+  
 
   return (
     <Dialog
@@ -119,12 +122,13 @@ export default function AddStudents() {
 
       <DialogContent>
         <form style={{ marginTop: 10 }} onSubmit={formik.handleSubmit}>
-          <AutoComplete formik={formik} selectedStudent={selectedStudents} setSelectedStudents={setSelectedStudents} />
+          <StudentAutoComplete formik={formik} selectedStudent={selectedStudents} setSelectedStudents={setSelectedStudents} />
 
-          {selectedStudents && (
+          {/* {selectedStudents && ( */}
             <>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <FormControl sx={{ width: '100%', margin: '10px 0' }}>
+                  <FormLabel>{t("Guruhga qo'shilish sanasi")}</FormLabel>
                   <DatePicker
                     value={formik.values.start_date ? dayjs(formik.values.start_date) : null}
                     onChange={newValue => {
@@ -142,56 +146,52 @@ export default function AddStudents() {
                   />
                 </FormControl>
               </LocalizationProvider>
-              <>
-                {isDiscount && (
-                  <FormControl sx={{ width: '100%', margin: '0' }}>
-                    <TextField
-                      size='small'
-                      label={t('Alohida narx')}
-                      name='discount_amount'
-                      type='number'
-                      error={!!formik.errors.discount_amount && formik.touched.discount_amount}
-                      value={formik.values.discount_amount ? new Intl.NumberFormat("uz-UZ", {
-                        style: "currency",
-                        currency: "UZS",
-                        minimumFractionDigits: 0,
-                      }).format(Number(formik.values.discount_amount)) : ''}
-                      onChange={e => {
-                        const rawValue = e.target.value.replace(/\D/g, '')
-                        if (/^\d*$/.test(rawValue)) {
-                          formik.setFieldValue('discount_amount', rawValue)
-                        }
-                      }}
-                      onKeyDown={e => {
-                        if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                          e.preventDefault()
-                        }
-                      }}
-                      onBlur={formik.handleBlur}
-                      fullWidth
-                    />
-                    <FormHelperText className='mb-2' error={true}>
-                      {formik.touched.discount_amount && formik.errors.discount_amount}
-                    </FormHelperText>
-                  </FormControl>
-                )}
 
-                <Button
-                  sx={{ margin: '10px 0px' }}
-                  onClick={() => setIsDiscount(!isDiscount)}
-                  type='button'
-                  variant='outlined'
-                  size='small'
-                  color='warning'
-                  fullWidth
-                >
-                  {isDiscount ? "Alohida narxni o'chirish" : 'Alohida narx kiritish'}
-                </Button>
-              </>
+              {isDiscount && (
+                <FormControl sx={{ width: '100%', margin: '0' }}>
+                  <FormLabel>{t('Alohida narx')}</FormLabel>
+                  <TextField
+                    size='small'
+                    name='discount_amount'
+                    type='text'
+                    error={!!formik.errors.discount_amount}
+                    value={
+                      formik.values.discount_amount
+                        ? new Intl.NumberFormat('uz-UZ', {
+                            style: 'currency',
+                            currency: 'UZS',
+                            minimumFractionDigits: 0
+                          }).format(Number(formik.values.discount_amount))
+                        : ''
+                    }
+                    onChange={e => {
+                      const rawValue = e.target.value.replace(/\D/g, '')
+                      formik.setFieldValue('discount_amount', rawValue)
+                    }}
+                    onBlur={formik.handleBlur}
+                    fullWidth
+                  />
+                  <FormHelperText className='mb-2' error={true}>
+                    {formik.errors.discount_amount}
+                  </FormHelperText>
+                </FormControl>
+              )}
+
+              <Button
+                sx={{ margin: '10px 0px' }}
+                onClick={() => setIsDiscount(!isDiscount)}
+                type='button'
+                variant='outlined'
+                size='small'
+                color='warning'
+                fullWidth
+              >
+                {isDiscount ? "Alohida narxni o'chirish" : 'Alohida narx kiritish'}
+              </Button>
             </>
-          )}
+          {/* )} */}
 
-          {selectedStudents && (
+          {/* {selectedStudents && ( */}
             <FormControl fullWidth>
               <TextField
                 rows={4}
@@ -207,9 +207,9 @@ export default function AddStudents() {
                 {!!formik.errors.body && formik.touched.body && formik.errors.body}
               </FormHelperText>
             </FormControl>
-          )}
+          {/* )} */}
           <DialogActions sx={{ justifyContent: 'center' }}>
-            <LoadingButton loading={isLoading} type='submit' variant='contained' sx={{ mr: 1 }}>
+            <LoadingButton disabled={!selectedStudents} loading={isLoading} type='submit' variant='contained' sx={{ mr: 1 }}>
               {t('Saqlash')}
             </LoadingButton>
             <Button

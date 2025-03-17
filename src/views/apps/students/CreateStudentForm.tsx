@@ -375,7 +375,7 @@ export default function CreateStudentForm() {
                   )}
 
                   <Button
-                    onClick={() => setIsDiscount(true)}
+                    onClick={() => setIsDiscount(!isDiscount)}
                     type='button'
                     variant='outlined'
                     size='small'

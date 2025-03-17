@@ -10,6 +10,7 @@ import { AutocompleteValue } from '@mui/material'
 import { FormikProps } from 'formik'
 import useDebounce from '../../../../../hooks/useDebounce'
 import { useRouter } from 'next/router'
+import ceoConfigs from 'src/configs/ceo'
 
 interface AutoCompleteProps {
   formik: FormikProps<{ student: number | null }>
@@ -17,18 +18,21 @@ interface AutoCompleteProps {
   selectedStudent: any
 }
 
-const AutoComplete = ({ formik, setSelectedStudents, selectedStudent }: AutoCompleteProps) => {
+const StudentAutoComplete = ({ formik, setSelectedStudents, selectedStudent }: AutoCompleteProps) => {
   const { t } = useTranslation()
   const [searchData, setSearchData] = useState<{ label: string; id: number }[]>([])
   const [search, setSearch] = useState('')
   const debounceSearch = useDebounce(search, 400)
   const router = useRouter()
-  const { id }  = router.query
+  const { id } = router.query
 
   const searchStudent = async () => {
     setSearchData([])
-    const resp = await api.get('student/list/', { params: { search: debounceSearch, group: id }})
-    setSearchData(resp.data.results?.map((item: StudentDetailType) => ({ label: item?.first_name, id: item?.id })))
+    const resp = await api.get(ceoConfigs.employee_checklist, {
+      params: { type: 'student', search: debounceSearch, group: id }
+    })
+    setSearchData(resp.data?.map((item: StudentDetailType) => ({ label: item?.first_name, id: item?.id })))
+    
   }
 
   useEffect(() => {
@@ -38,8 +42,6 @@ const AutoComplete = ({ formik, setSelectedStudents, selectedStudent }: AutoComp
       setSearchData([])
     }
   }, [debounceSearch])
-
-
 
   return (
     <Autocomplete
@@ -67,5 +69,5 @@ const AutoComplete = ({ formik, setSelectedStudents, selectedStudent }: AutoComp
   )
 }
 
-AutoComplete.displayName = 'AutoComplete'
-export default AutoComplete
+StudentAutoComplete.displayName = 'StudentAutoComplete'
+export default StudentAutoComplete
