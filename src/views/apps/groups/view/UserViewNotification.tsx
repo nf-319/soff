@@ -1,4 +1,3 @@
-// ** MUI Imports
 import Card from '@mui/material/Card'
 import Table from '@mui/material/Table'
 import Button from '@mui/material/Button'
