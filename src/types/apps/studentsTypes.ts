@@ -37,7 +37,7 @@ export type StudentsListType = StudentListItemType[]
 
 export interface StudentItemType {
   id?: number
-  
+
   image?:string,
   first_name: string
   school?:any
@@ -56,7 +56,8 @@ export interface CreateStudentDto extends StudentItemType {
   parent_phone?:string
   group?: number | string
   start_at?: string
-  fixed_price: string
+  discount_amount: number
+  is_discount: boolean
 }
 
 export interface UpdateStudentDto extends StudentItemType {
