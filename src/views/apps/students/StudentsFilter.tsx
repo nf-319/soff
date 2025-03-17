@@ -30,13 +30,15 @@ import { format } from 'date-fns'
 import { fetchSchoolsList, fetchSmsList } from 'src/store/apps/settings'
 import ExcelStudents from '../../../components/excelButton/ExcelStudents'
 import ceoConfigs from 'src/configs/ceo'
+import { useRouter } from 'next/router'
 
 type StudentsFilterProps = {
   isMobile: boolean
   students?:any[]
 }
 
-const StudentsFilter = ({ isMobile,students }: StudentsFilterProps) => {
+const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
+  const router = useRouter()
   const dispatch = useAppDispatch()
   const {  queryParams } = useAppSelector(state => state.students)
   const { schools } = useAppSelector(state => state.settings)
@@ -48,16 +50,17 @@ const StudentsFilter = ({ isMobile,students }: StudentsFilterProps) => {
   const { t } = useTranslation()
   const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
   const { smsTemps, getSMSTemps } = useSMS()
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<any>({})
+  const querySearch = new URLSearchParams(window.location.search).get('q')
+  const [search, setSearch] = useState<string>(querySearch || '')
+  const debounceSearch = useDebounce(search, 300)
   const studentIds = students?.map(student => student.id)
+
   const handleEditClickOpen = (value: ModalTypes) => {
     setOpenEdit(value)
   }
   const queryString = new URLSearchParams({ ...queryParams } as Record<string, string>).toString()
 
   const handleEditClose = () => {
-    setError({})
     setOpenEdit(null)
   }
 
@@ -72,10 +75,6 @@ const StudentsFilter = ({ isMobile,students }: StudentsFilterProps) => {
       .get(`${ceoConfigs.employee_checklist}?role=teacher`)
       .then(res => setTeachers(res.data))
       .catch(error => console.log(error))
-  }
-
-  const handleSearch = (value: string) => {
-    dispatch(updateStudentParams({ search: value }))
   }
 
   async function handleFilter(key: string, value: string | number | null) {
@@ -107,6 +106,31 @@ const StudentsFilter = ({ isMobile,students }: StudentsFilterProps) => {
   }
 
   useEffect(() => {
+    const { q, ...restQuery } = router.query
+
+    if (debounceSearch) {
+      void router.push(
+        {
+          pathname: '/students',
+          query: { ...restQuery, q: debounceSearch },
+        },
+        undefined,
+        { shallow: true }
+      )
+    } else if (q) {
+      void router.push(
+        {
+          pathname: '/students',
+          query: restQuery,
+        },
+        undefined,
+        { shallow: true }
+      )
+    }
+  }, [debounceSearch])
+
+
+  useEffect(() => {
     if (key == 'course') {
       getCourses()
     } else if (key == 'group') {
@@ -136,7 +160,8 @@ const StudentsFilter = ({ isMobile,students }: StudentsFilterProps) => {
             {t('Qidirish')}
           </InputLabel>
           <OutlinedInput
-            onChange={e => handleSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
+            value={search}
             endAdornment={
               <InputAdornment position='end'>
                 <IconifyIcon icon={'tabler:search'} />
@@ -344,7 +369,8 @@ const StudentsFilter = ({ isMobile,students }: StudentsFilterProps) => {
           </InputLabel>
 
           <OutlinedInput
-            onChange={e => handleSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
+            value={search}
             endAdornment={
               <InputAdornment position='end'>
                 <IconifyIcon icon={'tabler:search'} />
