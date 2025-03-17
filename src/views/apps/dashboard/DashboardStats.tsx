@@ -23,8 +23,7 @@ const DashboardStats = () => {
   const { push } = useRouter()
   const { t } = useTranslation()
   const { user } = useContext(AuthContext)
-
-  const { data: stats, isLoading, refetch } = useGet('common/dashboard/statistic-list/')
+  const { data: stats, isLoading , refetch } = useGet('common/dashboard/statistic-list/')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,7 +92,7 @@ const DashboardStats = () => {
               sx={{ bgcolor: 'grey.300' }}
               variant='rectangular'
               width={'100%'}
-              heighat={'140px'}
+              height={'120px'}
               style={{ borderRadius: '10px' }}
               animation='wave'
             />
