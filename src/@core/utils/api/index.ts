@@ -17,11 +17,6 @@ api.interceptors.request.use(
 
     config.baseURL = baseURL
 
-    const version = process.env.NEXT_PUBLIC_API_VERSION || '1.0.0'
-    const params = new URLSearchParams(config.params || {})
-    params.append('version', version)
-    config.params = params
-
     if (storedToken) {
       config.headers['Authorization'] = `Bearer ${storedToken}`
       config.headers['Accept-Language'] = localStorage.getItem('i18nextLng')
