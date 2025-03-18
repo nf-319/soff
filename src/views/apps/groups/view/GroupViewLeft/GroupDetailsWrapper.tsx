@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React, { useEffect } from 'react'
 
 import { useState } from "react"
 import {
@@ -132,6 +132,19 @@ export default function GroupDetails({
     link.click()
     document.body.removeChild(link)
   }
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+
+    if (qrModalOpen) {
+      timer = setTimeout(() => {
+        setQrModalOpen(false)
+      }, 600000)
+    }
+
+    return () => clearTimeout(timer)
+  }, [qrModalOpen])
+
 
   return (
     <>
