@@ -5,6 +5,7 @@ import { ScanLine } from "lucide-react"
 import { IconButton, Modal, Box, Typography, Button } from "@mui/material"
 import { QrReader } from "react-qr-reader"
 import { toast } from 'react-hot-toast'
+import api from '../../../utils/api'
 
 interface QrcodeScannerProps {
   onScan?: (result: string) => void
@@ -12,20 +13,29 @@ interface QrcodeScannerProps {
 
 export const QrcodeScanner = ({ onScan }: QrcodeScannerProps) => {
   const [open, setOpen] = useState(false)
-  const [scannedResult, setScannedResult] = useState<string | null>(null)
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
 
-  const handleScan = (result: string | null) => {
+  const handleScan = async (result: string | null) => {
     if (result) {
-      console.log("QR Code result:", result)
-      toast.success("Siz davomatdan o'tdingiz")
-      setScannedResult(result)
-      handleClose()
+      try {
+        await api.post("common/attendance/group-qrcode/", {
+          token: result,
+        })
+        toast.success("Siz davomatdan o'tdingiz")
+        handleClose()
 
-      if (onScan) {
-        onScan(result)
+        if (onScan) {
+          onScan(result)
+        }
+      } catch (error: any) {
+        if (error?.response?.data?.msg) {
+          toast.error(error.response.data.msg)
+          handleClose()
+        } else {
+          toast.error("Siz davomatdan o'tmadingiz, nimadir xato")
+        }
       }
     }
   }
@@ -82,7 +92,7 @@ export const QrcodeScanner = ({ onScan }: QrcodeScannerProps) => {
               constraints={{ facingMode: "environment" }}
               onResult={(result) => {
                 if (result) {
-                  handleScan(result.getText())
+                  void handleScan(result.getText())
                 }
               }}
               scanDelay={500}

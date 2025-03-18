@@ -175,7 +175,7 @@ const AppBarContent = (props: Props) => {
       <VideoModal />
 
       <LanguageDropdown settings={settings} saveSettings={saveSettings} />
-      <QrcodeScanner />
+      {user?.currentRole === 'student' && <QrcodeScanner />}
       <NotificationDropdown settings={settings} />
       <UserDropdown settings={settings} />
       <GlobalPaymentModal />

@@ -188,7 +188,7 @@ const AppBarContent = (props: Props) => {
         )}
         <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
           <LanguageDropdown settings={settings} saveSettings={saveSettings} />
-          <QrcodeScanner />
+          {user?.currentRole === 'student' && <QrcodeScanner />}
           <NotificationDropdown settings={settings} />
           <UserDropdown settings={settings} />
         </Box>

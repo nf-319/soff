@@ -18,15 +18,18 @@ import {
   DialogContentText,
   Tabs,
   Tab,
-  Divider, useMediaQuery
-} from '@mui/material'
+  Divider,
+  useMediaQuery,
+} from "@mui/material"
 import { LoadingButton } from "@mui/lab"
 import Link from "next/link"
 import dayjs from "dayjs"
 import IconifyIcon from "src/components/icon"
 import CustomChip from "src/components/mui/chip"
 import type { ThemeColor } from "src/@core/layouts/types"
-import Image from 'next/image'
+import Image from "next/image"
+import { usePost } from "../../../../../hooks/useApi"
+import api from '../../../../../@core/utils/api'
 
 const t = (text: string) => text
 
@@ -65,7 +68,9 @@ export default function GroupDetails({
 
   const [qrModalOpen, setQrModalOpen] = useState(false)
   const [activeTab, setActiveTab] = useState(0)
-  const mediaQuery = useMediaQuery("(max-width: 600px)")
+  const mediaQuery = useMediaQuery('(max-width: 600px)')
+  const [qrCodeImage, setQrCodeImage] = useState<string | null>(null)
+  const [isLoadingQrCode, setIsLoadingQrCode] = useState(false)
 
   const endDate = groupData?.end_date
   const today = dayjs()
@@ -100,23 +105,28 @@ export default function GroupDetails({
       .join(', ')
   }
 
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(
-    JSON.stringify({
-      id: groupData?.id,
-      name: groupData?.name,
-      course: groupData?.course_data?.name,
-      teacher: groupData?.teacher_data?.first_name,
-      students: groupData?.student_count
-    })
-  )}`
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue)
   }
 
+  const fetchQrCodeImage = async () => {
+    try {
+      setIsLoadingQrCode(true)
+      const response = await api.post(`common/get/group-qrcode/${groupData?.id}/`)
+      setQrCodeImage(response.data.path)
+    } catch (error) {
+      console.error('Failed to fetch QR code:', error)
+    } finally {
+      setIsLoadingQrCode(false)
+    }
+  }
+
   const handleDownloadQR = () => {
+    if (!qrCodeImage) return
+
     const link = document.createElement('a')
-    link.href = qrCodeUrl
+    link.href = qrCodeImage
     link.download = `group-${groupData?.name}-qr.png`
     document.body.appendChild(link)
     link.click()
@@ -473,7 +483,10 @@ export default function GroupDetails({
                       padding: 0,
                       backgroundColor: 'white'
                     }}
-                    onClick={() => setQrModalOpen(true)}
+                    onClick={() => {
+                      setQrModalOpen(true)
+                      void fetchQrCodeImage()
+                    }}
                   >
                     <IconifyIcon icon='mdi:qrcode' />
                   </Button>
@@ -488,7 +501,7 @@ export default function GroupDetails({
         <DialogTitle style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}>{t('Guruh QR kodi')}</DialogTitle>
         <DialogContent style={{ padding: '16px' }}>
           <DialogContentText style={{ marginBottom: '16px' }}>
-            {t("Ushbu QR kod orqali guruhda davomat qilish mumkin")}
+            {t('Ushbu QR kod orqali guruhda davomat qilish mumkin')}
           </DialogContentText>
 
           <Tabs
@@ -512,12 +525,16 @@ export default function GroupDetails({
                   backgroundColor: 'white'
                 }}
               >
-                <Image
-                  src={qrCodeUrl || '/placeholder.svg'}
-                  alt='Group QR Code'
-                  width={mediaQuery ? 200 : 400}
-                  height={mediaQuery ? 200 : 400}
-                />
+                {isLoadingQrCode ? (
+                  <Skeleton variant='rectangular' width={mediaQuery ? 200 : 400} height={mediaQuery ? 200 : 400} />
+                ) : (
+                  <Image
+                    src={qrCodeImage || '/placeholder.svg'}
+                    alt='Group QR Code'
+                    width={mediaQuery ? 200 : 400}
+                    height={mediaQuery ? 200 : 400}
+                  />
+                )}
               </Box>
               <Button
                 variant='outlined'
