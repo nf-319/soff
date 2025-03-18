@@ -43,7 +43,7 @@ export default function StudentProfile() {
 
   const getGroups = async () => {
     setIsLoading(true)
-    const resp = await api.get(`common/student/groups/`)
+    const resp = await api.get(`student/groups/${user?.id}`)
     setGroups(resp.data)
     setIsLoading(false)
   }
@@ -288,9 +288,24 @@ export default function StudentProfile() {
                     </div>
                     <CardContent>
                       <Box sx={{ marginBottom: 2 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <Typography sx={{ fontSize: '20px', color: 'black' }}>{group.name} </Typography>
-                          <Typography fontSize={12}>{group.group_interval}</Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between' }}>
+                          <Box>
+                            <Typography sx={{ fontSize: '20px', color: 'black' }}>{group.group_name} </Typography>
+                            <Typography fontSize={12}>{group.group_interval}</Typography>
+                          </Box>
+                          <Box>
+                            <Chip
+                              color='error'
+                              label={`Baho: ${group?.gpa?.toFixed(2) || 0}`}
+                              variant='outlined'
+                              size='small'
+                              sx={{
+                                color: Number(group?.gpa) >= 4 ? 'green' : Number(group?.gpa) >= 3 ? 'orange' : 'red',
+                                borderColor:
+                                  Number(group?.gpa) >= 4 ? 'green' : Number(group?.gpa) >= 3 ? 'orange' : 'red'
+                              }}
+                            />
+                          </Box>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                           <Icon color='lightgreen' icon={'mdi:school'} />

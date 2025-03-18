@@ -10,25 +10,28 @@ import { AutocompleteValue } from '@mui/material'
 import { FormikProps } from 'formik'
 import useDebounce from '../../../../../hooks/useDebounce'
 import { useRouter } from 'next/router'
+import ceoConfigs from 'src/configs/ceo'
 
-interface AutoCompleteProps {
+type Props = {
   formik: FormikProps<{ student: number | null }>
   setSelectedStudents: (id: number | null) => void
   selectedStudent: any
 }
 
-const AutoComplete = ({ formik, setSelectedStudents, selectedStudent }: AutoCompleteProps) => {
+const StudentAutoComplete = ({ formik, setSelectedStudents, selectedStudent }: Props) => {
   const { t } = useTranslation()
   const [searchData, setSearchData] = useState<{ label: string; id: number }[]>([])
   const [search, setSearch] = useState('')
   const debounceSearch = useDebounce(search, 400)
   const router = useRouter()
-  const { id }  = router.query
+  const { id } = router.query
 
   const searchStudent = async () => {
     setSearchData([])
-    const resp = await api.get('student/list/', { params: { search: debounceSearch, group: id }})
-    setSearchData(resp.data.results?.map((item: StudentDetailType) => ({ label: item?.first_name, id: item?.id })))
+    const resp = await api.get(ceoConfigs.employee_checklist, {
+      params: { type: 'student', search: debounceSearch, group: id }
+    })
+    setSearchData(resp.data?.map((item: StudentDetailType) => ({ label: `${item?.first_name} (${item.phone})`, id: item?.id })))
   }
 
   useEffect(() => {
@@ -39,10 +42,9 @@ const AutoComplete = ({ formik, setSelectedStudents, selectedStudent }: AutoComp
     }
   }, [debounceSearch])
 
-
-
   return (
     <Autocomplete
+      size='small'
       open={!(search === '' || selectedStudent)}
       onChange={(
         event: SyntheticEvent,
@@ -53,8 +55,20 @@ const AutoComplete = ({ formik, setSelectedStudents, selectedStudent }: AutoComp
       onInputChange={(event: SyntheticEvent, value: string) => setSearch(value)}
       id='combo-box-demo'
       options={searchData}
-      sx={{ border: '1px solid #00000' }}
-      noOptionsText={"Ma'lumot yoq"}
+      noOptionsText={"Ma'lumot yo'q"}
+      renderOption={(props, option) => (
+        <li
+          {...props}
+          style={{
+            // @ts-ignore
+            borderBottom: props['data-option-index'] !== searchData.length - 1 ? '1px solid #ddd' : 'none',
+            margin: 0,
+            padding: '8px 16px',
+          }}
+        >
+          {option.label}
+        </li>
+      )}
       renderInput={params => (
         <TextField
           {...params}
@@ -64,8 +78,9 @@ const AutoComplete = ({ formik, setSelectedStudents, selectedStudent }: AutoComp
         />
       )}
     />
+
   )
 }
 
-AutoComplete.displayName = 'AutoComplete'
-export default AutoComplete
+StudentAutoComplete.displayName = 'StudentAutoComplete'
+export default StudentAutoComplete
