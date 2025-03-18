@@ -12,13 +12,13 @@ import useDebounce from '../../../../../hooks/useDebounce'
 import { useRouter } from 'next/router'
 import ceoConfigs from 'src/configs/ceo'
 
-interface AutoCompleteProps {
+type Props = {
   formik: FormikProps<{ student: number | null }>
   setSelectedStudents: (id: number | null) => void
   selectedStudent: any
 }
 
-const StudentAutoComplete = ({ formik, setSelectedStudents, selectedStudent }: AutoCompleteProps) => {
+const StudentAutoComplete = ({ formik, setSelectedStudents, selectedStudent }: Props) => {
   const { t } = useTranslation()
   const [searchData, setSearchData] = useState<{ label: string; id: number }[]>([])
   const [search, setSearch] = useState('')
@@ -31,8 +31,7 @@ const StudentAutoComplete = ({ formik, setSelectedStudents, selectedStudent }: A
     const resp = await api.get(ceoConfigs.employee_checklist, {
       params: { type: 'student', search: debounceSearch, group: id }
     })
-    setSearchData(resp.data?.map((item: StudentDetailType) => ({ label: item?.first_name, id: item?.id })))
-    
+    setSearchData(resp.data?.map((item: StudentDetailType) => ({ label: `${item?.first_name} (${item.phone})`, id: item?.id })))
   }
 
   useEffect(() => {
@@ -56,8 +55,20 @@ const StudentAutoComplete = ({ formik, setSelectedStudents, selectedStudent }: A
       onInputChange={(event: SyntheticEvent, value: string) => setSearch(value)}
       id='combo-box-demo'
       options={searchData}
-      sx={{ border: '1px solid #00000' }}
-      noOptionsText={"Ma'lumot yoq"}
+      noOptionsText={"Ma'lumot yo'q"}
+      renderOption={(props, option) => (
+        <li
+          {...props}
+          style={{
+            // @ts-ignore
+            borderBottom: props['data-option-index'] !== searchData.length - 1 ? '1px solid #ddd' : 'none',
+            margin: 0,
+            padding: '8px 16px',
+          }}
+        >
+          {option.label}
+        </li>
+      )}
       renderInput={params => (
         <TextField
           {...params}
@@ -67,6 +78,7 @@ const StudentAutoComplete = ({ formik, setSelectedStudents, selectedStudent }: A
         />
       )}
     />
+
   )
 }
 
