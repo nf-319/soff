@@ -200,8 +200,8 @@ export default function TeacherGroupsModal() {
                                     <TableCell>
                                       {student.fines_count ? `${student.fines_count.toLocaleString()} ta` : "Yo'q"}
                                     </TableCell>
-                                    <TableCell>{student.original_amount.toLocaleString()} UZS</TableCell>
-                                    <TableCell>{student.condition.toLocaleString()} UZS</TableCell>
+                                    <TableCell>{student.original_amount?.toLocaleString()} UZS</TableCell>
+                                    <TableCell>{student.condition?.toLocaleString()} UZS</TableCell>
                                     <TableCell>
                                       <IconButton
                                         color='error'

@@ -61,6 +61,7 @@ const DraggableIcon = ({ style, ...props }: { style?: React.CSSProperties }) => 
       const res = await api.get('auth/analytics/', { params: { date: yesterdayDate } })
       dispatch(
         setSoffBotText({
+          income_by_types:res.data.income_by_types,
           missed_attendance: res.data.missed_attendance,
           groups: res.data.detail,
           absent_students: res.data.absent_students,
