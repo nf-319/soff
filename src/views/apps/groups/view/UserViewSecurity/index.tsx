@@ -355,7 +355,6 @@ const UserViewSecurity = () => {
         </>
       )}
 
-      {/* Date Change Dialog */}
       <DateChangeDialog
         open={openDialog}
         setOpen={setOpenDialog}
@@ -367,7 +366,6 @@ const UserViewSecurity = () => {
         handleDateChange={handleDateChange}
       />
 
-      {/* Topic Edit Dialog */}
       <TopicEditDialog
         open={updateTopic}
         setOpen={setUpdateTopic}
