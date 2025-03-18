@@ -21,6 +21,7 @@ import { updateQueryParams } from 'src/store/apps/settings'
 import { toggleQrCodeModal } from 'src/store/apps/page'
 import ceoConfigs from 'src/configs/ceo'
 import useDebounce from 'src/hooks/useDebounce'
+import { QrcodeScanner } from '../../../@core/layouts/components/shared-components/QrcodeScanner'
 
 interface Props {
   hidden: boolean
@@ -174,7 +175,7 @@ const AppBarContent = (props: Props) => {
       <VideoModal />
 
       <LanguageDropdown settings={settings} saveSettings={saveSettings} />
-
+      <QrcodeScanner />
       <NotificationDropdown settings={settings} />
       <UserDropdown settings={settings} />
       <GlobalPaymentModal />

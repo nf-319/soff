@@ -25,6 +25,7 @@ import GlobalPaymentModal from 'src/views/apps/students/GlobalPaymentModal'
 import { toggleQrCodeModal } from 'src/store/apps/page'
 import ceoConfigs from 'src/configs/ceo'
 import useDebounce from 'src/hooks/useDebounce'
+import { QrcodeScanner } from '../../../@core/layouts/components/shared-components/QrcodeScanner'
 
 interface Props {
   hidden: boolean
@@ -109,7 +110,7 @@ const AppBarContent = (props: Props) => {
 
         <VideoModal />
 
-        {!isMobile && (
+        {!isMobile && user?.role !== 'student' && (
           <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px' }}>
             {user?.role !== 'student' && (
               <>
@@ -187,6 +188,7 @@ const AppBarContent = (props: Props) => {
         )}
         <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
           <LanguageDropdown settings={settings} saveSettings={saveSettings} />
+          <QrcodeScanner />
           <NotificationDropdown settings={settings} />
           <UserDropdown settings={settings} />
         </Box>
