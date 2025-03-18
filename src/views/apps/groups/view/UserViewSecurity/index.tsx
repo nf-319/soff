@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/router"
 import { Box, Button, Paper, Tabs, Tab, Typography } from "@mui/material"
 import { Archive, ArrowUp } from "lucide-react"
@@ -11,10 +11,11 @@ import { useAppDispatch, useAppSelector } from "src/store"
 import { getAttendance, getDays, setGettingAttendance, updateParams } from "src/store/apps/groupDetails"
 import { useSettings } from "src/@core/hooks/useSettings"
 import { useTranslation } from "react-i18next"
-import { DateChangeDialog } from './DateChangeDialog'
-import { TopicEditDialog } from './TopicEditDialog'
-import { AttendanceTable } from './AttendenceTable'
-import { AttendanceTableSkeleton } from './AttendanceTableSkeleton'
+import { DateChangeDialog } from "./DateChangeDialog"
+import { TopicEditDialog } from "./TopicEditDialog"
+import { TopicAddDialog } from "./TopicAddDialog"
+import { AttendanceTable } from "./AttendenceTable"
+import { AttendanceTableSkeleton } from "./AttendanceTableSkeleton"
 
 const UserViewSecurity = () => {
   const { queryParams, attendance, isGettingAttendance, days, groupData, month_list } = useAppSelector(
@@ -29,7 +30,6 @@ const UserViewSecurity = () => {
   const { pathname, query, push } = useRouter()
   const { settings } = useSettings()
   const [opened_id, setOpenedId] = useState<any>(null)
-  const [openTooltip, setOpenTooltip] = useState<null | string>(null)
   const [topic, setTopic] = useState<any>("")
   const [updateTopic, setUpdateTopic] = useState(false)
   const [topicId, setTopicId] = useState<number | null>(null)
@@ -39,6 +39,10 @@ const UserViewSecurity = () => {
   const [loading, setLoading] = useState(false)
   const isDark = settings.mode === "dark"
   const initialized = useRef(false)
+
+  // State for topic add dialog
+  const [topicAddOpen, setTopicAddOpen] = useState(false)
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
 
   const isDatePast = (dateString: string): boolean => {
     if (!dateString) return false
@@ -146,29 +150,28 @@ const UserViewSecurity = () => {
     setLoading(false)
   }
 
-  const handleTopicSubmit = async (hour: any) => {
-    try {
-      const response = await api.post("common/topic/create/", { topic, group: query?.id, date: hour.date })
-      if (response.status == 201) {
-        setTopic(null)
-        setOpenTooltip(null)
-        if (query.month) {
-          await dispatch(
-            getDays({
-              date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
-              group: query?.id,
-            }),
-          )
-        } else {
-          toast.error(`Saqlangan ma'lumotni bolmadi`, { duration: 2000 })
-        }
-      } else {
-        toast.error("Saqlab bo'lmadi", { duration: 2000 })
-      }
-    } catch (err) {
-      console.error(err)
-      toast.error("Saqlab bo'lmadi", { duration: 2000 })
-    }
+  // Function to open topic add dialog
+  const handleOpenTopicAdd = (date: string) => {
+    setSelectedDate(date)
+    setTopicAddOpen(true)
+  }
+
+  // Function to refresh data after topic is added
+  const refreshData = () => {
+    dispatch(
+      getAttendance({
+        date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
+        group: query?.id,
+        queryString: queryString,
+      }),
+    )
+
+    dispatch(
+      getDays({
+        date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
+        group: query?.id,
+      }),
+    )
   }
 
   const attendanceDate = useMemo(() => {
@@ -190,7 +193,7 @@ const UserViewSecurity = () => {
 
         await Promise.all([
           dispatch(getDays({ date: attendanceDate, group: query?.id })),
-          dispatch(getAttendance({ date: attendanceDate, group: query?.id, queryString }))
+          dispatch(getAttendance({ date: attendanceDate, group: query?.id, queryString })),
         ])
       } catch (error) {
         console.error("Error fetching data:", error)
@@ -204,34 +207,36 @@ const UserViewSecurity = () => {
 
   useEffect(() => {
     if (!initialized.current && month_list.length > 0) {
-      initialized.current = true;
+      initialized.current = true
 
       const initializeData = async () => {
         if (query?.month) {
-          const index = month_list.findIndex((item) => getMontName(Number(item.date.split("-")[1])) === query.month);
+          const index = month_list.findIndex((item) => getMontName(Number(item.date.split("-")[1])) === query.month)
           if (index !== -1) {
-            setCurrentMonth(index);
-            dispatch(setGettingAttendance(true));
-            await dispatch(getDays({ date: month_list[index].date, group: query?.id }));
-            await dispatch(getAttendance({
-              date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
-              group: query?.id,
-              queryString: queryString
-            }));
-            dispatch(setGettingAttendance(false));
+            setCurrentMonth(index)
+            dispatch(setGettingAttendance(true))
+            await dispatch(getDays({ date: month_list[index].date, group: query?.id }))
+            await dispatch(
+              getAttendance({
+                date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
+                group: query?.id,
+                queryString: queryString,
+              }),
+            )
+            dispatch(setGettingAttendance(false))
           } else if (month_list.length > 0) {
-            const lastMonthIndex = month_list.length - 1;
-            setCurrentMonth(lastMonthIndex);
+            const lastMonthIndex = month_list.length - 1
+            setCurrentMonth(lastMonthIndex)
           }
         } else if (month_list.length > 0) {
-          const lastMonthIndex = month_list.length - 1;
-          setCurrentMonth(lastMonthIndex);
+          const lastMonthIndex = month_list.length - 1
+          setCurrentMonth(lastMonthIndex)
         }
-      };
+      }
 
-      void initializeData();
+      void initializeData()
     }
-  }, [month_list, query.month, query?.id, queryString, dispatch]);
+  }, [month_list, query.month, query?.id, queryString, dispatch])
 
   useEffect(() => {
     const fetchAttendance = async () => {
@@ -305,14 +310,11 @@ const UserViewSecurity = () => {
             isPast={isPast}
             opened_id={opened_id}
             setOpenedId={setOpenedId}
-            openTooltip={openTooltip}
-            setOpenTooltip={setOpenTooltip}
             handleDayClick={handleDayClick}
-            handleTopicSubmit={handleTopicSubmit}
-            topic={topic}
-            setTopic={setTopic}
+            handleOpenTopicAdd={handleOpenTopicAdd}
             setUpdateTopic={setUpdateTopic}
             setTopicId={setTopicId}
+            setTopic={setTopic}
             t={t}
             query={query}
             groupData={groupData}
@@ -353,6 +355,7 @@ const UserViewSecurity = () => {
         </>
       )}
 
+      {/* Date Change Dialog */}
       <DateChangeDialog
         open={openDialog}
         setOpen={setOpenDialog}
@@ -364,6 +367,7 @@ const UserViewSecurity = () => {
         handleDateChange={handleDateChange}
       />
 
+      {/* Topic Edit Dialog */}
       <TopicEditDialog
         open={updateTopic}
         setOpen={setUpdateTopic}
@@ -372,8 +376,20 @@ const UserViewSecurity = () => {
         changeTopicLoader={changeTopicLoader}
         handleTopicChange={handleTopicChange}
       />
+
+      {selectedDate && (
+        <TopicAddDialog
+          open={topicAddOpen}
+          onClose={() => setTopicAddOpen(false)}
+          date={selectedDate}
+          groupId={String(query?.id)}
+          onSuccess={refreshData}
+          t={t}
+        />
+      )}
     </Paper>
   )
 }
 
 export default UserViewSecurity
+
