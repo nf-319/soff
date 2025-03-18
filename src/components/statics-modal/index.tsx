@@ -20,10 +20,8 @@ const StaticsModal = () => {
   const { user } = useContext(AuthContext)
   const { isModalOpen } = useAppSelector(state => state.page)
   const soffBotText = useAppSelector(state => state.page.soffBotText)
-  const soffBotStatus = useAppSelector(state => state.page.soffBotStatus)
 
   const [typingComplete, setTypingComplete] = useState(false)
-  const [showFireworks, setShowFireworks] = useState(false)
   const [triggerConfetti, setTriggerConfetti] = useState(false)
   const [selectedDate, setSelectedDate] = useState('yesterday')
 
@@ -35,6 +33,7 @@ const StaticsModal = () => {
       const response = await api.get('auth/analytics/', { params: { date } })
       dispatch(
         setSoffBotText({
+          income_by_types:response.data.income_by_types,
           missed_attendance: response.data.missed_attendance,
           groups: response.data.detail,
           absent_students: response.data.absent_students,

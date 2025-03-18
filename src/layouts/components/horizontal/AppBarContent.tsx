@@ -110,7 +110,7 @@ const AppBarContent = (props: Props) => {
               size='small'
               loadingText={'Yuklanmoqda..'}
               loading={searchLoading}
-              noOptionsText={search === '' ? "O'quvchi yoki Teacher Qidirish" : "Malumot yo'q"}
+              noOptionsText={search === '' ? "O'quvchi yoki O'qituvchi Qidirish" : "Malumot yo'q"}
               getOptionLabel={(option: any) => option?.first_name || ''}
               filterOptions={options => options}
               renderOption={(props, option: any) => (
