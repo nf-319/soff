@@ -150,13 +150,11 @@ const UserViewSecurity = () => {
     setLoading(false)
   }
 
-  // Function to open topic add dialog
   const handleOpenTopicAdd = (date: string) => {
     setSelectedDate(date)
     setTopicAddOpen(true)
   }
 
-  // Function to refresh data after topic is added
   const refreshData = () => {
     dispatch(
       getAttendance({
