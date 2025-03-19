@@ -21,7 +21,6 @@ interface AttendanceTableProps {
   }
   days: any[]
   isDark: boolean
-  isPast: boolean
   opened_id: any
   setOpenedId: (id: any) => void
   handleDayClick: (day: any) => void
