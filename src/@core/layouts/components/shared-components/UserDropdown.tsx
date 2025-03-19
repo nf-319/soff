@@ -151,6 +151,7 @@ const UserDropdown = (props: Props) => {
   const handleLogout = () => {
     logout()
     dispatch(setRoles([]))
+    localStorage.clear()
     handleDropdownClose()
   }
 

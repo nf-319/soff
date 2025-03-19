@@ -86,7 +86,7 @@ const ScrollWrapper = ({ children, hidden }: { children: ReactNode; hidden: bool
 const NotificationDropdown = (props: Props) => {
   const { settings } = props
   const { t } = useTranslation()
-  const { notifications, notificationsCount, isGettingNotification } = useAppSelector(state => state.user)
+  const { notifications, notificationsCount } = useAppSelector(state => state.user)
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
   const dispatch = useAppDispatch()
 
@@ -101,7 +101,7 @@ const NotificationDropdown = (props: Props) => {
   }
 
   const handleDropdownClose = () => {
-    router.push('/notifications')
+    void router.push('/notifications')
     setAnchorEl(null)
   }
 
@@ -180,7 +180,7 @@ const NotificationDropdown = (props: Props) => {
             }}
           >
             <Button fullWidth variant='contained' onClick={() => router.push('/notifications')}>
-              {t('Barcha xabarnomalar')}
+              Barcha xabarnomalar
             </Button>
           </MenuItem>
         )}

@@ -1,46 +1,36 @@
-"use client";
+"use client"
 
-import React, { useMemo, useCallback } from "react";
-import {
-  Box,
-  IconButton,
-  Tooltip,
-  Typography,
-  ClickAwayListener,
-  TextField,
-  Button
-} from "@mui/material";
-import { CalendarCheck, Edit } from "lucide-react";
-import { UserViewItem } from "./UserViewItem";
-import { EmptyContent } from "src/components/empty-content";
+import React, { Dispatch } from 'react'
+import { useMemo, useCallback } from "react"
+import { Box, IconButton, Tooltip, Typography } from "@mui/material"
+import { CalendarCheck, Edit } from "lucide-react"
+import { UserViewItem } from "./UserViewItem"
+import { EmptyContent } from "src/components/empty-content"
 
 interface Student {
-  id: string | number;
-  first_name: string;
-  last_name?: string;
-  attendance?: any[];
+  id: string | number
+  first_name: string
+  last_name?: string
+  attendance?: any[]
 }
 
 interface AttendanceTableProps {
   attendance: {
-    students: Student[];
-  };
-  days: any[];
-  isDark: boolean;
-  isPast: boolean;
-  opened_id: any;
-  setOpenedId: (id: any) => void;
-  openTooltip: string | null;
-  setOpenTooltip: (id: any) => void;
-  handleDayClick: (day: any) => void;
-  handleTopicSubmit: (hour: any) => void;
-  topic: string;
-  setTopic: (topic: string) => void;
-  setUpdateTopic: (open: boolean) => void;
-  setTopicId: (id: number) => void;
-  t: (key: string) => string;
-  query: any;
-  groupData?: any;
+    students: Student[]
+  }
+  days: any[]
+  isDark: boolean
+  isPast: boolean
+  opened_id: any
+  setOpenedId: (id: any) => void
+  handleDayClick: (day: any) => void
+  handleOpenTopicAdd: (date: string) => void
+  setUpdateTopic: (open: boolean) => void
+  setTopicId: (id: number) => void
+  setTopic:  Dispatch<any>
+  t: (key: string) => string
+  query: any
+  groupData?: any
 }
 
 export const AttendanceTable = ({
@@ -50,10 +40,8 @@ export const AttendanceTable = ({
   isPast,
   opened_id,
   setOpenedId,
-  openTooltip,
-  setOpenTooltip,
   handleDayClick,
-  handleTopicSubmit,
+  handleOpenTopicAdd,
   setTopic,
   setUpdateTopic,
   setTopicId,
@@ -89,7 +77,9 @@ export const AttendanceTable = ({
       padding: '12px 20px',
       fontWeight: 600,
       borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
-      borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
+      borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
+      maxWidth: '150px',
+      width: '150px'
     }),
     [isDark]
   )
@@ -117,7 +107,9 @@ export const AttendanceTable = ({
       fontWeight: 500,
       borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
       borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
-      minWidth: '200px'
+      minWidth: '150px',
+      maxWidth: '150px',
+      width: '150px'
     }),
     [isDark]
   )
@@ -144,21 +136,6 @@ export const AttendanceTable = ({
       setTopic(topic)
     },
     [setUpdateTopic, setTopicId, setTopic]
-  )
-
-  const handleTooltipToggle = useCallback(
-    (date: any) => {
-      setOpenTooltip((current: any) => (current === date ? null : date))
-    },
-    [setOpenTooltip]
-  )
-
-  const handleFormSubmit = useCallback(
-    (e: any, hour: any) => {
-      e.preventDefault()
-      handleTopicSubmit(hour)
-    },
-    [handleTopicSubmit]
   )
 
   return (
@@ -208,7 +185,7 @@ export const AttendanceTable = ({
                           arrow
                           placement='top'
                           title={
-                            <Box style={{ padding: '8px' } as React.CSSProperties}>
+                            <Box style={{ padding: '8px', backgroundColor: '#fff' } as React.CSSProperties}>
                               <Typography style={{ margin: '0', marginBottom: '4px' } as React.CSSProperties}>
                                 {hour.exam.title}
                               </Typography>
@@ -271,58 +248,9 @@ export const AttendanceTable = ({
                           </Box>
                         </Tooltip>
                       ) : (
-                        <Tooltip
-                          arrow
-                          placement='top'
-                          open={openTooltip === hour.date}
-                          onClose={() => setOpenTooltip(null)}
-                          title={
-                            <ClickAwayListener onClickAway={() => setOpenTooltip(null)}>
-                              <Box
-                                style={
-                                  {
-                                    padding: '8px',
-                                    width: '200px',
-                                    backgroundColor: '#fff'
-                                  } as React.CSSProperties
-                                }
-                              >
-                                <Typography style={{ marginBottom: '8px', color: '#000' } as React.CSSProperties}>
-                                  Mavzu qo'shish
-                                </Typography>
-                                <form
-                                  style={
-                                    {
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      gap: '8px'
-                                    } as React.CSSProperties
-                                  }
-                                  onSubmit={e => handleFormSubmit(e, hour)}
-                                >
-                                  <TextField
-                                    autoComplete='off'
-                                    onChange={e => setTopic(e.target.value)}
-                                    size='small'
-                                    placeholder='Mavzu..'
-                                    fullWidth
-                                    style={{ marginBottom: '8px' } as React.CSSProperties}
-                                  />
-                                  <Button type='submit' variant='contained' size='small'>
-                                    {t('Saqlash')}
-                                  </Button>
-                                </form>
-                              </Box>
-                            </ClickAwayListener>
-                          }
-                        >
-                          <IconButton
-                            style={{ padding: '4px' } as React.CSSProperties}
-                            onClick={() => handleTooltipToggle(hour.date)}
-                          >
-                            <CalendarCheck style={{ width: '18px', height: '18px' }} />
-                          </IconButton>
-                        </Tooltip>
+                        <IconButton size='medium' onClick={() => handleOpenTopicAdd(hour.date)}>
+                          <CalendarCheck size={18} />
+                        </IconButton>
                       )}
                     </div>
                   )}
@@ -331,7 +259,7 @@ export const AttendanceTable = ({
             })}
           </tr>
           <tr>
-            <td style={{ ...stickyHeaderStyles, width: '200px' } as React.CSSProperties}>
+            <td style={{ ...stickyHeaderStyles } as React.CSSProperties}>
               <Typography fontWeight={600}>{t("O'quvchilar")}</Typography>
             </td>
             {displayDays.map((hour: any, index) => (
@@ -414,9 +342,11 @@ export const AttendanceTable = ({
                           {
                             fontWeight: 500,
                             color: isDark ? '#fff' : '#000',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
+                            whiteSpace: 'normal',
+                            wordWrap: 'normal',
+                            wordBreak: 'normal',
+                            maxWidth: '150px',
+                            width: '100%'
                           } as React.CSSProperties
                         }
                       >
@@ -494,7 +424,6 @@ export const AttendanceTable = ({
                         </td>
                       )
                     } else if (hour.weekend?.date) {
-                      // Weekend date
                       return (
                         <td
                           key={`weekend-${student.id}-${hour.date}`}
@@ -588,3 +517,4 @@ export const AttendanceTable = ({
     </Box>
   )
 }
+

@@ -100,9 +100,6 @@ export default function AddStudents() {
       }
     }
   })
-  console.log(formik.values,selectedStudents);
-  
-  
 
   return (
     <Dialog

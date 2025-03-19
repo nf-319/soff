@@ -597,7 +597,7 @@ const UserViewSecurity = () => {
                             <Typography color={'black'}>Keyingi to'lov</Typography>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <Icon icon={'mdi:clock'} />
-                              <Typography fontSize={13}>{group.next_payment}</Typography>
+                              <Typography fontSize={13}>{group.status === "active" ? group.next_payment : "-"}</Typography>
                             </Box>
                           </Box>
                           <Box>
