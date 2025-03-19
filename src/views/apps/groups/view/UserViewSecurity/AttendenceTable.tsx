@@ -1,6 +1,7 @@
 "use client"
 
-import React, { Dispatch } from 'react'
+import type React from "react"
+import type { Dispatch } from "react"
 import { useMemo, useCallback } from "react"
 import { Box, IconButton, Tooltip, Typography } from "@mui/material"
 import { CalendarCheck, Edit } from "lucide-react"
@@ -27,7 +28,7 @@ interface AttendanceTableProps {
   handleOpenTopicAdd: (date: string) => void
   setUpdateTopic: (open: boolean) => void
   setTopicId: (id: number) => void
-  setTopic:  Dispatch<any>
+  setTopic: Dispatch<any>
   t: (key: string) => string
   query: any
   groupData?: any
@@ -113,21 +114,6 @@ export const AttendanceTable = ({
     }),
     [isDark]
   )
-
-  const isAfterEndDate = useCallback(() => {
-    if (!groupData?.end_date) return false
-
-    const endDate = new Date(groupData.end_date)
-    const currentYear = query?.year ? Number.parseInt(query.year) : new Date().getFullYear()
-    const currentMonth = query?.month ? new Date(`${query.month} 1, 2000`).getMonth() : new Date().getMonth()
-
-    const endYear = endDate.getFullYear()
-    const endMonth = endDate.getMonth()
-
-    return currentYear > endYear || (currentYear === endYear && currentMonth > endMonth)
-  }, [groupData, query])
-
-  const showCourseEndedNotification = isPast || isAfterEndDate()
 
   const handleTopicEdit = useCallback(
     (lessonId: any, topic: any) => {
@@ -297,33 +283,7 @@ export const AttendanceTable = ({
         </thead>
 
         <tbody>
-          {showCourseEndedNotification && (
-            <tr>
-              <td
-                colSpan={displayDays.length + 1}
-                style={
-                  {
-                    padding: '20px',
-                    backgroundColor: isDark ? '#3a2a2e' : '#ffe4e6',
-                    textAlign: 'center',
-                    borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
-                  } as React.CSSProperties
-                }
-              >
-                <Typography
-                  variant='h5'
-                  style={
-                    {
-                      color: isDark ? '#ff8a8a' : '#c53030',
-                      fontWeight: 600
-                    } as React.CSSProperties
-                  }
-                >
-                  Kurs tugagan
-                </Typography>
-              </td>
-            </tr>
-          )}
+
 
           {students.length
             ? students.map((student: Student, studentIndex: number) => (
@@ -496,7 +456,7 @@ export const AttendanceTable = ({
               ))
             : null}
 
-          {attendance?.students?.length === 0 && !showCourseEndedNotification && (
+          {attendance?.students?.length === 0 && (
             <tr>
               <td
                 colSpan={displayDays.length + 1}

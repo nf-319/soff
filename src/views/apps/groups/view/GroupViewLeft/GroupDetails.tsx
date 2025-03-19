@@ -6,29 +6,17 @@ import { useRouter } from "next/router"
 import toast from "react-hot-toast"
 import { AuthContext } from "src/context/AuthContext"
 import { useAppDispatch, useAppSelector } from "src/store"
-import type { ThemeColor } from "src/@core/layouts/types"
 import { getSMSTemp, handleEditClickOpen, setOnlineLessonLoading } from "src/store/apps/groupDetails"
 import EditGroupModal from "../../EditGroupModal"
 import { getDashboardLessons, getGroupsDetails, handleOpenEdit } from "src/store/apps/groups"
 import api from "src/@core/utils/api"
 import GroupDetailsWrapper from "./GroupDetailsWrapper"
 
-interface ColorsType {
-  [key: string]: ThemeColor
-}
-
-const roleColors: ColorsType = {
-  ceo: "error",
-  admin: "info",
-  teacher: "warning",
-  director: "success",
-}
 
 export default function GroupDetails() {
   const { groupData, isGettingGroupDetails, onlineLessonLoading } = useAppSelector((state) => state.groupDetails)
   const dispatch = useAppDispatch()
   const { user } = useContext(AuthContext)
-  const { t } = useTranslation()
   const router = useRouter()
 
   const handleOpenSendSMSModal = async () => {

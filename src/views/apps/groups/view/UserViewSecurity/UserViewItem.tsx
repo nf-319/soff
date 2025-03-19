@@ -300,7 +300,7 @@ export const UserViewItem: FC<Props> = ({
           PaperProps={{
             sx: {
               borderRadius: '12px',
-              padding: '8px'
+              padding: '8px',
             }
           }}
         >
@@ -309,6 +309,7 @@ export const UserViewItem: FC<Props> = ({
               Kelmagan sababi haqida izoh
             </Typography>
           </DialogTitle>
+
           <DialogContent sx={{ p: '24px' }}>
             <Formik
               initialValues={{ description: descriptionText || '' }}
@@ -320,21 +321,18 @@ export const UserViewItem: FC<Props> = ({
               {({ handleChange, handleBlur, values }) => (
                 <Form>
                   <FormControl sx={{ width: '100%' }}>
-                    <Field
-                      as={TextField}
+                    <TextField
                       label='Izoh'
                       placeholder='Kelmagan sababi haqida izoh kiriting'
                       name='description'
                       fullWidth
+                      margin="normal"
                       variant='outlined'
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.description}
                       error={!!values.description && !values.description.trim()}
                       helperText={<ErrorMessage name='description' />}
-                      InputProps={{
-                        sx: { borderRadius: '8px' }
-                      }}
                     />
                   </FormControl>
                   <DialogActions sx={{ p: '16px 0 0 0', mt: '16px' }}>
