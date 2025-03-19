@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React, { Dispatch } from 'react'
 import { useMemo, useCallback } from "react"
 import { Box, IconButton, Tooltip, Typography } from "@mui/material"
 import { CalendarCheck, Edit } from "lucide-react"
@@ -27,7 +27,7 @@ interface AttendanceTableProps {
   handleOpenTopicAdd: (date: string) => void
   setUpdateTopic: (open: boolean) => void
   setTopicId: (id: number) => void
-  setTopic: (topic: string) => void
+  setTopic:  Dispatch<any>
   t: (key: string) => string
   query: any
   groupData?: any
@@ -49,6 +49,7 @@ export const AttendanceTable = ({
   query,
   groupData
 }: AttendanceTableProps) => {
+
   const displayDays = useMemo(() => {
     return days?.length > 0 ? days : Array(7).fill({ date: 'placeholder' })
   }, [days])
@@ -76,7 +77,9 @@ export const AttendanceTable = ({
       padding: '12px 20px',
       fontWeight: 600,
       borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
-      borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
+      borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
+      maxWidth: '150px',
+      width: '150px'
     }),
     [isDark]
   )
@@ -104,7 +107,9 @@ export const AttendanceTable = ({
       fontWeight: 500,
       borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
       borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
-      minWidth: '200px'
+      minWidth: '150px',
+      maxWidth: '150px',
+      width: '150px'
     }),
     [isDark]
   )
@@ -254,7 +259,7 @@ export const AttendanceTable = ({
             })}
           </tr>
           <tr>
-            <td style={{ ...stickyHeaderStyles, width: '200px' } as React.CSSProperties}>
+            <td style={{ ...stickyHeaderStyles } as React.CSSProperties}>
               <Typography fontWeight={600}>{t("O'quvchilar")}</Typography>
             </td>
             {displayDays.map((hour: any, index) => (
@@ -337,9 +342,11 @@ export const AttendanceTable = ({
                           {
                             fontWeight: 500,
                             color: isDark ? '#fff' : '#000',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
+                            whiteSpace: 'normal',
+                            wordWrap: 'normal',
+                            wordBreak: 'normal',
+                            maxWidth: '150px',
+                            width: '100%'
                           } as React.CSSProperties
                         }
                       >
