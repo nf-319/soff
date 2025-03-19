@@ -10,8 +10,7 @@ import { AuthValuesType, RegisterParams, LoginParams, ErrCallbackType, UserDataT
 import api from 'src/@core/utils/api'
 import { setCompanyInfo, setRoles } from 'src/store/apps/user'
 import { useTranslation } from 'react-i18next'
-import { useAppDispatch, useAppSelector } from 'src/store'
-import { useSettings } from 'src/@core/hooks/useSettings'
+import { useAppDispatch } from 'src/store'
 
 const defaultProvider: AuthValuesType = {
   user: null,
@@ -65,7 +64,6 @@ const AuthProvider = ({ children }: Props) => {
             last_login:response.data?.last_login,
             gpa: response.data.gpa,
             id: response.data.id,
-            // role: response.data.roles.find((el: any) => el.name === "Teacher").exists && !response.data.roles.find((el: any) => el.name === "Admin").exists && !response.data.roles.find((el: any) => el.name === "CEO").exists ? 'teacher' : 'admin',
             fullName: response.data.first_name,
             username: response.data.phone,
             password: 'null',
@@ -85,6 +83,7 @@ const AuthProvider = ({ children }: Props) => {
           setUser(null)
           setLoading(false)
           if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
+            localStorage.clear()
             router.replace('/login')
           }
         })
@@ -170,8 +169,7 @@ const AuthProvider = ({ children }: Props) => {
 
   const handleLogout = () => {
     setUser(null)
-    window.localStorage.removeItem('userData')
-    window.localStorage.removeItem(authConfig.storageTokenKeyName)
+    localStorage.clear()
     router.push('/login')
   }
 
