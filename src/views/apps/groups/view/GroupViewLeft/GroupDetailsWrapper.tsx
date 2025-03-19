@@ -158,15 +158,15 @@ export default function GroupDetails({
           }}
         >
           {isGettingGroupDetails ? (
-            <Skeleton variant='rounded' height={32} animation='wave' style={{ width: '75%' }} />
+            <Skeleton variant="rounded" height={32} animation="wave" style={{ width: '75%' }} />
           ) : (
             <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Typography variant='h6' style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <IconifyIcon icon='material-symbols:school' style={{ color: '#1976d2' }} />
+              <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <IconifyIcon icon="material-symbols:school" style={{ color: '#1976d2' }} />
                 {groupData?.name}
                 {daysLeft <= 7 && (
                   <Box
-                    component='span'
+                    component="span"
                     style={{
                       marginLeft: '8px',
                       padding: '2px 8px',
@@ -190,32 +190,32 @@ export default function GroupDetails({
             <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
               <Box style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {isGettingGroupDetails ? (
-                  <Skeleton variant='rounded' height={24} animation='wave' style={{ width: '100%' }} />
+                  <Skeleton variant="rounded" height={24} animation="wave" style={{ width: '100%' }} />
                 ) : (
                   <Box style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <IconifyIcon icon='mdi:account-group' style={{ color: '#666' }} />
-                    <Typography variant='body2' color='textSecondary'>
-                      {t("O'quvchilar soni")}:
+                    <IconifyIcon icon="mdi:account-group" style={{ color: '#666' }} />
+                    <Typography variant="body2" color="textSecondary">
+                      {t('O\'quvchilar soni')}:
                     </Typography>
-                    <Typography variant='body1' style={{ fontWeight: 500 }}>
+                    <Typography variant="body1" style={{ fontWeight: 500 }}>
                       {groupData?.student_count} ta
                     </Typography>
                   </Box>
                 )}
 
                 {isGettingGroupDetails ? (
-                  <Skeleton variant='rounded' height={24} animation='wave' style={{ width: '100%' }} />
+                  <Skeleton variant="rounded" height={24} animation="wave" style={{ width: '100%' }} />
                 ) : (
                   <Box style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <IconifyIcon icon='mdi:book-education' style={{ color: '#666' }} />
-                    <Typography variant='body2' color='textSecondary'>
+                    <IconifyIcon icon="mdi:book-education" style={{ color: '#666' }} />
+                    <Typography variant="body2" color="textSecondary">
                       {t('Kurs')}:
                     </Typography>
                     {!isTeacherOnly ? (
                       <Link href={`/settings/office/courses/`} style={{ textDecoration: 'none' }}>
                         <CustomChip
-                          skin='light'
-                          size='small'
+                          skin="light"
+                          size="small"
                           label={groupData?.course_data?.name}
                           color={roleColors['director']}
                           sx={{
@@ -232,8 +232,8 @@ export default function GroupDetails({
                       </Link>
                     ) : (
                       <CustomChip
-                        skin='light'
-                        size='small'
+                        skin="light"
+                        size="small"
                         label={groupData?.course_data?.name}
                         color={roleColors['director']}
                         sx={{
@@ -250,28 +250,28 @@ export default function GroupDetails({
                 )}
 
                 {isGettingGroupDetails ? (
-                  <Skeleton variant='rounded' height={24} animation='wave' style={{ width: '100%' }} />
+                  <Skeleton variant="rounded" height={24} animation="wave" style={{ width: '100%' }} />
                 ) : (
                   <Box style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <IconifyIcon icon='mdi:clock-outline' style={{ color: '#666' }} />
-                    <Typography variant='body2' color='textSecondary'>
+                    <IconifyIcon icon="mdi:clock-outline" style={{ color: '#666' }} />
+                    <Typography variant="body2" color="textSecondary">
                       {t('Dars vaqti')}:
                     </Typography>
-                    <Typography variant='body1' style={{ fontWeight: 500 }}>
+                    <Typography variant="body1" style={{ fontWeight: 500 }}>
                       {groupData && `${t(getLessonDays(groupData?.day_of_week || ''))} ${groupData?.start_at}`}
                     </Typography>
                   </Box>
                 )}
 
                 {isGettingGroupDetails ? (
-                  <Skeleton variant='rounded' height={24} animation='wave' style={{ width: '100%' }} />
+                  <Skeleton variant="rounded" height={24} animation="wave" style={{ width: '100%' }} />
                 ) : (
                   <Box style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <IconifyIcon icon='mdi:door' style={{ color: '#666' }} />
-                    <Typography variant='body2' color='textSecondary'>
+                    <IconifyIcon icon="mdi:door" style={{ color: '#666' }} />
+                    <Typography variant="body2" color="textSecondary">
                       {t('Dars xonasi')}:
                     </Typography>
-                    <Typography variant='body1' style={{ fontWeight: 500 }}>
+                    <Typography variant="body1" style={{ fontWeight: 500 }}>
                       {groupData?.room_data?.name}
                     </Typography>
                   </Box>
@@ -280,12 +280,12 @@ export default function GroupDetails({
 
               <Box style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {isGettingGroupDetails ? (
-                  <Skeleton variant='rounded' height={24} animation='wave' style={{ width: '100%' }} />
+                  <Skeleton variant="rounded" height={24} animation="wave" style={{ width: '100%' }} />
                 ) : (
                   <Box style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <IconifyIcon icon='mdi:account' style={{ color: '#666' }} />
-                    <Typography variant='body2' color='textSecondary'>
-                      {t("O'qituvchi")}:
+                    <IconifyIcon icon="mdi:account" style={{ color: '#666' }} />
+                    <Typography variant="body2" color="textSecondary">
+                      {t('O\'qituvchi')}:
                     </Typography>
                     <Link
                       href={`/mentors/view/security/?id=${groupData?.teacher_data?.id}`}
@@ -297,14 +297,14 @@ export default function GroupDetails({
                 )}
 
                 {isGettingGroupDetails ? (
-                  <Skeleton variant='rounded' height={24} animation='wave' style={{ width: '100%' }} />
+                  <Skeleton variant="rounded" height={24} animation="wave" style={{ width: '100%' }} />
                 ) : (
                   <Box style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <IconifyIcon icon='mdi:calendar' style={{ color: '#666' }} />
-                    <Typography variant='body2' color='textSecondary'>
+                    <IconifyIcon icon="mdi:calendar" style={{ color: '#666' }} />
+                    <Typography variant="body2" color="textSecondary">
                       {t('Kurs davomiyligi')}:
                     </Typography>
-                    <Typography variant='body1' style={{ fontWeight: 500 }}>
+                    <Typography variant="body1" style={{ fontWeight: 500 }}>
                       {groupData?.start_date?.split('-').reverse().join('.')} -
                       <span
                         style={{ color: daysLeft <= 2 ? '#f44336' : 'inherit', fontWeight: daysLeft <= 2 ? 600 : 500 }}
@@ -316,16 +316,16 @@ export default function GroupDetails({
                 )}
 
                 {isGettingGroupDetails ? (
-                  <Skeleton variant='rounded' height={24} animation='wave' style={{ width: '100%' }} />
+                  <Skeleton variant="rounded" height={24} animation="wave" style={{ width: '100%' }} />
                 ) : (
                   <Box style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <IconifyIcon icon='mdi:office-building' style={{ color: '#666' }} />
-                    <Typography variant='body2' color='textSecondary'>
+                    <IconifyIcon icon="mdi:office-building" style={{ color: '#666' }} />
+                    <Typography variant="body2" color="textSecondary">
                       Filial:
                     </Typography>
                     <CustomChip
-                      skin='light'
-                      size='small'
+                      skin="light"
+                      size="small"
                       label={groupData?.branch_data?.name}
                       color={roleColors['director']}
                       sx={{
@@ -341,18 +341,18 @@ export default function GroupDetails({
                 )}
 
                 {isGettingGroupDetails ? (
-                  <Skeleton variant='rounded' height={24} animation='wave' style={{ width: '100%' }} />
+                  <Skeleton variant="rounded" height={24} animation="wave" style={{ width: '100%' }} />
                 ) : (
                   <Box style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <IconifyIcon icon='mdi:currency-usd' style={{ color: '#666' }} />
-                    <Typography variant='body2' color='textSecondary'>
+                    <IconifyIcon icon="mdi:currency-usd" style={{ color: '#666' }} />
+                    <Typography variant="body2" color="textSecondary">
                       {t('Kurs narxi')}:
                     </Typography>
                     <CustomChip
-                      skin='light'
-                      size='small'
+                      skin="light"
+                      size="small"
                       label={`${groupData?.monthly_amount && addPeriodToThousands(+groupData?.monthly_amount)} so'm`}
-                      color='secondary'
+                      color="secondary"
                       sx={{
                         height: 24,
                         fontWeight: 600,
@@ -385,89 +385,97 @@ export default function GroupDetails({
               .map((_, i) => (
                 <Skeleton
                   key={i}
-                  variant='rounded'
+                  variant="rounded"
                   width={40}
                   height={40}
-                  animation='wave'
+                  animation="wave"
                   style={{ margin: '0 4px' }}
                 />
               ))
           ) : (
             <>
-              <Tooltip title={t('Tahrirlash')} placement='top'>
-                <Button
-                  variant='outlined'
-                  color='warning'
-                  style={{
-                    minWidth: '40px',
-                    width: '40px',
-                    height: '40px',
-                    padding: 0,
-                    backgroundColor: 'white'
-                  }}
-                  onClick={() => {
-                    handleEdit(groupData?.id)
-                  }}
-                >
-                  <IconifyIcon icon='iconamoon:edit-light' />
-                </Button>
-              </Tooltip>
+              {!isTeacherOnly && (
+                <Tooltip title={t('Tahrirlash')} placement="top">
+                  <Button
+                    variant="outlined"
+                    color="warning"
+                    style={{
+                      minWidth: '40px',
+                      width: '40px',
+                      height: '40px',
+                      padding: 0,
+                      backgroundColor: 'white'
+                    }}
+                    onClick={() => {
+                      handleEdit(groupData?.id)
+                    }}
+                  >
+                    <IconifyIcon icon="iconamoon:edit-light" />
+                  </Button>
+                </Tooltip>
+              )}
 
-              <Tooltip title={t("O'chirish")} placement='top'>
-                <Button
-                  variant='outlined'
-                  color='error'
-                  style={{
-                    minWidth: '40px',
-                    width: '40px',
-                    height: '40px',
-                    padding: 0,
-                    backgroundColor: 'white'
-                  }}
-                  onClick={() => handleEditClickOpen('delete')}
-                >
-                  <IconifyIcon icon='mdi-light:delete' />
-                </Button>
-              </Tooltip>
+              {!isTeacherOnly && (
+                <Tooltip title={t('O\'chirish')} placement="top">
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    style={{
+                      minWidth: '40px',
+                      width: '40px',
+                      height: '40px',
+                      padding: 0,
+                      backgroundColor: 'white'
+                    }}
+                    onClick={() => handleEditClickOpen('delete')}
+                  >
+                    <IconifyIcon icon="mdi-light:delete" />
+                  </Button>
+                </Tooltip>
+              )}
 
-              <Tooltip title={t('SMS yuborish')} placement='top'>
-                <Button
-                  variant='outlined'
-                  color='warning'
-                  style={{
-                    minWidth: '40px',
-                    width: '40px',
-                    height: '40px',
-                    padding: 0,
-                    backgroundColor: 'white'
-                  }}
-                  onClick={handleOpenSendSMSModal}
-                >
-                  <IconifyIcon icon='material-symbols-light:sms-outline' />
-                </Button>
-              </Tooltip>
+              {!isTeacherOnly && (
+                <Tooltip title={t('SMS yuborish')} placement="top">
+                  <Button
+                    variant="outlined"
+                    color="warning"
+                    style={{
+                      minWidth: '40px',
+                      width: '40px',
+                      height: '40px',
+                      padding: 0,
+                      backgroundColor: 'white'
+                    }}
+                    onClick={handleOpenSendSMSModal}
+                  >
+                    <IconifyIcon icon="material-symbols-light:sms-outline" />
+                  </Button>
+                </Tooltip>
+              )}
 
-              <Tooltip title={t("O'quvchi qo'shish")} placement='top'>
-                <Button
-                  variant='outlined'
-                  style={{
-                    minWidth: '40px',
-                    width: '40px',
-                    height: '40px',
-                    padding: 0,
-                    backgroundColor: 'white'
-                  }}
-                  onClick={() => handleEditClickOpen('add-student')}
-                >
-                  <IconifyIcon icon='mdi:user-add-outline' />
-                </Button>
-              </Tooltip>
+              {!isTeacherOnly && (
+                <Tooltip title={t('O\'quvchi qo\'shish')} placement="top">
+                  <Button
+                    variant="outlined"
+                    style={{
+                      minWidth: '40px',
+                      width: '40px',
+                      height: '40px',
+                      padding: 0,
+                      backgroundColor: 'white'
+                    }}
+                    onClick={() => handleEditClickOpen('add-student')}
+                  >
+                    <IconifyIcon icon="mdi:user-add-outline" />
+                  </Button>
+                </Tooltip>
+              )}
 
-              <Tooltip title={t('Online dars')} placement='top'>
+              <Tooltip title={t('Online dars')} placement="top">
                 <LoadingButton
                   loading={onlineLessonLoading}
-                  color='success'
-                  variant='outlined'
+                  color="success"
+                  variant="outlined"
                   style={{
                     minWidth: '40px',
                     width: '40px',
@@ -477,15 +485,15 @@ export default function GroupDetails({
                   }}
                   onClick={handleGetMeetLink}
                 >
-                  <IconifyIcon icon='mdi:laptop' />
+                  <IconifyIcon icon="mdi:laptop" />
                 </LoadingButton>
               </Tooltip>
 
-              <Tooltip title={t('QR kod')} placement='top'>
+              <Tooltip title={t('QR kod')} placement="top">
                 <Button
                   disabled={daysLeft < 0}
-                  variant='outlined'
-                  color='primary'
+                  variant="outlined"
+                  color="primary"
                   style={{
                     minWidth: '40px',
                     width: '40px',
@@ -498,7 +506,7 @@ export default function GroupDetails({
                     void fetchQrCodeImage()
                   }}
                 >
-                  <IconifyIcon icon='mdi:qrcode' />
+                  <IconifyIcon icon="mdi:qrcode" />
                 </Button>
               </Tooltip>
             </>
@@ -506,7 +514,7 @@ export default function GroupDetails({
         </CardActions>
       </Card>
 
-      <Dialog open={qrModalOpen} onClose={() => setQrModalOpen(false)} maxWidth='sm' fullWidth>
+      <Dialog open={qrModalOpen} onClose={() => setQrModalOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}>{t('Guruh QR kodi')}</DialogTitle>
         <DialogContent style={{ padding: '16px' }}>
           <DialogContentText style={{ marginBottom: '16px' }}>
@@ -516,11 +524,11 @@ export default function GroupDetails({
           <Tabs
             value={activeTab}
             onChange={handleTabChange}
-            variant='fullWidth'
+            variant="fullWidth"
             style={{ marginBottom: '16px', borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
           >
             <Tab label={t('QR Kod')} />
-            <Tab label={t("Ma'lumot")} />
+            <Tab label={t('Ma\'lumot')} />
           </Tabs>
 
           {activeTab === 0 && (
@@ -535,21 +543,21 @@ export default function GroupDetails({
                 }}
               >
                 {isLoadingQrCode ? (
-                  <Skeleton variant='rectangular' width={mediaQuery ? 200 : 400} height={mediaQuery ? 200 : 400} />
+                  <Skeleton variant="rectangular" width={mediaQuery ? 200 : 400} height={mediaQuery ? 200 : 400} />
                 ) : (
                   <Image
                     src={qrCodeImage || '/placeholder.svg'}
-                    alt='Group QR Code'
+                    alt="Group QR Code"
                     width={mediaQuery ? 200 : 400}
                     height={mediaQuery ? 200 : 400}
                   />
                 )}
               </Box>
               <Button
-                variant='outlined'
+                variant="outlined"
                 style={{ marginTop: '16px' }}
                 onClick={handleDownloadQR}
-                startIcon={<IconifyIcon icon='mdi:download' />}
+                startIcon={<IconifyIcon icon="mdi:download" />}
               >
                 {t('Yuklab olish')}
               </Button>
@@ -559,42 +567,42 @@ export default function GroupDetails({
           {activeTab === 1 && (
             <Box style={{ padding: '16px 0' }}>
               <Box style={{ marginBottom: '12px' }}>
-                <Typography variant='subtitle2' style={{ fontWeight: 500 }}>
+                <Typography variant="subtitle2" style={{ fontWeight: 500 }}>
                   {t('Guruh nomi')}
                 </Typography>
-                <Typography variant='body1'>{groupData?.name}</Typography>
+                <Typography variant="body1">{groupData?.name}</Typography>
                 <Divider style={{ margin: '8px 0' }} />
               </Box>
 
               <Box style={{ marginBottom: '12px' }}>
-                <Typography variant='subtitle2' style={{ fontWeight: 500 }}>
+                <Typography variant="subtitle2" style={{ fontWeight: 500 }}>
                   {t('Kurs')}
                 </Typography>
-                <Typography variant='body1'>{groupData?.course_data?.name}</Typography>
+                <Typography variant="body1">{groupData?.course_data?.name}</Typography>
                 <Divider style={{ margin: '8px 0' }} />
               </Box>
 
               <Box style={{ marginBottom: '12px' }}>
-                <Typography variant='subtitle2' style={{ fontWeight: 500 }}>
-                  {t("O'qituvchi")}
+                <Typography variant="subtitle2" style={{ fontWeight: 500 }}>
+                  {t('O\'qituvchi')}
                 </Typography>
-                <Typography variant='body1'>{groupData?.teacher_data?.first_name}</Typography>
+                <Typography variant="body1">{groupData?.teacher_data?.first_name}</Typography>
                 <Divider style={{ margin: '8px 0' }} />
               </Box>
 
               <Box style={{ marginBottom: '12px' }}>
-                <Typography variant='subtitle2' style={{ fontWeight: 500 }}>
-                  {t("O'quvchilar soni")}
+                <Typography variant="subtitle2" style={{ fontWeight: 500 }}>
+                  {t('O\'quvchilar soni')}
                 </Typography>
-                <Typography variant='body1'>{groupData?.student_count} ta</Typography>
+                <Typography variant="body1">{groupData?.student_count} ta</Typography>
                 <Divider style={{ margin: '8px 0' }} />
               </Box>
 
               <Box>
-                <Typography variant='subtitle2' style={{ fontWeight: 500 }}>
+                <Typography variant="subtitle2" style={{ fontWeight: 500 }}>
                   {t('Dars vaqti')}
                 </Typography>
-                <Typography variant='body1'>
+                <Typography variant="body1">
                   {groupData && `${t(getLessonDays(groupData?.day_of_week || ''))} ${groupData?.start_at}`}
                 </Typography>
               </Box>

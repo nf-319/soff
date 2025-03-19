@@ -1,12 +1,11 @@
 //@ts-nocheck
-import { Autocomplete, Box, Drawer, FormHelperText, IconButton, InputLabel, TextField, Typography } from '@mui/material'
+import { Box, Drawer, FormHelperText, IconButton, InputLabel, TextField, Typography } from '@mui/material'
 import IconifyIcon from '../../../components/icon'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import LoadingButton from '@mui/lab/LoadingButton'
 import {
-  fetchGroups,
   handleOpenEdit,
   setGroupData,
   resetFormParams,
@@ -21,7 +20,7 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import SubLoader from '../loaders/SubLoader'
-import { EmptyContent } from '../../../components/empty-content'
+import { EmptyContent } from 'src/components/empty-content'
 import Calendar from './Calendar'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
@@ -35,9 +34,10 @@ import {
   setGettingGroupDetails
 } from 'src/store/apps/groupDetails'
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
-import api from 'src/@core/utils/api'
 import { useQueryClient } from '@tanstack/react-query'
 import ceoConfigs from 'src/configs/ceo'
+import { setTeacherData } from '../../../store/apps/mentors'
+import api from '../../../@core/utils/api'
 
 export default function EditGroupModal() {
   const {
@@ -57,10 +57,7 @@ export default function EditGroupModal() {
   const [customWeekdays, setCustomWeekDays] = useState<string[]>([])
   const { query } = useRouter()
   const queryClient = useQueryClient()
-  const options = roomsData?.map(item => ({
-    label: item?.name,
-    value: item?.id
-  }))
+
 
   const validationSchema = Yup.object({
     name: Yup.string().required(t('Guruh nomini kiriting')),
@@ -222,6 +219,21 @@ export default function EditGroupModal() {
       dispatch(handleOpenEdit(false))
       dispatch(updateParams({ is_recovery: false }))
     }
+  }, [])
+
+  useEffect(() => {
+    const getTeachers = async () => {
+      await api
+        .get(`${ceoConfigs.employee_checklist}?role=teacher`)
+        .then(data => {
+          dispatch(setTeacherData(data.data))
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    }
+
+    getTeachers()
   }, [])
 
   return (
