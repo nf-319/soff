@@ -21,9 +21,13 @@ import * as Yup from 'yup'
 import usePayment from 'src/hooks/usePayment'
 import Router, { useRouter } from 'next/router'
 import { fetchStudentDetail, fetchStudentGroups, fetchStudentPayment } from 'src/store/apps/students'
-import AmountInput, { revereAmount } from '../../../../components/amount-input'
-import IconifyIcon from '../../../../components/icon'
+import AmountInput, { revereAmount } from 'src/components/amount-input'
+import IconifyIcon from 'src/components/icon'
 import { getStudents } from 'src/store/apps/groupDetails'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import dayjs, { Dayjs } from 'dayjs'
+import { toast } from 'react-hot-toast'
 
 type Props = {
   openEdit: any
@@ -57,7 +61,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
     group: ``,
     amount: '',
     description: '',
-    payment_date: today
+    payment_date: dayjs().format('YYYY-MM-DD'),
   }
 
   const formik = useFormik({
@@ -74,6 +78,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
       try {
         await createPayment(data)
         setLoading(false)
+        toast.success("To'lov mofaqiyatli to'landi")
         setOpenEdit(null)
         if (query.student) {
           await dispatch(fetchStudentGroups(query.student))
@@ -196,14 +201,14 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
                 onBlur={handleBlur}
               >
                 {groupsChecklist?.length === 0 ? (
-                  <MenuItem>
-                    Guruhga biriktirilmagan
-                  </MenuItem>
-                ) : groupsChecklist?.map((group: any) => (
-                  <MenuItem key={group.id} value={group.id} sx={{ whiteSpace: 'normal', lineHeight: 1.2 }}>
-                    {`${group.name} , ${group?.total_payments ? group.total_payments.toLocaleString() : '0'} so'm`}
-                  </MenuItem>
-                ))}
+                  <MenuItem>Guruhga biriktirilmagan</MenuItem>
+                ) : (
+                  groupsChecklist?.map((group: any) => (
+                    <MenuItem key={group.id} value={group.id} sx={{ whiteSpace: 'normal', lineHeight: 1.2 }}>
+                      {`${group.name} , ${group?.total_payments ? group.total_payments.toLocaleString() : '0'} so'm`}
+                    </MenuItem>
+                  ))
+                )}
               </Select>
               {!!errors.group && touched.group && <FormHelperText error>{!!errors.group}</FormHelperText>}
             </FormControl>
@@ -238,25 +243,29 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
               )}
             </FormControl>
 
-            <FormControl sx={{ width: '100%' }}>
-              <input
-                type='date'
-                style={{
-                  borderRadius: '8px',
-                  padding: '10px',
-                  outline: 'none',
-                  border: '1px solid gray',
-                  marginTop: '10px'
-                }}
-                name='payment_date'
-                value={values.payment_date}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              {!!errors.payment_date && touched.payment_date && (
-                <FormHelperText error>{errors.payment_date}</FormHelperText>
-              )}
-            </FormControl>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <FormControl sx={{ width: '100%' }}>
+                <DatePicker
+                  label='Payment Date'
+                  value={values.payment_date ? dayjs(values.payment_date) : null}
+                  onChange={newValue => {
+                    handleChange({ target: { name: 'payment_date', value: newValue } })
+                  }}
+                  // @ts-ignore
+                  onBlur={handleBlur}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      error: !!errors.payment_date && touched.payment_date,
+                      helperText: touched.payment_date && errors.payment_date
+                    }
+                  }}
+                />
+                {!!errors.payment_date && touched.payment_date && (
+                  <FormHelperText error>{errors.payment_date}</FormHelperText>
+                )}
+              </FormControl>
+            </LocalizationProvider>
 
             <DialogActions sx={{ justifyContent: 'center' }}>
               <LoadingButton loading={loading} type='submit' variant='contained' sx={{ mr: 1 }}>
@@ -293,7 +302,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
           >
             {t('Ortga qaytish')}
           </Button>
-          <Button    variant='contained' color='error' onClick={handleConfirmCancel}>
+          <Button variant='contained' color='error' onClick={handleConfirmCancel}>
             {t('Bekor qilish')}
           </Button>
         </DialogActions>

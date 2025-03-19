@@ -53,6 +53,11 @@ export const ListItem: FC<Props> = ({ defaultValue, userId, date, setOpenedId, r
   const handleGradeChange = (e: any) => {
     const inputValue = e.target.value
 
+    if (inputValue === "") {
+      setValue("-")
+      return
+    }
+
     if (inputValue === "-") {
       setValue("-")
       return
@@ -72,6 +77,7 @@ export const ListItem: FC<Props> = ({ defaultValue, userId, date, setOpenedId, r
     setValue(newGrade)
     setOpenedId(null)
   }
+
 
   return (
     <Box sx={{ position: "relative" }}>
@@ -93,6 +99,13 @@ export const ListItem: FC<Props> = ({ defaultValue, userId, date, setOpenedId, r
                 e.preventDefault()
                 setValue("-")
                 return
+              }
+
+              if (e.key === "Backspace" || e.key === "Delete") {
+                if (value.toString().length === 1) {
+                  setValue("-")
+                  return
+                }
               }
 
               if (
