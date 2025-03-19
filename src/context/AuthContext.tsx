@@ -31,13 +31,11 @@ type Props = {
 }
 
 const AuthProvider = ({ children }: Props) => {
-
   const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
   const { i18n } = useTranslation()
-  const { settings, saveSettings } = useSettings()
   const router = useRouter()
-  const { locales, locale: activeLocale, pathname, query, asPath } = router
+  const { pathname, query, asPath } = router
 
   const dispatch = useAppDispatch()
 
