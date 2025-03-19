@@ -17,7 +17,7 @@ export const CeoContent = ({ soffBotText, date, setTypingComplete }: CeoContentP
     setTypingComplete(false)
   }, [soffBotText])
 
-  
+
 
   return (
     <DialogContent sx={{ textAlign: 'justify', padding: '20px', fontFamily: 'Inter, sans-serif' }}>
@@ -46,7 +46,7 @@ export const CeoContent = ({ soffBotText, date, setTypingComplete }: CeoContentP
                       (item: { type: string; income: number }) =>
                         `. <span style="color: #0077FF; font-weight: 500;">${
                           item.type
-                        }</span>: ${item.income.toLocaleString('uz-UZ')} so'm`
+                        }</span>: ${Boolean(item.income) && item.income.toLocaleString('uz-UZ')} so'm`
                     )
                     .join('<br>')
                 : "Hozircha hech qanday to'lov ma'lumotlari mavjud emas."
@@ -63,11 +63,11 @@ export const CeoContent = ({ soffBotText, date, setTypingComplete }: CeoContentP
               soffBotText.income
             } so'm</span>
           </p>
-      
+
   <p style="font-size: 16px;">
             <strong style="color: #555;">💰 To'lov turlari: <br/></strong> <span style="color: #28a745;">${
               soffBotText?.income_by_types?.length !== 0 && incomeByTypesText
-            } so'm</span>
+            }</span>
           </p>
 
           <p style="font-size: 16px;">

@@ -1,8 +1,9 @@
 "use client"
 
-import React, { Dispatch } from 'react'
+import type React from "react"
+import type { Dispatch } from "react"
 import { useMemo, useCallback } from "react"
-import { Box, IconButton, Tooltip, Typography } from "@mui/material"
+import { Box, IconButton, Tooltip, Typography, useMediaQuery } from '@mui/material'
 import { CalendarCheck, Edit } from "lucide-react"
 import { UserViewItem } from "./UserViewItem"
 import { EmptyContent } from "src/components/empty-content"
@@ -27,7 +28,7 @@ interface AttendanceTableProps {
   handleOpenTopicAdd: (date: string) => void
   setUpdateTopic: (open: boolean) => void
   setTopicId: (id: number) => void
-  setTopic:  Dispatch<any>
+  setTopic: Dispatch<any>
   t: (key: string) => string
   query: any
   groupData?: any
@@ -37,7 +38,6 @@ export const AttendanceTable = ({
   attendance,
   days,
   isDark,
-  isPast,
   opened_id,
   setOpenedId,
   handleDayClick,
@@ -47,9 +47,8 @@ export const AttendanceTable = ({
   setTopicId,
   t,
   query,
-  groupData
 }: AttendanceTableProps) => {
-
+  const mediaQuery = useMediaQuery("(max-width: 600px)")
   const displayDays = useMemo(() => {
     return days?.length > 0 ? days : Array(7).fill({ date: 'placeholder' })
   }, [days])
@@ -62,8 +61,8 @@ export const AttendanceTable = ({
     () => ({
       borderCollapse: 'collapse',
       backgroundColor: isDark ? '#282A42' : '#fff',
-      minWidth: '768px',
-      width: '100%'
+      tableLayout: 'fixed',
+      width: mediaQuery ? "auto" : days?.length > 15 ? 'auto' : '100%'
     }),
     [isDark]
   )
@@ -78,24 +77,24 @@ export const AttendanceTable = ({
       fontWeight: 600,
       borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
       borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
-      maxWidth: '150px',
-      width: '150px'
+      width: '150px',
+      minWidth: '150px',
+      maxWidth: '150px'
     }),
     [isDark]
   )
 
-  const dayHeaderStyles: React.CSSProperties = useMemo(
-    () => ({
-      textAlign: 'center',
-      width: '60px',
-      padding: '12px 8px',
-      fontWeight: 600,
-      backgroundColor: isDark ? '#2a3246' : '#e6f0fa',
-      borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
-      borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
-    }),
-    [isDark]
-  )
+  const dayHeaderStyles: React.CSSProperties = {
+    textAlign: 'center',
+    width: '60px',
+    minWidth: '60px',
+    maxWidth: '60px',
+    padding: '12px 8px',
+    fontWeight: 600,
+    backgroundColor: isDark ? '#2a3246' : '#e6f0fa',
+    borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
+    borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
+  }
 
   const stickyColumnStyles: React.CSSProperties = useMemo(
     () => ({
@@ -107,27 +106,12 @@ export const AttendanceTable = ({
       fontWeight: 500,
       borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
       borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
+      width: '150px',
       minWidth: '150px',
-      maxWidth: '150px',
-      width: '150px'
+      maxWidth: '150px'
     }),
     [isDark]
   )
-
-  const isAfterEndDate = useCallback(() => {
-    if (!groupData?.end_date) return false
-
-    const endDate = new Date(groupData.end_date)
-    const currentYear = query?.year ? Number.parseInt(query.year) : new Date().getFullYear()
-    const currentMonth = query?.month ? new Date(`${query.month} 1, 2000`).getMonth() : new Date().getMonth()
-
-    const endYear = endDate.getFullYear()
-    const endMonth = endDate.getMonth()
-
-    return currentYear > endYear || (currentYear === endYear && currentMonth > endMonth)
-  }, [groupData, query])
-
-  const showCourseEndedNotification = isPast || isAfterEndDate()
 
   const handleTopicEdit = useCallback(
     (lessonId: any, topic: any) => {
@@ -143,13 +127,16 @@ export const AttendanceTable = ({
       sx={{
         width: '100%',
         overflowX: 'auto',
-        overflowY: 'hidden'
+        overflowY: 'hidden',
+        '& table': {
+          minWidth: days?.length <= 7 ? '100%' : (150 + (days?.length * 60)) + 'px'
+        }
       }}
     >
       <table style={tableStyles}>
         <thead>
           <tr>
-            <td style={{ ...stickyHeaderStyles, width: '100%', maxWidth: '100px' } as React.CSSProperties}>
+            <td style={stickyHeaderStyles}>
               <Typography fontWeight={600}>{t('Mavzular')}</Typography>
             </td>
 
@@ -259,7 +246,7 @@ export const AttendanceTable = ({
             })}
           </tr>
           <tr>
-            <td style={{ ...stickyHeaderStyles } as React.CSSProperties}>
+            <td style={stickyHeaderStyles}>
               <Typography fontWeight={600}>{t("O'quvchilar")}</Typography>
             </td>
             {displayDays.map((hour: any, index) => (
@@ -297,34 +284,6 @@ export const AttendanceTable = ({
         </thead>
 
         <tbody>
-          {showCourseEndedNotification && (
-            <tr>
-              <td
-                colSpan={displayDays.length + 1}
-                style={
-                  {
-                    padding: '20px',
-                    backgroundColor: isDark ? '#3a2a2e' : '#ffe4e6',
-                    textAlign: 'center',
-                    borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
-                  } as React.CSSProperties
-                }
-              >
-                <Typography
-                  variant='h5'
-                  style={
-                    {
-                      color: isDark ? '#ff8a8a' : '#c53030',
-                      fontWeight: 600
-                    } as React.CSSProperties
-                  }
-                >
-                  Kurs tugagan
-                </Typography>
-              </td>
-            </tr>
-          )}
-
           {students.length
             ? students.map((student: Student, studentIndex: number) => (
                 <tr
@@ -496,7 +455,7 @@ export const AttendanceTable = ({
               ))
             : null}
 
-          {attendance?.students?.length === 0 && !showCourseEndedNotification && (
+          {attendance?.students?.length === 0 && (
             <tr>
               <td
                 colSpan={displayDays.length + 1}

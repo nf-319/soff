@@ -40,7 +40,7 @@ export default function AddStudents() {
   const formik: any = useFormik({
     initialValues: {
       body: '',
-      start_date: '',
+      start_date: dayjs().format('YYYY-MM-DD'),
       student: '',
       discount_amount: ''
     },
@@ -51,7 +51,6 @@ export default function AddStudents() {
           .matches(/^(?!0\d).*$/, 'Son 0 bilan boshlanmasligi kerak!'),
         body: Yup.string(),
         start_date: Yup.string().required("Guruhga qo'shilish sanasi"),
-        // student:Yup.number().required("O'quvchini tanlang")
       }),
     onSubmit: async values => {
       setLoading(true)
@@ -127,9 +126,10 @@ export default function AddStudents() {
                 <FormControl sx={{ width: '100%', margin: '10px 0' }}>
                   <FormLabel>{t("Guruhga qo'shilish sanasi")}</FormLabel>
                   <DatePicker
-                    value={formik.values.start_date ? dayjs(formik.values.start_date) : null}
+                    format="DD/MM/YYYY"
+                    value={formik.values.start_date ? dayjs(formik.values.start_date) : dayjs()}
                     onChange={newValue => {
-                      formik.setFieldValue('start_date', newValue ? dayjs(newValue).format('YYYY-MM-DD') : '')
+                      formik.setFieldValue('start_date', newValue ? dayjs(newValue).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'))
                     }}
                     slotProps={{
                       textField: {

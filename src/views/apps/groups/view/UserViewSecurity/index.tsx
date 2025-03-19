@@ -40,7 +40,6 @@ const UserViewSecurity = () => {
   const isDark = settings.mode === "dark"
   const initialized = useRef(false)
 
-  // State for topic add dialog
   const [topicAddOpen, setTopicAddOpen] = useState(false)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
 
@@ -213,7 +212,7 @@ const UserViewSecurity = () => {
           if (index !== -1) {
             setCurrentMonth(index)
             dispatch(setGettingAttendance(true))
-            await dispatch(getDays({ date: month_list[index].date, group: query?.id }))
+            // await dispatch(getDays({ date: month_list[index].date, group: query?.id }))
             await dispatch(
               getAttendance({
                 date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
