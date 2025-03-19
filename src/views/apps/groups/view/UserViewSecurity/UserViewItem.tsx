@@ -171,7 +171,6 @@ export const UserViewItem: FC<Props> = ({
           alignItems: 'center'
         }}
       >
-        {/* Action menu */}
         {open && (
           <Paper
             elevation={3}

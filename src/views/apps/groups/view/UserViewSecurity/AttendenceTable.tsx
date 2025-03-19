@@ -3,7 +3,7 @@
 import type React from "react"
 import type { Dispatch } from "react"
 import { useMemo, useCallback } from "react"
-import { Box, IconButton, Tooltip, Typography } from "@mui/material"
+import { Box, IconButton, Tooltip, Typography, useMediaQuery } from '@mui/material'
 import { CalendarCheck, Edit } from "lucide-react"
 import { UserViewItem } from "./UserViewItem"
 import { EmptyContent } from "src/components/empty-content"
@@ -38,7 +38,6 @@ export const AttendanceTable = ({
   attendance,
   days,
   isDark,
-  isPast,
   opened_id,
   setOpenedId,
   handleDayClick,
@@ -48,9 +47,8 @@ export const AttendanceTable = ({
   setTopicId,
   t,
   query,
-  groupData
 }: AttendanceTableProps) => {
-
+  const mediaQuery = useMediaQuery("(max-width: 600px)")
   const displayDays = useMemo(() => {
     return days?.length > 0 ? days : Array(7).fill({ date: 'placeholder' })
   }, [days])
@@ -63,8 +61,8 @@ export const AttendanceTable = ({
     () => ({
       borderCollapse: 'collapse',
       backgroundColor: isDark ? '#282A42' : '#fff',
-      minWidth: '768px',
-      width: '100%'
+      tableLayout: 'fixed',
+      width: mediaQuery ? "auto" : days?.length > 15 ? 'auto' : '100%'
     }),
     [isDark]
   )
@@ -79,24 +77,24 @@ export const AttendanceTable = ({
       fontWeight: 600,
       borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
       borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
-      maxWidth: '150px',
-      width: '150px'
+      width: '150px',
+      minWidth: '150px',
+      maxWidth: '150px'
     }),
     [isDark]
   )
 
-  const dayHeaderStyles: React.CSSProperties = useMemo(
-    () => ({
-      textAlign: 'center',
-      width: '60px',
-      padding: '12px 8px',
-      fontWeight: 600,
-      backgroundColor: isDark ? '#2a3246' : '#e6f0fa',
-      borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
-      borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
-    }),
-    [isDark]
-  )
+  const dayHeaderStyles: React.CSSProperties = {
+    textAlign: 'center',
+    width: '60px',
+    minWidth: '60px',
+    maxWidth: '60px',
+    padding: '12px 8px',
+    fontWeight: 600,
+    backgroundColor: isDark ? '#2a3246' : '#e6f0fa',
+    borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
+    borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
+  }
 
   const stickyColumnStyles: React.CSSProperties = useMemo(
     () => ({
@@ -108,9 +106,9 @@ export const AttendanceTable = ({
       fontWeight: 500,
       borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
       borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
+      width: '150px',
       minWidth: '150px',
-      maxWidth: '150px',
-      width: '150px'
+      maxWidth: '150px'
     }),
     [isDark]
   )
@@ -129,13 +127,16 @@ export const AttendanceTable = ({
       sx={{
         width: '100%',
         overflowX: 'auto',
-        overflowY: 'hidden'
+        overflowY: 'hidden',
+        '& table': {
+          minWidth: days?.length <= 7 ? '100%' : (150 + (days?.length * 60)) + 'px'
+        }
       }}
     >
       <table style={tableStyles}>
         <thead>
           <tr>
-            <td style={{ ...stickyHeaderStyles, width: '100%', maxWidth: '100px' } as React.CSSProperties}>
+            <td style={stickyHeaderStyles}>
               <Typography fontWeight={600}>{t('Mavzular')}</Typography>
             </td>
 
@@ -245,7 +246,7 @@ export const AttendanceTable = ({
             })}
           </tr>
           <tr>
-            <td style={{ ...stickyHeaderStyles } as React.CSSProperties}>
+            <td style={stickyHeaderStyles}>
               <Typography fontWeight={600}>{t("O'quvchilar")}</Typography>
             </td>
             {displayDays.map((hour: any, index) => (
@@ -283,8 +284,6 @@ export const AttendanceTable = ({
         </thead>
 
         <tbody>
-
-
           {students.length
             ? students.map((student: Student, studentIndex: number) => (
                 <tr
