@@ -30,12 +30,7 @@ interface ItemChildTypes {
 
 export const UserViewStudentsItem = ({ item }: ItemChildTypes) => {
   const { created_at, message, description, admin_data } = item
-  const [commentId, setCommentId] = useState<number | any>(null)
-  const { query } = useRouter()
 
-  const dispatch = useAppDispatch()
-
-  const { mutate, isPending } = useDelete()
   const formatDate = (dateString: string): string => {
     if (!dateString) return ''
 
@@ -69,19 +64,6 @@ export const UserViewStudentsItem = ({ item }: ItemChildTypes) => {
     return dateString
   }
 
-  async function handleDelete() {
-    mutate(`student/description/delete/${item.id}/`, {
-      onSuccess: () => {
-        dispatch(fetchStudentComments(query.student))
-        setCommentId(null)
-        toast.success("Eslatman muvaffaqiyatli o'chirildi")
-      },
-      onError: err => {
-        toast.error(err.response.data)
-      }
-    })
-  }
-
   return (
     <Box sx={{ display: 'flex', gap: 3, justifyContent: 'space-between', alignItems: 'end' }}>
       <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
@@ -94,11 +76,6 @@ export const UserViewStudentsItem = ({ item }: ItemChildTypes) => {
           <Typography fontSize={10}>{formatDate(created_at)}</Typography>
         </Box>
       </Box>
-
-      <IconButton onClick={() => setCommentId(item.id)} sx={{ width: 40, height: 40 }}>
-        <Delete color='error' />
-      </IconButton>
-      <UserSuspendDialog open={Boolean(commentId)} setOpen={setCommentId} handleOk={handleDelete} loading={isPending} />
     </Box>
   )
 }

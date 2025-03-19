@@ -41,6 +41,7 @@ import EditStudent from '../../groups/view/ViewStudents/EditStudent'
 import toast from 'react-hot-toast'
 import api from 'src/@core/utils/api'
 import ExportDetailStudent from '../../groups/view/ViewStudents/ExportDetailStudent'
+import DebtorsDataTable from 'src/components/table/debtorsTable'
 
 export async function downloadImage(filename: string, url: string) {
   await fetch(url, {
@@ -194,18 +195,10 @@ const UserViewSecurity = () => {
   }
 
   const columns: customTableProps[] = [
+    { xs: 0.5, title: t('ID'), dataIndex: 'id' },
+    { xs: 1, title: t('Sana'), dataIndex: 'payment_date' },
     {
-      xs: 0.2,
-      title: t('ID'),
-      dataIndex: 'id'
-    },
-    {
-      xs: 0.6,
-      title: t('Sana'),
-      dataIndex: 'payment_date'
-    },
-    {
-      xs: 0.6,
+      xs: 1.2, // To'lov turi aniq chiqishi kerak
       title: t('Turi'),
       dataIndex: 'condition',
       renderItem: item => (
@@ -217,39 +210,19 @@ const UserViewSecurity = () => {
       )
     },
     {
-      xs: 0.7,
+      xs: 1.2, // Summa aniq ko‘rinishi kerak
       title: t('Summa'),
       dataIndex: 'amount',
       render: amount =>
         Number(amount) <= 0 ? `${formatCurrency(Number(amount) * -1)} UZS` : `${formatCurrency(amount)} UZS`
     },
+    { xs: 1, title: t('Guruh'), dataIndex: 'group_name' },
+    { xs: 2, title: t('Izoh'), dataIndex: 'description' }, // Izohga ko‘proq joy ajratildi
+    { xs: 1, title: 'Yaratilgan vaqt', dataIndex: 'created_at' },
+    { xs: 1, title: t("To'lov turi"), dataIndex: 'payment_type_name' },
+    { xs: 1, title: t('Qabul qildi'), dataIndex: 'admin' },
     {
-      xs: 1,
-      title: t('Guruh'),
-      dataIndex: 'group_name'
-    },
-    {
-      xs: 1,
-      title: t('Izoh'),
-      dataIndex: 'description'
-    },
-    {
-      xs: 1,
-      title: 'Yaratilgan vaqt',
-      dataIndex: 'created_at',
-    },
-    {
-      xs: 0.8,
-      title: t("To'lov turi"),
-      dataIndex: 'payment_type_name'
-    },
-    {
-      xs: 1,
-      title: t('Qabul qildi'),
-      dataIndex: 'admin'
-    },
-    {
-      xs: 0.2,
+      xs: 0.8, // Amallar uchun yetarli joy
       title: t('Amallar'),
       dataIndex: 'amount',
       renderId: (id, src) => (
@@ -273,6 +246,7 @@ const UserViewSecurity = () => {
       )
     }
   ]
+
   const handleLeft = async () => {
     setLoading(true)
     try {
@@ -556,7 +530,7 @@ const UserViewSecurity = () => {
                           {group?.lesson_days?.map((day: any) => (
                             <Typography
                               sx={{
-                                backgroundColor: "#f5f5f5",
+                                backgroundColor: '#f5f5f5',
                                 borderRadius: 10,
                                 color: 'black',
                                 paddingX: 3,
@@ -597,7 +571,9 @@ const UserViewSecurity = () => {
                             <Typography color={'black'}>Keyingi to'lov</Typography>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <Icon icon={'mdi:clock'} />
-                              <Typography fontSize={13}>{group.status === "active" ? group.next_payment : "-"}</Typography>
+                              <Typography fontSize={13}>
+                                {group.status === 'active' ? group.next_payment : '-'}
+                              </Typography>
                             </Box>
                           </Box>
                           <Box>
@@ -620,16 +596,16 @@ const UserViewSecurity = () => {
       )}
 
       <Typography sx={{ my: 3, fontSize: '20px' }}>{t("To'lov tarixi")}</Typography>
-      <DataTable
+      <DebtorsDataTable
         color
         loading={isLoading}
         maxWidth='100%'
         minWidth='450px'
         data={payments.map(el => ({
-            ...el,
-            color: Number(el.amount) >= 0 ? 'transparent' : 'rgba(227, 18, 18, 0.1)',
-            is_debtor: Number(el.amount) >= 0,
-          }))}
+          ...el,
+          color: Number(el.amount) >= 0 ? 'transparent' : 'rgba(227, 18, 18, 0.1)',
+          is_debtor: Number(el.amount) >= 0
+        }))}
         columns={columns}
       />
 
