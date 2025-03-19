@@ -282,20 +282,18 @@ export default function GroupDetails({
                 {isGettingGroupDetails ? (
                   <Skeleton variant='rounded' height={24} animation='wave' style={{ width: '100%' }} />
                 ) : (
-                  !isTeacherOnly && (
-                    <Box style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <IconifyIcon icon='mdi:account' style={{ color: '#666' }} />
-                      <Typography variant='body2' color='textSecondary'>
-                        {t("O'qituvchi")}:
-                      </Typography>
-                      <Link
-                        href={`/mentors/view/security/?id=${groupData?.teacher_data?.id}`}
-                        style={{ textDecoration: 'none', color: '#1976d2', fontWeight: 500 }}
-                      >
-                        {groupData?.teacher_data?.first_name}
-                      </Link>
-                    </Box>
-                  )
+                  <Box style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <IconifyIcon icon='mdi:account' style={{ color: '#666' }} />
+                    <Typography variant='body2' color='textSecondary'>
+                      {t("O'qituvchi")}:
+                    </Typography>
+                    <Link
+                      href={`/mentors/view/security/?id=${groupData?.teacher_data?.id}`}
+                      style={{ textDecoration: 'none', color: '#1976d2', fontWeight: 500 }}
+                    >
+                      {groupData?.teacher_data?.first_name}
+                    </Link>
+                  </Box>
                 )}
 
                 {isGettingGroupDetails ? (
@@ -371,143 +369,141 @@ export default function GroupDetails({
           </Box>
         </CardContent>
 
-        {!isTeacherOnly && (
-          <CardActions
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '8px 16px 16px 16px',
-              backgroundColor: 'rgba(0, 0, 0, 0.02)'
-            }}
-          >
-            {isGettingGroupDetails ? (
-              Array(5)
-                .fill(0)
-                .map((_, i) => (
-                  <Skeleton
-                    key={i}
-                    variant='rounded'
-                    width={40}
-                    height={40}
-                    animation='wave'
-                    style={{ margin: '0 4px' }}
-                  />
-                ))
-            ) : (
-              <>
-                <Tooltip title={t('Tahrirlash')} placement='top'>
-                  <Button
-                    variant='outlined'
-                    color='warning'
-                    style={{
-                      minWidth: '40px',
-                      width: '40px',
-                      height: '40px',
-                      padding: 0,
-                      backgroundColor: 'white'
-                    }}
-                    onClick={() => {
-                      handleEdit(groupData?.id)
-                    }}
-                  >
-                    <IconifyIcon icon='iconamoon:edit-light' />
-                  </Button>
-                </Tooltip>
+        <CardActions
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: '8px',
+            padding: '8px 16px 16px 16px',
+            backgroundColor: 'rgba(0, 0, 0, 0.02)'
+          }}
+        >
+          {isGettingGroupDetails ? (
+            Array(5)
+              .fill(0)
+              .map((_, i) => (
+                <Skeleton
+                  key={i}
+                  variant='rounded'
+                  width={40}
+                  height={40}
+                  animation='wave'
+                  style={{ margin: '0 4px' }}
+                />
+              ))
+          ) : (
+            <>
+              <Tooltip title={t('Tahrirlash')} placement='top'>
+                <Button
+                  variant='outlined'
+                  color='warning'
+                  style={{
+                    minWidth: '40px',
+                    width: '40px',
+                    height: '40px',
+                    padding: 0,
+                    backgroundColor: 'white'
+                  }}
+                  onClick={() => {
+                    handleEdit(groupData?.id)
+                  }}
+                >
+                  <IconifyIcon icon='iconamoon:edit-light' />
+                </Button>
+              </Tooltip>
 
-                <Tooltip title={t("O'chirish")} placement='top'>
-                  <Button
-                    variant='outlined'
-                    color='error'
-                    style={{
-                      minWidth: '40px',
-                      width: '40px',
-                      height: '40px',
-                      padding: 0,
-                      backgroundColor: 'white'
-                    }}
-                    onClick={() => handleEditClickOpen('delete')}
-                  >
-                    <IconifyIcon icon='mdi-light:delete' />
-                  </Button>
-                </Tooltip>
+              <Tooltip title={t("O'chirish")} placement='top'>
+                <Button
+                  variant='outlined'
+                  color='error'
+                  style={{
+                    minWidth: '40px',
+                    width: '40px',
+                    height: '40px',
+                    padding: 0,
+                    backgroundColor: 'white'
+                  }}
+                  onClick={() => handleEditClickOpen('delete')}
+                >
+                  <IconifyIcon icon='mdi-light:delete' />
+                </Button>
+              </Tooltip>
 
-                <Tooltip title={t('SMS yuborish')} placement='top'>
-                  <Button
-                    variant='outlined'
-                    color='warning'
-                    style={{
-                      minWidth: '40px',
-                      width: '40px',
-                      height: '40px',
-                      padding: 0,
-                      backgroundColor: 'white'
-                    }}
-                    onClick={handleOpenSendSMSModal}
-                  >
-                    <IconifyIcon icon='material-symbols-light:sms-outline' />
-                  </Button>
-                </Tooltip>
+              <Tooltip title={t('SMS yuborish')} placement='top'>
+                <Button
+                  variant='outlined'
+                  color='warning'
+                  style={{
+                    minWidth: '40px',
+                    width: '40px',
+                    height: '40px',
+                    padding: 0,
+                    backgroundColor: 'white'
+                  }}
+                  onClick={handleOpenSendSMSModal}
+                >
+                  <IconifyIcon icon='material-symbols-light:sms-outline' />
+                </Button>
+              </Tooltip>
 
-                <Tooltip title={t("O'quvchi qo'shish")} placement='top'>
-                  <Button
-                    variant='outlined'
-                    style={{
-                      minWidth: '40px',
-                      width: '40px',
-                      height: '40px',
-                      padding: 0,
-                      backgroundColor: 'white'
-                    }}
-                    onClick={() => handleEditClickOpen('add-student')}
-                  >
-                    <IconifyIcon icon='mdi:user-add-outline' />
-                  </Button>
-                </Tooltip>
+              <Tooltip title={t("O'quvchi qo'shish")} placement='top'>
+                <Button
+                  variant='outlined'
+                  style={{
+                    minWidth: '40px',
+                    width: '40px',
+                    height: '40px',
+                    padding: 0,
+                    backgroundColor: 'white'
+                  }}
+                  onClick={() => handleEditClickOpen('add-student')}
+                >
+                  <IconifyIcon icon='mdi:user-add-outline' />
+                </Button>
+              </Tooltip>
 
-                <Tooltip title={t('Online dars')} placement='top'>
-                  <LoadingButton
-                    loading={onlineLessonLoading}
-                    color='success'
-                    variant='outlined'
-                    style={{
-                      minWidth: '40px',
-                      width: '40px',
-                      height: '40px',
-                      padding: 0,
-                      backgroundColor: 'white'
-                    }}
-                    onClick={handleGetMeetLink}
-                  >
-                    <IconifyIcon icon='mdi:laptop' />
-                  </LoadingButton>
-                </Tooltip>
+              <Tooltip title={t('Online dars')} placement='top'>
+                <LoadingButton
+                  loading={onlineLessonLoading}
+                  color='success'
+                  variant='outlined'
+                  style={{
+                    minWidth: '40px',
+                    width: '40px',
+                    height: '40px',
+                    padding: 0,
+                    backgroundColor: 'white'
+                  }}
+                  onClick={handleGetMeetLink}
+                >
+                  <IconifyIcon icon='mdi:laptop' />
+                </LoadingButton>
+              </Tooltip>
 
-                <Tooltip title={t('QR kod')} placement='top'>
-                  <Button
-                    disabled={daysLeft < 0}
-                    variant='outlined'
-                    color='primary'
-                    style={{
-                      minWidth: '40px',
-                      width: '40px',
-                      height: '40px',
-                      padding: 0,
-                      backgroundColor: 'white'
-                    }}
-                    onClick={() => {
-                      setQrModalOpen(true)
-                      void fetchQrCodeImage()
-                    }}
-                  >
-                    <IconifyIcon icon='mdi:qrcode' />
-                  </Button>
-                </Tooltip>
-              </>
-            )}
-          </CardActions>
-        )}
+              <Tooltip title={t('QR kod')} placement='top'>
+                <Button
+                  disabled={daysLeft < 0}
+                  variant='outlined'
+                  color='primary'
+                  style={{
+                    minWidth: '40px',
+                    width: '40px',
+                    height: '40px',
+                    padding: 0,
+                    backgroundColor: 'white'
+                  }}
+                  onClick={() => {
+                    setQrModalOpen(true)
+                    void fetchQrCodeImage()
+                  }}
+                >
+                  <IconifyIcon icon='mdi:qrcode' />
+                </Button>
+              </Tooltip>
+            </>
+          )}
+        </CardActions>
       </Card>
 
       <Dialog open={qrModalOpen} onClose={() => setQrModalOpen(false)} maxWidth='sm' fullWidth>
