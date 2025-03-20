@@ -123,18 +123,18 @@ jobs:
                 }]
               };
             EOF
-          echo "PM2 reloading app: $APP_NAME"
-            pm2 reload "$CURRENT_DEPLOY_DIR/ecosystem.config.js" --update-env
-            pm2 list
-            else
-            # Birinchi marta ishga tushirish
-            cd "$CURRENT_LINK"
-          echo "PM2 starting app for first time: $APP_NAME"
-            pm2 start npm --name "$APP_NAME" -- start
-            pm2 list
-            fi
+            echo "PM2 reloading app: $APP_NAME"
+              pm2 reload "$CURRENT_DEPLOY_DIR/ecosystem.config.js" --update-env
+              pm2 list
+              else
+              # Birinchi marta ishga tushirish
+              cd "$CURRENT_LINK"
+            echo "PM2 starting app for first time: $APP_NAME"
+              pm2 start npm --name "$APP_NAME" -- start
+              pm2 list
+              fi
 
-            pm2 save
+              pm2 save
 
             # Eski deployment'larni o'chirish (4 tadan ortiq bo'lsa)
             ls -dt "$DEPLOY_DIR"/*/ | grep -v "$(readlink -f "$CURRENT_LINK")" | grep -v "$(readlink -f "$PREVIOUS_LINK" 2>/dev/null || echo 'none')" | tail -n +4 | xargs -I {} rm -rf {} || true
@@ -232,17 +232,17 @@ jobs:
               };
             EOF
 
-          echo "PM2 reloading app: $APP_NAME"
-            pm2 reload "$CURRENT_DEPLOY_DIR/ecosystem.config.js" --update-env
-            pm2 list
-            else
-            cd "$CURRENT_LINK"
-          echo "PM2 starting app for first time: $APP_NAME"
-            pm2 start npm --name "$APP_NAME" -- start
-            pm2 list
-            fi
+            echo "PM2 reloading app: $APP_NAME"
+              pm2 reload "$CURRENT_DEPLOY_DIR/ecosystem.config.js" --update-env
+              pm2 list
+              else
+              cd "$CURRENT_LINK"
+            echo "PM2 starting app for first time: $APP_NAME"
+              pm2 start npm --name "$APP_NAME" -- start
+              pm2 list
+              fi
 
-            pm2 save
+              pm2 save
 
-            # Eski deployment'larni o'chirish (4 tadan ortiq bo'lsa)
-            ls -dt "$DEPLOY_DIR"/*/ | grep -v "$(readlink -f "$CURRENT_LINK")" | grep -v "$(readlink -f "$PREVIOUS_LINK" 2>/dev/null || echo 'none')" | tail -n +4 | xargs -I {} rm -rf {} || true
+              # Eski deployment'larni o'chirish (4 tadan ortiq bo'lsa)
+              ls -dt "$DEPLOY_DIR"/*/ | grep -v "$(readlink -f "$CURRENT_LINK")" | grep -v "$(readlink -f "$PREVIOUS_LINK" 2>/dev/null || echo 'none')" | tail -n +4 | xargs -I {} rm -rf {} || true
