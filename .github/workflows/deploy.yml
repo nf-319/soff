@@ -100,5 +100,5 @@ jobs:
             npm run build
 
             # PM2 orqali jarayonlarni boshqarish
-            pm2 restart ${{ secrets.REPO_NAME }}-test || pm2 start npm --name ${{ secrets.REPO_NAME }}-test -- start
+            pm2 reload ${{ secrets.REPO_NAME }}-test || pm2 start npm --name ${{ secrets.REPO_NAME }}-test -- start
             pm2 save
