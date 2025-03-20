@@ -74,7 +74,6 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
         student: query?.student || student_id,
         amount: revereAmount(values.amount)
       }
-
       try {
         await createPayment(data)
         setLoading(false)
@@ -249,7 +248,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
                   label="To'lov sanasi"
                   value={values.payment_date ? dayjs(values.payment_date) : null}
                   onChange={newValue => {
-                    handleChange({ target: { name: 'payment_date', value: newValue } })
+                    handleChange({ target: { name: 'payment_date', value: dayjs(newValue).format('YYYY-MM-DD') } });
                   }}
                   // @ts-ignore
                   onBlur={handleBlur}
