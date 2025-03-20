@@ -96,11 +96,11 @@ jobs:
             PM2_RUNNING=$(pm2 list | grep "$APP_NAME" | wc -l)
             if [ "$PM2_RUNNING" -gt 0 ]; then
               # Restart config file bilan - loyiha ishlab turgan holatda
-              cat > $CURRENT_DEPLOY_DIR/ecosystem.config.js << EOL
+              cat > "$CURRENT_DEPLOY_DIR/ecosystem.config.js" << 'EOF'
               module.exports = {
                 apps: [{
-                  name: '$APP_NAME',
-                  cwd: '$CURRENT_LINK',
+                  name: '${APP_NAME}',
+                  cwd: '${CURRENT_LINK}',
                   script: 'npm',
                   args: 'start',
                   instances: 1,
@@ -112,14 +112,18 @@ jobs:
                   }
                 }]
               };
-              EOL
+            EOF
 
-              # Yangi versiyani ishga tushirish
-              pm2 reload $CURRENT_DEPLOY_DIR/ecosystem.config.js
+            # O'zgaruvchilarni almashtirish
+            sed -i "s|\${APP_NAME}|$APP_NAME|g" "$CURRENT_DEPLOY_DIR/ecosystem.config.js"
+            sed -i "s|\${CURRENT_LINK}|$CURRENT_LINK|g" "$CURRENT_DEPLOY_DIR/ecosystem.config.js"
+
+            # Yangi versiyani ishga tushirish
+            pm2 reload "$CURRENT_DEPLOY_DIR/ecosystem.config.js"
             else
-              # Birinchi marta ishga tushirish
-              cd "$CURRENT_LINK"
-              pm2 start npm --name "$APP_NAME" -- start
+            # Birinchi marta ishga tushirish
+            cd "$CURRENT_LINK"
+            pm2 start npm --name "$APP_NAME" -- start
             fi
 
             pm2 save
@@ -192,11 +196,11 @@ jobs:
             PM2_RUNNING=$(pm2 list | grep "$APP_NAME" | wc -l)
             if [ "$PM2_RUNNING" -gt 0 ]; then
               # Restart config file bilan - loyiha ishlab turgan holatda
-              cat > $CURRENT_DEPLOY_DIR/ecosystem.config.js << EOL
+              cat > "$CURRENT_DEPLOY_DIR/ecosystem.config.js" << 'EOF'
               module.exports = {
                 apps: [{
-                  name: '$APP_NAME',
-                  cwd: '$CURRENT_LINK',
+                  name: '${APP_NAME}',
+                  cwd: '${CURRENT_LINK}',
                   script: 'npm',
                   args: 'start',
                   instances: 1,
@@ -208,14 +212,18 @@ jobs:
                   }
                 }]
               };
-              EOL
+            EOF
 
-              # Yangi versiyani ishga tushirish
-              pm2 reload $CURRENT_DEPLOY_DIR/ecosystem.config.js
+            # O'zgaruvchilarni almashtirish
+            sed -i "s|\${APP_NAME}|$APP_NAME|g" "$CURRENT_DEPLOY_DIR/ecosystem.config.js"
+            sed -i "s|\${CURRENT_LINK}|$CURRENT_LINK|g" "$CURRENT_DEPLOY_DIR/ecosystem.config.js"
+
+            # Yangi versiyani ishga tushirish
+            pm2 reload "$CURRENT_DEPLOY_DIR/ecosystem.config.js"
             else
-              # Birinchi marta ishga tushirish
-              cd "$CURRENT_LINK"
-              pm2 start npm --name "$APP_NAME" -- start
+            # Birinchi marta ishga tushirish
+            cd "$CURRENT_LINK"
+            pm2 start npm --name "$APP_NAME" -- start
             fi
 
             pm2 save
