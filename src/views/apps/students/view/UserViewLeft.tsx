@@ -512,9 +512,12 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
     >
       <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
         {isSuccess ? (
-          <Box display='flex' gap={2} justifyContent='center'>
-            <MailCheck size={25} color='#1F7D53' />
-            <Typography color='#1F7D53'>Smslar muvaffaqiyat yuborildi</Typography>
+          <Box>
+            <Box display='flex' gap={2} justifyContent='center'>
+              <MailCheck size={25} color='#1F7D53' />
+              <Typography color='#1F7D53'>Smslar muvaffaqiyat yuborildi</Typography>
+            </Box>
+            <Typography fontSize={12}>Sms xabarlar yuborilgan o'qituvchilar ro'yxati</Typography>
           </Box>
         ) : usersData?.length ? (
           <Typography>{t(`Xabar (${`smslar soni: ${usersData?.length}` || 'sms'})`)}</Typography>
@@ -525,22 +528,9 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
 
       <DialogContent>
         {isSuccess ? (
-          <Box
-            display='flex'
-            flexDirection='column'
-            alignItems='center'
-            justifyContent='center'
-            gap={2}
-          >
+          <Box display='flex' flexDirection='column' alignItems='center' justifyContent='center' gap={2}>
             <Box component='nav' width='100%'>
-              <Box
-                component='ul'
-                display='grid'
-                padding={0}
-                gap={2}
-                paddingLeft={10}
-                margin={0}
-              >
+              <Box component='ul' display='grid' padding={0} gap={2} paddingLeft={10} margin={0}>
                 {usersData.map((item: any) => (
                   <Link
                     key={item.id}
@@ -548,27 +538,21 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
                     style={{
                       textDecoration: 'none',
                       color: 'inherit',
-                      transition: 'color 0.2s ease',
+                      transition: 'color 0.2s ease'
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = '#007bff')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = 'inherit')}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#007bff')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'inherit')}
                   >
-                    <Box component='li'>
-                      {item.first_name}
-                    </Box>
+                    <Box component='li'>{item.first_name}</Box>
                   </Link>
                 ))}
               </Box>
             </Box>
 
-            <Button
-              variant='outlined'
-              onClick={handleSendMessages}
-            >
-              Yaxshi
+            <Button variant='outlined' onClick={handleSendMessages}>
+              Yopish
             </Button>
           </Box>
-
         ) : (
           <form style={{ marginTop: 10 }} onSubmit={formik.handleSubmit}>
             <FormControl sx={{ width: '100%', marginBottom: 5 }}>
