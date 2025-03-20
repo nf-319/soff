@@ -17,7 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.12.2'
+          node-version: '20.10.0'
           cache: 'npm'
 
       - name: Install dependencies
@@ -54,7 +54,7 @@ jobs:
             mkdir -p $DEPLOY_DIR
             mkdir -p $CURRENT_DEPLOY_DIR
 
-            # NVM setup
+            # NVM setup va Node versiyani global o'zgaruvchiga eksport qilish
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             if ! command -v nvm &> /dev/null; then
@@ -64,6 +64,15 @@ jobs:
             fi
             nvm install 20.10.0
             nvm use 20.10.0
+
+            # Ushbu qatorlar Node.js-ni global PATH-ga qo'shadi
+            export PATH="$NVM_DIR/versions/node/v20.10.0/bin:$PATH"
+            NODE_PATH=$(which node)
+            NPM_PATH=$(which npm)
+            echo "Node.js path: $NODE_PATH"
+            echo "npm path: $NPM_PATH"
+            echo "Node.js version: $(node -v)"
+            echo "npm version: $(npm -v)"
 
             # PM2 o'rnatilgan bo'lishi kerak
             if ! command -v pm2 &> /dev/null; then
@@ -96,7 +105,8 @@ jobs:
             PM2_RUNNING=$(pm2 list | grep "$APP_NAME" | wc -l)
             if [ "$PM2_RUNNING" -gt 0 ]; then
               # Restart config file bilan - loyiha ishlab turgan holatda
-              cat > "$CURRENT_DEPLOY_DIR/ecosystem.config.js" << 'EOF'
+              # O'ZGARUVCHILARNI ENDI TO'G'RI ALMASHTIRISH KERAK!
+              cat > "$CURRENT_DEPLOY_DIR/ecosystem.config.js" << EOF
               module.exports = {
                 apps: [{
                   name: '${APP_NAME}',
@@ -113,17 +123,15 @@ jobs:
                 }]
               };
             EOF
-
-            # O'zgaruvchilarni almashtirish
-            sed -i "s|\${APP_NAME}|$APP_NAME|g" "$CURRENT_DEPLOY_DIR/ecosystem.config.js"
-            sed -i "s|\${CURRENT_LINK}|$CURRENT_LINK|g" "$CURRENT_DEPLOY_DIR/ecosystem.config.js"
-
-            # Yangi versiyani ishga tushirish
-            pm2 reload "$CURRENT_DEPLOY_DIR/ecosystem.config.js"
+          echo "PM2 reloading app: $APP_NAME"
+            pm2 reload "$CURRENT_DEPLOY_DIR/ecosystem.config.js" --update-env
+            pm2 list
             else
             # Birinchi marta ishga tushirish
             cd "$CURRENT_LINK"
+          echo "PM2 starting app for first time: $APP_NAME"
             pm2 start npm --name "$APP_NAME" -- start
+            pm2 list
             fi
 
             pm2 save
@@ -154,7 +162,7 @@ jobs:
             mkdir -p $DEPLOY_DIR
             mkdir -p $CURRENT_DEPLOY_DIR
 
-            # NVM setup
+            # NVM setup va Node versiyani global o'zgaruvchiga eksport qilish
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             if ! command -v nvm &> /dev/null; then
@@ -164,6 +172,15 @@ jobs:
             fi
             nvm install 20.10.0
             nvm use 20.10.0
+
+            # Ushbu qatorlar Node.js-ni global PATH-ga qo'shadi
+            export PATH="$NVM_DIR/versions/node/v20.10.0/bin:$PATH"
+            NODE_PATH=$(which node)
+            NPM_PATH=$(which npm)
+            echo "Node.js path: $NODE_PATH"
+            echo "npm path: $NPM_PATH"
+            echo "Node.js version: $(node -v)"
+            echo "npm version: $(npm -v)"
 
             # PM2 o'rnatilgan bo'lishi kerak
             if ! command -v pm2 &> /dev/null; then
@@ -196,7 +213,8 @@ jobs:
             PM2_RUNNING=$(pm2 list | grep "$APP_NAME" | wc -l)
             if [ "$PM2_RUNNING" -gt 0 ]; then
               # Restart config file bilan - loyiha ishlab turgan holatda
-              cat > "$CURRENT_DEPLOY_DIR/ecosystem.config.js" << 'EOF'
+              # O'ZGARUVCHILARNI ENDI TO'G'RI ALMASHTIRISH KERAK!
+              cat > "$CURRENT_DEPLOY_DIR/ecosystem.config.js" << EOF
               module.exports = {
                 apps: [{
                   name: '${APP_NAME}',
@@ -214,16 +232,14 @@ jobs:
               };
             EOF
 
-            # O'zgaruvchilarni almashtirish
-            sed -i "s|\${APP_NAME}|$APP_NAME|g" "$CURRENT_DEPLOY_DIR/ecosystem.config.js"
-            sed -i "s|\${CURRENT_LINK}|$CURRENT_LINK|g" "$CURRENT_DEPLOY_DIR/ecosystem.config.js"
-
-            # Yangi versiyani ishga tushirish
-            pm2 reload "$CURRENT_DEPLOY_DIR/ecosystem.config.js"
+          echo "PM2 reloading app: $APP_NAME"
+            pm2 reload "$CURRENT_DEPLOY_DIR/ecosystem.config.js" --update-env
+            pm2 list
             else
-            # Birinchi marta ishga tushirish
             cd "$CURRENT_LINK"
+          echo "PM2 starting app for first time: $APP_NAME"
             pm2 start npm --name "$APP_NAME" -- start
+            pm2 list
             fi
 
             pm2 save
