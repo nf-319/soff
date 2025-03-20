@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies (local runner)
         run: npm install
 
-      - name: create env file
+      - name: Create env file
         run: |
           touch .env
           echo "${{ secrets.TEST_ENV_CONTENT }}" >> .env
@@ -40,10 +40,11 @@ jobs:
             # NVM o'rnatilganligini tekshirish va kerakli Node.js versiyasini tanlash
             if [ ! -d "$HOME/.nvm" ]; then
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
-              source ~/.nvm/nvm.sh
-            else
-              source ~/.nvm/nvm.sh
+              export NVM_DIR="$HOME/.nvm"
+              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             fi
+            source ~/.nvm/nvm.sh
+            nvm install 20.10.0
             nvm use 20.10.0
 
             # Loyihaning joylashuvini yaratish va loyihani olish
@@ -60,7 +61,9 @@ jobs:
 
             # Kerakli kutubxonalarni o'rnatish va loyihani build qilish
             npm install
-            npm run build
+            export NODE_OPTIONS="--max_old_space_size=4096"
+            nohup npm run build > build.log 2>&1 &
+            wait
 
             # PM2 orqali jarayonlarni boshqarish
             pm2 restart subdomain-soffcrm-uz-3132 || pm2 start npm --name subdomain-soffcrm-uz-3132 -- start
@@ -77,10 +80,11 @@ jobs:
             # NVM o'rnatilganligini tekshirish va kerakli Node.js versiyasini tanlash
             if [ ! -d "$HOME/.nvm" ]; then
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
-              source ~/.nvm/nvm.sh
-            else
-              source ~/.nvm/nvm.sh
+              export NVM_DIR="$HOME/.nvm"
+              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             fi
+            source ~/.nvm/nvm.sh
+            nvm install 20.10.0
             nvm use 20.10.0
 
             # Loyihaning joylashuvini yaratish va loyihani olish
@@ -97,8 +101,10 @@ jobs:
 
             # Kerakli kutubxonalarni o'rnatish va loyihani build qilish
             npm install
-            npm run build
+            export NODE_OPTIONS="--max_old_space_size=4096"
+            nohup npm run build > build.log 2>&1 &
+            wait
 
             # PM2 orqali jarayonlarni boshqarish
-            pm2 reload ${{ secrets.REPO_NAME }}-test || pm2 start npm --name ${{ secrets.REPO_NAME }}-test -- start
+            pm2 restart ${{ secrets.REPO_NAME }}-test || pm2 start npm --name ${{ secrets.REPO_NAME }}-test -- start
             pm2 save
