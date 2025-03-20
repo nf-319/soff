@@ -24,7 +24,6 @@ export interface ExamType {
 const GroupExamsList = () => {
   const dispatch = useAppDispatch()
   const { exams, resultId, isGettingExams } = useAppSelector(state => state.groupDetails)
-  const { user } = useContext(AuthContext)
 
   const { query } = useRouter()
   const { t } = useTranslation()
