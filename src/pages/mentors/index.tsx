@@ -44,7 +44,8 @@ export default function GroupsPage() {
   const queryClient = useQueryClient()
   const { smsTemps, getSMSTemps } = useSMS()
   const { queryParams, openSms } = useAppSelector(state => state.mentors)
-  const [teachers, setTeachers] = useState<TacherItemType[]>()
+
+  const { data: teachers }  = useGet(`${ceoConfigs.employee_checklist}?role=teacher`)
 
   const handleEditClickOpen = (value: ModalTypes) => {
     dispatch(setOpenSms(value))
@@ -55,21 +56,6 @@ export default function GroupsPage() {
   const handleEditClose = () => {
     dispatch(setOpenSms(null))
   }
-
-  useEffect(() => {
-    const getTeachers = async () => {
-      await api
-        .get(`${ceoConfigs.employee_checklist}?role=teacher`)
-        .then(data => {
-          setTeachers(data.data)
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    }
-
-    void getTeachers()
-  }, [])
 
   useEffect(() => {
     void queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })
