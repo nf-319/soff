@@ -38,6 +38,9 @@ import StudentWithDrawForm from './StudentWithdrawForm'
 import toast from 'react-hot-toast'
 import { fetchSmsListQuery } from 'src/store/apps/settings'
 import StudentCard from './card'
+import Link from 'next/link'
+import { Box } from '@mui/system'
+import { MailCheck } from 'lucide-react'
 
 export type ModalTypes = 'group' | 'withdraw' | 'payment' | 'sms' | 'delete' | 'edit' | 'notes' | 'parent'
 
@@ -440,6 +443,10 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
   const [isActive, setIsActive] = useState(false)
   const { sms_list, smschild_list } = useAppSelector(state => state.settings)
   const [parent_id, setParentId] = useState<number | null>(null)
+  const [isSuccess, setIsSuccess] = useState<boolean>(false)
+
+  const studentIds = usersData?.map((student: any) => student.id)
+
   const formik: any = useFormik({
     initialValues: {
       message: ''
@@ -460,22 +467,19 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
     setLoading(true)
     const data = {
       ...value,
-      users: userData ? [userData.id] : usersData,
+      users: userData ? [studentIds.id] : studentIds,
       is_partly: isActive
     }
 
     try {
       await api.post(`common/send-message-user/`, data)
-      toast.success('Sms yuborildi')
-      setParentId(null)
       setLoading(false)
-      dispatch(setOpenEdit(null))
+      setIsSuccess(true)
       formik.resetForm()
       setIsErrorText(null)
       setIsActive(false)
       await dispatch(userData?.id)
     } catch (err: any) {
-
       if (err.response.status) {
         setIsErrorText(err.response.data.message)
         setLoading(false)
@@ -484,6 +488,13 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
         setLoading(false)
       }
     }
+  }
+
+  const handleSendMessages = () => {
+    setIsSuccess(false)
+    dispatch(setOpenEdit(null))
+    toast.success('Smslar yuborildi')
+    setParentId(null)
   }
 
   useEffect(() => {
@@ -500,101 +511,158 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
       aria-describedby='user-view-edit-description'
     >
       <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
-        {userData?.length ? (
-          <Typography>{t(`Xabar (${`smslar soni:${usersData?.length}` || 'sms'})`)}</Typography>
+        {isSuccess ? (
+          <Box display='flex' gap={2} justifyContent='center'>
+            <MailCheck size={25} color='#1F7D53' />
+            <Typography color='#1F7D53'>Smslar muvaffaqiyat yuborildi</Typography>
+          </Box>
+        ) : usersData?.length ? (
+          <Typography>{t(`Xabar (${`smslar soni: ${usersData?.length}` || 'sms'})`)}</Typography>
         ) : (
           <Typography>{t(`Xabar (sms)`)}</Typography>
         )}
       </DialogTitle>
+
       <DialogContent>
-        <form style={{ marginTop: 10 }} onSubmit={formik.handleSubmit}>
-          <FormControl sx={{ width: '100%', marginBottom: 5 }}>
-            <InputLabel size='small' id='demo-simple-select-outlined-label'>
-              {t('Kategoriya')}
-            </InputLabel>
-            <Select
-              size='small'
-              label={t('Kategoriya')}
-              name='parent'
-              onChange={(e: any) => setParentId(e.target.value)}
-              id='demo-simple-select-outlined'
-              labelId='demo-simple-select-outlined-label'
+        {isSuccess ? (
+          <Box
+            display='flex'
+            flexDirection='column'
+            alignItems='center'
+            justifyContent='center'
+            gap={2}
+          >
+            <Box component='nav' width='100%'>
+              <Box
+                component='ul'
+                display='grid'
+                padding={0}
+                gap={2}
+                paddingLeft={10}
+                margin={0}
+              >
+                {usersData.map((item: any) => (
+                  <Link
+                    key={item.id}
+                    href={`/mentors/view/security?id=${item.id}`}
+                    style={{
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      transition: 'color 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#007bff')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'inherit')}
+                  >
+                    <Box component='li'>
+                      {item.first_name}
+                    </Box>
+                  </Link>
+                ))}
+              </Box>
+            </Box>
+
+            <Button
+              variant='outlined'
+              onClick={handleSendMessages}
             >
-              {sms_list.map(item => (
-                <MenuItem value={item.id}>{item.description}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {parent_id && (
-            <FormControl sx={{ maxWidth: '100%' }} fullWidth>
+              Yaxshi
+            </Button>
+          </Box>
+
+        ) : (
+          <form style={{ marginTop: 10 }} onSubmit={formik.handleSubmit}>
+            <FormControl sx={{ width: '100%', marginBottom: 5 }}>
               <InputLabel size='small' id='demo-simple-select-outlined-label'>
-                {t('Shablonlar')}
+                {t('Kategoriya')}
               </InputLabel>
               <Select
                 size='small'
-                label={t('Shablonlar')}
-                value={formik.values.message}
+                label={t('Kategoriya')}
+                name='parent'
+                onChange={(e: any) => setParentId(e.target.value)}
                 id='demo-simple-select-outlined'
                 labelId='demo-simple-select-outlined-label'
-                onChange={e => formik?.setFieldValue('message', e.target.value)}
               >
-                {smschild_list.map((el: any) => (
-                  <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
-                    <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>
-                      {el.description}
-                    </span>
-                  </MenuItem>
+                {sms_list.map(item => (
+                  <MenuItem value={item.id}>{item.description}</MenuItem>
                 ))}
               </Select>
             </FormControl>
-          )}
-          <p style={{ fontSize: 12 }} className='mb-3 mt-2'>
-            {"Xabar matniga talaba ismini qo'shish uchun ${first_name} kalit so'zi qoldiring"}
-          </p>
-          <FormControl fullWidth>
-            <TextField
-              size='small'
-              name='message'
-              multiline
-              rows={4}
-              label={t('SMS matni ')}
-              onBlur={formik.handleBlur}
-              value={formik.values.message}
-              onChange={formik.handleChange}
-              error={!!formik.errors?.message && formik.touched.message}
-            />
-            <FormHelperText error={!!formik.errors.message && formik.touched.message}>
-              {formik.errors.message}
-            </FormHelperText>
-          </FormControl>
-          <p style={{ color: 'red', padding: 3 }}>{isErrorText}</p>
-          {isErrorText && (
-            <div className='d-flex align-items-start'>
-              <Checkbox checked={isActive} onChange={handleChangeActive} inputProps={{ 'aria-label': 'controlled' }} />
-              <p>Sms limit yetganicha habar yuborilsin (10) ta</p>
-            </div>
-          )}
-          <DialogActions sx={{ justifyContent: 'center' }}>
-            <Button
-              variant='outlined'
-              type='button'
-              color='secondary'
-              onClick={() => (
-                handleEditClose(),
-                formik.resetForm(),
-                setLoading(false),
-                setIsErrorText(null),
-                setParentId(null),
-                setIsActive(false)
-              )}
-            >
-              {t('Bekor qilish')}
-            </Button>
-            <LoadingButton loading={loading} type='submit' variant='contained' sx={{ mr: 1 }}>
-              {t('Yuborish')}
-            </LoadingButton>
-          </DialogActions>
-        </form>
+            {parent_id && (
+              <FormControl sx={{ maxWidth: '100%' }} fullWidth>
+                <InputLabel size='small' id='demo-simple-select-outlined-label'>
+                  {t('Shablonlar')}
+                </InputLabel>
+                <Select
+                  size='small'
+                  label={t('Shablonlar')}
+                  value={formik.values.message}
+                  id='demo-simple-select-outlined'
+                  labelId='demo-simple-select-outlined-label'
+                  onChange={e => formik?.setFieldValue('message', e.target.value)}
+                >
+                  {smschild_list.map((el: any) => (
+                    <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
+                      <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>
+                        {el.description}
+                      </span>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+            <p style={{ fontSize: 12 }} className='mb-3 mt-2'>
+              {"Xabar matniga talaba ismini qo'shish uchun ${first_name} kalit so'zi qoldiring"}
+            </p>
+            <FormControl fullWidth>
+              <TextField
+                size='small'
+                name='message'
+                multiline
+                rows={4}
+                label={t('SMS matni ')}
+                onBlur={formik.handleBlur}
+                value={formik.values.message}
+                onChange={formik.handleChange}
+                error={!!formik.errors?.message && formik.touched.message}
+              />
+              <FormHelperText error={!!formik.errors.message && formik.touched.message}>
+                {formik.errors.message}
+              </FormHelperText>
+            </FormControl>
+            <p style={{ color: 'red', padding: 3 }}>{isErrorText}</p>
+            {isErrorText && (
+              <div className='d-flex align-items-start'>
+                <Checkbox
+                  checked={isActive}
+                  onChange={handleChangeActive}
+                  inputProps={{ 'aria-label': 'controlled' }}
+                />
+                <p>Sms limit yetganicha habar yuborilsin (10) ta</p>
+              </div>
+            )}
+            <DialogActions sx={{ justifyContent: 'center' }}>
+              <Button
+                variant='outlined'
+                type='button'
+                color='secondary'
+                onClick={() => (
+                  handleEditClose(),
+                  formik.resetForm(),
+                  setLoading(false),
+                  setIsErrorText(null),
+                  setParentId(null),
+                  setIsActive(false)
+                )}
+              >
+                {t('Bekor qilish')}
+              </Button>
+              <LoadingButton loading={loading} type='submit' variant='contained' sx={{ mr: 1 }}>
+                {t('Yuborish')}
+              </LoadingButton>
+            </DialogActions>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   )

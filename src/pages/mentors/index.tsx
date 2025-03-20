@@ -1,12 +1,12 @@
 'use client'
 
 import { Box, Button, Chip, FormControlLabel, Pagination, Switch, Typography } from '@mui/material'
-import { ReactNode, useContext, useEffect, useState } from 'react'
+import { ChangeEvent, ReactNode, useContext, useEffect, useState } from 'react'
 import IconifyIcon from '../../components/icon'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { updateParams, setOpenEdit, setOpenSms } from 'src/store/apps/mentors'
+import { updateParams, setOpenEdit, setOpenSms, setTeacherData } from 'src/store/apps/mentors'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
 import useResponsive from 'src/@core/hooks/useResponsive'
@@ -24,6 +24,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
 import TeacherEditDialog from 'src/views/apps/mentors/TeacherEditDialog'
 import DataTable from '../../components/table'
+import api from '../../@core/utils/api'
+import { TacherItemType } from '../../types/apps/mentorsTypes'
 
 export type customTableProps = {
   xs: number
@@ -41,8 +43,8 @@ export default function GroupsPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { smsTemps, getSMSTemps } = useSMS()
-  const { teachers, queryParams, openSms } = useAppSelector(state => state.mentors)
-  const studentIds = teachers.map(student => student.id)
+  const { queryParams, openSms } = useAppSelector(state => state.mentors)
+  const [teachers, setTeachers] = useState<TacherItemType[]>()
 
   const handleEditClickOpen = (value: ModalTypes) => {
     dispatch(setOpenSms(value))
@@ -55,7 +57,22 @@ export default function GroupsPage() {
   }
 
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })
+    const getTeachers = async () => {
+      await api
+        .get(`${ceoConfigs.employee_checklist}?role=teacher`)
+        .then(data => {
+          setTeachers(data.data)
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    }
+
+    void getTeachers()
+  }, [])
+
+  useEffect(() => {
+    void queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })
   }, [user?.active_branch])
 
   const columns: customTableProps[] = [
@@ -119,7 +136,7 @@ export default function GroupsPage() {
   ]
 
   const rowClick = (id: any) => {
-    push(`/mentors/view/security?id=${id}`)
+    void push(`/mentors/view/security?id=${id}`)
   }
 
   useEffect(() => {
@@ -143,7 +160,7 @@ export default function GroupsPage() {
     dispatch(updateParams({ page }))
   }
 
-  const handleChangeStatus = async (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+  const handleChangeStatus = async (_: ChangeEvent<HTMLInputElement>, checked: boolean) => {
     dispatch(updateParams({ status: checked ? 'archive' : 'active', page: 1 }))
   }
 
@@ -192,7 +209,7 @@ export default function GroupsPage() {
         >
           <Button
             onClick={() => {
-              getSMSTemps()
+              void getSMSTemps()
               handleEditClickOpen('sms')
             }}
             variant='outlined'
@@ -236,7 +253,7 @@ export default function GroupsPage() {
         openEdit={openSms}
         smsTemps={smsTemps}
         setOpenEdit={setOpenSms}
-        usersData={studentIds}
+        usersData={teachers}
       />
     </div>
   )
