@@ -315,10 +315,10 @@ const UserViewSecurity = () => {
           style={
             {
               padding: '20px',
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               justifyContent: 'center',
-              gap: "10px",
+              gap: '10px',
               backgroundColor: isDark ? '#3a2a2e' : '#ffe4e6',
               textAlign: 'center',
               borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
@@ -348,12 +348,12 @@ const UserViewSecurity = () => {
           gap: '10px',
           textAlign: 'center',
           backgroundColor: '#edede9',
-          padding: '5px',
+          padding: '5px'
         }}
       >
         <ArrowLeftRight size={12} />
         <Typography variant='h6' fontSize={12}>
-          Tableda oynani to‘liq ko‘rish uchun aylantiring
+          Qolgan yoqlamalarni ko‘rish uchun ekrani garnizont bo‘yicha harakatlantiring.
         </Typography>
       </Box>
 

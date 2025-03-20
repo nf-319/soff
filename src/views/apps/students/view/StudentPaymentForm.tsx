@@ -246,7 +246,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <FormControl sx={{ width: '100%' }}>
                 <DatePicker
-                  label='Payment Date'
+                  label="To'lov sanasi"
                   value={values.payment_date ? dayjs(values.payment_date) : null}
                   onChange={newValue => {
                     handleChange({ target: { name: 'payment_date', value: newValue } })
