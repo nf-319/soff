@@ -192,29 +192,44 @@ const UserViewSecurity = () => {
   }, [query?.year, query?.month])
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!query?.month || !query?.id || isGettingAttendance) return
+    if (!initialized.current && month_list.length > 0) {
+      initialized.current = true;
 
-      dispatch(setGettingAttendance(true))
+      let targetIndex = -1;
+      if (query?.month) {
+        targetIndex = month_list.findIndex(
+          item => getMontName(Number(item.date.split("-")[1])) === query.month
+        );
+      }
 
-      try {
-        const year = query?.year || new Date().getFullYear()
-        const monthNumber = getMontNumber(query?.month)
-        const attendanceDate = `${year}-${monthNumber}`
+      if (targetIndex === -1) {
+        targetIndex = month_list.length - 1;
+      }
 
-        await Promise.all([
-          dispatch(getDays({ date: attendanceDate, group: query?.id })),
-          dispatch(getAttendance({ date: attendanceDate, group: query?.id, queryString })),
-        ])
-      } catch (error) {
-        console.error("Error fetching data:", error)
-      } finally {
-        dispatch(setGettingAttendance(false))
+      setCurrentMonth(targetIndex);
+
+      if (!isGettingAttendance) {
+        dispatch(setGettingAttendance(true));
+
+        const year = query?.year || new Date().getFullYear();
+        const month = query?.month
+          ? getMontNumber(query?.month)
+          : month_list[targetIndex].date.split("-")[1];
+
+        dispatch(getDays({ date: `${year}-${month}`, group: query?.id }))
+          .then(() => {
+            return dispatch(getAttendance({
+              date: `${year}-${month}`,
+              group: query?.id,
+              queryString
+            }));
+          })
+          .finally(() => {
+            dispatch(setGettingAttendance(false));
+          });
       }
     }
-
-    void fetchData()
-  }, [query?.month, query?.id, queryString, dispatch])
+  }, [month_list, query?.month, query?.id]);
 
   useEffect(() => {
     if (!initialized.current && month_list.length > 0) {
@@ -252,15 +267,17 @@ const UserViewSecurity = () => {
   useEffect(() => {
     const fetchAttendance = async () => {
       if (query?.month && query?.id && !isGettingAttendance) {
-        dispatch(setGettingAttendance(true))
-        await dispatch(getAttendance({ date: attendanceDate, group: query?.id, queryString }))
-        await dispatch(getDays({ date: attendanceDate, group: query?.id }))
-        dispatch(setGettingAttendance(false))
+        dispatch(setGettingAttendance(true));
+        try {
+          await dispatch(getAttendance({ date: attendanceDate, group: query?.id, queryString }));
+        } finally {
+          dispatch(setGettingAttendance(false));
+        }
       }
-    }
+    };
 
-    void fetchAttendance()
-  }, [queryParams.status, queryString])
+    void fetchAttendance();
+  }, [queryParams.status]);
 
   return (
     <Paper
@@ -315,10 +332,10 @@ const UserViewSecurity = () => {
           style={
             {
               padding: '20px',
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               justifyContent: 'center',
-              gap: "10px",
+              gap: '10px',
               backgroundColor: isDark ? '#3a2a2e' : '#ffe4e6',
               textAlign: 'center',
               borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
@@ -348,12 +365,12 @@ const UserViewSecurity = () => {
           gap: '10px',
           textAlign: 'center',
           backgroundColor: '#edede9',
-          padding: '5px',
+          padding: '5px'
         }}
       >
         <ArrowLeftRight size={12} />
         <Typography variant='h6' fontSize={12}>
-          Tableda oynani to‘liq ko‘rish uchun aylantiring
+          Qolgan yoqlamalarni ko‘rish uchun ekrani garnizont bo‘yicha harakatlantiring.
         </Typography>
       </Box>
 

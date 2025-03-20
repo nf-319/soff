@@ -40,15 +40,15 @@ export const CeoContent = ({ soffBotText, date, setTypingComplete }: CeoContentP
                 : "Hozircha hech qanday guruh ma'lumotlari mavjud emas."
 
             const incomeByTypesText =
-              soffBotText?.income_by_types?.length > 0
+              Array.isArray(soffBotText?.income_by_types) && soffBotText.income_by_types.length > 0
                 ? soffBotText.income_by_types
-                    .map(
-                      (item: { type: string; income: number }) =>
-                        `. <span style="color: #0077FF; font-weight: 500;">${
-                          item.type
-                        }</span>: ${Boolean(item.income) && item.income.toLocaleString('uz-UZ')} so'm`
-                    )
-                    .join('<br>')
+                  .map(
+                    (item: { type: string; income: number }) =>
+                      `. <span style="color: #0077FF; font-weight: 500;">${item.type}</span>: ${
+                        item.income.toLocaleString('uz-UZ')
+                      } so'm`
+                  )
+                  .join('<br>')
                 : "Hozircha hech qanday to'lov ma'lumotlari mavjud emas."
 
             const message = `
@@ -66,7 +66,7 @@ export const CeoContent = ({ soffBotText, date, setTypingComplete }: CeoContentP
 
   <p style="font-size: 16px;">
             <strong style="color: #555;">💰 To'lov turlari: <br/></strong> <span style="color: #28a745;">${
-              soffBotText?.income_by_types?.length !== 0 && incomeByTypesText
+              incomeByTypesText
             }</span>
           </p>
 

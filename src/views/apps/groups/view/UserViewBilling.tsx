@@ -149,7 +149,7 @@ const UserViewBilling = () => {
       title: t('Chegirmadagi kurs narxi'),
       dataIndex: 'student',
       render: (student: any) =>
-        student.personal_amount ? `${formatCurrency(student.personal_amount?.amount)}` : "yo'q"
+        student.personal_amount ? `${formatCurrency(student.personal_amount?.amount)} so'm` : "yo'q"
     },
     {
       xs: 0.12,
