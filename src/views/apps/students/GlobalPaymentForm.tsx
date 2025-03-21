@@ -28,6 +28,7 @@ import { disablePage } from 'src/store/apps/page'
 import { formatPhoneNumber } from '../../../components/phone-input/format-phone-number'
 import { useTranslation } from 'react-i18next'
 import api from 'src/@core/utils/api'
+import useResponsive from '../../../@core/hooks/useResponsive'
 
 type Props = {}
 
@@ -41,6 +42,7 @@ export default function GlobalPaymentForm({}: Props) {
   const [groups, setGroups] = useState([])
   const [groupData, setGroupData] = useState<any>(null)
   const dispatch = useAppDispatch()
+  const { isMobile } = useResponsive()
   const { studentData } = useAppSelector(state => state.students)
   const { createPayment, paymentMethods, getPaymentMethod } = usePayment()
 
@@ -186,7 +188,7 @@ export default function GlobalPaymentForm({}: Props) {
   }, [search])
 
   return (
-    <Box>
+    <Box sx={isMobile ? { width: '100%' } : { width: '450px' }}>
       <iframe src='' id='printFrame' style={{ display: 'none' }}></iframe>
       {step === 'search' || step === 'pay' ? (
         <form onSubmit={e => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -196,6 +198,7 @@ export default function GlobalPaymentForm({}: Props) {
                 size='small'
                 placeholder={t("O'quvchini qidiring... (Ismi yoki telefon raqami)")}
                 name='search'
+                fullWidth
                 value={formik.values.search}
                 onChange={e => (setStudentList([]), formik.handleChange(e))}
                 onBlur={formik.handleBlur}
