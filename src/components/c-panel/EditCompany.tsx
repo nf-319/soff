@@ -54,7 +54,7 @@ const EditCompany = () => {
       payment_service: details?.payment_service || 'by_coming_date',
       number_of_lesson: details?.number_of_lesson || '',
       expiration_date: details?.expiration_date || '',
-      show_students: false
+      // show_students: false
     },
     validationSchema,
     onSubmit: async values => {
@@ -190,21 +190,21 @@ const EditCompany = () => {
             </Select>
           </FormControl>
 
-          <FormControl fullWidth>
-            <FormLabel>O'quvchi qarzdorligi o'qtuvchiga ko'rinsinmi?</FormLabel>
+          {/*<FormControl fullWidth>*/}
+          {/*  <FormLabel>O'quvchi qarzdorligi o'qtuvchiga ko'rinsinmi?</FormLabel>*/}
 
-            <RadioGroup
-              defaultValue='false'
-              row
-              name='show_students'
-              value={formik.values.show_students}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            >
-              <FormControlLabel control={<Radio />} value={true} label='Ha' />
-              <FormControlLabel control={<Radio />} value={false} label="Yo'q" />
-            </RadioGroup>
-          </FormControl>
+          {/*  <RadioGroup*/}
+          {/*    defaultValue='false'*/}
+          {/*    row*/}
+          {/*    name='show_students'*/}
+          {/*    value={formik.values.show_students}*/}
+          {/*    onChange={formik.handleChange}*/}
+          {/*    onBlur={formik.handleBlur}*/}
+          {/*  >*/}
+          {/*    <FormControlLabel control={<Radio />} value={true} label='Ha' />*/}
+          {/*    <FormControlLabel control={<Radio />} value={false} label="Yo'q" />*/}
+          {/*  </RadioGroup>*/}
+          {/*</FormControl>*/}
 
           <LoadingButton loading={loading} variant='contained' type='submit'>
             {t('Saqlash')}

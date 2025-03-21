@@ -45,12 +45,12 @@ export default function CreateCompany() {
   async function handleSubmit(values: FormData) {
     setLoading(true)
     try {
-      const show_students = values.get('show_students') === 'true'
+      // const show_students = values.get('show_students') === 'true'
       const file = values.get('file')
 
       const formattedValues = {
         ...Object.fromEntries(values.entries()),
-        show_students,
+        // show_students,
         file,
       }
 
@@ -224,14 +224,14 @@ export default function CreateCompany() {
               </Select>
             </FormControl>
 
-            <FormControl fullWidth>
-              <FormLabel>O'quvchi qarzdorligi o'qtuvchiga ko'rinsinmi?</FormLabel>
+            {/*<FormControl fullWidth>*/}
+            {/*  <FormLabel>O'quvchi qarzdorligi o'qtuvchiga ko'rinsinmi?</FormLabel>*/}
 
-              <RadioGroup defaultValue="false" row name="show_students">
-                <FormControlLabel control={<Radio />} value="true" label="Ha" />
-                <FormControlLabel control={<Radio />} value="false" label="Yo'q" />
-              </RadioGroup>
-            </FormControl>
+            {/*  <RadioGroup defaultValue="false" row name="show_students">*/}
+            {/*    <FormControlLabel control={<Radio />} value="true" label="Ha" />*/}
+            {/*    <FormControlLabel control={<Radio />} value="false" label="Yo'q" />*/}
+            {/*  </RadioGroup>*/}
+            {/*</FormControl>*/}
 
             <FormControl fullWidth>
               <TextField
