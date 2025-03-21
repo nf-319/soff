@@ -24,8 +24,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
 import TeacherEditDialog from 'src/views/apps/mentors/TeacherEditDialog'
 import DataTable from '../../components/table'
-import api from '../../@core/utils/api'
-import { TacherItemType } from '../../types/apps/mentorsTypes'
 
 export type customTableProps = {
   xs: number
@@ -46,6 +44,9 @@ export default function GroupsPage() {
   const { queryParams, openSms } = useAppSelector(state => state.mentors)
 
   const { data: teachers }  = useGet(`${ceoConfigs.employee_checklist}?role=teacher`)
+
+  const studentIds = teachers?.map((student: any) => student.id)
+
 
   const handleEditClickOpen = (value: ModalTypes) => {
     dispatch(setOpenSms(value))
@@ -238,8 +239,9 @@ export default function GroupsPage() {
         handleEditClose={handleEditClose}
         openEdit={openSms}
         smsTemps={smsTemps}
+        teacherData={teachers}
         setOpenEdit={setOpenSms}
-        usersData={teachers}
+        usersData={studentIds}
       />
     </div>
   )

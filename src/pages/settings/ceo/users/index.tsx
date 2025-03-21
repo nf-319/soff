@@ -43,14 +43,15 @@ export default function GroupsPage() {
   // Hooks
   const { t } = useTranslation()
   const { getEmployeeById } = useEmployee()
-  const { employees, is_pending, employees_count, queryParams, roles, openSms,employee_id } = useAppSelector(
+  const { employees, is_pending, employees_count, queryParams, roles, openSms, employee_id } = useAppSelector(
     state => state.settings
   )
 
-  const {isMobile} = useResponsive()
+  const { isMobile } = useResponsive()
+
 
   const dispatch = useAppDispatch()
-  const { smsTemps, getSMSTemps } = useSMS()
+  const { smsTemps } = useSMS()
   const { push } = useRouter()
   const { user } = useContext(AuthContext)
 
@@ -60,12 +61,11 @@ export default function GroupsPage() {
     const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
     const [smallLoading, setSmallLoading] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
-    const { smsTemps, getSMSTemps } = useSMS()
+    const { getSMSTemps } = useSMS()
 
     const rowOptionsOpen = Boolean(anchorEl)
 
     const handleRowOptionsClick = (event: MouseEvent<HTMLElement>) => {
-
       setAnchorEl(event.currentTarget)
     }
     const handleRowOptionsClose = () => {
@@ -241,7 +241,7 @@ export default function GroupsPage() {
       title: t(''),
       render: actions => (
         <Box sx={{ textAlign: 'end' }}>
-          <RowOptions  id={actions} />
+          <RowOptions id={actions} />
         </Box>
       )
     }
@@ -297,7 +297,7 @@ export default function GroupsPage() {
       <VideoHeader item={videoUrls.employees} />
       <Box
         className='groups-page-header'
-        sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0',width:'100%' }}
+        sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0', width: '100%' }}
         py={2}
       >
         <Typography variant='h5'>{t('Xodimlar')}</Typography>
@@ -313,7 +313,7 @@ export default function GroupsPage() {
 
       <Box
         sx={{
-          alignItems: isMobile?'start':'center',
+          alignItems: isMobile ? 'start' : 'center',
           display: 'flex',
           gap: '10px',
           '& > *': {
@@ -322,14 +322,14 @@ export default function GroupsPage() {
         }}
       >
         <ButtonGroup
-      size="small"
-          aria-label="Small button group"
-          sx={{display:'flex',flexDirection:isMobile ? 'column':'row'}}
-      orientation={isMobile ? 'vertical' : 'horizontal'}
-      fullWidth={isMobile}
-    >
-      {buttons}
-    </ButtonGroup>
+          size='small'
+          aria-label='Small button group'
+          sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}
+          orientation={isMobile ? 'vertical' : 'horizontal'}
+          fullWidth={isMobile}
+        >
+          {buttons}
+        </ButtonGroup>
         <Link href='/settings/ceo/users/attandance-table'>
           <Button variant='contained' size='medium'>
             Xodimlar Davomati
