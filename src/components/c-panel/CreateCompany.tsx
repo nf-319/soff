@@ -1,11 +1,11 @@
 import {
   Box,
-  FormControl,
+  FormControl, FormControlLabel,
   FormHelperText,
   FormLabel,
   Input,
   InputLabel,
-  MenuItem,
+  MenuItem, Radio, RadioGroup,
   Select,
   TextField,
   Typography
@@ -23,10 +23,6 @@ import showResponseError from '../../@core/utils/show-response-error'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { today } from '../card-statistics/kanban-item'
 
-type Props = {
-  slug?: number | undefined
-}
-
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
   clipPath: 'inset(50%)',
@@ -39,24 +35,39 @@ const VisuallyHiddenInput = styled('input')({
   width: 1
 })
 
-export default function CreateCompany({ slug }: Props) {
+export default function CreateCompany() {
   const [error, setError] = useState<any>({})
   const { isMobile } = useResponsive()
   const { t } = useTranslation()
   const [loading, setLoading] = useState<boolean>(false)
   const [selectVal, setSelectVal] = useState<any>(null)
 
-  async function handleSubmit(values: any) {
+  async function handleSubmit(values: FormData) {
     setLoading(true)
     try {
-      await api.post(`/owner/create/client/`, values)
-      Router.push('/c-panel')
+      const show_students = values.get('show_students') === 'true'
+      const file = values.get('file')
+
+      const formattedValues = {
+        ...Object.fromEntries(values.entries()),
+        show_students,
+        file,
+      }
+
+      await api.post(`/owner/create/client/`, formattedValues, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      void Router.push('/c-panel')
     } catch (err: any) {
       showResponseError(err?.response?.data, setError)
     } finally {
       setLoading(false)
     }
   }
+
 
   return (
     <Box>
@@ -211,6 +222,15 @@ export default function CreateCompany({ slug }: Props) {
                 <MenuItem value={'by_lesson_price'}>Xar dars uchun pul yechish</MenuItem>
                 <MenuItem value={'number_of_lesson'}>Har nechtadur darsda</MenuItem>
               </Select>
+            </FormControl>
+
+            <FormControl fullWidth>
+              <FormLabel>O'quvchi qarzdorligi o'qtuvchiga ko'rinsinmi?</FormLabel>
+
+              <RadioGroup defaultValue="false" row name="show_students">
+                <FormControlLabel control={<Radio />} value="true" label="Ha" />
+                <FormControlLabel control={<Radio />} value="false" label="Yo'q" />
+              </RadioGroup>
             </FormControl>
 
             <FormControl fullWidth>
