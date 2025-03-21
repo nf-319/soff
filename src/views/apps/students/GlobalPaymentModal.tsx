@@ -22,13 +22,12 @@ export default function GlobalPaymentModal({}: Props) {
   const { t } = useTranslation()
 
   return (
-    <div>
-      <Dialog open={global_pay} onClose={closeModal}>
-        <DialogTitle sx={{ textAlign: 'center' }}>{t("O'quvchi uchun to'lov")}</DialogTitle>
-        <DialogContent sx={{ minWidth: '450px', padding: '0 20px 40px' }}>
-          <GlobalPaymentForm />
-        </DialogContent>
-      </Dialog>
-    </div>
+    <Dialog open={global_pay} onClose={closeModal}>
+      <DialogTitle sx={{ textAlign: 'center' }}>{t("O'quvchi uchun to'lov")}</DialogTitle>
+
+      <DialogContent>
+        <GlobalPaymentForm />
+      </DialogContent>
+    </Dialog>
   )
 }

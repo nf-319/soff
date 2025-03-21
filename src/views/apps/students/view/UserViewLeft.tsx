@@ -435,7 +435,7 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
 
 export default UserViewLeft
 
-export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData, usersData }: any) => {
+export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData, teacherData, usersData }: any) => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
@@ -444,8 +444,6 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
   const { sms_list, smschild_list } = useAppSelector(state => state.settings)
   const [parent_id, setParentId] = useState<number | null>(null)
   const [isSuccess, setIsSuccess] = useState<boolean>(false)
-
-  const studentIds = usersData?.map((student: any) => student.id)
 
   const formik: any = useFormik({
     initialValues: {
@@ -467,7 +465,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
     setLoading(true)
     const data = {
       ...value,
-      users: userData ? [studentIds.id] : studentIds,
+      users: userData ? [userData.id] : usersData,
       is_partly: isActive
     }
 
@@ -531,7 +529,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
           <Box display='flex' flexDirection='column' alignItems='center' justifyContent='center' gap={2}>
             <Box component='nav' width='100%'>
               <Box component='ul' display='grid' padding={0} gap={2} paddingLeft={10} margin={0}>
-                {usersData.map((item: any) => (
+                {teacherData.map((item: any) => (
                   <Link
                     key={item.id}
                     href={`/mentors/view/security?id=${item.id}`}
