@@ -3,21 +3,25 @@
 import { useState, useEffect, useCallback } from 'react'
 import toast from 'react-hot-toast'
 import api from 'src/@core/utils/api'
+import { getEnglish } from '../../@core/utils/getEnglish'
+import { uuidRegex } from '../qrCode-Modal'
 
 export default function QRCodeScanner() {
   const [scannedCode, setScannedCode] = useState<string>('')
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
 
-  const isEnglish = (text: string) => /^[A-Za-z0-9-]*$/.test(text)
-  const uuidRegex = /^.{8}-.{4}-.{4}-.{4}-.{12}$/
-
   const handleSendQrCode = useCallback(async (code: string): Promise<void> => {
-    if (!uuidRegex.test(code)) {
+    console.log('QR Code:', code)
+
+    if (!getEnglish(code)) {
+      console.log('English validation failed:', code)
+      toast.error("Qurilmangiz tili Ingliz tilida ekanligini tekshiring!")
       return
     }
 
-    if (!isEnglish(code)) {
-      toast.error("Qurilmangiz tili Ingliz tilida ekanligini tekshiring!")
+    if (!uuidRegex.test(code)) {
+      console.log('QR Code format incorrect:', code)
+      toast.error("QR kod noto'g'ri formatda")
       return
     }
 
@@ -26,11 +30,11 @@ export default function QRCodeScanner() {
       const res = await api.post(`common/attendance/by-qr-code/${code}/`)
       if (res.status === 200) {
         toast.success('Muvaffaqiyatli', {
-          style: { zIndex: 999999999 }
+          style: { zIndex: 999999999 },
         })
       }
     } catch (err: any) {
-      console.error(err)
+      console.error('API error:', err)
       if (err?.response?.status === 404) {
         toast.error("Ma'lumot topilmadi")
       } else {
@@ -49,49 +53,35 @@ export default function QRCodeScanner() {
       if (isProcessing) return
 
       const key = event.key
+
       if (key === 'Enter') {
         if (scannedCode) {
-          if (uuidRegex.test(scannedCode)) {
-            if (!isEnglish(scannedCode)) {
-              toast.error("Qurilmangiz tili Ingliz tilida ekanligini tekshiring!")
-              setScannedCode('')
-              return
-            } else {
-              void handleSendQrCode(scannedCode)
-            }
-          }
+          void handleSendQrCode(scannedCode)
         }
         return
       }
 
-      const newCode = scannedCode + key
-      setScannedCode(newCode)
+      setScannedCode((prev) => prev + key)
 
       if (timer) clearTimeout(timer)
 
       timer = setTimeout(() => {
-        if (uuidRegex.test(newCode)) {
-          if (!isEnglish(newCode)) {
-            toast.error("Qurilmangiz tili Ingliz tilida ekanligini tekshiring!")
-            setScannedCode('')
-            return
-          }
-
-          void handleSendQrCode(newCode)
-        } else if (newCode.length >= 36) {
+        if (uuidRegex.test(scannedCode)) {
+          void handleSendQrCode(scannedCode)
+        } else if (scannedCode.length >= 36) {
           setScannedCode('')
         }
-      }, 500)
+      }, 100)
     }
 
-    window.addEventListener('keypress', handleKeyPress)
+    window.focus()
+    window.addEventListener('keydown', handleKeyPress)
 
     return () => {
-      window.removeEventListener('keypress', handleKeyPress)
+      window.removeEventListener('keydown', handleKeyPress)
       if (timer) clearTimeout(timer)
     }
   }, [scannedCode, isProcessing, handleSendQrCode])
 
   return <div />
 }
-
