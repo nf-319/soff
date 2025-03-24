@@ -1,0 +1,1 @@
+export { StudentPoints } from './StudentsPoints'
