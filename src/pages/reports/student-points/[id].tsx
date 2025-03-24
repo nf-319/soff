@@ -19,8 +19,8 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  CircularProgress,
-} from '@mui/material';
+  CircularProgress, Chip
+} from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -176,27 +176,49 @@ const StudentPointsDetailPages: FC = () => {
 
   return (
     <Box style={{ padding: 16 }}>
-      <Paper style={{ padding: 16, marginBottom: 24 }}>
-        <Box style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Paper
+        style={{
+          padding: 24,
+          marginBottom: 24,
+          borderRadius: 12,
+          boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
+          background: '#fff'
+        }}
+      >
+        <Box
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 16
+          }}
+        >
           <Box>
-            <Typography variant='h5'>{student.first_name}</Typography>
-            <Typography variant='subtitle1' color='textSecondary'>
+            <Typography variant='h4' style={{ fontWeight: 600, marginBottom: 8 }}>
+              {student.first_name}
+            </Typography>
+            <Typography style={{ color: '#666', marginBottom: 4 }}>
               Filial: {student.branches.map(branch => branch.name).join(', ')}
             </Typography>
-            <Typography variant='body2' color='textSecondary'>
-              {student.phone}
-            </Typography>
+            <Typography style={{ color: '#666' }}>Telefon raqami: {student.phone}</Typography>
           </Box>
+
           <Box style={{ textAlign: 'right' }}>
-            <Box display="flex" gap={4} alignItems={'center'}>
-              <Typography variant='h4' style={{ fontWeight: 'bold' }}>
+            <div style={{ marginBottom: 8 }}>
+              <Typography
+                style={{
+                  fontSize: 36,
+                  fontWeight: 700,
+                  color: '#666cff',
+                  lineHeight: 1
+                }}
+              >
                 {student.total_points}
               </Typography>
-              <span>Jami ballar</span>
-            </Box>
-            <Typography variant='h6' color='textSecondary'>
-              O'rin: {student.rank}
-            </Typography>
+              <Typography style={{ color: '#666' }}>Jami ballar</Typography>
+            </div>
+            <Chip variant='outlined' color='primary' label={`O'rin: ${student.rank}`} />
           </Box>
         </Box>
       </Paper>
@@ -206,58 +228,80 @@ const StudentPointsDetailPages: FC = () => {
           marginBottom: 16,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          gap: 16
         }}
       >
-        <Typography variant='h6'>Ballar tarixi</Typography>
-        <Box style={{ display: 'flex', gap: 8 }}>
-          <Button
-            variant='contained'
-            startIcon={<AddIcon />}
-            disabled={isCreating}
-            onClick={() => setOpenAddModal(true)}
-          >
-            Ball qo'shish
-          </Button>
-        </Box>
+        <Typography variant='h5' style={{ fontWeight: 600 }}>
+          Ballar tarixi
+        </Typography>
+        <Button
+          variant='contained'
+          startIcon={<AddIcon />}
+          disabled={isCreating}
+          onClick={() => setOpenAddModal(true)}
+          style={{
+            minWidth: 160,
+            borderRadius: 8,
+            textTransform: 'none'
+          }}
+        >
+          Ball qo'shish
+        </Button>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
+      <TableContainer
+        component={Paper}
+        style={{
+          borderRadius: 12,
+          border: '1px solid #eee',
+          overflowX: 'auto'
+        }}
+      >
+        <Table style={{ minWidth: 600 }}>
+          <TableHead style={{ background: '#f5f5f5' }}>
             <TableRow>
-              <TableCell>Sana</TableCell>
-              <TableCell>Ball</TableCell>
-              <TableCell>Tavsif</TableCell>
-              <TableCell>Kim tomonidan</TableCell>
-              <TableCell align='right'>Amallar</TableCell>
+              <TableCell style={{ fontWeight: 600 }}>Sana</TableCell>
+              <TableCell style={{ fontWeight: 600 }}>Ball</TableCell>
+              <TableCell style={{ fontWeight: 600 }}>Tavsif</TableCell>
+              <TableCell style={{ fontWeight: 600 }}>Kim tomonidan</TableCell>
+              <TableCell align='right' style={{ fontWeight: 600 }}>
+                Amallar
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {student.points.length > 0 ? (
-              student.points.map(point => (
-                <TableRow key={point.id}>
-                  <TableCell>{point.created_at ? new Date(point.created_at).toLocaleDateString() : 'N/A'}</TableCell>
-                  <TableCell>{point.point}</TableCell>
-                  <TableCell>{point.description}</TableCell>
-                  <TableCell>{point.created_by}</TableCell>
-                  <TableCell align='right'>
-                    <IconButton size='small' color='primary' onClick={() => handleEditClick(point)}>
-                      <EditIcon fontSize='small' />
-                    </IconButton>
-                    <IconButton size='small' color='error' onClick={() => handleDeleteClick(point)}>
-                      <DeleteIcon fontSize='small' />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} align='center'>
-                  Ball tranzaksiyalari topilmadi
+            {student.points.map(point => (
+              <TableRow key={point.id} style={{ borderBottom: '1px solid #eee' }}>
+                <TableCell>{point.created_at ? new Date(point.created_at).toLocaleDateString() : 'N/A'}</TableCell>
+                <TableCell>{point.point}</TableCell>
+                <TableCell style={{ maxWidth: 300 }}>
+                  <div
+                    style={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                  >
+                    {point.description}
+                  </div>
+                </TableCell>
+                <TableCell>{point.created_by}</TableCell>
+                <TableCell align='right'>
+                  <IconButton
+                    size='small'
+                    color='primary'
+                    onClick={() => handleEditClick(point)}
+                    style={{ marginRight: 8 }}
+                  >
+                    <EditIcon fontSize='small' />
+                  </IconButton>
+                  <IconButton size='small' color='error' onClick={() => handleDeleteClick(point)}>
+                    <DeleteIcon fontSize='small' />
+                  </IconButton>
                 </TableCell>
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -272,6 +316,7 @@ const StudentPointsDetailPages: FC = () => {
             value={editFormData.point}
             onChange={e => setEditFormData({ ...editFormData, point: Number(e.target.value) })}
             margin='normal'
+            style={{ marginBottom: 16 }}
           />
           <TextField
             fullWidth
@@ -284,10 +329,27 @@ const StudentPointsDetailPages: FC = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEditModal(false)} disabled={isUpdating}>
+          <Button
+            style={{
+              color: '#666',
+              border: '1px solid #ddd',
+              borderRadius: 8
+            }}
+            onClick={() => setOpenEditModal(false)}
+            disabled={isUpdating}
+          >
             Bekor qilish
           </Button>
-          <Button onClick={handleEditSave} variant='contained' disabled={isUpdating}>
+          <Button
+            style={{
+              borderRadius: 8,
+              color: 'white',
+              marginLeft: 12
+            }}
+            onClick={handleEditSave}
+            variant='contained'
+            disabled={isUpdating}
+          >
             {isUpdating ? <CircularProgress size={24} /> : 'Saqlash'}
           </Button>
         </DialogActions>
@@ -338,6 +400,25 @@ const StudentPointsDetailPages: FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {isLoading && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(255,255,255,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999
+          }}
+        >
+          <CircularProgress />
+        </div>
+      )}
     </Box>
   )
 };

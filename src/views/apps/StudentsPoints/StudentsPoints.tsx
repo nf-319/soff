@@ -7,8 +7,8 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import { StudentPointsFilter } from './ui/StudentPointsFilter'
 import { DataGrid, GridPagination } from '@mui/x-data-grid'
-import { Chip, Dialog, DialogTitle, DialogContent, DialogActions, TextField, FormControl, InputLabel, Select, MenuItem, Autocomplete } from '@mui/material'
-import { useGet, usePost, usePatch } from 'src/hooks/useApi'
+import { Chip, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Autocomplete } from '@mui/material'
+import { useGet, usePost } from 'src/hooks/useApi'
 import { uzbekLocaleText } from './constants'
 import api from 'src/@core/utils/api'
 import useDebounce from 'src/hooks/useDebounce'
@@ -48,11 +48,19 @@ export const StudentPoints = () => {
   const [pageSize, setPageSize] = useState(parseInt(router.query.pageSize as string) || 10)
   const [search, setSearch] = useState('')
   const debounceSearch = useDebounce(search, 400)
+  const { search: searchQuery, branch, start_date, end_date } = router.query
+
+  console.log(branch)
 
   const { mutate: addMutate } = usePost()
-  const { mutate: editMutate } = usePatch()
-  const { data: pointStudents, isLoading: pointStudentLoading, refetch } = useGet(
-    `student/points/?limit=${pageSize}&offset=${page * pageSize}`
+  const {
+    data: pointStudents,
+    isLoading: pointStudentLoading,
+    refetch
+  } = useGet(
+    `student/points/?limit=${pageSize}&offset=${page * pageSize}&search=${searchQuery || ''}&branch=${
+      branch || ''
+    }&start_date=${start_date || ''}&end_date=${end_date || ''}`
   )
 
   useEffect(() => {
