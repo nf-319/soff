@@ -1,12 +1,5 @@
-import React from 'react'
-import EditCompany from '../../../components/c-panel/EditCompany'
+import EditCompany from 'src/components/c-panel/EditCompany'
 
-type Props = {}
+const Edit = () => <EditCompany />
 
-export default function Edit({ }: Props) {
-    return (
-        <div>
-            <EditCompany />
-        </div>
-    )
-}
+export default Edit

@@ -110,9 +110,9 @@ const AppBarContent = (props: Props) => {
 
         <VideoModal />
 
-        {!isMobile && user?.role !== 'student' && (
+        {user?.role !== 'student' && (
           <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {user?.role !== 'student' && (
+            {!isMobile && (
               <>
                 <Autocomplete
                   open={open}
@@ -162,6 +162,7 @@ const AppBarContent = (props: Props) => {
                     <TextField {...params} placeholder='Qidirish...' onChange={e => setSearch(e.target.value)} />
                   )}
                 />
+
                 <Tooltip title='Davomat' arrow>
                   <span
                     style={{
@@ -179,15 +180,26 @@ const AppBarContent = (props: Props) => {
                     </svg>
                   </span>
                 </Tooltip>
-                <Button variant='contained' size='small' sx={{ margin: '0 7px' }} onClick={clickGlobalPay}>
+
+                <Button
+                  variant='contained'
+                  size='small'
+                  sx={{ margin: '0 7px', height: '32px' }}
+                  onClick={clickGlobalPay}
+                >
                   <span>{t("To'lov")}</span>
                 </Button>
               </>
             )}
           </Box>
         )}
+        {isMobile && user?.currentRole !== "student" && (
+          <Button variant='contained' size='small' sx={{ margin: '0 7px', height: '32px' }} onClick={clickGlobalPay}>
+            <span>{t("To'lov")}</span>
+          </Button>
+        )}
         <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
-          <LanguageDropdown settings={settings} saveSettings={saveSettings} />
+          {/*<LanguageDropdown settings={settings} saveSettings={saveSettings} />*/}
           {user?.currentRole === 'student' && <QrcodeScanner />}
           <NotificationDropdown settings={settings} />
           <UserDropdown settings={settings} />

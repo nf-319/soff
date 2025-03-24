@@ -24,7 +24,6 @@ export interface ExamType {
 const GroupExamsList = () => {
   const dispatch = useAppDispatch()
   const { exams, resultId, isGettingExams } = useAppSelector(state => state.groupDetails)
-  const { user } = useContext(AuthContext)
 
   const { query } = useRouter()
   const { t } = useTranslation()
@@ -151,18 +150,16 @@ const GroupExamsList = () => {
         <ExamResults />
       ) : (
         <Box className='demo-space-y'>
-          {user && user.role[0] !== 'teacher' && (
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', margin: 0 }}>
-              <Button
-                variant='contained'
-                sx={{ marginLeft: '15px' }}
-                size='small'
-                onClick={() => dispatch(setOpen('add'))}
-              >
-                {t('Yaratish')}
-              </Button>
-            </div>
-          )}
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', margin: 0 }}>
+            <Button
+              variant='contained'
+              sx={{ marginLeft: '15px' }}
+              size='small'
+              onClick={() => dispatch(setOpen('add'))}
+            >
+              {t('Yaratish')}
+            </Button>
+          </div>
           <DataTable maxWidth='100%' minWidth='450px' loading={isGettingExams} data={exams} columns={columns} />
           <AddExam />
           <EditExam />

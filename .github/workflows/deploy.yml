@@ -52,6 +52,7 @@ jobs:
             if [ ! -d ".git" ]; then
                 git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
             else
+                git stash
                 git pull origin main
             fi
 
@@ -89,6 +90,7 @@ jobs:
             if [ ! -d ".git" ]; then
                 git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
             else
+                git stash
                 git pull origin test
             fi
 

@@ -1,12 +1,14 @@
+'use client'
+
 import { Box, BoxProps, IconButton, styled, Typography, TypographyProps } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { EmptyContent } from '../../components/empty-content'
-import IconifyIcon from '../../components/icon'
+import { EmptyContent } from 'src/components/empty-content'
 import { NotificationsType } from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchNotification } from 'src/store/apps/user'
+import { ChevronLeft } from 'lucide-react'
 
 const MenuItemTitle = styled(Typography)<TypographyProps>(({ theme }) => ({
   fontWeight: 600,
@@ -62,7 +64,7 @@ export default function Notifications() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <IconButton onClick={back} color='primary'>
-            <IconifyIcon icon={'ep:back'} style={{ cursor: 'pointer' }} />
+            <ChevronLeft />
           </IconButton>
 
           <Typography variant='h5'>{t('Xabarnomalar')}</Typography>

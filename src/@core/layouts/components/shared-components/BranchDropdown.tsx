@@ -1,5 +1,8 @@
-import Icon from '../../../../components/icon'
-import OptionsMenu from '../../../../components/option-menu'
+'use client'
+
+import { useRouter } from 'next/router'
+import Icon from 'src/components/icon'
+import OptionsMenu from 'src/components/option-menu'
 import { Typography } from '@mui/material'
 import api from 'src/@core/utils/api'
 import { useContext } from 'react'
@@ -7,12 +10,21 @@ import { AuthContext } from 'src/context/AuthContext'
 
 const BranchDropdown = () => {
   const { user, initAuth } = useContext(AuthContext)
+  const router = useRouter()
 
   const handleLangItemClick = async (id: number) => {
     try {
       if (user?.active_branch !== id) {
         await api.post('auth/branch-update/', { branch: id })
         initAuth()
+
+        const currentPath = window.location.pathname
+
+        if (currentPath.includes('/groups')) {
+          void router.replace('/groups')
+        } else if (currentPath.includes('/students')) {
+          void router.replace('/students')
+        }
       }
     } catch (err) {
       console.error(err)
@@ -36,14 +48,12 @@ const BranchDropdown = () => {
             sx: { py: 2 },
             selected: Number(el.id) === Number(user.active_branch),
             onClick: () => {
-              handleLangItemClick(el.id)
-            }
-          }
+              void handleLangItemClick(el.id)
+            },
+          },
         }))}
     />
-  ) : (
-    <></>
-  )
+  ) : null
 }
 
 export default BranchDropdown

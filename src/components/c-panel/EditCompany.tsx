@@ -7,23 +7,25 @@ import {
   Select,
   TextField,
   Typography,
-  Button
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio
 } from '@mui/material'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppSelector } from '../../store'
 import LoadingButton from '@mui/lab/LoadingButton'
-import IconifyIcon from '../icon'
 import useResponsive from '../../@core/hooks/useResponsive'
 import api from '../../@core/utils/api'
 import Router from 'next/router'
 import showResponseError from '../../@core/utils/show-response-error'
 import toast from 'react-hot-toast'
 
-const EditCompany = ({ slug }: { slug?: any }) => {
-  const { details, isLoading } = useAppSelector(state => state.companyDetails)
+const EditCompany = () => {
+  const { details } = useAppSelector(state => state.companyDetails)
   const { isMobile } = useResponsive()
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
@@ -51,7 +53,8 @@ const EditCompany = ({ slug }: { slug?: any }) => {
       reference_phone: details?.reference_phone || '+998',
       payment_service: details?.payment_service || 'by_coming_date',
       number_of_lesson: details?.number_of_lesson || '',
-      expiration_date: details?.expiration_date || ''
+      expiration_date: details?.expiration_date || '',
+      show_students: false
     },
     validationSchema,
     onSubmit: async values => {
@@ -59,7 +62,7 @@ const EditCompany = ({ slug }: { slug?: any }) => {
       setLoading(true)
       try {
         await api.patch(`/owner/client/${details?.id}/`, values)
-        Router.push('/c-panel')
+        void Router.push('/c-panel')
         toast.success("O'zgartirildi")
       } catch (err: any) {
         showResponseError(err?.response?.data, formik.setErrors)
@@ -166,27 +169,42 @@ const EditCompany = ({ slug }: { slug?: any }) => {
               />
             </FormControl>
           )}
-           <FormControl className='ms-auto' fullWidth>
-                        <InputLabel size='small' id='user-view-language-label'>
-                          {t('Oylik turi')}
-                        </InputLabel>
-                        <Select
+          <FormControl className='ms-auto' fullWidth>
+            <InputLabel size='small' id='user-view-language-label'>
+              {t('Oylik turi')}
+            </InputLabel>
+            <Select
+              size='small'
+              label={t('Oylik turi')}
+              id='user-view-language'
+              labelId='user-view-language-label'
+              name='salary_service'
+              value={formik.values.salary_service}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.salary_service && Boolean(formik.errors.salary_service)}
+            >
+              <MenuItem value={'by_course_price'}>Kurs narxidan oylik hisoblash</MenuItem>
+              <MenuItem value={'by_student_arrears'}>Yechilgan puldan oylik hisoblash</MenuItem>
+              <MenuItem value={'by_student_payments'}>To'langan puldan oylik hisoblash</MenuItem>
+            </Select>
+          </FormControl>
 
-                          size='small'
-                          label={t('Oylik turi')}
-                          id='user-view-language'
-                          labelId='user-view-language-label'
-                          name='salary_service'
-                          value={formik.values.salary_service}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          error={formik.touched.salary_service && Boolean(formik.errors.salary_service)}
-                        >
-                          <MenuItem value={'by_course_price'}>Kurs narxidan oylik hisoblash</MenuItem>
-                          <MenuItem value={'by_student_arrears'}>Yechilgan puldan oylik hisoblash</MenuItem>
-                          <MenuItem value={'by_student_payments'}>To'langan puldan oylik hisoblash</MenuItem>
-                        </Select>
-                      </FormControl>
+          <FormControl fullWidth>
+            <FormLabel>O'quvchi qarzdorligi o'qtuvchiga ko'rinsinmi?</FormLabel>
+
+            <RadioGroup
+              defaultValue='false'
+              row
+              name='show_students'
+              value={formik.values.show_students}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            >
+              <FormControlLabel control={<Radio />} value={true} label='Ha' />
+              <FormControlLabel control={<Radio />} value={false} label="Yo'q" />
+            </RadioGroup>
+          </FormControl>
 
           <LoadingButton loading={loading} variant='contained' type='submit'>
             {t('Saqlash')}

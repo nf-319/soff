@@ -163,8 +163,7 @@ const AppBarContent = (props: Props) => {
               </span>
             </Tooltip>
 
-            <Button variant='contained' size='small' sx={{ margin: '0 7px' }} onClick={clickGlobalPay}>
-              <IconifyIcon fontSize={18} icon={'weui:add-outlined'} />
+            <Button variant='contained' size='small' sx={{ margin: '0 7px', height: '32px' }} onClick={clickGlobalPay}>
               <span>{t("To'lov")}</span>
             </Button>
           </>
@@ -174,7 +173,7 @@ const AppBarContent = (props: Props) => {
 
       <VideoModal />
 
-      <LanguageDropdown settings={settings} saveSettings={saveSettings} />
+      {/*<LanguageDropdown settings={settings} saveSettings={saveSettings} />*/}
       {user?.currentRole === 'student' && <QrcodeScanner />}
       <NotificationDropdown settings={settings} />
       <UserDropdown settings={settings} />
