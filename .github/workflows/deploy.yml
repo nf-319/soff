@@ -14,22 +14,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Set up Node.js (local runner)
         uses: actions/setup-node@v3
         with:
-          node-version: '20.10.0'
-          cache: 'npm'
+          node-version: 'v20.12.2'
 
-      - name: Install dependencies
-        run: npm ci --no-audit --prefer-offline
+      - name: Install dependencies (local runner)
+        run: npm install
 
-      - name: Create env file
+      - name: create env file
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "${{ secrets.PROD_ENV_CONTENT }}" > .env
-          else
-            echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
-          fi
+          touch .env
+          echo "${{ secrets.TEST_ENV_CONTENT }}" >> .env
+          touch .env
+          echo "${{ secrets.PROD_ENV_CONTENT }}" >> .env
 
       - name: Deploy to production server (for main branch)
         if: github.ref == 'refs/heads/main'
@@ -39,105 +37,35 @@ jobs:
           username: ubuntu
           password: ${{ secrets.PROD_SERVER_PASSWORD }}
           script: |
-            #!/bin/bash
-            set -e
-
-            # Asosiy o'zgaruvchilar
-            APP_NAME="subdomain-soffcrm-uz-3132"
-            MAIN_DIR="$HOME/CRMFrondEnd/cicd/${{ secrets.REPO_NAME }}"
-            DEPLOY_DIR="$HOME/CRMFrondEnd/cicd/deployments"
-            CURRENT_DEPLOY_DIR="$DEPLOY_DIR/$(date +%Y%m%d_%H%M%S)"
-            CURRENT_LINK="$DEPLOY_DIR/current"
-            PREVIOUS_LINK="$DEPLOY_DIR/previous"
-
-            # Deployments katalogini yaratish
-            mkdir -p $DEPLOY_DIR
-            mkdir -p $CURRENT_DEPLOY_DIR
-
-            # NVM setup va Node versiyani global o'zgaruvchiga eksport qilish
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            if ! command -v nvm &> /dev/null; then
+            # NVM o'rnatilganligini tekshirish va kerakli Node.js versiyasini tanlash
+            if [ ! -d "$HOME/.nvm" ]; then
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
-              export NVM_DIR="$HOME/.nvm"
-              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+              source ~/.nvm/nvm.sh
+            else
+              source ~/.nvm/nvm.sh
             fi
-            nvm install 20.10.0
             nvm use 20.10.0
 
-            # Ushbu qatorlar Node.js-ni global PATH-ga qo'shadi
-            export PATH="$NVM_DIR/versions/node/v20.10.0/bin:$PATH"
-            NODE_PATH=$(which node)
-            NPM_PATH=$(which npm)
-            echo "Node.js path: $NODE_PATH"
-            echo "npm path: $NPM_PATH"
-            echo "Node.js version: $(node -v)"
-            echo "npm version: $(npm -v)"
-
-            # PM2 o'rnatilgan bo'lishi kerak
-            if ! command -v pm2 &> /dev/null; then
-              npm install -g pm2
+            # Loyihaning joylashuvini yaratish va loyihani olish
+            mkdir -p ~/CRMFrondEnd/cicd/${{ secrets.REPO_NAME }}
+            cd ~/CRMFrondEnd/cicd/${{ secrets.REPO_NAME }}
+            if [ ! -d ".git" ]; then
+                git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
+            else
+                git stash
+                git pull origin main
             fi
 
-            # Yangi versiyani deploy qilish
-            cd $CURRENT_DEPLOY_DIR
-            git clone --depth 1 --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
+            # .env faylini yuklash
             echo "${{ secrets.PROD_ENV_CONTENT }}" > .env
 
-            # Loyihani build qilish
-            export NODE_OPTIONS="--max-old-space-size=8192"
-            npm ci --no-audit --prefer-offline
+            # Kerakli kutubxonalarni o'rnatish va loyihani build qilish
+            npm install
             npm run build
 
-            # Joriy versiyani saqlash
-            if [ -L "$CURRENT_LINK" ]; then
-              if [ -L "$PREVIOUS_LINK" ]; then
-                rm "$PREVIOUS_LINK"
-              fi
-
-              mv "$CURRENT_LINK" "$PREVIOUS_LINK"
-            fi
-
-            # Yangi versiyani "current" qilish
-            ln -sf "$CURRENT_DEPLOY_DIR" "$CURRENT_LINK"
-
-            # Loyihani ishga tushirish
-            PM2_RUNNING=$(pm2 list | grep "$APP_NAME" | wc -l)
-            if [ "$PM2_RUNNING" -gt 0 ]; then
-              # Restart config file bilan - loyiha ishlab turgan holatda
-              # O'ZGARUVCHILARNI ENDI TO'G'RI ALMASHTIRISH KERAK!
-              cat > "$CURRENT_DEPLOY_DIR/ecosystem.config.js" << EOF
-              module.exports = {
-                apps: [{
-                  name: '${APP_NAME}',
-                  cwd: '${CURRENT_LINK}',
-                  script: 'npm',
-                  args: 'start',
-                  instances: 1,
-                  autorestart: true,
-                  watch: false,
-                  max_memory_restart: '1G',
-                  env: {
-                    NODE_ENV: 'production'
-                  }
-                }]
-              };
-            EOF
-            echo "PM2 reloading app: $APP_NAME"
-              pm2 reload "$CURRENT_DEPLOY_DIR/ecosystem.config.js" --update-env
-              pm2 list
-              else
-              # Birinchi marta ishga tushirish
-              cd "$CURRENT_LINK"
-            echo "PM2 starting app for first time: $APP_NAME"
-              pm2 start npm --name "$APP_NAME" -- start
-              pm2 list
-              fi
-
-              pm2 save
-
-            # Eski deployment'larni o'chirish (4 tadan ortiq bo'lsa)
-            ls -dt "$DEPLOY_DIR"/*/ | grep -v "$(readlink -f "$CURRENT_LINK")" | grep -v "$(readlink -f "$PREVIOUS_LINK" 2>/dev/null || echo 'none')" | tail -n +4 | xargs -I {} rm -rf {} || true
+            # PM2 orqali jarayonlarni boshqarish
+            pm2 restart subdomain-soffcrm-uz-3132 || pm2 start npm --name subdomain-soffcrm-uz-3132 -- start
+            pm2 save
 
       - name: Deploy to development server (for test branch)
         if: github.ref == 'refs/heads/test'
@@ -147,102 +75,32 @@ jobs:
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
-            #!/bin/bash
-            set -e
-
-            # Asosiy o'zgaruvchilar
-            APP_NAME="${{ secrets.REPO_NAME }}-test"
-            MAIN_DIR="/projects/crm-front/${{ secrets.REPO_NAME }}"
-            DEPLOY_DIR="/projects/crm-front/deployments/${{ secrets.REPO_NAME }}"
-            CURRENT_DEPLOY_DIR="$DEPLOY_DIR/$(date +%Y%m%d_%H%M%S)"
-            CURRENT_LINK="$DEPLOY_DIR/current"
-            PREVIOUS_LINK="$DEPLOY_DIR/previous"
-
-            # Deployments katalogini yaratish
-            mkdir -p $DEPLOY_DIR
-            mkdir -p $CURRENT_DEPLOY_DIR
-
-            # NVM setup va Node versiyani global o'zgaruvchiga eksport qilish
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            if ! command -v nvm &> /dev/null; then
+            # NVM o'rnatilganligini tekshirish va kerakli Node.js versiyasini tanlash
+            if [ ! -d "$HOME/.nvm" ]; then
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
-              export NVM_DIR="$HOME/.nvm"
-              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+              source ~/.nvm/nvm.sh
+            else
+              source ~/.nvm/nvm.sh
             fi
-            nvm install 20.10.0
             nvm use 20.10.0
 
-            # Ushbu qatorlar Node.js-ni global PATH-ga qo'shadi
-            export PATH="$NVM_DIR/versions/node/v20.10.0/bin:$PATH"
-            NODE_PATH=$(which node)
-            NPM_PATH=$(which npm)
-            echo "Node.js path: $NODE_PATH"
-            echo "npm path: $NPM_PATH"
-            echo "Node.js version: $(node -v)"
-            echo "npm version: $(npm -v)"
-
-            # PM2 o'rnatilgan bo'lishi kerak
-            if ! command -v pm2 &> /dev/null; then
-              npm install -g pm2
+            # Loyihaning joylashuvini yaratish va loyihani olish
+            mkdir -p /projects/crm-front/${{ secrets.REPO_NAME }}
+            cd /projects/crm-front/${{ secrets.REPO_NAME }}
+            if [ ! -d ".git" ]; then
+                git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
+            else
+                git stash
+                git pull origin test
             fi
 
-            # Yangi versiyani deploy qilish
-            cd $CURRENT_DEPLOY_DIR
-            git clone --depth 1 --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
+            # .env faylini yuklash
             echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
 
-            # Loyihani build qilish
-            export NODE_OPTIONS="--max-old-space-size=8192"
-            npm ci --no-audit --prefer-offline
+            # Kerakli kutubxonalarni o'rnatish va loyihani build qilish
+            npm install
             npm run build
 
-            # Joriy versiyani saqlash
-            if [ -L "$CURRENT_LINK" ]; then
-              if [ -L "$PREVIOUS_LINK" ]; then
-                rm "$PREVIOUS_LINK"
-              fi
-
-              mv "$CURRENT_LINK" "$PREVIOUS_LINK"
-            fi
-
-            # Yangi versiyani "current" qilish
-            ln -sf "$CURRENT_DEPLOY_DIR" "$CURRENT_LINK"
-
-            # Loyihani ishga tushirish
-            PM2_RUNNING=$(pm2 list | grep "$APP_NAME" | wc -l)
-            if [ "$PM2_RUNNING" -gt 0 ]; then
-              # Restart config file bilan - loyiha ishlab turgan holatda
-              # O'ZGARUVCHILARNI ENDI TO'G'RI ALMASHTIRISH KERAK!
-              cat > "$CURRENT_DEPLOY_DIR/ecosystem.config.js" << EOF
-              module.exports = {
-                apps: [{
-                  name: '${APP_NAME}',
-                  cwd: '${CURRENT_LINK}',
-                  script: 'npm',
-                  args: 'start',
-                  instances: 1,
-                  autorestart: true,
-                  watch: false,
-                  max_memory_restart: '1G',
-                  env: {
-                    NODE_ENV: 'production'
-                  }
-                }]
-              };
-            EOF
-
-            echo "PM2 reloading app: $APP_NAME"
-              pm2 reload "$CURRENT_DEPLOY_DIR/ecosystem.config.js" --update-env
-              pm2 list
-              else
-              cd "$CURRENT_LINK"
-            echo "PM2 starting app for first time: $APP_NAME"
-              pm2 start npm --name "$APP_NAME" -- start
-              pm2 list
-              fi
-
-              pm2 save
-
-              # Eski deployment'larni o'chirish (4 tadan ortiq bo'lsa)
-              ls -dt "$DEPLOY_DIR"/*/ | grep -v "$(readlink -f "$CURRENT_LINK")" | grep -v "$(readlink -f "$PREVIOUS_LINK" 2>/dev/null || echo 'none')" | tail -n +4 | xargs -I {} rm -rf {} || true
+            # PM2 orqali jarayonlarni boshqarish
+            pm2 restart ${{ secrets.REPO_NAME }}-test || pm2 start npm --name ${{ secrets.REPO_NAME }}-test -- start
+            pm2 save
