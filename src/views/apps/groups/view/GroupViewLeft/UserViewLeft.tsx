@@ -21,11 +21,10 @@ import OnlineLessonModal from './OnlineLessonModal'
 import { useAuth } from 'src/hooks/useAuth'
 
 const UserViewLeft = () => {
-  const { studentsQueryParams, isGettingStudents } = useAppSelector(state => state.groupDetails)
+  const { studentsQueryParams, isGettingStudents, groupData } = useAppSelector(state => state.groupDetails)
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
   const { query } = useRouter()
-  const { user } = useAuth()
 
   const queryString = useMemo(() => {
     return new URLSearchParams(studentsQueryParams).toString()
@@ -35,13 +34,14 @@ const UserViewLeft = () => {
     dispatch(getStudents({ id: query.id, queryString }))
   }, [queryString])
 
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <GroupDetails />
       </Grid>
 
-      {user?.currentRole !== 'teacher' && (
+      {groupData?.show_students && (
         <Grid item xs={12}>
           <CardContent sx={{ p: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '10px' }}>
