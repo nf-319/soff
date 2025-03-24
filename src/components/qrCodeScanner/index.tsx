@@ -11,17 +11,15 @@ export default function QRCodeScanner() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
 
   const handleSendQrCode = useCallback(async (code: string): Promise<void> => {
-    console.log('QR Code:', code)
-
     if (!getEnglish(code)) {
-      console.log('English validation failed:', code)
       toast.error("Qurilmangiz tili Ingliz tilida ekanligini tekshiring!")
+      setScannedCode('')
       return
     }
 
     if (!uuidRegex.test(code)) {
-      console.log('QR Code format incorrect:', code)
       toast.error("QR kod noto'g'ri formatda")
+      setScannedCode('')
       return
     }
 
@@ -49,10 +47,28 @@ export default function QRCodeScanner() {
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null
 
+    const ignoredKeys = [
+      'CapsLock', 'Tab', 'Escape', 'Backspace', 'Alt', 'Control', 'Shift',
+      'Meta', 'Dead', 'ContextMenu', 'Insert', 'Delete', 'PageUp', 'PageDown',
+      'Home', 'End', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+      'NumLock', 'ScrollLock', 'Pause', 'PrintScreen'
+    ]
+
     const handleKeyPress = (event: KeyboardEvent): void => {
       if (isProcessing) return
 
       const key = event.key
+      const code = event.code
+
+      if (
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey ||
+        ignoredKeys.includes(code)
+      ) {
+        return
+      }
 
       if (key === 'Enter') {
         if (scannedCode) {
