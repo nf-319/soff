@@ -67,7 +67,6 @@ export default function GroupDetails({
 }: GroupDetailsProps) {
 
   const [qrModalOpen, setQrModalOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState(0)
   const mediaQuery = useMediaQuery('(max-width: 600px)')
   const [qrCodeImage, setQrCodeImage] = useState<string | null>(null)
   const [isLoadingQrCode, setIsLoadingQrCode] = useState(false)
@@ -105,11 +104,6 @@ export default function GroupDetails({
       .join(', ')
   }
 
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue)
-  }
-
   const fetchQrCodeImage = async () => {
     try {
       setIsLoadingQrCode(true)
@@ -127,6 +121,7 @@ export default function GroupDetails({
 
     const link = document.createElement('a')
     link.href = qrCodeImage
+    link.target = '_blank'
     link.download = `group-${groupData?.name}-qr.png`
     document.body.appendChild(link)
     link.click()
@@ -515,39 +510,28 @@ export default function GroupDetails({
       </Card>
 
       <Dialog open={qrModalOpen} onClose={() => setQrModalOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}>{t('Guruh QR kodi')}</DialogTitle>
+        <DialogTitle style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)', textAlign: "center" }}>{t('Guruh QR kodi')}</DialogTitle>
         <DialogContent style={{ padding: '16px' }}>
-          <DialogContentText style={{ marginBottom: '16px' }}>
-            {t('Ushbu QR kod orqali guruhda davomat qilish mumkin')}
+          <DialogContentText style={{ marginBottom: '16px', textAlign: "center" }}>
+            {t('QR kodni o‘quvchilarga ko‘rsating, ular o‘z profillariga kirib skaner qilganda, davomati avtomatik yozib olinadi.\n')}
           </DialogContentText>
-
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            variant="fullWidth"
-            style={{ marginBottom: '16px', borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
-          >
-            <Tab label={t('QR Kod')} />
-            <Tab label={t('Ma\'lumot')} />
-          </Tabs>
-
-          {activeTab === 0 && (
             <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 0' }}>
               <Box
                 style={{
                   border: '1px solid rgba(0, 0, 0, 0.12)',
-                  padding: '16px',
                   borderRadius: '8px',
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-                  backgroundColor: 'white'
+                  backgroundColor: 'white',
+                  overflow: "hidden"
                 }}
               >
                 {isLoadingQrCode ? (
                   <Skeleton variant="rectangular" width={mediaQuery ? 200 : 400} height={mediaQuery ? 200 : 400} />
                 ) : (
                   <Image
-                    src={qrCodeImage || '/placeholder.svg'}
+                    src={qrCodeImage || 'https://me-qr.com/static/pages/all-pricing-img/top-img.webp'}
                     alt="Group QR Code"
+                    style={{ objectFit: "contain" }}
                     width={mediaQuery ? 200 : 400}
                     height={mediaQuery ? 200 : 400}
                   />
@@ -562,52 +546,6 @@ export default function GroupDetails({
                 {t('Yuklab olish')}
               </Button>
             </Box>
-          )}
-
-          {activeTab === 1 && (
-            <Box style={{ padding: '16px 0' }}>
-              <Box style={{ marginBottom: '12px' }}>
-                <Typography variant="subtitle2" style={{ fontWeight: 500 }}>
-                  {t('Guruh nomi')}
-                </Typography>
-                <Typography variant="body1">{groupData?.name}</Typography>
-                <Divider style={{ margin: '8px 0' }} />
-              </Box>
-
-              <Box style={{ marginBottom: '12px' }}>
-                <Typography variant="subtitle2" style={{ fontWeight: 500 }}>
-                  {t('Kurs')}
-                </Typography>
-                <Typography variant="body1">{groupData?.course_data?.name}</Typography>
-                <Divider style={{ margin: '8px 0' }} />
-              </Box>
-
-              <Box style={{ marginBottom: '12px' }}>
-                <Typography variant="subtitle2" style={{ fontWeight: 500 }}>
-                  {t('O\'qituvchi')}
-                </Typography>
-                <Typography variant="body1">{groupData?.teacher_data?.first_name}</Typography>
-                <Divider style={{ margin: '8px 0' }} />
-              </Box>
-
-              <Box style={{ marginBottom: '12px' }}>
-                <Typography variant="subtitle2" style={{ fontWeight: 500 }}>
-                  {t('O\'quvchilar soni')}
-                </Typography>
-                <Typography variant="body1">{groupData?.student_count} ta</Typography>
-                <Divider style={{ margin: '8px 0' }} />
-              </Box>
-
-              <Box>
-                <Typography variant="subtitle2" style={{ fontWeight: 500 }}>
-                  {t('Dars vaqti')}
-                </Typography>
-                <Typography variant="body1">
-                  {groupData && `${t(getLessonDays(groupData?.day_of_week || ''))} ${groupData?.start_at}`}
-                </Typography>
-              </Box>
-            </Box>
-          )}
         </DialogContent>
       </Dialog>
     </>

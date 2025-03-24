@@ -128,7 +128,7 @@ export const AttendanceTable = ({
         overflowX: 'auto',
         overflowY: 'hidden',
         '& table': {
-          minWidth: days?.length <= 7 ? '100%' : (150 + (days?.length * 60)) + 'px'
+          minWidth: days?.length <= 7 ? '100%' : 150 + days?.length * 60 + 'px'
         }
       }}
     >
@@ -294,34 +294,38 @@ export const AttendanceTable = ({
                   }
                 >
                   <td style={stickyColumnStyles}>
-                    {student.id !== 'placeholder' ? (
-                      <Typography
-                        style={
-                          {
-                            fontWeight: 500,
-                            color: isDark ? '#fff' : '#000',
-                            whiteSpace: 'normal',
-                            wordWrap: 'normal',
-                            wordBreak: 'normal',
-                            maxWidth: '150px',
-                            width: '100%'
-                          } as React.CSSProperties
-                        }
-                      >
-                        {student.first_name}
-                      </Typography>
-                    ) : (
-                      <Typography
-                        style={
-                          {
-                            fontWeight: 500,
-                            color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)'
-                          } as React.CSSProperties
-                        }
-                      >
-                        {student.first_name}
-                      </Typography>
-                    )}
+                    <div style={{ overflow: 'hidden' }}>
+                      {student.id !== 'placeholder' ? (
+                        <Tooltip title={student.first_name} placement='top'>
+                          <Typography
+                            style={
+                              {
+                                fontWeight: 500,
+                                color: isDark ? '#fff' : '#000',
+                                whiteSpace: 'normal',
+                                wordWrap: 'normal',
+                                wordBreak: 'normal',
+                                maxWidth: '150px',
+                                width: '100%'
+                              } as React.CSSProperties
+                            }
+                          >
+                            {student.first_name}
+                          </Typography>
+                        </Tooltip>
+                      ) : (
+                        <Typography
+                          style={
+                            {
+                              fontWeight: 500,
+                              color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)'
+                            } as React.CSSProperties
+                          }
+                        >
+                          {student.first_name}
+                        </Typography>
+                      )}
+                    </div>
                   </td>
 
                   {displayDays.map((hour: any, dayIndex: number) => {
@@ -338,6 +342,7 @@ export const AttendanceTable = ({
                               borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
                             } as React.CSSProperties
                           }
+
                         >
                           <UserViewItem
                             currentDate={null}

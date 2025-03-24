@@ -1,12 +1,6 @@
-import React from 'react'
-import CreateCompany from '../../../components/c-panel/CreateCompany'
+import CreateCompany from 'src/components/c-panel/CreateCompany'
 
-type Props = {}
+const Create = ()  => <CreateCompany />
 
-export default function Create({ }: Props) {
-  return (
-    <div>
-      <CreateCompany />
-    </div>
-  )
-}
+Create.displayName = 'Create'
+export default Create

@@ -9,7 +9,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, ChangeEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import api from 'src/@core/utils/api'
@@ -19,8 +19,11 @@ import { Icon } from '@iconify/react'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { Done } from '@mui/icons-material'
 import useDebounce from 'src/hooks/useDebounce'
+import { getEnglish } from 'src/@core/utils/getEnglish'
 
-const isEnglish = (text: string) => /^[A-Za-z0-9-]*$/.test(text)
+export const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+export const uuidAllRegex = /^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$/
+
 
 const QrCodeModal = () => {
   const { isQrCodeModalOpen } = useAppSelector(state => state.page)
@@ -34,7 +37,6 @@ const QrCodeModal = () => {
   const [userData, setUserData] = useState<any | null>(null)
 
   const validateUUID = (id: string) => {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
     return uuidRegex.test(id)
   }
 
@@ -48,8 +50,13 @@ const QrCodeModal = () => {
   const handleSendQrCode = async (id: string) => {
     if (!id) return
 
+    if (!getEnglish(id)) {
+      setErrorText("Qurilmangiz tili Ingliz tilida ekanligini tekshiring!")
+      return
+    }
+
     if (!validateUUID(id)) {
-      setErrorText("Noto'g'ri ID format")
+      setErrorText("QR kod noto'g'ri formatda")
       return
     }
 
@@ -80,19 +87,15 @@ const QrCodeModal = () => {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value
-    if (!isEnglish(text)) {
-      setErrorText("Qurilmangiz tili Ingliz tilida ekanligini tekshiring!")
-    } else {
       setErrorText('')
       setStudentId(text)
-    }
   }
 
   useEffect(() => {
     if (debouncedStudentId) {
-      handleSendQrCode(debouncedStudentId)
+      void handleSendQrCode(debouncedStudentId)
     }
   }, [debouncedStudentId])
 
@@ -118,13 +121,14 @@ const QrCodeModal = () => {
         <TextField
           type='text'
           size='small'
+          autoFocus
           fullWidth
           error={Boolean(errorText)}
           sx={{ marginTop: 1.2 }}
           value={studentId}
-          label={t('Qr code')}
+          label={t('Qr kod')}
           onChange={handleChange}
-          placeholder='Scan or enter QR code'
+          placeholder='QR kodni skanerlang yoki kiriting'
         />
 
         {errorText && (
