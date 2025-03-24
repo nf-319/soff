@@ -22,6 +22,8 @@ import useDebounce from 'src/hooks/useDebounce'
 import { getEnglish } from 'src/@core/utils/getEnglish'
 
 export const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+export const uuidAllRegex = /^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$/
+
 
 const QrCodeModal = () => {
   const { isQrCodeModalOpen } = useAppSelector(state => state.page)

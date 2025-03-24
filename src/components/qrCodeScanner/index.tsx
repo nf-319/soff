@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import toast from 'react-hot-toast'
 import api from 'src/@core/utils/api'
 import { getEnglish } from '../../@core/utils/getEnglish'
-import { uuidRegex } from '../qrCode-Modal'
+import { uuidAllRegex, uuidRegex } from '../qrCode-Modal'
 
 export default function QRCodeScanner() {
   const [scannedCode, setScannedCode] = useState<string>('')
@@ -71,8 +71,10 @@ export default function QRCodeScanner() {
       }
 
       if (key === 'Enter') {
-        if (scannedCode) {
+        if (scannedCode && scannedCode.length === 36) {
           void handleSendQrCode(scannedCode)
+        } else {
+          setScannedCode('')
         }
         return
       }
@@ -82,9 +84,10 @@ export default function QRCodeScanner() {
       if (timer) clearTimeout(timer)
 
       timer = setTimeout(() => {
-        if (uuidRegex.test(scannedCode)) {
-          void handleSendQrCode(scannedCode)
-        } else if (scannedCode.length >= 36) {
+        const currentCode = scannedCode + key
+        if (uuidRegex.test(currentCode)) {
+          void handleSendQrCode(currentCode)
+        } else if (currentCode.length >= 36) {
           setScannedCode('')
         }
       }, 100)
