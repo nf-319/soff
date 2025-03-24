@@ -8,28 +8,50 @@ import Button from '@mui/material/Button'
 import { StudentPointsFilter } from './ui/StudentPointsFilter'
 import { DataGrid, GridPagination } from '@mui/x-data-grid'
 import { Chip, Dialog, DialogTitle, DialogContent, DialogActions, TextField, FormControl, InputLabel, Select, MenuItem, Autocomplete } from '@mui/material'
-import { useGet } from 'src/hooks/useApi'
-import ceoConfigs from 'src/configs/ceo'
+import { useGet, usePost, usePatch } from 'src/hooks/useApi'
 import { uzbekLocaleText } from './constants'
 import api from 'src/@core/utils/api'
 import useDebounce from 'src/hooks/useDebounce'
+import toast from 'react-hot-toast'
+import * as yup from 'yup'
+import { useFormik } from 'formik'
+import Link from 'next/link'
+
+interface Student {
+  id: number;
+  first_name: string;
+  phone: string;
+  total_points: number;
+  branch?: string;
+  rank?: number;
+}
+
+const validationSchema = yup.object({
+  points: yup
+    .number()
+    .required('Ball majburiy')
+    .min(1, 'Ball 1 dan kam bo\'lmasligi kerak'),
+  reason: yup
+    .string()
+    .required('Sabab majburiy'),
+  selectedStudent: yup
+    .object()
+    .nullable()
+    .required('O\'quvchini tanlash majburiy')
+})
 
 export const StudentPoints = () => {
   const router = useRouter()
   const [openAddModal, setOpenAddModal] = useState(false)
-  const [openEditModal, setOpenEditModal] = useState(false)
-  const [selectedStudent, setSelectedStudent] = useState<any>(null)
-  const [points, setPoints] = useState('')
-  const [reason, setReason] = useState('')
-  const [students, setStudents] = useState([])
-  const [selectedStudentId, setSelectedStudentId] = useState('')
+  const [students, setStudents] = useState<Student[]>([])
   const [page, setPage] = useState(parseInt(router.query.page as string) || 0)
   const [pageSize, setPageSize] = useState(parseInt(router.query.pageSize as string) || 10)
   const [search, setSearch] = useState('')
   const debounceSearch = useDebounce(search, 400)
 
-  const { data: studentsData } = useGet(ceoConfigs.students)
-  const { data: pointStudents, isLoading: pointStudentLoading } = useGet(
+  const { mutate: addMutate } = usePost()
+  const { mutate: editMutate } = usePatch()
+  const { data: pointStudents, isLoading: pointStudentLoading, refetch } = useGet(
     `student/points/?limit=${pageSize}&offset=${page * pageSize}`
   )
 
@@ -46,21 +68,41 @@ export const StudentPoints = () => {
     }, undefined, { shallow: true })
   }, [page, pageSize])
 
-  const handleAddPoints = () => {
-    setOpenAddModal(false)
-    setPoints('')
-    setReason('')
-    setSelectedStudentId('')
-  }
-
-  const handleEditPoints = () => {
-    setOpenEditModal(false)
-    setSelectedStudent(null)
-  }
+  const formik = useFormik({
+    initialValues: {
+      points: '',
+      reason: '',
+      selectedStudent: null as Student | null
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      try {
+        if (values.selectedStudent) {
+          await addMutate("student/point/", {
+            user: values.selectedStudent.id,
+            point: values.points,
+            description: values.reason
+          })
+          refetch()
+          setOpenAddModal(false)
+          toast.success("Muvaffaqiyatli qo'shildi")
+          formik.resetForm()
+        }
+      } catch (e) {
+        console.error(e)
+        toast.error("Xatolik yuz berdi, iltimos qaytadan urinib ko'ring")
+      }
+    }
+  })
 
   const handleSearchStudents = async (search: string) => {
-    const response = await api.get(`student/new-list/?status=active&search=${search}`)
-    setStudents(response.data.results)
+    try {
+      const response = await api.get(`student/new-list/?status=active&search=${search}`)
+      setStudents(response.data.results)
+    } catch (error) {
+      console.error('Error searching students:', error)
+      setStudents([])
+    }
   }
 
   useEffect(() => {
@@ -73,56 +115,79 @@ export const StudentPoints = () => {
 
   const columns = [
     {
-      field: 'id',
+      field: 'rank',
       headerName: "O'rin",
       width: 100,
-      sortable: true,
-      renderCell: (params: any) => (
-        <Typography>{params.api.getRowIndex(params.row.id) + 1}</Typography>
-      )
+      sortable: true
     },
     {
       field: 'first_name',
       headerName: 'Talaba ismi',
       width: 200,
       sortable: true,
-      flex: 1
+      flex: 1,
+      renderCell: (params: any) => (
+        <Link
+          href={`/student-points/${params.row.id}`}
+          style={{
+            color: '#4c4e64de',
+            textDecoration: 'none',
+            transition: 'text-decoration 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.textDecoration = 'underline'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.textDecoration = 'none'
+          }}
+        >
+          {params.value}
+        </Link>
+      )
     },
     {
-      field: 'branch',
+      field: 'branches',
       headerName: 'Filial',
       width: 150,
       sortable: true,
-      flex: 1
+      flex: 1,
+      renderCell: (params: any) => (
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+          {params.value?.map((branch: { id: number; name: string }) => (
+            <span key={branch.id}>{branch.name}</span>
+          ))}
+        </div>
+      )
     },
+
     {
       field: 'total_points',
       headerName: 'Jami ballar',
       width: 150,
       sortable: true,
       flex: 1,
-      renderCell: (params: any) => (
-        <Chip label={params.value} variant='outlined' />
-      )
+      renderCell: (params: any) => <Chip label={params.value} variant='outlined' />
     },
     {
       field: 'edit',
-      headerName: "Amallar",
+      headerName: 'Amallar',
       width: 150,
       flex: 1,
       renderCell: (params: any) => (
         <Button
-          variant="outlined"
-          size="small"
+          variant='outlined'
+          size='small'
           onClick={() => {
-            setSelectedStudent(params.row)
-            setOpenEditModal(true)
+            formik.setFieldValue('selectedStudent', params.row)
+            formik.setFieldValue('points', '')
+            formik.setFieldValue('reason', '')
+            setOpenAddModal(true)
           }}
         >
-          O'zgartirish
+          Ball berish
         </Button>
       )
-    },
+    }
   ]
 
   return (
@@ -130,14 +195,17 @@ export const StudentPoints = () => {
       <Box display='flex' alignItems='center' justifyContent='space-between' mb={4}>
         <Typography variant='h5'>Talabalar reytingi</Typography>
 
-        <Button variant='outlined' size='medium' onClick={() => setOpenAddModal(true)}>
+        <Button variant='outlined' size='medium' onClick={() => {
+          formik.resetForm()
+          setOpenAddModal(true)
+        }}>
           Ball berish
         </Button>
       </Box>
 
       <StudentPointsFilter />
 
-      <Box sx={{ height: 'auto', width: '100%', mt: 4 }}>
+      <Box style={{ height: 'auto', width: '100%', marginTop: 4 }}>
         <DataGrid
           autoHeight
           rows={pointStudents?.results || []}
@@ -160,96 +228,83 @@ export const StudentPoints = () => {
               page: 0
             }
           }}
-        
+
         />
 
         <Dialog open={openAddModal} onClose={() => setOpenAddModal(false)} maxWidth='sm' fullWidth>
           <DialogTitle>Ball berish</DialogTitle>
           <DialogContent>
-            <FormControl fullWidth sx={{ mt: 2 }}>
+            {formik.values.selectedStudent && (
+              <Box style={{ marginBottom: 2, marginTop: 2, display: "flex", justifyContent: 'space-between', alignItems: 'start' }}>
+                <Box>
+
+                <Typography variant='subtitle1'>Talaba: {formik.values.selectedStudent.first_name}</Typography>
+                <Typography variant='body2'>Telefon: {formik.values.selectedStudent.phone}</Typography>
+                <Typography variant='body2'>Joriy ball: {formik.values.selectedStudent.total_points}</Typography>
+                </Box>
+
+                <Button variant='outlined' size='small' onClick={() => formik.setFieldValue('selectedStudent', null)}>
+                  O'quvchini o'zgartirish
+                </Button>
+              </Box>
+            )}
+
+            {!formik.values.selectedStudent && (
               <Autocomplete
                 options={students}
-                getOptionLabel={(option: any) => `${option.first_name} - ${option.phone}`}
-                onInputChange={(event, newInputValue) => {
-                  setSearch(newInputValue)
-                }}
+                getOptionLabel={(option: Student) => `${option.first_name} - ${option.phone}`}
                 onChange={(event, newValue) => {
-                  setSelectedStudentId(newValue?.id || '')
-                  setSelectedStudent(newValue || null)
+                  formik.setFieldValue('selectedStudent', newValue)
                 }}
-                renderInput={(params) => <TextField {...params} label="Talaba" />}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Talabani qidiring"
+                    variant="outlined"
+                    fullWidth
+                    onChange={(e) => setSearch(e.target.value)}
+                    required
+                    error={formik.touched.selectedStudent && Boolean(formik.errors.selectedStudent)}
+                    helperText={formik.touched.selectedStudent && formik.errors.selectedStudent as string}
+                  />
+                )}
+                style={{ marginTop: 2 }}
               />
-            </FormControl>
-
-            {selectedStudent && (
-              <>
-                <TextField
-                  fullWidth
-                  label='Ball'
-                  type='number'
-                  value={points}
-                  onChange={e => setPoints(e.target.value)}
-                  sx={{ mt: 2 }}
-                />
-
-                <TextField
-                  fullWidth
-                  label='Sabab'
-                  multiline
-                  rows={4}
-                  value={reason}
-                  onChange={e => setReason(e.target.value)}
-                  sx={{ mt: 2 }}
-                />
-              </>
             )}
+
+            <TextField
+              fullWidth
+              label='Ball'
+              type='number'
+              value={formik.values.points}
+              onChange={formik.handleChange}
+              name='points'
+              style={{ marginTop: '10px' }}
+              required
+              error={formik.touched.points && Boolean(formik.errors.points)}
+              helperText={formik.touched.points && formik.errors.points}
+            />
+
+            <TextField
+              fullWidth
+              label='Sabab'
+              multiline
+              rows={4}
+              value={formik.values.reason}
+              onChange={formik.handleChange}
+              name='reason'
+              style={{ marginTop: '10px' }}
+              required
+              error={formik.touched.reason && Boolean(formik.errors.reason)}
+              helperText={formik.touched.reason && formik.errors.reason}
+            />
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenAddModal(false)}>Bekor qilish</Button>
-            <Button onClick={handleAddPoints} variant='contained'>
-              Saqlash
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)} maxWidth='sm' fullWidth>
-          <DialogTitle>Ball o'zgartirish</DialogTitle>
-          <DialogContent>
-            {selectedStudent && (
-              <>
-                <Box sx={{ mb: 2, mt: 2 }}>
-                  <Typography variant='subtitle1'>Talaba: {selectedStudent.first_name}</Typography>
-                  <Typography variant='body2'>Telefon: {selectedStudent.phone}</Typography>
-                  <Typography variant='body2'>Joriy ball: {selectedStudent.total_points}</Typography>
-                </Box>
-
-                <TextField
-                  fullWidth
-                  label='Ball'
-                  size='medium'
-                  type='number'
-                  value={points}
-                  onChange={e => setPoints(e.target.value)}
-                  sx={{ mt: 2 }}
-                />
-
-                <TextField
-                  fullWidth
-                  label='Sabab'
-                  size='small'
-                  multiline
-                  rows={4}
-                  value={reason}
-                  onChange={e => setReason(e.target.value)}
-                  sx={{ mt: 2 }}
-                />
-              </>
-            )}
-          </DialogContent>
-
-          <DialogActions>
-            <Button onClick={() => setOpenEditModal(false)}>Bekor qilish</Button>
-            <Button onClick={handleEditPoints} variant='contained'>
+            <Button
+              onClick={() => formik.handleSubmit()}
+              variant='contained'
+            >
               Saqlash
             </Button>
           </DialogActions>
