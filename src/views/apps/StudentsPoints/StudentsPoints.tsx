@@ -128,7 +128,8 @@ export const StudentPoints = () => {
       flex: 1,
       renderCell: (params: any) => (
         <Link
-          href={`/student-points/${params.row.id}`}
+          href={`/reports/student-points/[id]`}
+          as={`/reports/student-points/${params.row.id}`}
           style={{
             color: '#4c4e64de',
             textDecoration: 'none',
