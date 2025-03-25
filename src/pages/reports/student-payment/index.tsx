@@ -95,6 +95,12 @@ const StudentPaymentsPage = () => {
     },
     {
       xs: 1.7,
+      title: "O'quvchi bonuslari",
+      dataIndex: 'bonus',
+      render: bonus => <Chip color='warning' variant='outlined' label={`${new Intl.NumberFormat('uz-UZ').format(Number.parseInt(bonus))} ball`} />
+    },
+    {
+      xs: 1.7,
       title: t("To'lov sanasi"),
       dataIndex: 'payment_date'
     },
@@ -126,7 +132,7 @@ const StudentPaymentsPage = () => {
   }
 
   useEffect(() => {
-    getTeachers()
+    void getTeachers()
     dispatch(fetchCoursesList(''))
   }, [])
 
@@ -137,7 +143,7 @@ const StudentPaymentsPage = () => {
       !user?.role.includes('watcher') &&
       !user?.role.includes('marketolog')
     ) {
-      push('/')
+      void push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
     }
     if (rowsPerPage) {
@@ -159,7 +165,7 @@ const StudentPaymentsPage = () => {
     )
   }
   const rowClick = (student: any) => {
-    router.push(`/students/view/security?student=${student}`)
+    void router.push(`/students/view/security?student=${student}`)
   }
   const { isMobile } = useResponsive()
 
@@ -198,6 +204,7 @@ const StudentPaymentsPage = () => {
         </Box>
         <FilterBlock />
       </Box>
+
       <PaymentTable rowClick={rowClick} loading={isLoading} columns={columns} data={studentsPayment} />
 
       {Math.ceil(paymentsCount / 10) > 1 && !isLoading && (
