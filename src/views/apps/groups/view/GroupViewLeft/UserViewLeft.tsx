@@ -25,6 +25,7 @@ const UserViewLeft = () => {
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
   const { query } = useRouter()
+  const { user } = useAuth()
 
   const queryString = useMemo(() => {
     return new URLSearchParams(studentsQueryParams).toString()
@@ -41,7 +42,7 @@ const UserViewLeft = () => {
         <GroupDetails />
       </Grid>
 
-      {groupData?.show_students && (
+      {(user?.currentRole === 'teacher' ? groupData?.show_students : true) && (
         <Grid item xs={12}>
           <CardContent sx={{ p: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '10px' }}>

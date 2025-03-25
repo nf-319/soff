@@ -201,6 +201,7 @@ export default function EditTeacherModal() {
         </TeacherAvatar>
 
         <FormControl sx={{ width: '100%' }}>
+          
           <TextField
             label={t('first_name')}
             name='first_name'

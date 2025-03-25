@@ -3,12 +3,19 @@
 import { useState, useEffect, useCallback } from 'react'
 import toast from 'react-hot-toast'
 import api from 'src/@core/utils/api'
-import { getEnglish } from '../../@core/utils/getEnglish'
-import { uuidAllRegex, uuidRegex } from '../qrCode-Modal'
+import { getEnglish } from 'src/@core/utils/getEnglish'
+import { uuidRegex } from '../qrCode-Modal'
+import { setAttendance } from '../../store/apps/groupDetails'
+import { useDispatch } from 'react-redux'
+import { getMontNumber } from '../../@core/utils/gwt-month-name'
+import { useRouter } from 'next/router'
 
 export default function QRCodeScanner() {
   const [scannedCode, setScannedCode] = useState<string>('')
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
+  const pathname = window.location.pathname
+  const router = useRouter()
+  const dispatch = useDispatch()
 
   const handleSendQrCode = useCallback(async (code: string): Promise<void> => {
     if (!getEnglish(code)) {
@@ -31,6 +38,16 @@ export default function QRCodeScanner() {
           style: { zIndex: 999999999 },
         })
       }
+
+      if (pathname.includes('groups/view/security')) {
+        const response = await api.get(
+          `common/attendance-list/${router.query?.year || new Date().getFullYear()}-${getMontNumber(
+            router.query?.month
+          )}-01/group/${router.query?.id}/?`
+        )
+        dispatch(setAttendance(response.data))
+      }
+
     } catch (err: any) {
       console.error('API error:', err)
       if (err?.response?.status === 404) {

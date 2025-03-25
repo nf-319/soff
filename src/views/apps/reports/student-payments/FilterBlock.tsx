@@ -252,7 +252,7 @@ export default function FilterBlock() {
           minutes: t('Minut'),
           seconds: t('Sekund')
         }}
-        format='yyyy-MM-dd'
+        format='dd/MM/yyyy'
         onChange={handleChangeDate}
         translate='yes'
         size='lg'

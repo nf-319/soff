@@ -490,7 +490,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
 
   const handleSendMessages = () => {
     setIsSuccess(false)
-    dispatch(setOpenEdit(null))
+    setOpenEdit(null)
     toast.success('Smslar yuborildi')
     setParentId(null)
   }
@@ -529,7 +529,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
           <Box display='flex' flexDirection='column' alignItems='center' justifyContent='center' gap={2}>
             <Box component='nav' width='100%'>
               <Box component='ul' display='grid' padding={0} gap={2} paddingLeft={10} margin={0}>
-                {teacherData.map((item: any) => (
+                {teacherData?.map((item: any) => (
                   <Link
                     key={item.id}
                     href={`/mentors/view/security?id=${item.id}`}
