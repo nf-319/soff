@@ -129,7 +129,6 @@ export default function StudentCard({
       value: Yup.string().required("Ma'lumotni kiritish shart")
     }),
     onSubmit: values => {
-      console.log(values)
       editMutate(`student/extradata/update/${editItem?.id}/`, values, {
         onSuccess: () => {
           toast.success("Ma'lumot o'zgartirildi")
@@ -210,7 +209,7 @@ export default function StudentCard({
           onClose()
         },
         onError: err => {
-          toast.error(err.response.data)
+          toast.error("Barcha ma'lumotlarni to'ldiring")
         }
       }
     )

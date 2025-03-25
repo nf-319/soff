@@ -54,6 +54,43 @@ const SmsSettings = () => {
     | 'extra_settings'
     | null
   >(null)
+
+  const birthdateInputRef = useRef<HTMLInputElement>(null)
+  const absendInputRef = useRef<HTMLInputElement>(null)
+  const attendInputRef = useRef<HTMLInputElement>(null)
+  const paymentInputRef = useRef<HTMLInputElement>(null)
+  const debtorInputRef = useRef<HTMLInputElement>(null)
+  const scoreInputRef = useRef<HTMLInputElement>(null)
+
+  const insertAtCursor = (key: string, sinputRef: any, text: string) => {
+    if (sinputRef.current) {
+      const input = sinputRef.current
+      const start = input.selectionStart || 0
+      const end = input.selectionEnd || 0
+      if (key == 'birthdate') {
+        const newText = birthday_text.slice(0, start) + text + birthday_text.slice(end)
+        setBirthday_text(newText)
+      } else if (key == 'absend') {
+        const newText = absent_text.slice(0, start) + text + absent_text.slice(end)
+        setAbsent_text(newText)
+      } else if (key == 'attend') {
+        const newText = attend_text.slice(0, start) + text + attend_text.slice(end)
+        setAttend_text(newText)
+      } else if (key == 'payment') {
+        const newText = payment_text.slice(0, start) + text + payment_text.slice(end)
+        setPayment_text(newText)
+      } else if (key == 'debtor') {
+        const newText = debt_text.slice(0, start) + text + debt_text.slice(end)
+        setDebt_text(newText)
+      } else if (key == 'score') {
+        const newText = score_text.slice(0, start) + text + score_text.slice(end)
+        setScore_text(newText)
+      }
+
+      setTimeout(() => input.setSelectionRange(start + text.length, start + text.length), 0)
+    }
+  }
+
   const updateSettings = async (key: any, value: any) => {
     try {
       const formData: any = new FormData()
@@ -291,25 +328,40 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t('SMS Matni')}:
             </Typography>
-            {/* {editable === 'birthdate' && (
-              <Box display={'flex'} gap={2}>
-                <div onClick={() => setBirthday_text((prev: any) => prev + '${first_name}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
-                </div>
-                <div onClick={() => setBirthday_text((prev: any) => prev + '${date}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
-                </div>
-                <div onClick={() => setBirthday_text((prev: any) => prev + '${amount}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
-                </div>
-                <div onClick={() => setBirthday_text((prev: any) => prev + '${group}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
-                </div>
-                <div onClick={() => setBirthday_text((prev: any) => prev + '${grade}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
-                </div>
+            {editable === 'birthdate' && (
+              <Box display='flex' gap={2} mt={2}>
+                <Chip
+                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${first_name}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='error'
+                  label={'Ism familiya'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${date}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='info'
+                  label={'Sana'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${amount}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='primary'
+                  label={'Summa'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${group}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='secondary'
+                  label={'Guruh'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${grade}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='success'
+                  label={"O'quvchi bahosi"}
+                />
               </Box>
-            )} */}
+            )}
 
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'birthdate' ? (
@@ -318,6 +370,7 @@ const SmsSettings = () => {
                     multiline
                     rows={4}
                     size='small'
+                    inputRef={birthdateInputRef}
                     value={birthday_text}
                     // defaultValue={companyInfo?.auto_sms?.birthday_text}
                     // onBlur={e => {
@@ -347,7 +400,7 @@ const SmsSettings = () => {
                     value={birthday_text}
                     size='small'
                     placeholder={t('SMS Matni')}
-                    // onBlur={e => console.log(e.target.value)}
+                   
                   />
                   <IconifyIcon
                     icon={'basil:edit-outline'}
@@ -388,25 +441,40 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t(`SMS matnini kiriting (kelmagan o'quvchiga ertasi kuni yuboriladi)`)}
             </Typography>
-            {/* {editable === 'absend' && (
-              <Box display={'flex'} gap={2}>
-                <div onClick={() => setAbsent_text((prev: any) => prev + '${first_name}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
-                </div>
-                <div onClick={() => setAbsent_text((prev: any) => prev + '${date}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
-                </div>
-                <div onClick={() => setAbsent_text((prev: any) => prev + '${amount}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
-                </div>
-                <div onClick={() => setAbsent_text((prev: any) => prev + '${group}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
-                </div>
-                <div onClick={() => setAbsent_text((prev: any) => prev + '${grade}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
-                </div>
+            {editable === 'absend' && (
+              <Box display='flex' gap={2} mt={2}>
+                <Chip
+                  onClick={() => insertAtCursor('absend', absendInputRef, '${first_name}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='error'
+                  label={'Ism familiya'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('absend', absendInputRef, '${date}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='info'
+                  label={'Sana'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('absend', absendInputRef, '${amount}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='primary'
+                  label={'Summa'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('absend', absendInputRef, '${group}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='secondary'
+                  label={'Guruh'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('absend', absendInputRef, '${grade}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='success'
+                  label={"O'quvchi bahosi"}
+                />
               </Box>
-            )} */}
+            )}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'absend' ? (
                 <>
@@ -415,6 +483,7 @@ const SmsSettings = () => {
                     rows={4}
                     size='small'
                     focused
+                    inputRef={absendInputRef}
                     value={absent_text}
                     // onBlur={e => {
                     //   updateSettings('absent_text', e.target.value)
@@ -483,25 +552,40 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t(`SMS matnini kiriting (kelgan o'quvchiga ertasi kuni yuboriladi)`)}
             </Typography>
-            {/* {editable === 'attend' && (
-              <Box display={'flex'} gap={2}>
-                <div onClick={() => setAttend_text((prev: any) => prev + '${first_name}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
-                </div>
-                <div onClick={() => setAttend_text((prev: any) => prev + '${date}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
-                </div>
-                <div onClick={() => setAttend_text((prev: any) => prev + '${amount}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
-                </div>
-                <div onClick={() => setAttend_text((prev: any) => prev + '${group}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
-                </div>
-                <div onClick={() => setAttend_text((prev: any) => prev + '${grade}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
-                </div>
+            {editable === 'attend' && (
+              <Box display='flex' gap={2} mt={2}>
+                <Chip
+                  onClick={() => insertAtCursor('attend', attendInputRef, '${first_name}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='error'
+                  label={'Ism familiya'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('attend', attendInputRef, '${date}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='info'
+                  label={'Sana'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('attend', attendInputRef, '${amount}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='primary'
+                  label={'Summa'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('attend', attendInputRef, '${group}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='secondary'
+                  label={'Guruh'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('attend', attendInputRef, '${grade}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='success'
+                  label={"O'quvchi bahosi"}
+                />
               </Box>
-            )} */}
+            )}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'attend' ? (
                 <>
@@ -510,6 +594,7 @@ const SmsSettings = () => {
                     rows={4}
                     size='small'
                     focused
+                    inputRef={attendInputRef}
                     value={attend_text}
                     // onBlur={e => {
                     //   updateSettings('attend_text', e.target.value)
@@ -605,25 +690,40 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t('SMS Matni')}:
             </Typography>
-            {/* {editable === 'payment' && (
-              <Box display={'flex'} gap={2}>
-                <div onClick={() => setPayment_text((prev: any) => prev + '${first_name}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
-                </div>
-                <div onClick={() => setPayment_text((prev: any) => prev + '${date}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
-                </div>
-                <div onClick={() => setPayment_text((prev: any) => prev + '${amount}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
-                </div>
-                <div onClick={() => setPayment_text((prev: any) => prev + '${group}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
-                </div>
-                <div onClick={() => setPayment_text((prev: any) => prev + '${grade}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
-                </div>
+            {editable === 'payment' && (
+              <Box display='flex' gap={2} mt={2}>
+                <Chip
+                  onClick={() => insertAtCursor('payment', paymentInputRef, '${first_name}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='error'
+                  label={'Ism familiya'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('payment', paymentInputRef, '${date}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='info'
+                  label={'Sana'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('payment', paymentInputRef, '${amount}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='primary'
+                  label={'Summa'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('payment', paymentInputRef, '${group}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='secondary'
+                  label={'Guruh'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('payment', paymentInputRef, '${grade}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='success'
+                  label={"O'quvchi bahosi"}
+                />
               </Box>
-            )} */}
+            )}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'payment' ? (
                 <>
@@ -632,6 +732,7 @@ const SmsSettings = () => {
                     rows={4}
                     size='small'
                     focused
+                    inputRef={paymentInputRef}
                     value={payment_text}
                     // onBlur={e => {
                     //   updateSettings('payment_text', e.target.value)
@@ -729,25 +830,40 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t('SMS Matni')}:
             </Typography>
-            {/* {editable === 'debtor' && (
-              <Box display={'flex'} gap={2}>
-                <div onClick={() => setDebt_text((prev: any) => prev + '${first_name}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
-                </div>
-                <div onClick={() => setDebt_text((prev: any) => prev + '${date}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
-                </div>
-                <div onClick={() => setDebt_text((prev: any) => prev + '${amount}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
-                </div>
-                <div onClick={() => setDebt_text((prev: any) => prev + '${group}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
-                </div>
-                <div onClick={() => setDebt_text((prev: any) => prev + '${grade}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
-                </div>
+            {editable === 'debtor' && (
+              <Box display='flex' gap={2} mt={2}>
+                <Chip
+                  onClick={() => insertAtCursor('debtor', debtorInputRef, '${first_name}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='error'
+                  label={'Ism familiya'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('debtor', debtorInputRef, '${date}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='info'
+                  label={'Sana'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('debtor', debtorInputRef, '${amount}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='primary'
+                  label={'Summa'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('debtor', debtorInputRef, '${group}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='secondary'
+                  label={'Guruh'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('debtor', debtorInputRef, '${grade}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='success'
+                  label={"O'quvchi bahosi"}
+                />
               </Box>
-            )} */}
+            )}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'debtor' ? (
                 <>
@@ -756,6 +872,7 @@ const SmsSettings = () => {
                     rows={4}
                     size='small'
                     focused
+                    inputRef={debtorInputRef}
                     value={debt_text}
                     // onBlur={e => {
                     //   updateSettings('debt_text', e.target.value)
@@ -832,25 +949,40 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t(`SMS matnini kiriting (kelmagan o'quvchiga ertasi kuni yuboriladi)`)}
             </Typography>
-            {/* {editable === 'score' && (
-              <Box display={'flex'} gap={2}>
-                <div onClick={() => setScore_text((prev: any) => prev + '${first_name}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='error' label={'Ism familiya'} />
-                </div>
-                <div onClick={() => setScore_text((prev: any) => prev + '${date}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='info' label={'Sana'} />
-                </div>
-                <div onClick={() => setScore_text((prev: any) => prev + '${amount}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='primary' label={'Summa'} />
-                </div>
-                <div onClick={() => setScore_text((prev: any) => prev + '${group}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='secondary' label={'Guruh'} />
-                </div>
-                <div onClick={() => setScore_text((prev: any) => prev + '${grade}')}>
-                  <Chip sx={{ cursor: 'pointer' }} color='success' label={"O'quvchi bahosi"} />
-                </div>
+            {editable === 'score' && (
+              <Box display='flex' gap={2} mt={2}>
+                <Chip
+                  onClick={() => insertAtCursor('score', scoreInputRef, '${first_name}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='error'
+                  label={'Ism familiya'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('score', scoreInputRef, '${date}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='info'
+                  label={'Sana'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('score', scoreInputRef, '${amount}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='primary'
+                  label={'Summa'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('score', scoreInputRef, '${group}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='secondary'
+                  label={'Guruh'}
+                />
+                <Chip
+                  onClick={() => insertAtCursor('score', scoreInputRef, '${grade}')}
+                  sx={{ cursor: 'pointer' }}
+                  color='success'
+                  label={"O'quvchi bahosi"}
+                />
               </Box>
-            )} */}
+            )}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'score' ? (
                 <>
@@ -859,6 +991,7 @@ const SmsSettings = () => {
                     rows={4}
                     size='small'
                     focused
+                    inputRef={scoreInputRef}
                     value={score_text}
                     // onBlur={e => {
                     //   updateSettings('score_text', e.target.value)
