@@ -623,9 +623,12 @@ const UserViewSecurity = () => {
                         </Box>
                       </Box>
                       <Box sx={{ marginBottom: 2 }}>
-                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', marginBottom: 2 }}>
-                          <Typography sx={{ color: 'black' }}>Dars kunlari :</Typography>
+                        <Box sx={{marginBottom:2}} display={'flex'} alignItems={'center'} gap={2}>
+                          <Typography sx={{fontSize:15, color: 'black' }}>Dars vaqti :</Typography>
                           <Typography fontSize={12}>{group.lesson_time}</Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', marginBottom: 2 }}>
+                          <Typography  sx={{fontSize:15, color: 'black' }}>Dars kunlari :</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', paddingBottom: 2 }}>
                           {group?.lesson_days?.map((day: any) => (
@@ -738,8 +741,10 @@ const UserViewSecurity = () => {
           To'lovni o'chirishni tasdiqlang
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', justifyContent: 'center' ,gap:2}}>
-            <Button variant='contained' onClick={() => setDelete(null)}>{t('Bekor qilish')}</Button>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Button variant='contained' onClick={() => setDelete(null)}>
+              {t('Bekor qilish')}
+            </Button>
             <LoadingButton variant='contained' color='error' onClick={onHandleDelete} loading={loading}>
               {t("O'chirish")}
             </LoadingButton>
