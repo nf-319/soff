@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import api from 'src/@core/utils/api'
 import ceoConfigs from 'src/configs/ceo'
 import { IGroupDetailsState } from 'src/types/apps/groupDetailsTypes'
@@ -158,6 +158,9 @@ export const groupDetailsSlice = createSlice({
     setResultEdit: (state, action) => {
       state.examStudentId = action.payload
     },
+    setAttendance: (state, action: PayloadAction<any[]>) => {
+      state.attendance = action.payload
+    },
     setUpdateStatusModal: (state, action) => {
       state.updateStatusModal = action.payload
     },
@@ -299,6 +302,7 @@ export const {
   setGettingAttendance,
   setGettingGrades,
   setOpen,
+  setAttendance,
   setUpdateStatusModal,
   setEditData,
   setMeetLink,
