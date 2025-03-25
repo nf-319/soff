@@ -247,6 +247,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
                 <DatePicker
                   label="To'lov sanasi"
                   value={values.payment_date ? dayjs(values.payment_date) : null}
+                  format="DD/MM/YYYY"
                   onChange={newValue => {
                     handleChange({ target: { name: 'payment_date', value: dayjs(newValue).format('YYYY-MM-DD') } });
                   }}

@@ -138,7 +138,8 @@ export const GroupsFilterStudents = ({ isMobile }: GroupsFilterProps) => {
             id='date-range-picker'
             onChange={handleOnChange}
             shouldCloseOnSelect={false}
-            popperPlacement={'top'}
+            dateFormat="DD/MM/YYYY"
+            popperPlacement='top'
             customInput={
               <CustomInput label="Sana" start={startDate as Date | number} end={endDate as Date | number} />
             }
