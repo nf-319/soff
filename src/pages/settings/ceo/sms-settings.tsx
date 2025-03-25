@@ -328,7 +328,7 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t('SMS Matni')}:
             </Typography>
-            {editable === 'birthdate' && (
+            {/* {editable === 'birthdate' && (
               <Box display='flex' gap={2} mt={2}>
                 <Chip
                   onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${first_name}')}
@@ -361,7 +361,7 @@ const SmsSettings = () => {
                   label={"O'quvchi bahosi"}
                 />
               </Box>
-            )}
+            )} */}
 
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'birthdate' ? (
@@ -441,7 +441,7 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t(`SMS matnini kiriting (kelmagan o'quvchiga ertasi kuni yuboriladi)`)}
             </Typography>
-            {editable === 'absend' && (
+            {/* {editable === 'absend' && (
               <Box display='flex' gap={2} mt={2}>
                 <Chip
                   onClick={() => insertAtCursor('absend', absendInputRef, '${first_name}')}
@@ -474,7 +474,7 @@ const SmsSettings = () => {
                   label={"O'quvchi bahosi"}
                 />
               </Box>
-            )}
+            )} */}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'absend' ? (
                 <>
@@ -552,7 +552,7 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t(`SMS matnini kiriting (kelgan o'quvchiga ertasi kuni yuboriladi)`)}
             </Typography>
-            {editable === 'attend' && (
+            {/* {editable === 'attend' && (
               <Box display='flex' gap={2} mt={2}>
                 <Chip
                   onClick={() => insertAtCursor('attend', attendInputRef, '${first_name}')}
@@ -585,7 +585,7 @@ const SmsSettings = () => {
                   label={"O'quvchi bahosi"}
                 />
               </Box>
-            )}
+            )} */}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'attend' ? (
                 <>
@@ -690,7 +690,7 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t('SMS Matni')}:
             </Typography>
-            {editable === 'payment' && (
+            {/* {editable === 'payment' && (
               <Box display='flex' gap={2} mt={2}>
                 <Chip
                   onClick={() => insertAtCursor('payment', paymentInputRef, '${first_name}')}
@@ -723,7 +723,7 @@ const SmsSettings = () => {
                   label={"O'quvchi bahosi"}
                 />
               </Box>
-            )}
+            )} */}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'payment' ? (
                 <>
@@ -830,7 +830,7 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t('SMS Matni')}:
             </Typography>
-            {editable === 'debtor' && (
+            {/* {editable === 'debtor' && (
               <Box display='flex' gap={2} mt={2}>
                 <Chip
                   onClick={() => insertAtCursor('debtor', debtorInputRef, '${first_name}')}
@@ -863,7 +863,7 @@ const SmsSettings = () => {
                   label={"O'quvchi bahosi"}
                 />
               </Box>
-            )}
+            )} */}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'debtor' ? (
                 <>
@@ -949,7 +949,7 @@ const SmsSettings = () => {
             <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
               {t(`SMS matnini kiriting (kelmagan o'quvchiga ertasi kuni yuboriladi)`)}
             </Typography>
-            {editable === 'score' && (
+            {/* {editable === 'score' && (
               <Box display='flex' gap={2} mt={2}>
                 <Chip
                   onClick={() => insertAtCursor('score', scoreInputRef, '${first_name}')}
@@ -982,7 +982,7 @@ const SmsSettings = () => {
                   label={"O'quvchi bahosi"}
                 />
               </Box>
-            )}
+            )} */}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
               {editable === 'score' ? (
                 <>
