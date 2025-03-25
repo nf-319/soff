@@ -56,9 +56,12 @@ export default function EditStudentForm() {
   const validationSchema = Yup.object({
     first_name: Yup.string().required('Ismingizni kiriting'),
     phone: Yup.string().required('Telefon raqam kiriting'),
-    birth_date: Yup.string(),
     gender: Yup.string().required('Jinsini tanlang'),
-    password: Yup.string()
+    password: Yup.string(),
+    birth_date: Yup.string()
+      .nullable()
+      .matches(/^\d{4}-\d{2}-\d{2}$/, 'Formatda hatolik')
+      .required("Tug'ilgan kun kiritilishi kerak")
   })
 
   const initialValues: UpdateStudentDto = {
@@ -99,8 +102,6 @@ export default function EditStudentForm() {
       } else {
         console.error('Invalid image type:', image)
       }
-
-      
 
       const resp = await dispatch(updateStudent({ data: newValues, id: studentData?.id }))
 
