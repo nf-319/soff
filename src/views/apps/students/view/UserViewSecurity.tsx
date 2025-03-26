@@ -45,6 +45,7 @@ import ExportDetailStudent from '../../groups/view/ViewStudents/ExportDetailStud
 import DebtorsDataTable from 'src/components/table/debtorsTable'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { uzbekLocaleText } from '../../StudentsPoints/constants'
+import { MoreVertical } from 'lucide-react'
 
 export async function downloadImage(filename: string, url: string) {
   await fetch(url, {
@@ -95,7 +96,6 @@ const UserViewSecurity = () => {
     }
     setOpenEdit(value)
   }
-  console.log(payments)
 
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>, groupData: any) => {
@@ -199,6 +199,7 @@ const UserViewSecurity = () => {
   }
   const columns: GridColDef[] = [
     {
+      width: 70,
       headerName: t('ID'),
       field: 'id'
     },
@@ -213,6 +214,7 @@ const UserViewSecurity = () => {
     },
     {
       headerName: t('Turi'),
+      width: 115,
       field: 'condition',
       renderCell: params => (
         <Tooltip title={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}>
@@ -225,6 +227,7 @@ const UserViewSecurity = () => {
       )
     },
     {
+      width: 120,
       headerName: t('Summa'),
       field: 'amount',
       renderCell: params => (
@@ -257,6 +260,7 @@ const UserViewSecurity = () => {
     },
     {
       headerName: 'Yaratilgan vaqt',
+      width: 140,
       field: 'created_at',
       renderCell: params => (
         <Tooltip title={params.value || ''}>
@@ -426,7 +430,7 @@ const UserViewSecurity = () => {
                   !(user?.role.length === 1 && user?.role.includes('teacher')) ? handleClick(e, group) : undefined
                 }
               >
-                <IconifyIcon icon={'charm:menu-kebab'} fontSize={15} />
+                <MoreVertical size={15} />
               </Typography>
 
               <Menu
@@ -623,12 +627,12 @@ const UserViewSecurity = () => {
                         </Box>
                       </Box>
                       <Box sx={{ marginBottom: 2 }}>
-                        <Box sx={{marginBottom:2}} display={'flex'} alignItems={'center'} gap={2}>
-                          <Typography sx={{fontSize:15, color: 'black' }}>Dars vaqti :</Typography>
+                        <Box sx={{ marginBottom: 2 }} display={'flex'} alignItems={'center'} gap={2}>
+                          <Typography sx={{ fontSize: 15, color: 'black' }}>Dars vaqti :</Typography>
                           <Typography fontSize={12}>{group.lesson_time}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', marginBottom: 2 }}>
-                          <Typography  sx={{fontSize:15, color: 'black' }}>Dars kunlari :</Typography>
+                          <Typography sx={{ fontSize: 15, color: 'black' }}>Dars kunlari :</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', paddingBottom: 2 }}>
                           {group?.lesson_days?.map((day: any) => (

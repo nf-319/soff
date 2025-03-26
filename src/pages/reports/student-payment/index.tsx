@@ -95,9 +95,17 @@ const StudentPaymentsPage = () => {
     },
     {
       xs: 1.7,
-      title: "O'quvchi bonuslari",
+      title: "O'quvchi ballari",
       dataIndex: 'bonus',
-      render: bonus => <Chip color='warning' variant='outlined' label={`${new Intl.NumberFormat('uz-UZ').format(Number.parseInt(bonus))} ball`} />
+      render: bonus => (
+        <Chip
+          color='warning'
+          variant='outlined'
+          label={
+            bonus == '0.00' || bonus === null ? `-` : `${new Intl.NumberFormat('uz-UZ').format(Number.parseInt(bonus || '0'))} ball`
+          }
+        />
+      )
     },
     {
       xs: 1.7,
