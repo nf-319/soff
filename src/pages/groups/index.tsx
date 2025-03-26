@@ -344,7 +344,7 @@ export default function GroupsPage() {
         <div className='d-flex'>
           <Pagination
             page={Number(queryParams.offset) ? Number(queryParams.offset) / rowsPerPage + 1 : 1}
-            count={Math.ceil(data?.cpount / 10)}
+            count={Math.ceil(data?.count / 10)}
             variant='outlined'
             shape='rounded'
             onChange={(e: any, page) => handlePagination(String(page))}
