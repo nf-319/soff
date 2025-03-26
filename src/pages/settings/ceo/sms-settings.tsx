@@ -9,6 +9,8 @@ import showResponseError from 'src/@core/utils/show-response-error'
 import IconifyIcon from 'src/components/icon'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setCompanyInfo } from 'src/store/apps/user'
+import { SmsCard } from '../../../views/apps/sms-settings'
+import { PLACEHOLDERS } from '../../../views/apps/sms-settings/constants'
 
 const SmsSettings = () => {
   const { isMobile } = useResponsive()
@@ -55,41 +57,11 @@ const SmsSettings = () => {
     | null
   >(null)
 
-  const birthdateInputRef = useRef<HTMLInputElement>(null)
   const absendInputRef = useRef<HTMLInputElement>(null)
   const attendInputRef = useRef<HTMLInputElement>(null)
   const paymentInputRef = useRef<HTMLInputElement>(null)
   const debtorInputRef = useRef<HTMLInputElement>(null)
   const scoreInputRef = useRef<HTMLInputElement>(null)
-
-  const insertAtCursor = (key: string, sinputRef: any, text: string) => {
-    if (sinputRef.current) {
-      const input = sinputRef.current
-      const start = input.selectionStart || 0
-      const end = input.selectionEnd || 0
-      if (key == 'birthdate') {
-        const newText = birthday_text.slice(0, start) + text + birthday_text.slice(end)
-        setBirthday_text(newText)
-      } else if (key == 'absend') {
-        const newText = absent_text.slice(0, start) + text + absent_text.slice(end)
-        setAbsent_text(newText)
-      } else if (key == 'attend') {
-        const newText = attend_text.slice(0, start) + text + attend_text.slice(end)
-        setAttend_text(newText)
-      } else if (key == 'payment') {
-        const newText = payment_text.slice(0, start) + text + payment_text.slice(end)
-        setPayment_text(newText)
-      } else if (key == 'debtor') {
-        const newText = debt_text.slice(0, start) + text + debt_text.slice(end)
-        setDebt_text(newText)
-      } else if (key == 'score') {
-        const newText = score_text.slice(0, start) + text + score_text.slice(end)
-        setScore_text(newText)
-      }
-
-      setTimeout(() => input.setSelectionRange(start + text.length, start + text.length), 0)
-    }
-  }
 
   const updateSettings = async (key: any, value: any) => {
     try {
@@ -297,122 +269,10 @@ const SmsSettings = () => {
       setLoading(null)
     }
   }
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '100%' }}>
-      <Card>
-        <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <Box>
-              <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-                {t("Tug'ilgan kunda sms bilan tabriklash")}:
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {loading === 'birthdate' ? (
-                <CircularProgress disableShrink size={'20px'} sx={{ margin: '10px 0', marginLeft: '15px' }} />
-              ) : (
-                <Switch
-                  checked={Boolean(companyInfo?.auto_sms?.on_birthday)}
-                  onChange={async (e, i) => {
-                    await updateSettings('on_birthday', i)
-                  }}
-                />
-              )}
-            </Box>
-          </Box>
-          <Typography sx={{ marginBottom: 5 }} fontSize={12}>
-            {"Xabar matniga talaba ismini qo'shish uchun ${first_name} kalit so'zi qoldiring."}
-          </Typography>
-
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flexDirection: 'column' }}>
-            <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-              {t('SMS Matni')}:
-            </Typography>
-            {/* {editable === 'birthdate' && (
-              <Box display='flex' gap={2} mt={2}>
-                <Chip
-                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${first_name}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='error'
-                  label={'Ism familiya'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${date}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='info'
-                  label={'Sana'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${amount}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='primary'
-                  label={'Summa'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${group}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='secondary'
-                  label={'Guruh'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${grade}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='success'
-                  label={"O'quvchi bahosi"}
-                />
-              </Box>
-            )} */}
-
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
-              {editable === 'birthdate' ? (
-                <>
-                  <TextField
-                    multiline
-                    rows={4}
-                    size='small'
-                    inputRef={birthdateInputRef}
-                    value={birthday_text}
-                    // defaultValue={companyInfo?.auto_sms?.birthday_text}
-                    // onBlur={e => {
-                    //   updateSettings('birthday_text', e.target.value)
-                    // }}
-                    onChange={e => {
-                      setBirthday_text(e.target.value)
-                    }}
-                    fullWidth
-                  />
-                  <IconifyIcon
-                    icon={loading === 'birthdate' ? 'line-md:loading-loop' : 'ic:baseline-check'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {
-                      updateSettings('birthday_text', birthday_text)
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    disabled
-                    type='text'
-                    value={birthday_text}
-                    size='small'
-                    placeholder={t('SMS Matni')}
-                   
-                  />
-                  <IconifyIcon
-                    icon={'basil:edit-outline'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => setEditable('birthdate')}
-                  />
-                </>
-              )}
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+      <SmsCard companyInfo={companyInfo} loading={loading === 'birthdate'} placeholders={PLACEHOLDERS.firstname} updateSettings={updateSettings} defaultValue={companyInfo?.auto_sms?.birthday_text} />
 
       <Card>
         <CardContent>

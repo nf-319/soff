@@ -65,7 +65,6 @@ export default function GroupDetails({
   handleEditClickOpen,
   handleGetMeetLink
 }: GroupDetailsProps) {
-
   const [qrModalOpen, setQrModalOpen] = useState(false)
   const mediaQuery = useMediaQuery('(max-width: 600px)')
   const [qrCodeImage, setQrCodeImage] = useState<string | null>(null)
