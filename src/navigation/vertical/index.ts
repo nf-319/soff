@@ -167,7 +167,7 @@ const Navigation = (t: any): VerticalNavItemsType => {
           path: '/reports/student-payment'
         },
         {
-          title: "O'quvchilar Bonuslari",
+          title: "O'quvchilar Ballari",
           path: '/reports/student-points'
         },
         {
@@ -300,7 +300,7 @@ const Navigation = (t: any): VerticalNavItemsType => {
           path: '/reports/student-payment'
         },
         {
-          title: "O'quvchilar Bonuslari",
+          title: "O'quvchilar Ballari",
           path: '/reports/student-points'
         },
         {
