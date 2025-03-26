@@ -95,7 +95,6 @@ const UserViewSecurity = () => {
     }
     setOpenEdit(value)
   }
-  console.log(payments)
 
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>, groupData: any) => {
@@ -199,6 +198,7 @@ const UserViewSecurity = () => {
   }
   const columns: GridColDef[] = [
     {
+      width:70,
       headerName: t('ID'),
       field: 'id'
     },
@@ -213,6 +213,7 @@ const UserViewSecurity = () => {
     },
     {
       headerName: t('Turi'),
+      width:115,
       field: 'condition',
       renderCell: params => (
         <Tooltip title={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}>
@@ -225,6 +226,7 @@ const UserViewSecurity = () => {
       )
     },
     {
+      width:120,
       headerName: t('Summa'),
       field: 'amount',
       renderCell: params => (
@@ -257,6 +259,7 @@ const UserViewSecurity = () => {
     },
     {
       headerName: 'Yaratilgan vaqt',
+      width:140,
       field: 'created_at',
       renderCell: params => (
         <Tooltip title={params.value || ''}>
