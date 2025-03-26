@@ -1,8 +1,6 @@
-// ** Toolkit imports
 import { configureStore } from '@reduxjs/toolkit'
 import { useDispatch } from 'react-redux'
 import { TypedUseSelectorHook, useSelector } from 'react-redux'
-// ** Reducers
 import chat from 'src/store/apps/chat'
 import attendance from 'src/store/apps/attandance'
 import user from 'src/store/apps/user'

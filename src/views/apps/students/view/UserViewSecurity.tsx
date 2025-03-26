@@ -15,6 +15,7 @@ import {
   Menu,
   MenuItem,
   Select,
+  Tooltip,
   Typography
 } from '@mui/material'
 import Link from 'next/link'
@@ -41,6 +42,9 @@ import EditStudent from '../../groups/view/ViewStudents/EditStudent'
 import toast from 'react-hot-toast'
 import api from 'src/@core/utils/api'
 import ExportDetailStudent from '../../groups/view/ViewStudents/ExportDetailStudent'
+import DebtorsDataTable from 'src/components/table/debtorsTable'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import { uzbekLocaleText } from '../../StudentsPoints/constants'
 
 export async function downloadImage(filename: string, url: string) {
   await fetch(url, {
@@ -91,6 +95,7 @@ const UserViewSecurity = () => {
     }
     setOpenEdit(value)
   }
+  console.log(payments)
 
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>, groupData: any) => {
@@ -192,87 +197,157 @@ const UserViewSecurity = () => {
     }
     setLoading(null)
   }
-
-  const columns: customTableProps[] = [
+  const columns: GridColDef[] = [
     {
-      xs: 0.2,
-      title: t('ID'),
-      dataIndex: 'id'
+      headerName: t('ID'),
+      field: 'id'
     },
     {
-      xs: 0.6,
-      title: t('Sana'),
-      dataIndex: 'payment_date'
-    },
-    {
-      xs: 0.6,
-      title: t('Turi'),
-      dataIndex: 'condition',
-      renderItem: item => (
-        <Chip
-          size='small'
-          label={item?.condition !== 'debt' ? "To'landi" : 'Qarzdorlik'}
-          color={item?.condition !== 'debt' ? 'success' : Number(item?.amount) === 0 ? 'secondary' : 'error'}
-        />
+      headerName: t('Sana'),
+      field: 'payment_date',
+      renderCell: params => (
+        <Tooltip title={params.value || ''}>
+          <span>{params.value}</span>
+        </Tooltip>
       )
     },
     {
-      xs: 0.7,
-      title: t('Summa'),
-      dataIndex: 'amount',
-      render: amount =>
-        Number(amount) <= 0 ? `${formatCurrency(Number(amount) * -1)} UZS` : `${formatCurrency(amount)} UZS`
+      headerName: t('Turi'),
+      field: 'condition',
+      renderCell: params => (
+        <Tooltip title={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}>
+          <Chip
+            size='small'
+            label={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}
+            color={params.value !== 'debt' ? 'success' : Number(params.row.amount) === 0 ? 'secondary' : 'error'}
+          />
+        </Tooltip>
+      )
     },
     {
-      xs: 1,
-      title: t('Guruh'),
-      dataIndex: 'group_name'
+      headerName: t('Summa'),
+      field: 'amount',
+      renderCell: params => (
+        <Tooltip title={`${formatCurrency(params.value)} UZS`}>
+          <span>
+            {Number(params.value) <= 0
+              ? `${formatCurrency(Number(params.value) * -1)} UZS`
+              : `${formatCurrency(params.value)} UZS`}
+          </span>
+        </Tooltip>
+      )
     },
     {
-      xs: 1,
-      title: t('Izoh'),
-      dataIndex: 'description'
+      headerName: t('Guruh'),
+      field: 'group_name',
+      renderCell: params => (
+        <Tooltip title={params.value || ''}>
+          <span>{params.value}</span>
+        </Tooltip>
+      )
     },
     {
-      xs: 1,
-      title: 'Yaratilgan vaqt',
-      dataIndex: 'created_at',
+      headerName: t('Izoh'),
+      field: 'description',
+      renderCell: params => (
+        <Tooltip title={params.value || ''}>
+          <span>{params.value}</span>
+        </Tooltip>
+      )
     },
     {
-      xs: 0.8,
-      title: t("To'lov turi"),
-      dataIndex: 'payment_type_name'
+      headerName: 'Yaratilgan vaqt',
+      field: 'created_at',
+      renderCell: params => (
+        <Tooltip title={params.value || ''}>
+          <span>{params.value}</span>
+        </Tooltip>
+      )
     },
     {
-      xs: 1,
-      title: t('Qabul qildi'),
-      dataIndex: 'admin'
+      headerName: t("To'lov turi"),
+      field: 'payment_type_name'
     },
     {
-      xs: 0.2,
-      title: t('Amallar'),
-      dataIndex: 'amount',
-      renderId: (id, src) => (
-        <Box sx={{ display: 'flex', gap: '10px' }}>
-          <IconifyIcon onClick={() => handleEdit(id)} icon='mdi:pencil-outline' fontSize={20} />
-          {Number(src) <= 0 ? (
-            ''
-          ) : (
-            <IconifyIcon onClick={() => setDelete(id)} icon='mdi:delete-outline' fontSize={20} />
+      headerName: t('Qabul qildi'),
+      field: 'admin'
+    },
+    {
+      headerName: t('Amallar'),
+      field: '',
+      renderCell: params => (
+        <Box sx={{ display: 'flex', gap: '5px' }}>
+          <IconifyIcon onClick={() => handleEdit(params.row.id)} icon='mdi:pencil-outline' fontSize={20} />
+          {Number(params.row.amount) > 0 && (
+            <IconifyIcon onClick={() => setDelete(params.row.id)} icon='mdi:delete-outline' fontSize={20} />
           )}
-          {Number(src) < 0 ? (
+          {Number(params.row.amount) < 0 ? (
             ''
-          ) : loading === id ? (
+          ) : loading === params.row.id ? (
             <IconifyIcon icon={'la:spinner'} fontSize={20} />
           ) : isMobile ? (
-            <IconifyIcon onClick={() => handleDownload(id)} icon={`ph:receipt-light`} fontSize={20} />
+            <IconifyIcon onClick={() => handleDownload(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
           ) : (
-            <IconifyIcon onClick={() => getReceipt(id)} icon={`ph:receipt-light`} fontSize={20} />
+            <IconifyIcon onClick={() => getReceipt(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
           )}
         </Box>
       )
     }
   ]
+
+  // const columns: customTableProps[] = [
+  //   { xs: 0.5, title: t('ID'), dataIndex: 'id' },
+  //   { xs: 1, title: t('Sana'), dataIndex: 'payment_date' },
+  //   {
+  //     xs: 1.2, // To'lov turi aniq chiqishi kerak
+  //     title: t('Turi'),
+  //     dataIndex: 'condition',
+  //     renderItem: item => (
+  //       <Chip
+  //         size='small'
+  //         label={item?.condition !== 'debt' ? "To'landi" : 'Qarzdorlik'}
+  //         color={item?.condition !== 'debt' ? 'success' : Number(item?.amount) === 0 ? 'secondary' : 'error'}
+  //       />
+  //     )
+  //   },
+  //   {
+  //     xs: 1.2, // Summa aniq ko‘rinishi kerak
+  //     title: t('Summa'),
+  //     dataIndex: 'amount',
+  //     render: amount =>
+  //       Number(amount) <= 0 ? `${formatCurrency(Number(amount) * -1)} UZS` : `${formatCurrency(amount)} UZS`
+  //   },
+  //   { xs: 1, title: t('Guruh'), dataIndex: 'group_name' },
+  //   { xs: 2, title: t('Izoh'), dataIndex: 'description' }, // Izohga ko‘proq joy ajratildi
+  //   { xs: 1.3, title: 'Yaratilgan vaqt', dataIndex: 'created_at' },
+  //   { xs: 1, title: t("To'lov turi"), dataIndex: 'payment_type_name' },
+  //   { xs: 1, title: t('Qabul qildi'), dataIndex: 'admin' },
+  //   {
+  //     xs: 0.8, // Amallar uchun yetarli joy
+  //     title: t('Amallar'),
+  //     dataIndex: 'amount',
+  //     renderId: (id, src) => (
+  //       <Box sx={{ display: 'flex', gap: '5px' }}>
+  //         <IconifyIcon onClick={() => handleEdit(id)} icon='mdi:pencil-outline' fontSize={20} />
+  //         {Number(src) <= 0 ? (
+  //           ''
+  //         ) : (
+  //           <IconifyIcon onClick={() => setDelete(id)} icon='mdi:delete-outline' fontSize={20} />
+  //         )}
+  //         {Number(src) < 0 ? (
+  //           ''
+  //         ) : loading === id ? (
+  //           <IconifyIcon icon={'la:spinner'} fontSize={20} />
+  //         ) : isMobile ? (
+  //           <IconifyIcon onClick={() => handleDownload(id)} icon={`ph:receipt-light`} fontSize={20} />
+  //         ) : (
+  //           <IconifyIcon onClick={() => getReceipt(id)} icon={`ph:receipt-light`} fontSize={20} />
+  //         )}
+  //       </Box>
+  //     )
+  //   }
+  // ]
+
   const handleLeft = async () => {
     setLoading(true)
     try {
@@ -548,15 +623,18 @@ const UserViewSecurity = () => {
                         </Box>
                       </Box>
                       <Box sx={{ marginBottom: 2 }}>
-                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', marginBottom: 2 }}>
-                          <Typography sx={{ color: 'black' }}>Dars kunlari :</Typography>
+                        <Box sx={{marginBottom:2}} display={'flex'} alignItems={'center'} gap={2}>
+                          <Typography sx={{fontSize:15, color: 'black' }}>Dars vaqti :</Typography>
                           <Typography fontSize={12}>{group.lesson_time}</Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', marginBottom: 2 }}>
+                          <Typography  sx={{fontSize:15, color: 'black' }}>Dars kunlari :</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', paddingBottom: 2 }}>
                           {group?.lesson_days?.map((day: any) => (
                             <Typography
                               sx={{
-                                backgroundColor: "#f5f5f5",
+                                backgroundColor: '#f5f5f5',
                                 borderRadius: 10,
                                 color: 'black',
                                 paddingX: 3,
@@ -597,7 +675,9 @@ const UserViewSecurity = () => {
                             <Typography color={'black'}>Keyingi to'lov</Typography>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <Icon icon={'mdi:clock'} />
-                              <Typography fontSize={13}>{group.status === "active" ? group.next_payment : "-"}</Typography>
+                              <Typography fontSize={13}>
+                                {group.status === 'active' ? group.next_payment : '-'}
+                              </Typography>
                             </Box>
                           </Box>
                           <Box>
@@ -620,19 +700,17 @@ const UserViewSecurity = () => {
       )}
 
       <Typography sx={{ my: 3, fontSize: '20px' }}>{t("To'lov tarixi")}</Typography>
-      <DataTable
-        color
-        loading={isLoading}
-        maxWidth='100%'
-        minWidth='450px'
-        data={payments.map(el => ({
-            ...el,
-            color: Number(el.amount) >= 0 ? 'transparent' : 'rgba(227, 18, 18, 0.1)',
-            is_debtor: Number(el.amount) >= 0,
-          }))}
-        columns={columns}
-      />
-
+      <Box style={{ height: 'auto', width: '100%', marginTop: 4 }}>
+        <DataGrid
+          autoHeight
+          selectionModel={[]}
+          hideFooterPagination
+          loading={isLoading}
+          localeText={uzbekLocaleText}
+          rows={payments ?? []}
+          columns={columns}
+        />
+      </Box>
       <iframe src='' id='printFrame' style={{ height: 0 }}></iframe>
 
       <StudentPaymentEditForm openEdit={edit} setOpenEdit={setEdit} />
@@ -663,9 +741,11 @@ const UserViewSecurity = () => {
           To'lovni o'chirishni tasdiqlang
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Button onClick={() => setDelete(null)}>{t('Bekor qilish')}</Button>
-            <LoadingButton variant='outlined' color='error' onClick={onHandleDelete} loading={loading}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Button variant='contained' onClick={() => setDelete(null)}>
+              {t('Bekor qilish')}
+            </Button>
+            <LoadingButton variant='contained' color='error' onClick={onHandleDelete} loading={loading}>
               {t("O'chirish")}
             </LoadingButton>
           </Box>
