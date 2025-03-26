@@ -230,6 +230,8 @@ export const StudentPoints = () => {
           rowCount={pointStudents?.count || 0}
           localeText={uzbekLocaleText}
           page={page}
+          pageSize={pageSize}
+          rowsPerPageOptions={[10, 25, 50]}
           onPageChange={newPage => setPage(newPage)}
           onPageSizeChange={newPageSize => setPageSize(newPageSize)}
           components={{
