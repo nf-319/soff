@@ -272,7 +272,15 @@ const SmsSettings = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '100%' }}>
-      <SmsCard companyInfo={companyInfo} loading={loading === 'birthdate'} placeholders={PLACEHOLDERS.firstname} updateSettings={updateSettings} defaultValue={companyInfo?.auto_sms?.birthday_text} />
+      <SmsCard
+        title="Tug'ilgan kunda sms bilan tabriklash:"
+        subtitle="Xabar matniga dinamik ma'lumotlarni qo'shish uchun quyidagi tugmalardan foydalaning"
+        companyInfo={companyInfo}
+        loading={loading === 'birthdate'}
+        placeholders={PLACEHOLDERS.firstname}
+        updateSettings={updateSettings}
+        defaultValue={companyInfo?.auto_sms?.birthday_text}
+      />
 
       <Card>
         <CardContent>

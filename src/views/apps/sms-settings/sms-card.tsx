@@ -1,16 +1,16 @@
-import React, { FC, useRef, useState } from 'react'
+import { FC, useState, useRef } from 'react'
 import {
   Box,
   Card,
   CardContent,
   Switch,
-  TextField,
   Typography,
   Button,
   Stack,
-  alpha, Tooltip
+  Tooltip,
+  Chip, ButtonProps
 } from '@mui/material'
-import { Check as CheckIcon } from '@mui/icons-material'
+import { ChipProps } from '@mui/material/Chip'
 
 type PlaceholderType = {
   label: string
@@ -25,27 +25,30 @@ type Props = {
   updateSettings: (key: string, value: any) => Promise<void>
   defaultValue?: string
   placeholders: PlaceholderType[]
+  title: string
+  subtitle: string
 }
 
-export const SmsCard: FC<Props> = ({ companyInfo, loading, updateSettings, defaultValue = '', placeholders }) => {
-  const [value, setValue] = useState(defaultValue)
-
-  const textAreaRef = useRef<HTMLTextAreaElement>(null)
+export const SmsCard: FC<Props> = ({
+  companyInfo,
+  loading,
+  updateSettings,
+  defaultValue = '',
+  subtitle,
+  title,
+  placeholders
+}) => {
+  const textRef = useRef<HTMLDivElement>(null)
+  const [value, setValue] = useState<(string | PlaceholderType)[]>(
+    defaultValue?.split(/(\$\{\w+\})/).map(item => {
+      const match = placeholders.find(ph => ph.value === item)
+      return match ? match : item
+    })
+  )
   const [editable, setEditable] = useState(false)
 
-  const handlePlaceholderInsert = (placeholder: string) => {
-    if (textAreaRef.current) {
-      const startPos = textAreaRef.current.selectionStart
-      const endPos = textAreaRef.current.selectionEnd
-      const newValue = value.substring(0, startPos) + placeholder + value.substring(endPos)
-
-      setValue(newValue)
-
-      setTimeout(() => {
-        textAreaRef.current?.setSelectionRange(startPos + placeholder.length, startPos + placeholder.length)
-        textAreaRef.current?.focus()
-      }, 0)
-    }
+  const handlePlaceholderInsert = (placeholder: PlaceholderType) => {
+    setValue(prev => [...prev, placeholder, ' '])
   }
 
   const handleSave = async () => {
@@ -53,7 +56,8 @@ export const SmsCard: FC<Props> = ({ companyInfo, loading, updateSettings, defau
       setEditable(true)
       return
     }
-    await updateSettings('birthday_text', value)
+    const cleanValue = value.map(item => (typeof item === 'string' ? item : item.value)).join('')
+    await updateSettings('birthday_text', cleanValue)
     setEditable(false)
   }
 
@@ -61,7 +65,7 @@ export const SmsCard: FC<Props> = ({ companyInfo, loading, updateSettings, defau
     <Card sx={{ width: '100%', boxShadow: 2 }}>
       <CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-          <Typography sx={{ flexGrow: 1 }}>Tug'ilgan kunda sms bilan tabriklash:</Typography>
+          <Typography>{title}</Typography>
           <Switch
             checked={Boolean(companyInfo?.auto_sms?.on_birthday)}
             onChange={async (_, checked) => {
@@ -69,67 +73,72 @@ export const SmsCard: FC<Props> = ({ companyInfo, loading, updateSettings, defau
             }}
           />
         </Box>
-
         <Typography variant='caption' sx={{ display: 'block', mb: 2, color: 'text.secondary' }}>
-          Xabar matniga dinamik ma'lumotlarni qo'shish uchun quyidagi buttonlardan foydalaning
+          {subtitle}
         </Typography>
 
-        <Box component='div' display='flex' alignItems='center' justifyContent='space-between' marginBottom={2}>
-          <Stack direction='row' spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-            {placeholders.map((placeholder, index) => (
-              <Tooltip key={`${placeholder.label}-${index}`} title={placeholder.placeholder} placement='top'>
-                <Button
-                  key={placeholder.value}
-                  variant='contained'
-                  disabled={!editable}
-                  color={placeholder.color as any}
-                  size='small'
-                  onClick={() => handlePlaceholderInsert(placeholder.value)}
-                  sx={{ textTransform: 'none', boxShadow: 'none' }}
-                >
-                  {placeholder.label}
-                </Button>
-              </Tooltip>
-            ))}
-          </Stack>
-
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            {editable && (
-              <Button variant='outlined' color='secondary' onClick={() => setEditable(false)}>
-                Bekor qilish
+        <Stack direction='row' spacing={1} sx={{ flexWrap: 'wrap', gap: 1, mb: 2 }}>
+          {placeholders.map((placeholder, index) => (
+            <Tooltip key={index} title={placeholder.placeholder} placement='top'>
+              <Button
+                variant='contained'
+                disabled={!editable}
+                color={placeholder.color as ButtonProps['color']}
+                size='small'
+                onClick={() => handlePlaceholderInsert(placeholder)}
+              >
+                {placeholder.label}
               </Button>
-            )}
+            </Tooltip>
+          ))}
+        </Stack>
 
-            <Button variant='contained' color='primary' onClick={handleSave} disabled={loading}>
-              {editable ? 'Saqlash' : 'Tahrirlash'}
+        <Typography
+          ref={textRef}
+          component='div'
+          variant='body1'
+          contentEditable={editable}
+          suppressContentEditableWarning
+          sx={{
+            width: '100%',
+            padding: '16.5px 14px',
+            border: '1px solid rgba(0,0,0,0.23)',
+            borderRadius: 1,
+            minHeight: '125px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 1,
+            outline: 'none'
+          }}
+          onInput={e => {
+            const text = e.currentTarget.textContent || ''
+            const newValue = text.split(/(\$\{\w+\})/).map(item => {
+              const match = placeholders.find(ph => `\${${ph.value}}` === item)
+              return match ? match : item
+            })
+            setValue(newValue)
+          }}
+        >
+          {value?.map((item, index) =>
+            typeof item === 'string' ? (
+              <span key={index}>{item}</span>
+            ) : (
+              <Chip key={index} label={item.label} color={item.color as ChipProps['color']} size='small' />
+            )
+          )}
+        </Typography>
+
+        <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+          {editable && (
+            <Button variant='outlined' color='secondary' onClick={() => setEditable(false)}>
+              Bekor qilish
             </Button>
-          </Box>
-        </Box>
-
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-          <TextField
-            inputRef={textAreaRef}
-            multiline
-            rows={4}
-            fullWidth
-            variant='outlined'
-            value={value}
-            disabled={!editable}
-            onChange={e => setValue(e.target.value)}
-            sx={{ flexGrow: 1 }}
-            InputProps={{
-              readOnly: !editable,
-              sx: {
-                '& .MuiInputBase-input': {
-                  WebkitTextFillColor: 'inherit'
-                }
-              }
-            }}
-          />
+          )}
+          <Button variant='contained' color='primary' onClick={handleSave} disabled={loading}>
+            {editable ? 'Saqlash' : 'Tahrirlash'}
+          </Button>
         </Box>
       </CardContent>
     </Card>
   )
 }
-
-export default SmsCard

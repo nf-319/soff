@@ -1,10 +1,15 @@
 export const PLACEHOLDERS = {
   firstname: [
     {
-      label: 'First Name',
+      label: 'Talaba ismi',
       value: '${first_name}',
       color: 'info',
-      clickColor: "secondary",
+      placeholder: "Bu tugma talaba ismini qo'shish uchun"
+    },
+    {
+      label: 'Talaba ismi',
+      value: '${first_name}',
+      color: 'warning',
       placeholder: "Bu tugma talaba ismini qo'shish uchun"
     }
   ]
