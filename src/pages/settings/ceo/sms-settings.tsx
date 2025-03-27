@@ -14,13 +14,9 @@ import { PLACEHOLDERS } from '../../../views/apps/sms-settings/constants'
 
 const SmsSettings = () => {
   const { isMobile } = useResponsive()
-  const [id, setId] = useState<null | { key: 'branch' | 'payment-type'; id: any }>(null)
-  const [name, setName] = useState<string>('')
-  const [error, setError] = useState<any>({})
   const dispatch = useAppDispatch()
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const { t } = useTranslation()
-  const [birthday_text, setBirthday_text] = useState(companyInfo?.auto_sms?.birthday_text)
   const [absent_text, setAbsent_text] = useState(companyInfo?.auto_sms?.absent_text)
   const [attend_text, setAttend_text] = useState(companyInfo?.auto_sms?.attend_text)
   const [payment_text, setPayment_text] = useState(companyInfo?.auto_sms?.payment_text)
@@ -248,7 +244,6 @@ const SmsSettings = () => {
         }
 
         await api.put('common/auto-sms/update/', formData)
-        setName('')
       } else {
         if (key === 'extra_settings') {
           formData.append('extra_settings', JSON.stringify({ allow_debt_editing_on_payment: value }))
@@ -260,11 +255,8 @@ const SmsSettings = () => {
 
       dispatch(setCompanyInfo(getresp.data[0]))
       setEditable(null)
-      setId(null)
     } catch (err: any) {
-      if (err?.response?.data) {
-        showResponseError(err?.response?.data, setError)
-      }
+      console.error(err)
     } finally {
       setLoading(null)
     }
