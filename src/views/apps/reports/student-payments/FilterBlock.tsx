@@ -89,7 +89,7 @@ export default function FilterBlock() {
   }
 
   const handleFilterBonus = async (e: SelectChangeEvent<string>) => {
-    dispatch(updateParams({ order: e.target.value, page: '1' }))
+    dispatch(updateParams({ bonus: e.target.value, page: '1' }))
     // const queryString = new URLSearchParams({ ...queryParams, payment_type: e.target.value, page: '1' }).toString()
     // await dispatch(fetchStudentPaymentsList(queryString))
   }
@@ -239,26 +239,20 @@ export default function FilterBlock() {
       </FormControl>
       <FormControl fullWidth>
         <InputLabel size='small' id='group-filter-label'>
-          {t("Oquvchi ballari")}
+          {t('Oquvchi bonusi')}
         </InputLabel>
 
         <Select
           sx={{ bgcolor: 'white' }}
           size='small'
-          label={t("Oquvchi ballari")}
-          value={queryParams.order || '0'}
+          label={t('Oquvchi bonusi')}
+          value={queryParams.bonus || ''}
           id='group-filter'
           labelId='group-filter-label'
           onChange={handleFilterBonus}
         >
-          <MenuItem value='0'>
-            {t('Barchasi')}
-          </MenuItem>
-          <MenuItem value='1'>
-          {t("O'sish bo'yicha")}
-          </MenuItem>
-
-         
+          <MenuItem value=''>{t('Barchasi')}</MenuItem>
+          <MenuItem value='1'>{t('Bonus olganlar')}</MenuItem>
         </Select>
       </FormControl>
       <DateRangePicker
