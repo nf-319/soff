@@ -62,7 +62,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
     amount: '',
     description: '',
     payment_date: dayjs().format('YYYY-MM-DD'),
-    bonus: '0'
+    bonus: ""
   }
 
   const formik = useFormik({
@@ -250,12 +250,13 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
             <FormControl fullWidth>
               <TextField
                 rows={4}
-                type='text'
-                label="O'quvchiga bonus (pul miqdorida)"
+                type="text"
+                label="O'quvchiga bonus"
                 name='bonus'
                 size='small'
-                value={values.bonus ? `${formatNumber(values.bonus)}` : '0'}
-                onChange={e => {
+                defaultValue={''}
+                value={values.bonus ? `${t('Ball')} ${formatNumber(values.bonus)}` : ''}
+                onChange={(e) => {
                   const rawValue = e.target.value.replace(/\D/g, '')
                   handleChange({ target: { name: 'bonus', value: rawValue } })
                 }}
@@ -268,16 +269,16 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
                 <DatePicker
                   label="To'lov sanasi"
                   value={values.payment_date ? dayjs(values.payment_date) : null}
-                  format='DD/MM/YYYY'
+                  format="DD/MM/YYYY"
                   onChange={newValue => {
-                    handleChange({ target: { name: 'payment_date', value: dayjs(newValue).format('YYYY-MM-DD') } })
+                    handleChange({ target: { name: 'payment_date', value: dayjs(newValue).format('YYYY-MM-DD') } });
                   }}
                   // @ts-ignore
                   onBlur={handleBlur}
                   slotProps={{
                     textField: {
                       fullWidth: true,
-                      size: 'small',
+                      size: "small",
                       error: !!errors.payment_date && touched.payment_date,
                       helperText: touched.payment_date && errors.payment_date
                     }

@@ -119,7 +119,7 @@ const Navigation = (t: any): HorizontalNavItemsType => {
           path: '/reports/student-payment'
         },
         {
-          title: "O'quvchilar Ballari",
+          title: "O'quvchilar Bonuslari",
           path: '/reports/student-points'
         },
         {
@@ -233,7 +233,7 @@ const Navigation = (t: any): HorizontalNavItemsType => {
           path: '/reports/student-payment'
         },
         {
-          title: "O'quvchilar Ballari",
+          title: "O'quvchilar Bonuslari",
           path: '/reports/student-points'
         },
         {

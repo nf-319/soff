@@ -88,12 +88,6 @@ export default function FilterBlock() {
     // await dispatch(fetchStudentPaymentsList(queryString))
   }
 
-  const handleFilterBonus = async (e: SelectChangeEvent<string>) => {
-    dispatch(updateParams({ order: e.target.value, page: '1' }))
-    // const queryString = new URLSearchParams({ ...queryParams, payment_type: e.target.value, page: '1' }).toString()
-    // await dispatch(fetchStudentPaymentsList(queryString))
-  }
-
   const filterGroup = (group: GroupsPaymentType[]) => {
     const teacherGroup: GroupsPaymentType[] = teacher?.length ? group?.filter(e => teacher === e.teacher) : group
 
@@ -114,7 +108,7 @@ export default function FilterBlock() {
         display: 'grid',
         gridColumn: isMobile ? '1/5' : '1/5',
         alignItems: 'center',
-        gridTemplateColumns: isMobile ? '1fr 1fr' : ' 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr',
+        gridTemplateColumns: isMobile ? '1fr 1fr' : ' 1fr 1fr 1fr 1fr 1fr 1fr 1fr',
         gap: '10px'
       }}
     >
@@ -237,30 +231,7 @@ export default function FilterBlock() {
           ))}
         </Select>
       </FormControl>
-      <FormControl fullWidth>
-        <InputLabel size='small' id='group-filter-label'>
-          {t("Oquvchi ballari")}
-        </InputLabel>
 
-        <Select
-          sx={{ bgcolor: 'white' }}
-          size='small'
-          label={t("Oquvchi ballari")}
-          value={queryParams.order || '0'}
-          id='group-filter'
-          labelId='group-filter-label'
-          onChange={handleFilterBonus}
-        >
-          <MenuItem value='0'>
-            {t('Barchasi')}
-          </MenuItem>
-          <MenuItem value='1'>
-          {t("O'sish bo'yicha")}
-          </MenuItem>
-
-         
-        </Select>
-      </FormControl>
       <DateRangePicker
         style={{ minWidth: 'auto', gridColumn: isMobile ? '1/3' : '' }}
         showOneCalendar
