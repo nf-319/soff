@@ -44,6 +44,7 @@ export const SmsCard: FC<Props> = ({
   const [editable, setEditable] = useState(false)
 
   const handleValueChange = (newValue: string) => {
+    console.log('value ', newValue)
     setValue(newValue)
   }
 
@@ -53,6 +54,7 @@ export const SmsCard: FC<Props> = ({
       const endPos = textAreaRef.current.selectionEnd
       const placeholderText = placeholder.value
       const newValue = value.substring(0, startPos) + placeholderText + value.substring(endPos)
+      console.log(newValue)
       handleValueChange(newValue)
 
       setTimeout(() => {
@@ -139,22 +141,9 @@ export const SmsCard: FC<Props> = ({
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-          {editable ? (
-            <TextField
-              inputRef={textAreaRef}
-              multiline
-              rows={4}
-              fullWidth
-              variant='outlined'
-              value={value}
-              onChange={e => handleValueChange(e.target.value)}
-              sx={{ flexGrow: 1 }}
-            />
-          ) : (
-            <Typography
-              component='div'
-              variant='body1'
-              sx={{
+            <div
+              contentEditable={editable}
+              style={{
                 width: '100%',
                 padding: '16.5px 14px',
                 border: '1px solid rgba(0,0,0,0.23)',
@@ -163,8 +152,7 @@ export const SmsCard: FC<Props> = ({
               }}
             >
               {renderTextWithPlaceholders()}
-            </Typography>
-          )}
+            </div>
         </Box>
       </CardContent>
     </Card>
