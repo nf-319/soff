@@ -36,12 +36,12 @@ const UserView = ({ tab, student }: any) => {
   const { query } = useRouter()
   const columns: GridColDef[] = [
     {
-      width: 100,
+      width: 70,
       headerName: t('ID'),
       field: 'id'
     },
     {
-      width: 150,
+      width: 120,
       headerName: t('Sana'),
       field: 'payment_date',
       renderCell: params => (
@@ -52,7 +52,7 @@ const UserView = ({ tab, student }: any) => {
     },
     {
       headerName: t('Turi'),
-      width: 115,
+      width: 100,
       field: 'condition',
       renderCell: params => (
         <Tooltip title={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}>
@@ -65,9 +65,23 @@ const UserView = ({ tab, student }: any) => {
       )
     },
     {
-      width: 150,
+      width: 130,
       headerName: t('Summa'),
       field: 'amount',
+      renderCell: params => (
+        <Tooltip title={`${formatCurrency(params?.value)} UZS`}>
+          <span>
+            {Number(params.value) <= 0
+              ? `${formatCurrency(Number(params.value) * -1)} UZS`
+              : `${formatCurrency(params.value)} UZS`}
+          </span>
+        </Tooltip>
+      )
+    },
+    {
+      width: 130,
+      headerName: t('Bonus'),
+      field: 'bonus',
       renderCell: params => (
         <Tooltip title={`${formatCurrency(params?.value)} UZS`}>
           <span>
@@ -89,7 +103,7 @@ const UserView = ({ tab, student }: any) => {
       )
     },
     {
-      width: 200,
+      width: 150,
       headerName: t('Izoh'),
       field: 'description',
       renderCell: params => (
@@ -109,12 +123,10 @@ const UserView = ({ tab, student }: any) => {
       )
     },
     {
-      width: 120,
       headerName: t("To'lov turi"),
       field: 'payment_type_name'
     },
     {
-      width: 150,
       headerName: t('Qabul qildi'),
       field: 'admin'
     },
