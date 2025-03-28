@@ -52,7 +52,7 @@ const UserView = ({ tab, student }: any) => {
     },
     {
       headerName: t('Turi'),
-      width: 100,
+      width: 130,
       field: 'condition',
       renderCell: params => (
         <Tooltip title={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}>
