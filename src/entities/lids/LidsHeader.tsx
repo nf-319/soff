@@ -75,6 +75,7 @@ export const LidsHeader = () => {
         />
         <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Switch checked={!isActive} onChange={() => setIsActive(prev => !prev)} />
+          
           {t('Arxiv')}
         </label>
         <Button variant='outlined' onClick={() => push('/lids/stats')}>
