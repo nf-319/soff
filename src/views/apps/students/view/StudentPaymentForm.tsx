@@ -130,7 +130,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
     }
   }, [openEdit])
 
-  const formatNumber = (num: any) => {
+   const formatNumber = (num: any) => {
     return new Intl.NumberFormat('uz-UZ').format(num)
   }
 
