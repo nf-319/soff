@@ -16,32 +16,26 @@ import toast from 'react-hot-toast'
 import * as yup from 'yup'
 import { useFormik } from 'formik'
 import Link from 'next/link'
+import { useAuth } from 'src/hooks/useAuth'
 
 interface Student {
-  id: number;
-  first_name: string;
-  phone: string;
-  total_points: number;
-  branch?: string;
-  rank?: number;
+  id: number
+  first_name: string
+  phone: string
+  total_points: number
+  branch?: string
+  rank?: number
 }
 
 const validationSchema = yup.object({
-  points: yup
-    .number()
-    .required('Ball majburiy')
-    .min(1, 'Ball 1 dan kam bo\'lmasligi kerak'),
-  reason: yup
-    .string()
-    .required('Sabab majburiy'),
-  selectedStudent: yup
-    .object()
-    .nullable()
-    .required('O\'quvchini tanlash majburiy')
+  points: yup.number().required('Ball majburiy').min(1, "Ball 1 dan kam bo'lmasligi kerak"),
+  reason: yup.string().required('Sabab majburiy'),
+  selectedStudent: yup.object().nullable().required("O'quvchini tanlash majburiy")
 })
 
 export const StudentPoints = () => {
   const router = useRouter()
+  const { user } = useAuth()
   const [openAddModal, setOpenAddModal] = useState(false)
   const [students, setStudents] = useState<Student[]>([])
   const [page, setPage] = useState(parseInt(router.query.page as string) || 0)
@@ -49,8 +43,6 @@ export const StudentPoints = () => {
   const [search, setSearch] = useState('')
   const debounceSearch = useDebounce(search, 400)
   const { search: searchQuery, branch, start_date, end_date } = router.query
-
-  console.log(branch)
 
   const { mutate: addMutate } = usePost()
   const {
@@ -70,10 +62,14 @@ export const StudentPoints = () => {
     if (pageSize !== 10) query.pageSize = pageSize.toString()
     else delete query.pageSize
 
-    router.push({
-      pathname: router.pathname,
-      query
-    }, undefined, { shallow: true })
+    router.push(
+      {
+        pathname: router.pathname,
+        query
+      },
+      undefined,
+      { shallow: true }
+    )
   }, [page, pageSize])
 
   const formik = useFormik({
@@ -83,15 +79,15 @@ export const StudentPoints = () => {
       selectedStudent: null as Student | null
     },
     validationSchema: validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async values => {
       try {
         if (values.selectedStudent) {
-          await addMutate("student/point/", {
+          await addMutate('student/point/', {
             user: values.selectedStudent.id,
             point: values.points,
             description: values.reason
           })
-          refetch()
+          await refetch()
           setOpenAddModal(false)
           toast.success("Muvaffaqiyatli qo'shildi")
           formik.resetForm()
@@ -121,6 +117,10 @@ export const StudentPoints = () => {
     }
   }, [debounceSearch])
 
+  useEffect(() => {
+    refetch()
+  }, [user?.active_branch])
+
   const columns = [
     {
       field: 'rank',
@@ -141,12 +141,12 @@ export const StudentPoints = () => {
           style={{
             color: '#4c4e64de',
             textDecoration: 'none',
-            transition: 'text-decoration 0.2s ease',
+            transition: 'text-decoration 0.2s ease'
           }}
-          onMouseEnter={(e) => {
+          onMouseEnter={e => {
             e.currentTarget.style.textDecoration = 'underline'
           }}
-          onMouseLeave={(e) => {
+          onMouseLeave={e => {
             e.currentTarget.style.textDecoration = 'none'
           }}
         >
@@ -202,12 +202,16 @@ export const StudentPoints = () => {
   return (
     <Box component='section'>
       <Box display='flex' alignItems='center' justifyContent='space-between' mb={4}>
-        <Typography variant='h5'>Talabalar reytingi</Typography>
+        <Typography variant='h5'>O'quvchilar ballari</Typography>
 
-        <Button variant='outlined' size='medium' onClick={() => {
-          formik.resetForm()
-          setOpenAddModal(true)
-        }}>
+        <Button
+          variant='outlined'
+          size='medium'
+          onClick={() => {
+            formik.resetForm()
+            setOpenAddModal(true)
+          }}
+        >
           Ball berish
         </Button>
       </Box>
@@ -226,10 +230,12 @@ export const StudentPoints = () => {
           rowCount={pointStudents?.count || 0}
           localeText={uzbekLocaleText}
           page={page}
+          pageSize={pageSize}
+          rowsPerPageOptions={[10, 25, 50]}
           onPageChange={newPage => setPage(newPage)}
           onPageSizeChange={newPageSize => setPageSize(newPageSize)}
           components={{
-            Pagination: GridPagination,
+            Pagination: GridPagination
           }}
           initialState={{
             pagination: {
@@ -237,19 +243,25 @@ export const StudentPoints = () => {
               page: 0
             }
           }}
-
         />
 
         <Dialog open={openAddModal} onClose={() => setOpenAddModal(false)} maxWidth='sm' fullWidth>
           <DialogTitle>Ball berish</DialogTitle>
           <DialogContent>
             {formik.values.selectedStudent && (
-              <Box style={{ marginBottom: 2, marginTop: 2, display: "flex", justifyContent: 'space-between', alignItems: 'start' }}>
+              <Box
+                style={{
+                  marginBottom: 2,
+                  marginTop: 2,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'start'
+                }}
+              >
                 <Box>
-
-                <Typography variant='subtitle1'>Talaba: {formik.values.selectedStudent.first_name}</Typography>
-                <Typography variant='body2'>Telefon: {formik.values.selectedStudent.phone}</Typography>
-                <Typography variant='body2'>Joriy ball: {formik.values.selectedStudent.total_points}</Typography>
+                  <Typography variant='subtitle1'>Talaba: {formik.values.selectedStudent.first_name}</Typography>
+                  <Typography variant='body2'>Telefon: {formik.values.selectedStudent.phone}</Typography>
+                  <Typography variant='body2'>Joriy ball: {formik.values.selectedStudent.total_points}</Typography>
                 </Box>
 
                 <Button variant='outlined' size='small' onClick={() => formik.setFieldValue('selectedStudent', null)}>
@@ -265,16 +277,16 @@ export const StudentPoints = () => {
                 onChange={(event, newValue) => {
                   formik.setFieldValue('selectedStudent', newValue)
                 }}
-                renderInput={(params) => (
+                renderInput={params => (
                   <TextField
                     {...params}
-                    label="Talabani qidiring"
-                    variant="outlined"
+                    label='Talabani qidiring'
+                    variant='outlined'
                     fullWidth
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={e => setSearch(e.target.value)}
                     required
                     error={formik.touched.selectedStudent && Boolean(formik.errors.selectedStudent)}
-                    helperText={formik.touched.selectedStudent && formik.errors.selectedStudent as string}
+                    helperText={formik.touched.selectedStudent && (formik.errors.selectedStudent as string)}
                   />
                 )}
                 style={{ marginTop: 2 }}
@@ -310,10 +322,7 @@ export const StudentPoints = () => {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenAddModal(false)}>Bekor qilish</Button>
-            <Button
-              onClick={() => formik.handleSubmit()}
-              variant='contained'
-            >
+            <Button onClick={() => formik.handleSubmit()} variant='contained'>
               Saqlash
             </Button>
           </DialogActions>

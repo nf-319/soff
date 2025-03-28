@@ -29,6 +29,10 @@ const EditCompany = () => {
   const { isMobile } = useResponsive()
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
+  const [showStudents, setShowStudents] = useState(false)
+
+  console.log(details);
+  
 
   const validationSchema = Yup.object({
     name: Yup.string().required(t('Ism kiritish shart') || 'Ism kiritish shart'),
@@ -44,24 +48,22 @@ const EditCompany = () => {
     expiration_date: Yup.date().required(t('Majburiy maydon') || 'Majburiy maydon')
   })
 
-
   const formik = useFormik({
     initialValues: {
       name: details?.name || '',
-      salary_service:details?.salary_service||"",
+      salary_service: details?.salary_service || '',
       reference_name: details?.reference_name || '',
       reference_phone: details?.reference_phone || '+998',
       payment_service: details?.payment_service || 'by_coming_date',
       number_of_lesson: details?.number_of_lesson || '',
-      expiration_date: details?.expiration_date || '',
-      show_students: false
+      expiration_date: details?.expiration_date || ''
     },
     validationSchema,
     onSubmit: async values => {
-
       setLoading(true)
+
       try {
-        await api.patch(`/owner/client/${details?.id}/`, values)
+        await api.patch(`/owner/client/${details?.id}/`, { ...values, show_students: showStudents })
         void Router.push('/c-panel')
         toast.success("O'zgartirildi")
       } catch (err: any) {
@@ -194,12 +196,11 @@ const EditCompany = () => {
             <FormLabel>O'quvchi qarzdorligi o'qtuvchiga ko'rinsinmi?</FormLabel>
 
             <RadioGroup
-              defaultValue='false'
               row
+              defaultValue={showStudents}
               name='show_students'
-              value={formik.values.show_students}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
+              value={showStudents}
+              onChange={() => setShowStudents(!showStudents)}
             >
               <FormControlLabel control={<Radio />} value={true} label='Ha' />
               <FormControlLabel control={<Radio />} value={false} label="Yo'q" />
