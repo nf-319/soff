@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Button, Switch, TextField } from '@mui/material'
+import { Box, Button, Switch, TextField, Tooltip } from '@mui/material'
 import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -25,9 +25,9 @@ export const LidsHeader = () => {
   const searchVal = useDebounce(search, 800)
 
   useEffect(() => {
-    const searchQuery = Array.isArray(query.search) ? query.search[0] : query.search || '';
-    setSearch(searchQuery);
-  }, [query.search]);
+    const searchQuery = Array.isArray(query.search) ? query.search[0] : query.search || ''
+    setSearch(searchQuery)
+  }, [query.search])
 
   useEffect(() => {
     const updatedQuery = { ...query }
@@ -75,11 +75,14 @@ export const LidsHeader = () => {
         />
         <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Switch checked={!isActive} onChange={() => setIsActive(prev => !prev)} />
-          
-          {t('Arxiv')}
+          <Tooltip title={t('Arxivdagi leadlarni ko‘rish.')} arrow>
+            <span>{t('Arxiv')}</span>
+          </Tooltip>
         </label>
         <Button variant='outlined' onClick={() => push('/lids/stats')}>
-          {t('Hisobot')}
+          <Tooltip title={t('Lidlar manbasi va hisoboti.')}>
+            <span>{t('Manba')}</span>
+          </Tooltip>
         </Button>
       </form>
 
