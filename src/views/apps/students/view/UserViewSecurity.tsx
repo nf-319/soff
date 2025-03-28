@@ -395,7 +395,7 @@ const UserViewSecurity = () => {
     if (query?.student) {
       dispatch(fetchStudentGroups(query?.student))
     }
-    dispatch(fetchStudentPayment(query?.student))
+    // dispatch(fetchStudentPayment(query?.student))
   }, [query?.student])
 
   return (
@@ -703,7 +703,7 @@ const UserViewSecurity = () => {
         <EmptyContent />
       )}
 
-      <Typography sx={{ my: 3, fontSize: '20px' }}>{t("To'lov tarixi")}</Typography>
+      {/* <Typography sx={{ my: 3, fontSize: '20px' }}>{t("To'lov tarixi")}</Typography>
       <Box style={{ height: 'auto', width: '100%', marginTop: 4 }}>
         <DataGrid
           autoHeight
@@ -714,7 +714,7 @@ const UserViewSecurity = () => {
           rows={payments ?? []}
           columns={columns}
         />
-      </Box>
+      </Box> */}
       <iframe src='' id='printFrame' style={{ height: 0 }}></iframe>
 
       <StudentPaymentEditForm openEdit={edit} setOpenEdit={setEdit} />
