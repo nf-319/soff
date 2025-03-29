@@ -11,7 +11,7 @@ import {
   Button,
   Stack,
   Tooltip,
-  Chip, ButtonProps
+  Chip, ButtonProps, Alert
 } from '@mui/material'
 import { ChipProps } from '@mui/material/Chip'
 
@@ -30,8 +30,9 @@ type Props = {
   placeholders: PlaceholderType[]
   title: string
   onSwitch: string
+  name: string
   onSwitchInfo: boolean
-  subtitle: string
+  alert?: string
 }
 
 export const SmsCard: FC<Props> = ({
@@ -39,7 +40,8 @@ export const SmsCard: FC<Props> = ({
   loading,
   updateSettings,
   defaultValue = '',
-  subtitle,
+  name,
+  alert,
   onSwitch,
   title,
   placeholders
@@ -175,12 +177,12 @@ export const SmsCard: FC<Props> = ({
       setEditable(true)
       return
     }
-    await updateSettings(onSwitch, value)
+    await updateSettings(name, value)
     setEditable(false)
   }
 
   const renderTextWithPlaceholders = () => {
-    return value.split(/(\$\{(?:group|balance|first_name|reason|score)})/).map((part, index) => {
+    return value.split(/(\$\{(?:group|balance|first_name|reason|score|amount|date)})/).map((part, index) => {
       const placeholder = placeholders.find(p => p.value === part)
       if (placeholder) {
         return (
@@ -201,19 +203,25 @@ export const SmsCard: FC<Props> = ({
     <Card sx={{ width: '100%', boxShadow: 2 }}>
       <CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-          <Typography>{title}</Typography>
+          <Typography variant='h6'>{title}</Typography>
 
           <Switch
             checked={onSwitchInfo}
             onChange={async (_, checked) => {
-              await updateSettings('on_birthday', checked)
+              await updateSettings(onSwitch, checked)
             }}
           />
         </Box>
 
         <Typography variant='caption' sx={{ display: 'block', mb: 2, color: 'text.secondary' }}>
-          {subtitle}
+          Xabar matniga dinamik ma'lumotlarni qo'shish uchun quyidagi tugmalardan foydalaning
         </Typography>
+
+        {alert && (
+          <Alert severity='info' sx={{ mb: 2 }}>
+            Eslatma: {alert}
+          </Alert>
+        )}
 
         <Box component='div' display='flex' alignItems='center' justifyContent='space-between' marginBottom={2}>
           <Stack direction='row' spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>

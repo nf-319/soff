@@ -1,6 +1,6 @@
 const FIRST_NAME = {
   label: 'Talaba ismi',
-  value: '{first_name}',
+  value: '${first_name}',
   color: 'info',
   displayValue: '@TALABA_ISMI',
   placeholder: "Xabar matniga talabaning ismini qo'shish uchun",
@@ -8,7 +8,7 @@ const FIRST_NAME = {
 
 const GROUP = {
   label: 'Guruh nomi',
-  value: '{group}',
+  value: '${group}',
   color: 'warning',
   displayValue: '@GURUH_NOMI',
   placeholder: "Xabar matniga guruh nomini qo'shish uchun",
@@ -16,7 +16,7 @@ const GROUP = {
 
 const BALANCE = {
   label: 'Balans',
-  value: '{balance}',
+  value: '${balance}',
   color: 'warning',
   displayValue: '@BALANS',
   placeholder: "Xabar matniga balansni qo'shish uchun",
@@ -24,7 +24,7 @@ const BALANCE = {
 
 const REASON = {
   label: 'Sabab',
-  value: '{reason}',
+  value: '${reason}',
   color: 'info',
   displayValue: '@SABAB',
   placeholder: "Xabar matniga sababni qo'shish uchun",
@@ -32,7 +32,7 @@ const REASON = {
 
 const SCORE = {
   label: 'Ball',
-  value: '{score}',
+  value: '${score}',
   color: 'success',
   displayValue: '@BALL',
   placeholder: "Xabar matniga ball qo'shish uchun",
@@ -40,7 +40,7 @@ const SCORE = {
 
 const DATE = {
   label: 'Sana',
-  value: '{date}',
+  value: '${date}',
   color: 'primary',
   displayValue: '@SANA',
   placeholder: "Xabar matniga sanani qo'shish uchun",
@@ -48,8 +48,8 @@ const DATE = {
 
 const AMOUNT = {
   label: 'Miqdor',
-  value: '{amount}',
-  color: 'danger',
+  value: '${amount}',
+  color: 'warning',
   displayValue: '@MIQDOR',
   placeholder: "Xabar matniga miqdorni qo'shish uchun",
 }
