@@ -44,7 +44,6 @@ const Lids = () => {
     params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
 
-  // Modified approach
   useEffect(() => {
     if (!leadData || leadData.results.length === 0) return
 
@@ -85,8 +84,6 @@ const Lids = () => {
   }
 
   const currentDepartmentId = currentData?.id ? String(currentData.id) : null
-
-  console.log(currentData?.id)
 
   return (
     <div>

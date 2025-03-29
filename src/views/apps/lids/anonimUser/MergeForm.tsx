@@ -17,6 +17,8 @@ import { useGet } from 'src/hooks/useApi'
 import { LeadsResult } from '../../../../entities/lids/LeadsKanban'
 import { LeadsType } from 'src/entities/lids'
 import { useAuth } from 'src/hooks/useAuth'
+import { DepartmentsResultType } from '../../../../pages/lids'
+import { useRouter } from 'next/router'
 
 type Props = {
   item: any
@@ -29,22 +31,24 @@ type Props = {
 
 export default function MergeToDepartment({ setOpen, open, currentId, is_amocrm, item, reRender }: Props) {
   const { t } = useTranslation()
+  const { query } = useRouter()
   const dispatch = useAppDispatch()
   const { loading, pipelines } = useAppSelector(state => state.leads)
   const [department, setDepartment] = useState<any>(null)
   const [loadingAmo, setLoading] = useState(false)
   const { user } = useAuth()
+  const { is_active } = query
 
   const validationSchema = Yup.object({
     department: Yup.number().required("Bo'limni tanlang")
   })
 
-  const { data: leadData } = useGet<LeadsType<LeadsResult[]>>('leads/department/parent/', {
-    params: { branch: user?.active_branch},
-    deps: ['departments-leads']
+  const {
+    data: leadData,
+  } = useGet<LeadsType<DepartmentsResultType[]>>('leads/departments/', {
+    deps: ['leads'],
+    params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
-
-  console.log(department)
 
   const { data: parentLeadData } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
     params: { branch: user?.active_branch, parent: department},
