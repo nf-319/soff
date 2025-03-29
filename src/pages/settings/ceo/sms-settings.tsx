@@ -267,9 +267,10 @@ const SmsSettings = () => {
       <SmsCard
         title="Tug'ilgan kunda sms bilan tabriklash:"
         subtitle="Xabar matniga dinamik ma'lumotlarni qo'shish uchun quyidagi tugmalardan foydalaning"
-        companyInfo={companyInfo}
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_birthday)}
         loading={loading === 'birthdate'}
-        placeholders={PLACEHOLDERS.firstname}
+        onSwitch='on_birthday'
+        placeholders={PLACEHOLDERS.birthdate}
         updateSettings={updateSettings}
         defaultValue={companyInfo?.auto_sms?.birthday_text}
       />
