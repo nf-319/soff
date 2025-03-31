@@ -474,21 +474,21 @@ export default function EditGroupModal() {
                   </FormHelperText>
                   </FormControl>
 
-                {/*  <FormControl sx={{ width: '100%' }}>*/}
-                {/*  <TextField*/}
-                {/*    size='small'*/}
-                {/*    type='date'*/}
-                {/*    label={t('Tugash sanasi')}*/}
-                {/*    name='end_date'*/}
-                {/*    onChange={formik.handleChange}*/}
-                {/*    onBlur={formik.handleBlur}*/}
-                {/*    value={formik.values.end_date}*/}
-                {/*    error={!!formik.errors.end_date && formik.touched.end_date}*/}
-                {/*  />*/}
-                {/*  <FormHelperText error={!!formik.errors.end_date && formik.touched.end_date}>*/}
-                {/*    {!!formik.errors.end_date && formik.touched.end_date && formik.errors.end_date}*/}
-                {/*  </FormHelperText>*/}
-                {/*</FormControl>*/}
+                 <FormControl sx={{ width: '100%' }}>
+                 <TextField
+                   size='small'
+                  type='date'
+                    label={t('Tugash sanasi')}
+                   name='end_date'
+                   onChange={formik.handleChange}
+                   onBlur={formik.handleBlur}
+                   value={formik.values.end_date}
+                   error={!!formik.errors.end_date && formik.touched.end_date}
+                 />
+                  <FormHelperText error={!!formik.errors.end_date && formik.touched.end_date}>
+                   {!!formik.errors.end_date && formik.touched.end_date && formik.errors.end_date}
+                 </FormHelperText>
+                </FormControl>
 
                 <FormControl sx={{ width: '100%' }}>
                   <TextField

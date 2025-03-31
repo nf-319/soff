@@ -12,7 +12,8 @@ import {
   OutlinedInput,
   Select,
   SelectChangeEvent,
-  TextField
+  TextField,
+  Tooltip
 } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -51,8 +52,7 @@ export const GroupsFilter = ({ isMobile }: GroupsFilterProps) => {
       .get(`meets/google/login/`)
       .then(res => {
         if (res.data.url) {
-         router.push(res.data.url)
-
+          router.push(res.data.url)
         }
       })
       .catch(err => {
@@ -280,7 +280,8 @@ export const GroupsFilter = ({ isMobile }: GroupsFilterProps) => {
               <MenuItem value={'monday,tuesday,wednesday,thursday,friday,saturday,sunday'}>{t('Har kuni')}</MenuItem>
             </Select>
           </FormControl>
-          <Excel url='/common/groups/export/' queryString={queryString} />
+            <Excel tooltip="Ko‘rinib turgan jadvalni Excel fayliga yuklab oling." url='/common/groups/export/' queryString={queryString} />
+          <Tooltip title={t("Online darsni boshlash uchun bosing.")}>
           <LoadingButton
             loading={onlineLessonLoading}
             color='success'
@@ -291,6 +292,7 @@ export const GroupsFilter = ({ isMobile }: GroupsFilterProps) => {
           >
             <IconifyIcon icon='mdi:laptop' />
           </LoadingButton>
+          </Tooltip>
         </Box>
       </Box>
     )

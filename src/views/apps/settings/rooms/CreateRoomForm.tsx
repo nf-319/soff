@@ -28,7 +28,7 @@ export default function CreateRoomForm({ }: Props) {
     }
 
     const validationSchema = Yup.object({
-        name: Yup.string().required("Nom kiriting"),
+        name: Yup.string().required(t("Nomini kiriting")||"Nomini kiriting"),
     });
 
     const formik: any = useFormik({
