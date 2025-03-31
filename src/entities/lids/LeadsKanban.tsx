@@ -235,9 +235,8 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      {/* Main droppable for sections */}
-      <Droppable droppableId='section-list' direction={isMobile ? 'vertical' : 'horizontal'} type='SECTION'>
-        {provided => (
+      <Droppable droppableId="section-list" direction={isMobile ? 'vertical' : 'horizontal'} type="SECTION">
+        {(provided) => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
@@ -253,7 +252,6 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
           >
             {displayData?.results?.length ? (
               displayData.results.map((section, sectionIndex) => (
-                // Make each section draggable
                 <Draggable key={section.id} draggableId={`section-${section.id}`} index={sectionIndex}>
                   {(sectionProvided, sectionSnapshot) => (
                     <div
@@ -282,7 +280,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
                               display='flex'
                               alignItems='center'
                               justifyContent='space-between'
-                              {...sectionProvided.dragHandleProps} // Add drag handle to header
+                              {...sectionProvided.dragHandleProps}
                               sx={{ cursor: 'grab' }}
                             >
                               <div
