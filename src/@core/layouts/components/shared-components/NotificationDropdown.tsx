@@ -141,7 +141,7 @@ const NotificationDropdown = (props: Props) => {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <Typography sx={{ cursor: 'text', fontWeight: 600 }}>{t('Xabarnomalar')}</Typography>
 
-            {data?.results.length?.length !== 0 && (
+            {data?.results.length  && (
               <CustomChip
                 skin='light'
                 size='small'
