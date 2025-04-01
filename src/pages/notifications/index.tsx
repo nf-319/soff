@@ -5,10 +5,13 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { EmptyContent } from 'src/components/empty-content'
-import { NotificationsType } from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchNotification } from 'src/store/apps/user'
 import { ChevronLeft } from 'lucide-react'
+import useNotificationStore from 'src/store/apps/notification'
+import { NotificationItemType } from 'src/@core/layouts/components/shared-components/NotificationDropdown'
+import { useNotifications } from 'src/hooks/useNotification'
+import useResponsive from 'src/@core/hooks/useResponsive'
 
 const MenuItemTitle = styled(Typography)<TypographyProps>(({ theme }) => ({
   fontWeight: 600,
@@ -44,49 +47,74 @@ const NotificationContainer = styled(Box)<BoxProps>(({ theme }) => ({
 
 export default function Notifications() {
   const { t } = useTranslation()
+  const { isMobile } = useResponsive()
   const { back } = useRouter()
-  const dispatch = useAppDispatch()
-  const { notifications } = useAppSelector(state => state.user)
-
+  const { data, refetch } = useNotifications()
   useEffect(() => {
     ;(async function () {
       if (!window.location.hostname.split('.').includes('c-panel')) {
-        await dispatch(fetchNotification())
+        await refetch()
       }
     })()
   }, [])
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Box
         className='groups-page-header'
-        sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 1
+        }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <IconButton onClick={back} color='primary'>
             <ChevronLeft />
           </IconButton>
-
           <Typography variant='h5'>{t('Xabarnomalar')}</Typography>
         </Box>
       </Box>
+      {data?.results.length ? (
+        <Box
+          sx={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+            alignItems: 'center'
+          }}
+        >
+          {data?.results?.map((element: NotificationItemType) => (
+            <Box
+              key={element.id}
+              sx={{
+                maxWidth: '100%',
+                width:'100%',
+                bgcolor: '#E0E0E0',
+                p: 5,
+                borderRadius: 2,
+                boxShadow: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}
+            >
+              <Typography variant='h6' sx={{ textAlign: 'center', fontWeight: 'bold', color: 'black' }}>
+                {element.notification.title}
+              </Typography>
 
-      {notifications.length ? (
-        <NotificationContainer sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {notifications?.map((element: NotificationsType) => (
-            <Box sx={{ bgcolor: '#F8EFE0', p: 3, borderRadius: '10px' }}>
-              <Box sx={{ flex: '1 1', display: 'flex', fontSize: '12px', overflow: 'hidden', flexDirection: 'column' }}>
-                <MenuItemTitle>{element.notification_data.title}</MenuItemTitle>
+              <Typography variant='body2' sx={{ textAlign: 'center', mt: 2, width: '100%', borderRadius: '8px' }}>
+                <div style={{width:'100%'}} dangerouslySetInnerHTML={{ __html: element.notification.body }} />
+              </Typography>
 
-                <MenuItemSubtitle variant='body2'>{element.notification_data.body}</MenuItemSubtitle>
-              </Box>
-
-              <Typography variant='caption' sx={{ color: 'text.disabled' }}>
-                {element.date}
+              <Typography variant='caption' sx={{ color: 'black', marginTop: 2 }}>
+                {element.notification.created_at}
               </Typography>
             </Box>
           ))}
-        </NotificationContainer>
+        </Box>
       ) : (
         <EmptyContent />
       )}
