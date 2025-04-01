@@ -45,6 +45,7 @@ import ExportDetailStudent from '../../groups/view/ViewStudents/ExportDetailStud
 import DebtorsDataTable from 'src/components/table/debtorsTable'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { uzbekLocaleText } from '../../StudentsPoints/constants'
+import { MoreVertical } from 'lucide-react'
 
 export async function downloadImage(filename: string, url: string) {
   await fetch(url, {
@@ -95,7 +96,6 @@ const UserViewSecurity = () => {
     }
     setOpenEdit(value)
   }
-  console.log(payments)
 
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>, groupData: any) => {
@@ -199,6 +199,7 @@ const UserViewSecurity = () => {
   }
   const columns: GridColDef[] = [
     {
+      width: 70,
       headerName: t('ID'),
       field: 'id'
     },
@@ -213,6 +214,7 @@ const UserViewSecurity = () => {
     },
     {
       headerName: t('Turi'),
+      width: 115,
       field: 'condition',
       renderCell: params => (
         <Tooltip title={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}>
@@ -225,6 +227,7 @@ const UserViewSecurity = () => {
       )
     },
     {
+      width: 120,
       headerName: t('Summa'),
       field: 'amount',
       renderCell: params => (
@@ -257,6 +260,7 @@ const UserViewSecurity = () => {
     },
     {
       headerName: 'Yaratilgan vaqt',
+      width: 140,
       field: 'created_at',
       renderCell: params => (
         <Tooltip title={params.value || ''}>
@@ -391,7 +395,7 @@ const UserViewSecurity = () => {
     if (query?.student) {
       dispatch(fetchStudentGroups(query?.student))
     }
-    dispatch(fetchStudentPayment(query?.student))
+    // dispatch(fetchStudentPayment(query?.student))
   }, [query?.student])
 
   return (
@@ -426,7 +430,7 @@ const UserViewSecurity = () => {
                   !(user?.role.length === 1 && user?.role.includes('teacher')) ? handleClick(e, group) : undefined
                 }
               >
-                <IconifyIcon icon={'charm:menu-kebab'} fontSize={15} />
+                <MoreVertical size={15} />
               </Typography>
 
               <Menu
@@ -623,9 +627,12 @@ const UserViewSecurity = () => {
                         </Box>
                       </Box>
                       <Box sx={{ marginBottom: 2 }}>
-                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', marginBottom: 2 }}>
-                          <Typography sx={{ color: 'black' }}>Dars kunlari :</Typography>
+                        <Box sx={{ marginBottom: 2 }} display={'flex'} alignItems={'center'} gap={2}>
+                          <Typography sx={{ fontSize: 15, color: 'black' }}>Dars vaqti :</Typography>
                           <Typography fontSize={12}>{group.lesson_time}</Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', marginBottom: 2 }}>
+                          <Typography sx={{ fontSize: 15, color: 'black' }}>Dars kunlari :</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', paddingBottom: 2 }}>
                           {group?.lesson_days?.map((day: any) => (
@@ -696,7 +703,7 @@ const UserViewSecurity = () => {
         <EmptyContent />
       )}
 
-      <Typography sx={{ my: 3, fontSize: '20px' }}>{t("To'lov tarixi")}</Typography>
+      {/* <Typography sx={{ my: 3, fontSize: '20px' }}>{t("To'lov tarixi")}</Typography>
       <Box style={{ height: 'auto', width: '100%', marginTop: 4 }}>
         <DataGrid
           autoHeight
@@ -707,7 +714,7 @@ const UserViewSecurity = () => {
           rows={payments ?? []}
           columns={columns}
         />
-      </Box>
+      </Box> */}
       <iframe src='' id='printFrame' style={{ height: 0 }}></iframe>
 
       <StudentPaymentEditForm openEdit={edit} setOpenEdit={setEdit} />
@@ -738,8 +745,10 @@ const UserViewSecurity = () => {
           To'lovni o'chirishni tasdiqlang
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', justifyContent: 'center' ,gap:2}}>
-            <Button variant='contained' onClick={() => setDelete(null)}>{t('Bekor qilish')}</Button>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Button variant='contained' onClick={() => setDelete(null)}>
+              {t('Bekor qilish')}
+            </Button>
             <LoadingButton variant='contained' color='error' onClick={onHandleDelete} loading={loading}>
               {t("O'chirish")}
             </LoadingButton>

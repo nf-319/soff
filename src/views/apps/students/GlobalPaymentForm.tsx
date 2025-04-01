@@ -111,7 +111,8 @@ export default function GlobalPaymentForm({}: Props) {
     debt_amount: groupData?.last_debt,
     payment_date: today,
     group: '',
-    payment_type: ''
+    payment_type: '',
+    bonus: '0'
   }
 
   const formik: any = useFormik({
@@ -179,13 +180,15 @@ export default function GlobalPaymentForm({}: Props) {
     setLoading(false)
   }
 
-
   useEffect(() => {
     setStudentList([])
     if (!formik.errors.search && search) {
       handleSearch()
     }
   }, [search])
+  const formatNumber = (num: any) => {
+    return new Intl.NumberFormat('uz-UZ').format(num)
+  }
 
   return (
     <Box sx={isMobile ? { width: '100%' } : { width: '450px' }}>
@@ -354,20 +357,37 @@ export default function GlobalPaymentForm({}: Props) {
             </FormControl>
           )}
           {step === 'pay' && (
-            <FormControl fullWidth>
-              <AmountInput
-                size='small'
-                placeholder={t('Summa')}
-                error={!!payform.errors.amount && payform.touched.amount}
-                name='amount'
-                value={payform.values.amount}
-                onChange={payform.handleChange}
-                onBlur={payform.handleBlur}
-              />
-              {!!payform.errors.amount && payform.touched.amount && (
-                <FormHelperText error>{payform.errors.amount}</FormHelperText>
-              )}
-            </FormControl>
+            <>
+              <FormControl fullWidth>
+                <AmountInput
+                  size='small'
+                  placeholder={t('Summa')}
+                  error={!!payform.errors.amount && payform.touched.amount}
+                  name='amount'
+                  value={payform.values.amount}
+                  onChange={payform.handleChange}
+                  onBlur={payform.handleBlur}
+                />
+                {!!payform.errors.amount && payform.touched.amount && (
+                  <FormHelperText error>{payform.errors.amount}</FormHelperText>
+                )}
+              </FormControl>
+              <FormControl fullWidth>
+                <TextField
+                  rows={4}
+                  type='text'
+                  label="O'quvchiga bonus (pul miqdorida)"
+                  name='bonus'
+                  size='small'
+                  value={payform.values.bonus ? `${formatNumber(payform.values.bonus)}` : '0'}
+                  onChange={e => {
+                    const rawValue = e.target.value.replace(/\D/g, '')
+                    payform.handleChange({ target: { name: 'bonus', value: rawValue } })
+                  }}
+                  onBlur={payform.handleBlur}
+                />
+              </FormControl>
+            </>
           )}
 
           {step === 'pay' && (

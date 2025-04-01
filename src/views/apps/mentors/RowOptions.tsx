@@ -48,7 +48,7 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
 
   const handleDeleteTeacher = async (id: string | number) => {
     dispatch(disablePage(true))
-    mutate(ceoConfigs.employee_delete + id, {
+    mutate(ceoConfigs.employee_delete + id + '/', {
       onSuccess: () => {
         toast.success(`${t("O'qituvchilar ro'yxatidan o'chirildi")}`, { position: 'top-center' })
         queryClient.invalidateQueries({ queryKey: [ceoConfigs.teachers, 'mentors'] })

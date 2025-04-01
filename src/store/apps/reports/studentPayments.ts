@@ -48,6 +48,7 @@ interface IStudentsPaymentState {
   isLoading: boolean
   groups: GroupsPaymentType[]
   queryParams: {
+    bonus?:string,
     payment_type: string
     teacher?: any
     course?: any
@@ -65,7 +66,7 @@ const initialState: IStudentsPaymentState = {
   studentsPayment: [],
   teachersData: [],
   groups: [],
-  queryParams: { payment_type: '', is_payment: true, page: '1', offset: '0', limit: '10', teacher: '', course: '' },
+  queryParams: {bonus:'', payment_type: '', is_payment: true, page: '1', offset: '0', limit: '10', teacher: '', course: '' },
   paymentsCount: 0,
   total_payments: 0,
   isLoading: false

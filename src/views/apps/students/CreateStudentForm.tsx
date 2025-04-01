@@ -26,12 +26,7 @@ import { today } from 'src/components/card-statistics/kanban-item'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { CreateStudentDto } from 'src/types/apps/studentsTypes'
-import {
-  createStudent,
-  fetchGroupCheckList,
-  setOpenEdit,
-  updateStudentParams
-} from 'src/store/apps/students'
+import { createStudent, fetchGroupCheckList, setOpenEdit, updateStudentParams } from 'src/store/apps/students'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import PhoneInput from 'src/components/phone-input'
@@ -42,6 +37,7 @@ import Router from 'next/router'
 import { TeacherAvatar, VisuallyHiddenInput } from '../mentors/AddMentorsModal'
 import { useQueryClient } from '@tanstack/react-query'
 import { Add, Remove } from '@mui/icons-material'
+import { fetchSchoolsList } from 'src/store/apps/settings'
 
 export default function CreateStudentForm() {
   const { t } = useTranslation()
@@ -72,21 +68,21 @@ export default function CreateStudentForm() {
     phone: Yup.string().required('Telefon raqam kiriting'),
     birth_date: Yup.string(),
     parent_phone: Yup.string().nullable(),
-    parent_first_name:Yup.string().nullable(),
+    parent_first_name: Yup.string().nullable(),
     gender: Yup.string().required('Jinsini tanlang'),
     password: Yup.string(),
     is_discount: Yup.boolean(),
     discount_amount: Yup.number().when('is_discount', {
       is: true,
-      then: Yup.number().required("Chegirma miqdorini kiriting"),
-      otherwise: Yup.number().nullable(),
-    }),
+      then: Yup.number().required('Chegirma miqdorini kiriting'),
+      otherwise: Yup.number().nullable()
+    })
   })
 
   const initialValues: CreateStudentDto = {
     first_name: '',
     phone: '',
-    parent_first_name:'',
+    parent_first_name: '',
     image: '',
     school: '',
     parent_phone: '',
@@ -95,7 +91,7 @@ export default function CreateStudentForm() {
     gender: 'male',
     start_at: today,
     is_discount: false,
-    discount_amount: 0,
+    discount_amount: 0
   }
 
   const formik = useFormik({
@@ -146,7 +142,7 @@ export default function CreateStudentForm() {
 
   useEffect(() => {
     void getGroups()
-
+    dispatch(fetchSchoolsList())
     return () => {
       formik.resetForm()
     }
@@ -292,7 +288,7 @@ export default function CreateStudentForm() {
               Guruhga qo'shish
             </AccordionSummary>
             <AccordionDetails>
-              <FormControl style={{ display: "grid", gap: '5px' }} fullWidth>
+              <FormControl style={{ display: 'grid', gap: '5px' }} fullWidth>
                 <InputLabel size='small' id='user-view-language-label'>
                   {t('Guruhlar')}
                 </InputLabel>
@@ -306,14 +302,19 @@ export default function CreateStudentForm() {
                   name='group'
                   onChange={handleChange}
                   value={values.group || ''}
-                  sx={{ mb: 3 }}
+                  sx={{ mb: 3, maxWidth: isMobile ? 320 : 'auto' }}
                 >
                   <MenuItem className='hover:bg-gray-100 cursor-not-allowed' sx={{ width: '500px' }}>
                     <TextField onChange={e => handleSearch(e.target.value)} label={'Qidiruv'} fullWidth size='small' />
                   </MenuItem>
 
                   {groups.map((group: any) => (
-                    <MenuItem key={group.id} onClick={() => setIsGroup(true)} value={Number(group.id)} sx={{ width: '500px' }}>
+                    <MenuItem
+                      key={group.id}
+                      onClick={() => setIsGroup(true)}
+                      value={Number(group.id)}
+                      sx={{ width: '500px' }}
+                    >
                       {group.name}
                     </MenuItem>
                   ))}
@@ -343,19 +344,19 @@ export default function CreateStudentForm() {
                   {isDiscount && (
                     <div>
                       <TextField
-                        size="small"
+                        size='small'
                         label={t('Alohida narx')}
-                        name="discount_amount"
-                        type="text"
+                        name='discount_amount'
+                        type='text'
                         error={!!errors.discount_amount}
                         value={
                           formik.values.discount_amount
-                            ? new Intl.NumberFormat("uz-UZ", {
-                              style: "currency",
-                              currency: "UZS",
-                              minimumFractionDigits: 0,
-                            }).format(Number(formik.values.discount_amount))
-                            : ""
+                            ? new Intl.NumberFormat('uz-UZ', {
+                                style: 'currency',
+                                currency: 'UZS',
+                                minimumFractionDigits: 0
+                              }).format(Number(formik.values.discount_amount))
+                            : ''
                         }
                         onChange={e => {
                           const rawValue = e.target.value.replace(/\D/g, '')
@@ -364,7 +365,7 @@ export default function CreateStudentForm() {
                         onBlur={handleBlur}
                         fullWidth
                       />
-                      <FormHelperText className="mb-2" error={true}>
+                      <FormHelperText className='mb-2' error={true}>
                         {errors.discount_amount}
                       </FormHelperText>
 
@@ -467,7 +468,6 @@ export default function CreateStudentForm() {
           </Accordion>
         </Box>
       </FormControl>
-
 
       <LoadingButton loading={loading} variant='contained' type='submit' fullWidth>
         {t('Saqlash')}
