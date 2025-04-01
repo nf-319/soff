@@ -250,7 +250,7 @@ const SmsSettings = () => {
         loading={loading === 'absend'}
         onSwitch='on_absent'
         name='absent_text'
-        onSwitchInfo={Boolean(companyInfo?.auto_sms?.on)}
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_absent)}
         placeholders={PLACEHOLDERS.notComeLesson}
         updateSettings={updateSettings}
         defaultValue={companyInfo?.auto_sms?.absent_text}
@@ -272,9 +272,9 @@ const SmsSettings = () => {
         title="To'lovi yaqin qolganlarni ogohlantirish"
         alert="Sms xabarnoma o'quvchiga to'lovga 7 kun qolganda yuboriladi"
         loading={loading === 'payment'}
-        onSwitch='for_debtor'
+        onSwitch='payment_warning'
         name='payment_text'
-        onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_debtor)}
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.payment_warning)}
         placeholders={PLACEHOLDERS.whosePayment}
         updateSettings={updateSettings}
         defaultValue={companyInfo?.auto_sms?.payment_text}

@@ -1,33 +1,25 @@
 'use client'
 
-import { FC, useRef, useState } from 'react'
+import { FC, useState } from 'react'
 import {
   Box,
   Card,
   CardContent,
-  Switch,
-  TextField,
   Typography,
-  Button,
-  Stack,
-  Tooltip,
-  Chip, ButtonProps, Alert
+  FormControlLabel,
+  Switch,
+  Paper,
+  Tooltip
 } from '@mui/material'
-import { ChipProps } from '@mui/material/Chip'
-
-type PlaceholderType = {
-  label: string
-  value: string
-  displayValue: string
-  color: string
-  placeholder: string
-}
+import { PlaceholdersButtonsAreaTypes } from 'src/types'
+import { TextAreaWithPlaceholders } from 'src/components'
+import InfoIcon from '@mui/icons-material/Info'
 
 type Props = {
   loading: boolean
   updateSettings: (key: string, value: any) => Promise<void>
   defaultValue?: string
-  placeholders: PlaceholderType[]
+  placeholders: PlaceholdersButtonsAreaTypes[]
   title: string
   onSwitch: string
   name: string
@@ -47,130 +39,7 @@ export const SmsCard: FC<Props> = ({
   placeholders
 }) => {
   const [value, setValue] = useState(defaultValue)
-  const [displayValue, setDisplayValue] = useState(convertToDisplayText(defaultValue, placeholders))
-  const [prevDisplayValue, setPrevDisplayValue] = useState(displayValue)
-  const textAreaRef = useRef<HTMLTextAreaElement>(null)
   const [editable, setEditable] = useState(false)
-
-  function convertToDisplayText(text: string, placeholders: PlaceholderType[]): string {
-    let result = text
-    placeholders.forEach(p => {
-      const regex = new RegExp(escapeRegExp(p.value), 'g')
-      result = result.replace(regex, p.displayValue)
-    })
-    return result
-  }
-
-  function convertToApiText(text: string, placeholders: PlaceholderType[]): string {
-    let result = text
-    placeholders.forEach(p => {
-      const regex = new RegExp(escapeRegExp(p.displayValue), 'g')
-      result = result.replace(regex, p.value)
-    })
-    return result
-  }
-
-  function escapeRegExp(string: string): string {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  }
-
-  function findAllPlaceholdersInText(text: string): {
-    placeholder: PlaceholderType
-    index: number
-    length: number
-  }[] {
-    const result: {
-      placeholder: PlaceholderType
-      index: number
-      length: number
-    }[] = []
-
-    placeholders.forEach(p => {
-      let regex = new RegExp(escapeRegExp(p.displayValue), 'g')
-      let match
-
-      while ((match = regex.exec(text)) !== null) {
-        result.push({
-          placeholder: p,
-          index: match.index,
-          length: p.displayValue.length
-        })
-      }
-    })
-
-    return result.sort((a, b) => a.index - b.index)
-  }
-
-  const handleValueChange = (newDisplayValue: string) => {
-    const placeholdersInPrev = findAllPlaceholdersInText(prevDisplayValue)
-
-    if (Math.abs(newDisplayValue.length - prevDisplayValue.length) > 10) {
-      setDisplayValue(newDisplayValue)
-      setValue(convertToApiText(newDisplayValue, placeholders))
-      setPrevDisplayValue(newDisplayValue)
-      return
-    }
-
-    let isValid = true
-    let modifiedText = newDisplayValue
-
-    for (let i = placeholdersInPrev.length - 1; i >= 0; i--) {
-      const p = placeholdersInPrev[i]
-      const expectedText = p.placeholder.displayValue
-      const actualTextInRegion = newDisplayValue.substring(p.index, p.index + p.length)
-
-      if (
-        actualTextInRegion !== expectedText &&
-        actualTextInRegion.length > 0 &&
-        (actualTextInRegion.includes(expectedText.substring(0, 3)) || expectedText.includes(actualTextInRegion))
-      ) {
-        if (actualTextInRegion.length < expectedText.length) {
-          modifiedText =
-            modifiedText.substring(0, p.index) + modifiedText.substring(p.index + actualTextInRegion.length)
-        } else {
-          modifiedText =
-            modifiedText.substring(0, p.index) +
-            expectedText +
-            modifiedText.substring(p.index + actualTextInRegion.length)
-        }
-
-        isValid = false
-      }
-    }
-
-    if (!isValid) {
-      setDisplayValue(modifiedText)
-      setValue(convertToApiText(modifiedText, placeholders))
-      setPrevDisplayValue(modifiedText)
-
-      setTimeout(() => {
-        if (textAreaRef.current) {
-          const pos = modifiedText.length
-          textAreaRef.current.setSelectionRange(pos, pos)
-        }
-      }, 0)
-    } else {
-      setDisplayValue(newDisplayValue)
-      setValue(convertToApiText(newDisplayValue, placeholders))
-      setPrevDisplayValue(newDisplayValue)
-    }
-  }
-
-  const handlePlaceholderInsert = (placeholder: PlaceholderType) => {
-    if (textAreaRef.current) {
-      const startPos = textAreaRef.current.selectionStart
-      const endPos = textAreaRef.current.selectionEnd
-
-      const placeholderText = placeholder.displayValue
-      const newDisplayValue = displayValue.substring(0, startPos) + placeholderText + displayValue.substring(endPos)
-      handleValueChange(newDisplayValue)
-
-      setTimeout(() => {
-        textAreaRef.current?.setSelectionRange(startPos + placeholderText.length, startPos + placeholderText.length)
-        textAreaRef.current?.focus()
-      }, 0)
-    }
-  }
 
   const handleSave = async () => {
     if (!editable) {
@@ -181,110 +50,90 @@ export const SmsCard: FC<Props> = ({
     setEditable(false)
   }
 
-  const renderTextWithPlaceholders = () => {
-    return value.split(/(\$\{(?:group|balance|first_name|reason|score|amount|date)})/).map((part, index) => {
-      const placeholder = placeholders.find(p => p.value === part)
-      if (placeholder) {
-        return (
-          <Chip
-            key={index}
-            label={placeholder.label}
-            color={placeholder.color as ChipProps['color']}
-            size='small'
-            sx={{ mx: 0.5, verticalAlign: 'middle' }}
-          />
-        )
-      }
-      return part
-    })
+  const handleCancel = () => {
+    setValue(defaultValue)
+    setEditable(false)
   }
 
   return (
-    <Card sx={{ width: '100%', boxShadow: 2 }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-          <Typography variant='h6'>{title}</Typography>
+    <Paper
+      elevation={3}
+      sx={{
+        marginBottom: 3,
+        borderRadius: 2,
+        border: '1px solid rgba(0,0,0,0.20)',
+        overflow: 'hidden',
+        boxShadow: 'none'
+      }}
+    >
+      <Card sx={{ border: 'none', boxShadow: 'none' }}>
+        <Box
+          sx={{
+            padding: 4,
+            backgroundColor: '#f5f5f5',
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
+            borderBottom: '1px solid #e0e0e0'
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant='h6' sx={{ fontWeight: 500 }}>
+                {title}
+              </Typography>
 
-          <Switch
-            checked={onSwitchInfo}
-            onChange={async (_, checked) => {
-              await updateSettings(onSwitch, checked)
-            }}
-          />
-        </Box>
+              {alert && (
+                <Tooltip title={alert}>
+                  <InfoIcon fontSize='small' color='primary' />
+                </Tooltip>
+              )}
+            </Box>
 
-        <Typography variant='caption' sx={{ display: 'block', mb: 2, color: 'text.secondary' }}>
-          Xabar matniga dinamik ma'lumotlarni qo'shish uchun quyidagi tugmalardan foydalaning
-        </Typography>
-
-        {alert && (
-          <Alert severity='info' sx={{ mb: 2 }}>
-            Eslatma: {alert}
-          </Alert>
-        )}
-
-        <Box component='div' display='flex' alignItems='center' justifyContent='space-between' marginBottom={2}>
-          <Stack direction='row' spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-            {placeholders.map((placeholder, index) => (
-              <Tooltip key={`${placeholder.label}-${index}`} title={placeholder.placeholder} placement='top'>
-                <Button
-                  variant='contained'
-                  disabled={!editable}
-                  color={placeholder.color as ButtonProps['color']}
-                  size='small'
-                  onClick={() => handlePlaceholderInsert(placeholder)}
-                  sx={{ textTransform: 'none', boxShadow: 'none' }}
-                >
-                  {placeholder.label}
-                </Button>
-              </Tooltip>
-            ))}
-          </Stack>
-
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            {editable && (
-              <Button variant='outlined' color='secondary' onClick={() => setEditable(false)}>
-                Bekor qilish
-              </Button>
-            )}
-
-            <Button variant='contained' color='primary' onClick={handleSave} disabled={loading}>
-              {editable ? 'Saqlash' : 'Tahrirlash'}
-            </Button>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={onSwitchInfo}
+                  onChange={async (_, checked) => {
+                    await updateSettings(onSwitch, checked)
+                  }}
+                />
+              }
+              label={onSwitchInfo ? 'Faol' : "O'chirilgan"}
+              labelPlacement='start'
+              sx={{
+                mr: 0,
+                '.MuiFormControlLabel-label': {
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: onSwitchInfo ? 'success.main' : 'text.secondary'
+                }
+              }}
+            />
           </Box>
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-          {editable ? (
-            <TextField
-              inputRef={textAreaRef}
-              multiline
-              rows={4}
-              fullWidth
-              variant='outlined'
-              value={displayValue}
-              onChange={e => handleValueChange(e.target.value)}
-              sx={{ flexGrow: 1 }}
+        <CardContent sx={{ p: onSwitchInfo ? 4 : 0 }}>
+          {onSwitchInfo ? (
+            <TextAreaWithPlaceholders
+              value={value}
+              shortDescription="Xabar matniga dinamik ma'lumotlarni qo'shish uchun quyidagi tugmalardan foydalaning"
+              editable={editable}
+              loading={loading}
+              alert={alert}
+              handleCancel={handleCancel}
+              handleChange={handleSave}
+              setEditable={setEditable}
+              placeholders={placeholders}
+              defaultValue={defaultValue}
+              onChange={setValue}
             />
           ) : (
-            <Typography
-              component='div'
-              variant='body1'
-              sx={{
-                width: '100%',
-                padding: '16.5px 14px',
-                border: '1px solid rgba(0,0,0,0.23)',
-                borderRadius: 1,
-                minHeight: '125px',
-                userSelect: 'none',
-                cursor: 'not-allowed'
-              }}
-            >
-              {renderTextWithPlaceholders()}
-            </Typography>
+            <Box sx={{ paddingTop: 4, textAlign: 'center', color: 'text.secondary' }}>
+              <Typography variant='body2'>Ushbu xususiyatni yoqish uchun yuqoridagi tugmani yoqing</Typography>
+            </Box>
           )}
-        </Box>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Paper>
   )
 }

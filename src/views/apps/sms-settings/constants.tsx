@@ -31,12 +31,21 @@ const REASON = {
 }
 
 const SCORE = {
-  label: 'Ball',
+  label: 'Talabaning balli',
   value: '${score}',
   color: 'success',
-  displayValue: '@BALL',
-  placeholder: "Xabar matniga ball qo'shish uchun",
+  displayValue: '@TALABANING_BALLI',
+  placeholder: "Xabar matniga talabaning balli qo'shish uchun",
 }
+
+const WHOSE_PAYMENT_DATE = {
+  label: "To'lov sanasi",
+  value: '${date}',
+  color: 'primary',
+  displayValue: "@TO'LOV_SANASI",
+  placeholder: "Xabar matniga to'lov sanasi qo'shish uchun",
+}
+
 
 const DATE = {
   label: 'Sana',
@@ -54,13 +63,20 @@ const AMOUNT = {
   placeholder: "Xabar matniga miqdorni qo'shish uchun",
 }
 
+const DEPT_AMOUNT = {
+  label: 'Qarzdorlik summasi',
+  value: '${amount}',
+  color: 'warning',
+  displayValue: '@QARZDORLIK_SUMMASI',
+  placeholder: "Xabar matniga qarzdorlik summasini qo'shish uchun",
+}
 
-export const PLACEHOLDERS = {
+export const PLACEHOLDERS: any = {
   birthdate: [FIRST_NAME],
   notComeLesson: [FIRST_NAME],
   comeLesson: [FIRST_NAME],
-  whosePayment: [FIRST_NAME, DATE, AMOUNT],
-  deptStudents: [FIRST_NAME, DATE, AMOUNT],
+  whosePayment: [FIRST_NAME, WHOSE_PAYMENT_DATE, DEPT_AMOUNT],
+  deptStudents: [FIRST_NAME, WHOSE_PAYMENT_DATE, DEPT_AMOUNT],
   gradeStudents: [FIRST_NAME, GROUP, SCORE],
 }
 
