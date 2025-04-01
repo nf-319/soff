@@ -1,14 +1,18 @@
-import { useGet } from 'src/hooks/useApi';
-import { create } from 'zustand';
+import { create } from 'zustand'
 
-const useNotificationStore = create((set) => ({
-  products: [],
+
+type NotificationStore = {
+  notifications: any[]
+  loading: boolean
+  setNotifications: (data: any[]) => void
+  setLoading: (isLoading: boolean) => void
+}
+
+const useNotificationStore = create<NotificationStore>(set => ({
+  notifications: [],
   loading: false,
-    fetchProducts: async () => {
-    const {data,isLoading} = useGet('')
-    set({ loading: isLoading });
-    set({ products: data, loading: false });
-  },
-}));
+  setNotifications: (data: any) => set({ notifications: data, loading: false }),
+  setLoading: (isLoading: boolean) => set({ loading: isLoading })
+}))
 
-export default useNotificationStore;
+export default useNotificationStore

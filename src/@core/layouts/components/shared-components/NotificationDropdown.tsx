@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, SyntheticEvent, Fragment, ReactNode } from 'react'
+import { useState, SyntheticEvent, Fragment, ReactNode, useEffect } from 'react'
 import Box from '@mui/material/Box'
 import Badge from '@mui/material/Badge'
 import Button from '@mui/material/Button'
@@ -15,10 +15,11 @@ import { Settings } from 'src/@core/context/settingsContext'
 import CustomChip from '../../../../components/mui/chip'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'react-i18next'
-import { useAppDispatch, useAppSelector } from 'src/store'
-import { fetchNotification } from 'src/store/apps/user'
 import { EmptyContent } from '../../../../components/empty-content'
 import { Bell } from 'lucide-react'
+import useNotificationStore from 'src/store/apps/notification'
+import { useGet } from 'src/hooks/useApi'
+import { Skeleton } from '@mui/material'
 
 export type NotificationsType = {
   date: string
@@ -86,18 +87,24 @@ const ScrollWrapper = ({ children, hidden }: { children: ReactNode; hidden: bool
 const NotificationDropdown = (props: Props) => {
   const { settings } = props
   const { t } = useTranslation()
-  const { notifications, notificationsCount } = useAppSelector(state => state.user)
+  const { notifications, setNotifications } = useNotificationStore()
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
-  const dispatch = useAppDispatch()
-
+  const { data, isLoading, refetch } = useGet('/common/notification-list/', { options: { enabled: false } })
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
+  console.log(data)
 
   const { direction } = settings
   const router = useRouter()
 
+  useEffect(() => {
+    if (data) {
+      setNotifications(data?.results)
+    }
+  }, [data, isLoading, setNotifications])
+
   const handleDropdownOpen = async (event: SyntheticEvent) => {
     setAnchorEl(event.currentTarget)
-    await dispatch(fetchNotification())
+    refetch()
   }
 
   const handleDropdownClose = () => {
@@ -111,8 +118,8 @@ const NotificationDropdown = (props: Props) => {
         <Badge
           color='error'
           variant='standard'
-          badgeContent={notificationsCount}
-          invisible={!notificationsCount}
+          // badgeContent={notificationsCount}
+          // invisible={!notificationsCount}
           sx={{
             '& .MuiBadge-badge': { top: 4, right: 4, boxShadow: theme => `0 0 0 2px ${theme.palette.background.paper}` }
           }}
@@ -140,15 +147,17 @@ const NotificationDropdown = (props: Props) => {
               skin='light'
               size='small'
               color='primary'
-              label={`${notifications.length} ` + t('Yangi')}
+              label={`${notifications?.length} ` + t('Yangi')}
               sx={{ height: 20, fontSize: '0.75rem', fontWeight: 500, borderRadius: '10px' }}
             />
           </Box>
         </MenuItem>
 
         <ScrollWrapper hidden={hidden}>
-          {notifications.length ? (
-            notifications.map((notification: NotificationsType, index: number) => (
+          {isLoading ? (
+            <Skeleton height={80} sx={{ marginX: 2 }} />
+          ) : notifications?.length ? (
+            notifications.map((notification: any, index: number) => (
               <MenuItem key={index} onClick={handleDropdownClose}>
                 <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
                   <Box sx={{ mx: 4, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
@@ -166,7 +175,7 @@ const NotificationDropdown = (props: Props) => {
           )}
         </ScrollWrapper>
 
-        {notifications.length > 5 && (
+        {notifications?.length > 5 && (
           <MenuItem
             disableRipple
             disableTouchRipple
