@@ -8,6 +8,7 @@ import { OptionsMenuType } from '../option-menu/types'
 export type CardStatsHorizontalProps = {
   title: string
   stats: string
+  tooltip?:string,
   icon: ReactNode
   color?: ThemeColor
   trendNumber?: string

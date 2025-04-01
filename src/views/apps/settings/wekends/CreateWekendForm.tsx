@@ -23,7 +23,7 @@ export default function CreateWekendForm() {
 
     const validationSchema = Yup.object({
         dates: Yup.array().min(1, "Kamida bitta sana tanlang").required("Sanalarni tanlang"),
-        description: Yup.string().required("Sabab yozing"),
+        description: Yup.string().required(t("Sabab")||"Sabab"),
     });
 
     const formik = useFormik({

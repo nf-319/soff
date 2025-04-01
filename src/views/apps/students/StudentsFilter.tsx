@@ -10,7 +10,8 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
-  TextField
+  TextField,
+  Tooltip
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import IconifyIcon from '../../../components/icon'
@@ -573,7 +574,12 @@ const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
             />
           </Box>
         )}
-        <ExcelStudents size='medium' url='/student/offset-list/' queryString={queryString} />
+        <ExcelStudents
+          tooltip='Ko‘rinib turgan jadvalni Excel faylga yuklab olish.'
+          size='medium'
+          url='/student/offset-list/'
+          queryString={queryString}
+        />
         <Button
           onClick={() => (getSMSTemps(), handleEditClickOpen('sms'))}
           variant='outlined'
@@ -582,7 +588,9 @@ const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
           size='small'
           startIcon={<IconifyIcon icon='material-symbols-light:sms-outline' />}
         >
-          {t('Sms yuborish')}
+          <Tooltip title={t("Ro‘yxatdagi o‘quvchilarga SMS yuborish.")}>
+            <span>{t('Sms yuborish')}</span>
+          </Tooltip>
         </Button>
       </Box>
 

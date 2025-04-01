@@ -42,6 +42,7 @@ const FinanceAllNumber = () => {
   const statsHorizontal = all_numbers
     ? [
         {
+          tooltip: t("O‘quvchilardan tushgan pul miqdori."),
           color: 'warning',
           stats: all_numbers?.label.benefit,
           trend: 'negative',
@@ -53,6 +54,7 @@ const FinanceAllNumber = () => {
         {
           stats: all_numbers?.label.expense,
           color: 'error',
+          tooltip: t("O‘quv markaz chiqimlari."),
           icon: 'hugeicons:money-send-flow-02',
           trendNumber: '22.5%',
           title: t('Chiqimlar'),
@@ -64,6 +66,7 @@ const FinanceAllNumber = () => {
           trend: Number(all_numbers?.label.difference) < 0 ? 'negative' : 'positive',
           icon: Number(all_numbers?.label.difference) < 0 ? 'mdi:trending-down' : 'mdi:trending-up',
           trendNumber: '12.6%',
+          tooltip: t("O‘quv markaz foydasi."),
           title: t('Foyda'),
           id: '#tushumlar'
         },
