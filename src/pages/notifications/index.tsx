@@ -91,26 +91,25 @@ export default function Notifications() {
               key={element.id}
               sx={{
                 maxWidth: '100%',
-                width:'100%',
-                bgcolor: '#E0E0E0',
+                width: '100%',
+                bgcolor: '#EDEDF9',
                 p: 5,
-                borderRadius: 2,
+                borderRadius: 1,
                 boxShadow: 1,
                 display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
+                flexDirection: 'column'
+                // alignItems: 'center'
               }}
             >
-              <Typography variant='h6' sx={{ textAlign: 'center', fontWeight: 'bold', color: 'black' }}>
-                {element.notification.title}
-              </Typography>
+              <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+                <Typography variant='h6'>{element.notification.title}</Typography>
+                <Typography variant='caption' sx={{ color: 'black', marginTop: 2 }}>
+                  {element.notification.created_at}
+                </Typography>
+              </Box>
 
-              <Typography variant='body2' sx={{ textAlign: 'center', mt: 2, width: '100%', borderRadius: '8px' }}>
-                <div style={{width:'100%'}} dangerouslySetInnerHTML={{ __html: element.notification.body }} />
-              </Typography>
-
-              <Typography variant='caption' sx={{ color: 'black', marginTop: 2 }}>
-                {element.notification.created_at}
+              <Typography variant='body2' sx={{ textAlign: 'start', mt: 2, borderRadius: '8px' }}>
+                <div dangerouslySetInnerHTML={{ __html: element.notification.body }} />
               </Typography>
             </Box>
           ))}
