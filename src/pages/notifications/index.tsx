@@ -95,9 +95,9 @@ export default function Notifications() {
                 bgcolor: '#EDEDF9',
                 p: 5,
                 borderRadius: 1,
-                boxShadow: 1,
-                display: 'flex',
-                flexDirection: 'column'
+                boxShadow: 1
+                // display: 'flex',
+                // flexDirection: 'column'
                 // alignItems: 'center'
               }}
             >
