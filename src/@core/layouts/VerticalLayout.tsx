@@ -29,7 +29,7 @@ import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
 import { Alert, Container } from 'react-bootstrap'
 import { Button } from '@mui/material'
-import { MoveRight, X } from 'lucide-react'
+import { Bell, MoveRight, X } from 'lucide-react'
 import useResponsive from '../hooks/useResponsive'
 
 const VerticalLayoutWrapper = styled(Box)({
@@ -118,6 +118,7 @@ const VerticalLayout = (props: LayoutProps) => {
             >
               <Container className='d-flex flex-wrap justify-content-around align-items-center'>
                 <div className='d-flex align-items-center gap-2 text-white'>
+                  <Bell size={14}/>
                   <span className='small fw-medium'>
                     Tizimdan foydalanish muddati tugagungacha {formattedUserData.payment_days} kun qoldi, Tizimdan
                     uzluksiz foydalanish uchun to'lovni amalga oshiring
@@ -146,7 +147,7 @@ const VerticalLayout = (props: LayoutProps) => {
                   border: 'none'
                 }}
               >
-                <X size={12} />
+                <X size={20} />
               </Button>
             </Alert>
           )}

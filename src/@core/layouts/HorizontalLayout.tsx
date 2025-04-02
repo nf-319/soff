@@ -20,7 +20,7 @@ import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
 import { Alert, Container } from 'react-bootstrap'
-import { MoveRight, X, XCircle } from 'lucide-react'
+import { Bell, MoveRight, X, XCircle } from 'lucide-react'
 import { Button } from '@mui/material'
 
 const HorizontalLayoutWrapper = styled(Box)({
@@ -112,6 +112,7 @@ const HorizontalLayout = (props: LayoutProps) => {
           >
             <Container className='d-flex justify-content-between align-items-center'>
               <div className='d-flex align-items-center gap-2 text-white'>
+                 <Bell size={14}/>
                 <span className='small fw-medium'>
                   Tizimdan foydalanish muddati tugagungacha {formattedUserData.payment_days} kun qoldi, Tizimdan
                   uzluksiz foydalanish uchun to'lovni amalga oshiring
@@ -140,7 +141,7 @@ const HorizontalLayout = (props: LayoutProps) => {
                 border: 'none'
               }}
             >
-              <X size={12} />
+              <X size={20} />
             </Button>
           </Alert>
         )}
