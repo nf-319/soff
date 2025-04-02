@@ -36,7 +36,7 @@ const StudentPaymentsPage = () => {
   const { push } = useRouter()
   const { user } = useContext(AuthContext)
   const [rowsPerPage, setRowsPerPage] = useState<number>(() => Number(localStorage.getItem('rowsPerPage')) || 10)
-  const { studentsPayment, paymentsCount, total_payments, isLoading, queryParams } = useAppSelector(
+  const { studentsPayment, paymentsCount, total_payments, isLoading, queryParams, total_bonus } = useAppSelector(
     state => state.studentPayments
   )
   const router = useRouter()
@@ -102,7 +102,9 @@ const StudentPaymentsPage = () => {
           color='warning'
           variant='outlined'
           label={
-            bonus == '0.00' || bonus === null ? `-` : `${new Intl.NumberFormat('uz-UZ').format(Number.parseInt(bonus || '0'))} UZS`
+            bonus == '0.00' || bonus === null
+              ? `-`
+              : `${new Intl.NumberFormat('uz-UZ').format(Number.parseInt(bonus || '0'))} UZS`
           }
         />
       )
@@ -201,6 +203,15 @@ const StudentPaymentsPage = () => {
               color='success'
               label={`${formatCurrency(total_payments)} UZS`}
             />
+            {total_bonus && (
+              <Chip
+                variant='outlined'
+                size='medium'
+                sx={{ fontSize: '14px', display: isMobile ? 'flex' : 'none', fontWeight: 'bold' }}
+                color='success'
+                label={`${formatCurrency(total_bonus)} UZS`}
+              />
+            )}
           </Box>
           <Chip
             variant='outlined'
@@ -209,6 +220,15 @@ const StudentPaymentsPage = () => {
             color='success'
             label={`${formatCurrency(total_payments)} UZS`}
           />
+          {total_bonus && (
+            <Chip
+              variant='outlined'
+              size='medium'
+              sx={{ fontSize: '14px', display: isMobile ? 'none' : 'flex', fontWeight: 'bold' }}
+              color='warning'
+              label={`${formatCurrency(total_bonus)} UZS (Bonus)`}
+            />
+          )}
         </Box>
         <FilterBlock />
       </Box>

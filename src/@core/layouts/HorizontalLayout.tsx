@@ -15,10 +15,13 @@ import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 import { useAuth } from 'src/hooks/useAuth'
 import StaticsModal from '../../components/statics-modal'
 import QrCodeModal from '../../components/qrCode-Modal'
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
+import { Alert, Container } from 'react-bootstrap'
+import { MoveRight, X, XCircle } from 'lucide-react'
+import { Button } from '@mui/material'
 
 const HorizontalLayoutWrapper = styled(Box)({
   height: '100%',
@@ -76,6 +79,18 @@ const HorizontalLayout = (props: LayoutProps) => {
   const userNavMenuContent = horizontalLayoutProps?.navMenu?.content
   const auth = useAuth()
   const { user } = useContext(AuthContext)
+  const [showWarning, setShowWarning] = useState(false)
+  const userData = localStorage.getItem('userData')
+
+  const formattedUserData = JSON.parse(userData as string)
+
+  useEffect(() => {
+    if (formattedUserData.payment_days !== null) {
+      setShowWarning(true)
+    } else {
+      setShowWarning(false)
+    }
+  }, [window.location.pathname])
 
   let userAppBarStyle = {}
 
@@ -88,6 +103,47 @@ const HorizontalLayout = (props: LayoutProps) => {
   return (
     <HorizontalLayoutWrapper className='layout-wrapper'>
       <MainContentWrapper className='layout-content-wrapper' sx={{ ...(contentHeightFixed && { maxHeight: '100vh' }) }}>
+        {showWarning && (
+          <Alert
+          
+            variant='danger'
+            className='text-white m-0 p-0 position-relative'
+            style={{ height: '40px', backgroundColor: '#FF4D4D', borderRadius: 0 }}
+          >
+            <Container className='d-flex justify-content-between align-items-center'>
+              <div className='d-flex align-items-center gap-2 text-white'>
+                <span className='small fw-medium'>
+                  Tizimdan foydalanish muddati tugagungacha {formattedUserData.payment_days} kun qoldi, Tizimdan
+                  uzluksiz foydalanish uchun to'lovni amalga oshiring
+                </span>
+              </div>
+              {user?.currentRole == 'ceo' && (
+                <Button
+                  onClick={() => router.push('/crm-payments')}
+                  sx={{ color: 'white', fontSize: 10, padding: 2, display: 'flex', gap: 2 }}
+                >
+                  <span>To'lovni amalga oshirish</span>
+                  <MoveRight size={16} />
+                </Button>
+              )}
+            </Container>
+
+            {/* Close Button Positioned at the Top-Right */}
+            <Button
+              onClick={() => setShowWarning(false)}
+              className='position-absolute'
+              style={{
+                top: '2px',
+                right: '2px',
+                color: 'black',
+                background: 'transparent',
+                border: 'none'
+              }}
+            >
+              <X size={12} />
+            </Button>
+          </Alert>
+        )}
         {!auth?.user?.payment_page && (
           <AppBar
             color='default'
