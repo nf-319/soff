@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { Box, Card, CardContent, Tab, Tabs } from '@mui/material'
-import { CompanyInfo } from './CompanyInfo'
+import { Box, Tab, Tabs } from '@mui/material'
+import CenterSetting from './CenterSetting'
+import SmsSettings from 'src/pages/settings/ceo/sms-settings'
 
 interface TabOption {
   label: string;
@@ -12,12 +13,13 @@ interface TabOption {
 
 const tabOptions: TabOption[] = [
   { label: '🏢 Markaz Sozlamalari', value: 'center' },
-  { label: '📩 SMS Sozlamalari', value: 'sms' }
+  { label: '📩 Auto SMS Sozlamalari', value: 'sms' }
 ]
 
 export const AllSettings = () => {
   const router = useRouter()
-  const [tabIndex, setTabIndex] = useState<string>('center')
+  const searchParams = new URLSearchParams(window.location.search)
+  const [tabIndex, setTabIndex] = useState<string>(searchParams.get('tab') || 'center')
 
   useEffect(() => {
     if (router.isReady) {
@@ -40,15 +42,15 @@ export const AllSettings = () => {
       delete query.tab
     }
 
-    router.push({
+    void router.push({
       pathname: router.pathname,
       query: query
     }, undefined, { shallow: true })
   }
 
   return (
-    <Card>
-      <CardContent>
+    <Box>
+
         <Tabs
           value={tabIndex}
           sx={{ marginBottom: 3 }}
@@ -60,13 +62,8 @@ export const AllSettings = () => {
           ))}
         </Tabs>
 
-        {tabIndex === 'center' && <CompanyInfo />}
-        {tabIndex === 'sms' && (
-          <Box>
-            <h2>SMS Sozlamalari</h2>
-          </Box>
-        )}
-      </CardContent>
-    </Card>
+        {tabIndex === 'center' && <CenterSetting />}
+        {tabIndex === 'sms' && <SmsSettings />}
+    </Box>
   )
 }
