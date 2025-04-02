@@ -45,6 +45,7 @@ export default function AddGroupModal() {
     teacher: Yup.string().required(t("O'qituvchini tanlang") || "O'qituvchini tanlang"),
     room: Yup.string().required(t('Xonani tanlang') || 'Xonani tanlang'),
     start_date: Yup.string().required(t('Boshlanish sanasini tanlang') || 'Boshlanish sanasini tanlang'),
+    end_date: Yup.string().required(t('Tugash sanasini tanlang') || 'Tugash sanasini tanlang'),
     start_at: Yup.string().required(t('Boshlanish vaqtini tanlang') || 'Boshlanish vaqtini tanlang'),
     day_of_week: Yup.string().required(t('Dars kunlarini tanlang') || 'Dars kunlarini tanlang'),
     end_at: Yup.string().required(t('Tugash vaqtini tanlang') || 'Tugash vaqtini tanlang')
@@ -333,6 +334,23 @@ export default function AddGroupModal() {
                   onBlur={formik.handleBlur}
                   value={formik.values.start_date}
                   error={!!formik.errors.start_date && !!formik.touched.start_date}
+                />
+                <FormHelperText error={!!formik.errors.start_date && !!formik.touched.start_date}>
+                  {!!formik.errors.start_date && !!formik.touched.start_date && formik.errors.start_date}
+                </FormHelperText>
+              </FormControl>
+
+              <FormControl sx={{ width: '100%' }}>
+                <TextField
+                  size='small'
+                  type='date'
+                  label={t('Tugash sanasi')}
+                  name='end_date'
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.end_date}
+                  error={!!formik.errors.start_date && !!formik.touched.end_date}
+                  InputLabelProps={{ shrink: true }}
                 />
                 <FormHelperText error={!!formik.errors.start_date && !!formik.touched.start_date}>
                   {!!formik.errors.start_date && !!formik.touched.start_date && formik.errors.start_date}
