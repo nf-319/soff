@@ -1,9 +1,11 @@
-import { Button } from '@mui/material'
+import { Button, Tooltip } from '@mui/material'
 import Link from 'next/link'
 import { VscodeIconsFileTypeExcel2 } from './ExcelIcon'
+import { useTranslation } from 'react-i18next'
 
 interface ExcelProps {
   queryString?: string
+  tooltip?: string
   url: string
   variant?: 'text' | 'outlined' | 'contained'
   color?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning'
@@ -13,12 +15,14 @@ interface ExcelProps {
 
 export default function Excel({
   queryString = '',
+  tooltip = '',
   variant = 'outlined',
   color = 'success',
   size = 'small',
   url,
   ...args
 }: ExcelProps) {
+  const { t } = useTranslation()
   const subdomain = location.hostname.split('.')
   const baseURL =
     process.env.NODE_ENV === 'development'
@@ -44,7 +48,9 @@ export default function Excel({
         color={color}
         size={'medium'}
       >
-        Excel
+        <Tooltip title={t(tooltip)}>
+          <span>Excel</span>
+        </Tooltip>
       </Button>
     </Link>
   )
