@@ -1,0 +1,1 @@
+export { TextAreaWithPlaceholders } from './TextAreaWithPlaceholders'

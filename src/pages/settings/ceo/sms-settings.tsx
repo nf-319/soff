@@ -1,43 +1,17 @@
-import { Icon } from '@iconify/react'
-import { Box, CardContent, Chip, CircularProgress, Switch, TextField, Tooltip, Typography } from '@mui/material'
-import { useRef, useState } from 'react'
-import { Card } from 'react-bootstrap'
-import { useTranslation } from 'react-i18next'
-import useResponsive from 'src/@core/hooks/useResponsive'
+'use client'
+
+import { Box } from '@mui/material'
+import { useState } from 'react'
 import api from 'src/@core/utils/api'
-import showResponseError from 'src/@core/utils/show-response-error'
-import IconifyIcon from 'src/components/icon'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setCompanyInfo } from 'src/store/apps/user'
+import { SmsCard } from 'src/views/apps/sms-settings'
+import { PLACEHOLDERS } from 'src/views/apps/sms-settings/constants'
 
 const SmsSettings = () => {
-  const { isMobile } = useResponsive()
-  const [id, setId] = useState<null | { key: 'branch' | 'payment-type'; id: any }>(null)
-  const [name, setName] = useState<string>('')
-  const [error, setError] = useState<any>({})
   const dispatch = useAppDispatch()
   const { companyInfo } = useAppSelector((state: any) => state.user)
-  const { t } = useTranslation()
-  const [birthday_text, setBirthday_text] = useState(companyInfo?.auto_sms?.birthday_text)
-  const [absent_text, setAbsent_text] = useState(companyInfo?.auto_sms?.absent_text)
-  const [attend_text, setAttend_text] = useState(companyInfo?.auto_sms?.attend_text)
-  const [payment_text, setPayment_text] = useState(companyInfo?.auto_sms?.payment_text)
-  const [debt_text, setDebt_text] = useState(companyInfo?.auto_sms?.debt_text)
-  const [score_text, setScore_text] = useState(companyInfo?.auto_sms?.score_text)
 
-  const [editable, setEditable] = useState<
-    | null
-    | 'title'
-    | 'logo'
-    | 'start-time'
-    | 'end-time'
-    | 'birthdate'
-    | 'absend'
-    | 'payment'
-    | 'score'
-    | 'attend'
-    | 'debtor'
-  >(null)
   const [loading, setLoading] = useState<
     | 'name'
     | 'branch'
@@ -54,42 +28,6 @@ const SmsSettings = () => {
     | 'extra_settings'
     | null
   >(null)
-
-  const birthdateInputRef = useRef<HTMLInputElement>(null)
-  const absendInputRef = useRef<HTMLInputElement>(null)
-  const attendInputRef = useRef<HTMLInputElement>(null)
-  const paymentInputRef = useRef<HTMLInputElement>(null)
-  const debtorInputRef = useRef<HTMLInputElement>(null)
-  const scoreInputRef = useRef<HTMLInputElement>(null)
-
-  const insertAtCursor = (key: string, sinputRef: any, text: string) => {
-    if (sinputRef.current) {
-      const input = sinputRef.current
-      const start = input.selectionStart || 0
-      const end = input.selectionEnd || 0
-      if (key == 'birthdate') {
-        const newText = birthday_text.slice(0, start) + text + birthday_text.slice(end)
-        setBirthday_text(newText)
-      } else if (key == 'absend') {
-        const newText = absent_text.slice(0, start) + text + absent_text.slice(end)
-        setAbsent_text(newText)
-      } else if (key == 'attend') {
-        const newText = attend_text.slice(0, start) + text + attend_text.slice(end)
-        setAttend_text(newText)
-      } else if (key == 'payment') {
-        const newText = payment_text.slice(0, start) + text + payment_text.slice(end)
-        setPayment_text(newText)
-      } else if (key == 'debtor') {
-        const newText = debt_text.slice(0, start) + text + debt_text.slice(end)
-        setDebt_text(newText)
-      } else if (key == 'score') {
-        const newText = score_text.slice(0, start) + text + score_text.slice(end)
-        setScore_text(newText)
-      }
-
-      setTimeout(() => input.setSelectionRange(start + text.length, start + text.length), 0)
-    }
-  }
 
   const updateSettings = async (key: any, value: any) => {
     try {
@@ -276,7 +214,6 @@ const SmsSettings = () => {
         }
 
         await api.put('common/auto-sms/update/', formData)
-        setName('')
       } else {
         if (key === 'extra_settings') {
           formData.append('extra_settings', JSON.stringify({ allow_debt_editing_on_payment: value }))
@@ -287,752 +224,85 @@ const SmsSettings = () => {
       const getresp = await api.get('common/settings/list/')
 
       dispatch(setCompanyInfo(getresp.data[0]))
-      setEditable(null)
-      setId(null)
     } catch (err: any) {
-      if (err?.response?.data) {
-        showResponseError(err?.response?.data, setError)
-      }
+      console.error(err)
     } finally {
       setLoading(null)
     }
   }
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '100%' }}>
-      <Card>
-        <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <Box>
-              <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-                {t("Tug'ilgan kunda sms bilan tabriklash")}:
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {loading === 'birthdate' ? (
-                <CircularProgress disableShrink size={'20px'} sx={{ margin: '10px 0', marginLeft: '15px' }} />
-              ) : (
-                <Switch
-                  checked={Boolean(companyInfo?.auto_sms?.on_birthday)}
-                  onChange={async (e, i) => {
-                    await updateSettings('on_birthday', i)
-                  }}
-                />
-              )}
-            </Box>
-          </Box>
-          <Typography sx={{ marginBottom: 5 }} fontSize={12}>
-            {"Xabar matniga talaba ismini qo'shish uchun ${first_name} kalit so'zi qoldiring."}
-          </Typography>
+      <SmsCard
+        title="Tug'ilgan kunda sms bilan tabriklash"
+        loading={loading === 'birthdate'}
+        onSwitch='on_birthday'
+        name='birthday_text'
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_birthday)}
+        placeholders={PLACEHOLDERS.birthdate}
+        updateSettings={updateSettings}
+        defaultValue={companyInfo?.auto_sms?.birthday_text}
+      />
 
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flexDirection: 'column' }}>
-            <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-              {t('SMS Matni')}:
-            </Typography>
-            {/* {editable === 'birthdate' && (
-              <Box display='flex' gap={2} mt={2}>
-                <Chip
-                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${first_name}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='error'
-                  label={'Ism familiya'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${date}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='info'
-                  label={'Sana'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${amount}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='primary'
-                  label={'Summa'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${group}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='secondary'
-                  label={'Guruh'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('birthdate', birthdateInputRef, '${grade}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='success'
-                  label={"O'quvchi bahosi"}
-                />
-              </Box>
-            )} */}
+      <SmsCard
+        title="Darsga kelmaganlarga sms yuborish"
+        alert="Kelmagan o'quvchiga sms xabarnoma ertasi kuni yuboriladi"
+        loading={loading === 'absend'}
+        onSwitch='on_absent'
+        name='absent_text'
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_absent)}
+        placeholders={PLACEHOLDERS.notComeLesson}
+        updateSettings={updateSettings}
+        defaultValue={companyInfo?.auto_sms?.absent_text}
+      />
 
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
-              {editable === 'birthdate' ? (
-                <>
-                  <TextField
-                    multiline
-                    rows={4}
-                    size='small'
-                    inputRef={birthdateInputRef}
-                    value={birthday_text}
-                    // defaultValue={companyInfo?.auto_sms?.birthday_text}
-                    // onBlur={e => {
-                    //   updateSettings('birthday_text', e.target.value)
-                    // }}
-                    onChange={e => {
-                      setBirthday_text(e.target.value)
-                    }}
-                    fullWidth
-                  />
-                  <IconifyIcon
-                    icon={loading === 'birthdate' ? 'line-md:loading-loop' : 'ic:baseline-check'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {
-                      updateSettings('birthday_text', birthday_text)
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    disabled
-                    type='text'
-                    value={birthday_text}
-                    size='small'
-                    placeholder={t('SMS Matni')}
-                   
-                  />
-                  <IconifyIcon
-                    icon={'basil:edit-outline'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => setEditable('birthdate')}
-                  />
-                </>
-              )}
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+      <SmsCard
+        title="Darsga kelganlarga sms yuborish"
+        alert="Kelgan o'quvchiga ertasi kuni sms xabarnoma yuboriladi"
+        loading={loading === 'attend'}
+        onSwitch='on_attend'
+        name='attend_text'
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_attend)}
+        placeholders={PLACEHOLDERS.comeLesson}
+        updateSettings={updateSettings}
+        defaultValue={companyInfo?.auto_sms?.attend_text}
+      />
 
-      <Card>
-        <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-              {t('Darsga kelmaganlarga sms yuborish')}:
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {loading === 'absend' ? (
-                <CircularProgress disableShrink size={'20px'} sx={{ margin: '10px 0', marginLeft: '15px' }} />
-              ) : (
-                <Switch
-                  checked={Boolean(companyInfo?.auto_sms?.on_absent)}
-                  onChange={async (e, i) => {
-                    setLoading('absend')
-                    await updateSettings('on_absent', i)
-                  }}
-                />
-              )}
-            </Box>
-          </Box>
-          <Typography sx={{ marginBottom: 5 }} fontSize={12}>
-            {"Xabar matniga talaba ismini qo'shish uchun ${first_name} kalit so'zi qoldiring."}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flexDirection: 'column' }}>
-            <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-              {t(`SMS matnini kiriting (kelmagan o'quvchiga ertasi kuni yuboriladi)`)}
-            </Typography>
-            {/* {editable === 'absend' && (
-              <Box display='flex' gap={2} mt={2}>
-                <Chip
-                  onClick={() => insertAtCursor('absend', absendInputRef, '${first_name}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='error'
-                  label={'Ism familiya'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('absend', absendInputRef, '${date}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='info'
-                  label={'Sana'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('absend', absendInputRef, '${amount}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='primary'
-                  label={'Summa'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('absend', absendInputRef, '${group}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='secondary'
-                  label={'Guruh'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('absend', absendInputRef, '${grade}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='success'
-                  label={"O'quvchi bahosi"}
-                />
-              </Box>
-            )} */}
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
-              {editable === 'absend' ? (
-                <>
-                  <TextField
-                    multiline
-                    rows={4}
-                    size='small'
-                    focused
-                    inputRef={absendInputRef}
-                    value={absent_text}
-                    // onBlur={e => {
-                    //   updateSettings('absent_text', e.target.value)
-                    // }}
-                    onChange={e => {
-                      setAbsent_text(e.target.value)
-                    }}
-                    fullWidth
-                  />
-                  <IconifyIcon
-                    icon={loading === 'absend' ? 'line-md:loading-loop' : 'ic:baseline-check'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {
-                      updateSettings('absent_text', absent_text)
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <TextField
-                    disabled
-                    fullWidth
-                    multiline
-                    rows={4}
-                    type='text'
-                    value={absent_text}
-                    size='small'
-                    placeholder={t('Boshlanish vaqti')}
-                    // onBlur={e => console.log(e.target.value)}
-                  />
-                  <IconifyIcon
-                    icon={'basil:edit-outline'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => setEditable('absend')}
-                  />
-                </>
-              )}
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-              {t('Darsga kelganlarga sms yuborish')}:
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {loading === 'attend' ? (
-                <CircularProgress disableShrink size={'20px'} sx={{ margin: '10px 0', marginLeft: '15px' }} />
-              ) : (
-                <Switch
-                  checked={companyInfo?.auto_sms?.on_attend}
-                  onChange={async (e, i) => {
-                    setLoading('attend')
-                    await updateSettings('on_attend', i)
-                  }}
-                />
-              )}
-            </Box>
-          </Box>
-          <Typography sx={{ marginBottom: 5 }} fontSize={12}>
-            {"Xabar matniga talaba ismini qo'shish uchun ${first_name} kalit so'zi qoldiring."}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flexDirection: 'column' }}>
-            <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-              {t(`SMS matnini kiriting (kelgan o'quvchiga ertasi kuni yuboriladi)`)}
-            </Typography>
-            {/* {editable === 'attend' && (
-              <Box display='flex' gap={2} mt={2}>
-                <Chip
-                  onClick={() => insertAtCursor('attend', attendInputRef, '${first_name}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='error'
-                  label={'Ism familiya'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('attend', attendInputRef, '${date}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='info'
-                  label={'Sana'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('attend', attendInputRef, '${amount}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='primary'
-                  label={'Summa'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('attend', attendInputRef, '${group}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='secondary'
-                  label={'Guruh'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('attend', attendInputRef, '${grade}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='success'
-                  label={"O'quvchi bahosi"}
-                />
-              </Box>
-            )} */}
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
-              {editable === 'attend' ? (
-                <>
-                  <TextField
-                    multiline
-                    rows={4}
-                    size='small'
-                    focused
-                    inputRef={attendInputRef}
-                    value={attend_text}
-                    // onBlur={e => {
-                    //   updateSettings('attend_text', e.target.value)
-                    // }}
-                    onChange={e => {
-                      setAttend_text(e.target.value)
-                    }}
-                    fullWidth
-                  />
-                  <IconifyIcon
-                    icon={loading === 'attend' ? 'line-md:loading-loop' : 'ic:baseline-check'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {
-                      updateSettings('attend_text', attend_text)
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <TextField
-                    fullWidth
-                    disabled
-                    multiline
-                    rows={4}
-                    type='text'
-                    value={attend_text}
-                    size='small'
-                    placeholder={t('Boshlanish vaqti')}
-                    // onBlur={e => console.log(e.target.value)}
-                  />
-                  <IconifyIcon
-                    icon={'basil:edit-outline'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => setEditable('attend')}
-                  />
-                </>
-              )}
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-              {t("To'lovi yaqin qolganlarni ogohlantirish")}:{' '}
-              <Tooltip
-                title={
-                  <Typography
-                    color='white'
-                    sx={{
-                      minWidth: isMobile ? '90px' : '180px',
-                      fontSize: isMobile ? '10px' : '13px'
-                    }}
-                  >
-                    {t("Xabar to'lovga 7 kun qolganda yuboriladi")}
-                  </Typography>
-                }
-                arrow
-              >
-                <span style={{ cursor: 'pointer' }}>
-                  <Icon
-                    icon='mdi:help-circle-outline'
-                    style={{ fontSize: isMobile ? '16px' : '20px', marginLeft: '5px' }}
-                  />
-                </span>
-              </Tooltip>
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {loading === 'payment' ? (
-                <CircularProgress disableShrink size={'20px'} sx={{ margin: '10px 0', marginLeft: '15px' }} />
-              ) : (
-                <Switch
-                  checked={Boolean(companyInfo?.auto_sms?.payment_warning)}
-                  onChange={async (e, i) => {
-                    await updateSettings('payment_warning', i)
-                  }}
-                />
-              )}
-            </Box>
-          </Box>
-          <Typography sx={{ marginBottom: 2 }} fontSize={12}>
-            {"Xabar matniga talaba ismini qo'shish uchun ${first_name} kalit so'zi qoldiring."}
-          </Typography>
-          <Typography sx={{ marginBottom: 2 }} fontSize={12}>
-            {"Xabar matniga kunni  qo'shish uchun ${date} kalit so'zi qoldiring."}
-          </Typography>
-          <Typography sx={{ marginBottom: 5 }} fontSize={12}>
-            {"Xabar matniga summani  qo'shish uchun ${amount} kalit so'zi qoldiring."}
-          </Typography>
+      <SmsCard
+        title="To'lovi yaqin qolganlarni ogohlantirish"
+        alert="Sms xabarnoma o'quvchiga to'lovga 7 kun qolganda yuboriladi"
+        loading={loading === 'payment'}
+        onSwitch='payment_warning'
+        name='payment_text'
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.payment_warning)}
+        placeholders={PLACEHOLDERS.whosePayment}
+        updateSettings={updateSettings}
+        defaultValue={companyInfo?.auto_sms?.payment_text}
+      />
 
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flexDirection: 'column' }}>
-            <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-              {t('SMS Matni')}:
-            </Typography>
-            {/* {editable === 'payment' && (
-              <Box display='flex' gap={2} mt={2}>
-                <Chip
-                  onClick={() => insertAtCursor('payment', paymentInputRef, '${first_name}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='error'
-                  label={'Ism familiya'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('payment', paymentInputRef, '${date}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='info'
-                  label={'Sana'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('payment', paymentInputRef, '${amount}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='primary'
-                  label={'Summa'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('payment', paymentInputRef, '${group}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='secondary'
-                  label={'Guruh'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('payment', paymentInputRef, '${grade}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='success'
-                  label={"O'quvchi bahosi"}
-                />
-              </Box>
-            )} */}
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
-              {editable === 'payment' ? (
-                <>
-                  <TextField
-                    multiline
-                    rows={4}
-                    size='small'
-                    focused
-                    inputRef={paymentInputRef}
-                    value={payment_text}
-                    // onBlur={e => {
-                    //   updateSettings('payment_text', e.target.value)
-                    // }}
-                    onChange={e => {
-                      setPayment_text(e.target.value)
-                    }}
-                    fullWidth
-                  />
-                  <IconifyIcon
-                    icon={loading === 'payment' ? 'line-md:loading-loop' : 'ic:baseline-check'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {
-                      updateSettings('payment_text', payment_text)
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <TextField
-                    fullWidth
-                    multiline
-                    disabled
-                    rows={4}
-                    type='text'
-                    value={payment_text}
-                    size='small'
-                    placeholder={t('SMS Matni')}
-                    // onBlur={e => console.log(e.target.value)}
-                  />
-                  <IconifyIcon
-                    icon={'basil:edit-outline'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => setEditable('payment')}
-                  />
-                </>
-              )}
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <Box display={'flex'}>
-              <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-                {t('Qarzdorlarni ogohlantirish')}:{' '}
-              </Typography>
-              <Tooltip
-                title={
-                  <Typography
-                    color='white'
-                    sx={{
-                      minWidth: isMobile ? '90px' : '180px',
-                      fontSize: isMobile ? '10px' : '13px'
-                    }}
-                  >
-                    {t("O'quvchi qarzdor bo'lgan kuni 1 marta ogohlantirish boradi")}
-                  </Typography>
-                }
-                arrow
-              >
-                <span style={{ cursor: 'pointer' }}>
-                  <Icon
-                    icon='mdi:help-circle-outline'
-                    style={{ fontSize: isMobile ? '16px' : '20px', marginLeft: '5px' }}
-                  />
-                </span>
-              </Tooltip>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {loading === 'debtor' ? (
-                <CircularProgress disableShrink size={'20px'} sx={{ margin: '10px 0', marginLeft: '15px' }} />
-              ) : (
-                <Switch
-                  checked={Boolean(companyInfo?.auto_sms?.for_debtor)}
-                  onChange={async (e, i) => {
-                    await updateSettings('for_debtor', i)
-                  }}
-                />
-              )}
-            </Box>
-          </Box>
-          <Typography sx={{ marginBottom: 2 }} fontSize={12}>
-            {"Xabar matniga kunni  qo'shish uchun ${date} kalit so'zi qoldiring."}
-          </Typography>
-          <Typography sx={{ marginBottom: 2 }} fontSize={12}>
-            {"Xabar matniga talaba ismini qo'shish uchun ${first_name} kalit so'zi qoldiring."}
-          </Typography>
-          <Typography sx={{ marginBottom: 5 }} fontSize={12}>
-            {"Xabar matniga summani  qo'shish uchun ${amount} kalit so'zi qoldiring."}
-          </Typography>
+      <SmsCard
+        title="Qarzdorlarni ogohlantirish"
+        alert="O'quvchi qarzdor bo'lgan kuni 1 marta ogohlantirish boradi"
+        loading={loading === 'debtor'}
+        onSwitch='for_debtor'
+        name='debt_text'
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_debtor)}
+        placeholders={PLACEHOLDERS.deptStudents}
+        updateSettings={updateSettings}
+        defaultValue={companyInfo?.auto_sms?.debt_text}
+      />
 
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flexDirection: 'column' }}>
-            <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-              {t('SMS Matni')}:
-            </Typography>
-            {/* {editable === 'debtor' && (
-              <Box display='flex' gap={2} mt={2}>
-                <Chip
-                  onClick={() => insertAtCursor('debtor', debtorInputRef, '${first_name}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='error'
-                  label={'Ism familiya'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('debtor', debtorInputRef, '${date}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='info'
-                  label={'Sana'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('debtor', debtorInputRef, '${amount}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='primary'
-                  label={'Summa'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('debtor', debtorInputRef, '${group}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='secondary'
-                  label={'Guruh'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('debtor', debtorInputRef, '${grade}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='success'
-                  label={"O'quvchi bahosi"}
-                />
-              </Box>
-            )} */}
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
-              {editable === 'debtor' ? (
-                <>
-                  <TextField
-                    multiline
-                    rows={4}
-                    size='small'
-                    focused
-                    inputRef={debtorInputRef}
-                    value={debt_text}
-                    // onBlur={e => {
-                    //   updateSettings('debt_text', e.target.value)
-                    // }}
-                    onChange={e => {
-                      setDebt_text(e.target.value)
-                    }}
-                    fullWidth
-                  />
-                  <IconifyIcon
-                    icon={loading === 'debtor' ? 'line-md:loading-loop' : 'ic:baseline-check'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {
-                      updateSettings('debt_text', debt_text)
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <TextField
-                    fullWidth
-                    multiline
-                    disabled
-                    rows={4}
-                    type='text'
-                    value={debt_text || 'Text'}
-                    size='small'
-                    placeholder={t('SMS Matni')}
-                    // onBlur={e => console.log(e.target.value)}
-                  />
-                  <IconifyIcon
-                    icon={'basil:edit-outline'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => setEditable('debtor')}
-                  />
-                </>
-              )}
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-              {t("O'quvchi baholarini yuborish")}:
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {loading === 'score' ? (
-                <CircularProgress disableShrink size={'20px'} sx={{ margin: '10px 0', marginLeft: '15px' }} />
-              ) : (
-                <Switch
-                  checked={Boolean(companyInfo?.auto_sms?.on_score)}
-                  onChange={async (e, i) => {
-                    setLoading('score')
-                    await updateSettings('on_score', i)
-                  }}
-                />
-              )}
-            </Box>
-          </Box>
-          <Typography sx={{ marginBottom: 2 }} fontSize={12}>
-            {"Xabar matniga talaba ismini qo'shish uchun ${first_name} kalit so'zi qoldiring."}
-          </Typography>
-
-          <Typography sx={{ marginBottom: 2 }} fontSize={12}>
-            {"Xabar matniga guruh nomini qo'shish uchun ${group} kalit so'zi qoldiring."}
-          </Typography>
-          <Typography sx={{ marginBottom: 5 }} fontSize={12}>
-            {"Xabar matniga talaba bahosini qo'shish uchun ${score} kalit so'zi qoldiring."}
-          </Typography>
-
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flexDirection: 'column' }}>
-            <Typography sx={{ minWidth: isMobile ? '90px' : '180px', fontSize: isMobile ? '13px' : '16px' }}>
-              {t(`SMS matnini kiriting (kelmagan o'quvchiga ertasi kuni yuboriladi)`)}
-            </Typography>
-            {/* {editable === 'score' && (
-              <Box display='flex' gap={2} mt={2}>
-                <Chip
-                  onClick={() => insertAtCursor('score', scoreInputRef, '${first_name}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='error'
-                  label={'Ism familiya'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('score', scoreInputRef, '${date}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='info'
-                  label={'Sana'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('score', scoreInputRef, '${amount}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='primary'
-                  label={'Summa'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('score', scoreInputRef, '${group}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='secondary'
-                  label={'Guruh'}
-                />
-                <Chip
-                  onClick={() => insertAtCursor('score', scoreInputRef, '${grade}')}
-                  sx={{ cursor: 'pointer' }}
-                  color='success'
-                  label={"O'quvchi bahosi"}
-                />
-              </Box>
-            )} */}
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
-              {editable === 'score' ? (
-                <>
-                  <TextField
-                    multiline
-                    rows={4}
-                    size='small'
-                    focused
-                    inputRef={scoreInputRef}
-                    value={score_text}
-                    // onBlur={e => {
-                    //   updateSettings('score_text', e.target.value)
-                    // }}
-                    onChange={e => {
-                      setScore_text(e.target.value)
-                    }}
-                    fullWidth
-                  />
-                  <IconifyIcon
-                    icon={loading === 'score' ? 'line-md:loading-loop' : 'ic:baseline-check'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {
-                      updateSettings('score_text', score_text)
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    disabled
-                    type='text'
-                    value={score_text}
-                    size='small'
-                    placeholder={t('Boshlanish vaqti')}
-                    // onBlur={e => console.log(e.target.value)}
-                  />
-                  <IconifyIcon
-                    icon={'basil:edit-outline'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => setEditable('score')}
-                  />
-                </>
-              )}
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+      <SmsCard
+        title="O'quvchi baholarini yuborish"
+        alert="Kelmagan o'quvchiga ertasi kuni sms xabarnoma yuboriladi"
+        loading={loading === 'debtor'}
+        onSwitch='on_score'
+        name='debt_text'
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_score)}
+        placeholders={PLACEHOLDERS.deptStudents}
+        updateSettings={updateSettings}
+        defaultValue={companyInfo?.auto_sms?.debt_text}
+      />
     </Box>
   )
 }
