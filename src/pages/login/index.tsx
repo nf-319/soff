@@ -95,13 +95,11 @@ const LoginPage = () => {
   const handleLogin = async (params: { phone: string, password: string }) => {
     try {
       setLoading(true)
-
       const response = await api.post(authConfig.loginEndpoint, params)
       window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.tokens.access)
       window.localStorage.setItem('userData', JSON.stringify({ ...response.data }))
-
       const userRoles = response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase())
-
+      
       dispatch(setRoles(userRoles))
 
       if (
