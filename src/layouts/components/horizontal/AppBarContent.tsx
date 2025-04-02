@@ -88,8 +88,6 @@ const AppBarContent = (props: Props) => {
     handleSearch(debouncedSearch)
   }, [debouncedSearch])
 
-  console.log(search)
-
   return (
     <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
       {(user?.role.includes('admin') ||
@@ -120,9 +118,7 @@ const AppBarContent = (props: Props) => {
                 <li {...props} key={option.id}>
                   <Link
                     style={{ textDecoration: 'none' }}
-                    onClick={() => {
-                      dispatch(setStudentId(option.id)), setSearch('')
-                    }}
+                    onClick={() => dispatch(setStudentId(option.id))}
                     href={renderRoleBasedLink(option)}
                   >
                     <Icon
@@ -145,7 +141,7 @@ const AppBarContent = (props: Props) => {
                 </li>
               )}
               renderInput={params => (
-                <TextField {...params} placeholder='Qidirish...'  onChange={e => setSearch(e.target.value)} />
+                <TextField {...params} placeholder='Qidirish...' onChange={e => setSearch(e.target.value)} />
               )}
             />
 
