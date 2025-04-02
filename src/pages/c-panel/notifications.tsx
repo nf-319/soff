@@ -1,8 +1,13 @@
+// components/custom-editor.js
+'use client' // Required only in App Router.
 
-const CPanelNotification = () => {
+import React from 'react';
+import CustomEditorr from 'src/components/ckeditor';
+
+const CustomEditor = () => {
   return (
-    <>dewfewfewf</>
-  )
+   <CustomEditorr/>
+ )
 }
 
-export default CPanelNotification
+export default CustomEditor;
