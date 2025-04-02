@@ -249,8 +249,8 @@ export default function AllSettings() {
         onChange={(event, newIndex) => setTabIndex(newIndex)}
         variant='fullWidth'
       >
-        <Tab label='🏢 Markaz Sozlamalari' />
-        <Tab label='📩 SMS Sozlamalari' />
+        <Tab label={t('🏢 Markaz Sozlamalari')} />
+        <Tab label={t('📩 SMS Sozlamalari')} />
       </Tabs>
       <>
         {tabIndex === 0 &&
@@ -448,7 +448,15 @@ export default function AllSettings() {
                             onChange={handleChangeExtraSettings}
                           />
                         }
-                        label="O'quvchi to'lovida kurs narxini tahrirlash"
+                        label={
+                          <Tooltip
+                            title={t(
+                              'Ushbu funksiya yoqilgandan so‘ng, o‘quvchi to‘lov qilayotganda uning qarzdorligini tahrirlash imkoniyati yoqiladi.'
+                            )}
+                          >
+                            <span>{t("O'quvchi to'lovida kurs narxini tahrirlash")}</span>
+                          </Tooltip>
+                        }
                       />
                     </CardContent>
                   </Card>

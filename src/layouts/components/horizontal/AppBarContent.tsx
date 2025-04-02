@@ -145,10 +145,9 @@ const AppBarContent = (props: Props) => {
                 </li>
               )}
               renderInput={params => (
-                <TextField {...params} placeholder='Qidirish...'  onChange={e => setSearch(e.target.value)} />
+                <TextField {...params} placeholder='Qidirish...' onChange={e => setSearch(e.target.value)} />
               )}
             />
-
             <Tooltip title='Davomat' arrow>
               <span
                 style={{
@@ -166,10 +165,16 @@ const AppBarContent = (props: Props) => {
                 </svg>
               </span>
             </Tooltip>
-
-            <Button variant='contained' size='small' sx={{ margin: '0 7px', height: '32px' }} onClick={clickGlobalPay}>
-              <span>{t("To'lov")}</span>
-            </Button>
+          <Tooltip enterDelay={2000} title={t("O'quvchi to'lovni qabul qilish")} arrow>
+              <Button
+                variant='contained'
+                size='small'
+                sx={{ margin: '0 7px', height: '32px' }}
+                onClick={clickGlobalPay}
+              >
+                <span>{t("To'lov")}</span>
+              </Button>
+            </Tooltip>
           </>
         )}
 
@@ -177,7 +182,7 @@ const AppBarContent = (props: Props) => {
 
       <VideoModal />
 
-      {/*<LanguageDropdown settings={settings} saveSettings={saveSettings} />*/}
+      <LanguageDropdown settings={settings} saveSettings={saveSettings} />
       {user?.currentRole === 'student' && <QrcodeScanner />}
       <NotificationDropdown settings={settings} />
       <UserDropdown settings={settings} />

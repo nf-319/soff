@@ -71,18 +71,17 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
 
   const apiParams = {
     is_active: is_active ?? true
-  };
+  }
 
   if (id || defaultId) {
     // @ts-ignore
-    apiParams.parent = id || defaultId;
+    apiParams.parent = id || defaultId
   }
 
   if (search && search !== 'undefined') {
     // @ts-ignore
-    apiParams.search = search;
+    apiParams.search = search
   }
-
 
   const {
     data: leadData,
@@ -263,8 +262,8 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
                         opacity: sectionSnapshot.isDragging ? 0.8 : 1
                       }}
                     >
-                      <Droppable key={section.id} droppableId={String(section.id)} type="LEAD">
-                        {(leadsProvided) => (
+                      <Droppable key={section.id} droppableId={String(section.id)} type='LEAD'>
+                        {leadsProvided => (
                           <div
                             {...leadsProvided.droppableProps}
                             className='kanban__section'
@@ -354,7 +353,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
                                 variant='outlined'
                                 startIcon={<PersonAddAlt />}
                               >
-                                Yangi lid qo'shish
+                                {t("Yangi lid qo'shish")}
                               </Button>
                             </Box>
                           </div>

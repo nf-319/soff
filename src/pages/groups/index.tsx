@@ -12,6 +12,7 @@ import {
   MenuItem,
   Pagination,
   Select,
+  Tooltip,
   Typography
 } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
@@ -318,7 +319,9 @@ export default function GroupsPage() {
           size='small'
           startIcon={<IconifyIcon icon='ic:baseline-plus' />}
         >
-          {t("Yangi qo'shish")}
+          <Tooltip title={t('Yangi guruh qo‘shish.')}>
+            <span>{t("Yangi qo'shish")}</span>
+          </Tooltip>
         </Button>
       </Box>
 

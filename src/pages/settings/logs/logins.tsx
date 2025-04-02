@@ -21,7 +21,7 @@ function Logins() {
 
   const columns: customTableDataProps[] = [
     { xs: 0.3, title: t('ID'), dataIndex: 'index' },
-    { xs: 1, title: t('Username'), dataIndex: 'user_name' },
+    { xs: 1, title: t('Ism'), dataIndex: 'user_name' },
     { xs: 1, title: t('Telefon raqam'), dataIndex: 'user_phone' },
     { xs: 1.4, title: t('Kirgan sanasi'), dataIndex: 'date' }
   ]
