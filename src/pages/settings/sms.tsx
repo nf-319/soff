@@ -71,7 +71,7 @@ export default function RoomsPage() {
               size='small'
               startIcon={<IconifyIcon icon='ic:baseline-plus' />}
             >
-              {t("Yangi kategoriya qo'shish")}
+              {t('SMS kategoriya yaratish')}
             </Button>
             <Button
               onClick={() => setOpenAddGroup(true)}
@@ -79,7 +79,7 @@ export default function RoomsPage() {
               size='small'
               startIcon={<IconifyIcon icon='ic:baseline-plus' />}
             >
-              {t("Yangi shablon qo'shish")}
+              {t('Yangi SMS kategoriya qo‘shish')}
             </Button>
           </Box>
         </Box>
@@ -95,7 +95,7 @@ export default function RoomsPage() {
               size='small'
               startIcon={<IconifyIcon icon='ic:baseline-plus' />}
             >
-              {t("Yangi kategoriya qo'shish")}
+              {t('SMS kategoriya yaratish')}
             </Button>
             <Button
               fullWidth
@@ -104,7 +104,7 @@ export default function RoomsPage() {
               size='small'
               startIcon={<IconifyIcon icon='ic:baseline-plus' />}
             >
-              {t("Yangi shablon qo'shish")}
+              {t('Yangi SMS kategoriya qo‘shish')}
             </Button>
           </Box>
         </Box>
@@ -115,9 +115,8 @@ export default function RoomsPage() {
       ) : (
         sms_list.map(item => (
           <Accordion
-
             key={item.id}
-            sx={{ marginY: 5 ,borderRadius:2,border:'none',position:'unset'}}
+            sx={{ marginY: 5, borderRadius: 2, border: 'none', position: 'unset' }}
             expanded={parentId === item.id}
             onChange={() => setParentId(parentId === item.id ? null : item.id)}
           >

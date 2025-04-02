@@ -59,7 +59,7 @@ const DashboardStats = () => {
   }
 
   const tooltip = {
-    active_groups: 'Ayni vaqtda faol guruhlar soni',
+    active_groups: 'Faol guruhlar soni.',
     active_students: "Ayni vaqtda faol o'quvchilar soni",
     active_debts_count: `Umumiy qarzdor o'quvchilar soni : ${stats?.debtor_users} ta, arxivdagi o'quvchilar soni : ${stats?.active_debts_count} ta (1 ta o'quvchi 2 va undan ortiq guruhda o'qishi mumkin)`,
     active_debts_amount: `Umumiy o'quvchilar qarzdorligi : ${formatCurrency(stats?.debtors_amount) + " so'm"}
@@ -68,7 +68,7 @@ const DashboardStats = () => {
       `Arxivdagi o'quvchilar qarzdorligi : ${formatCurrency(stats.archive_debts_amount) + " so'm"}`
     }
     `,
-    leads_count: "Kurslarga ro'yxatdan o'tgan faol lidlar soni",
+    leads_count: "Hozirda faol bo‘lgan va ishlov berilishi kerak bo‘lgan lidlar ro‘yxati.",
     not_activated_students: "Sinov darsiga kelib ketgan o'quvchilar soni",
     payment_approaching: "To'lov qilishiga 7 kundan kam qolgan o'quvchilar soni",
     teacher_count: "O'qituvchilar soni",
@@ -102,7 +102,7 @@ const DashboardStats = () => {
       {stats && !isLoading
         ? stats?.payment_approaching
           ? statsData.map((item, index) => (
-              <Tooltip key={`${item.key}-${index}`} arrow title={tooltip[item.key]}>
+              <Tooltip key={`${item.key}-${index}`} arrow title={t(tooltip[item.key])}>
                 <Box sx={{ cursor: 'pointer', width: "100%" }} onClick={() => click(item.link)}>
                   <CardStatsVertical
                     data_key={item.key}
@@ -117,7 +117,7 @@ const DashboardStats = () => {
           : statsData
               ?.filter(el => el.key !== 'payment_approaching')
               .map((_, index) => (
-                <Tooltip key={`${_.key}-${index}`} arrow title={tooltip[_.key]}>
+                <Tooltip key={`${_.key}-${index}`} arrow title={t(tooltip[_.key])}>
                   <Box sx={{ cursor: 'pointer', width: "100%" }} onClick={() => click(_.link)}>
                     <CardStatsVertical
                       key={_.key}

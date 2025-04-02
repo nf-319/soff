@@ -484,7 +484,6 @@ export default function EditGroupModal() {
                     onBlur={formik.handleBlur}
                     value={formik.values.end_date}
                     error={!!formik.errors.end_date && formik.touched.end_date}
-                    InputLabelProps={{ shrink: true }}
                   />
                   <FormHelperText error={!!formik.errors.end_date && formik.touched.end_date}>
                     {!!formik.errors.end_date && formik.touched.end_date && formik.errors.end_date}

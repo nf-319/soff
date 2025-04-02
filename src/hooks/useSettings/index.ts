@@ -1,0 +1,1 @@
+export { useGetSettings } from './useSettings'

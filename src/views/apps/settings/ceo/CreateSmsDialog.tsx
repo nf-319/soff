@@ -49,8 +49,10 @@ export default function CreateSmsDialog({}: Props) {
   }
 
   const validationSchema = Yup.object({
-    description: Yup.string().required('Xabarni kiriting'),
-    parent: Yup.string().required('Kategorya tanlanishi shart')
+    description: Yup.string().required(t('Xabarni kiriting')||'Xabarni kiriting'),
+    parent: Yup.string()
+      .nullable()
+      .required(t('Kategorya tanlanishi shart') || 'Kategorya tanlanishi shart')
   })
 
   const initialValues = {
@@ -153,7 +155,6 @@ export default function CreateSmsDialog({}: Props) {
             ))}
           </Select>
           {!!errors.parent && touched.parent && <FormHelperText error>{errors.parent}</FormHelperText>}
-
         </FormControl>
         <FormControl fullWidth>
           <TextField

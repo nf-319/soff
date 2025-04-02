@@ -118,6 +118,7 @@ export const appUsersSlice = createSlice({
     setNotifications: (state, action) => {
       state.notificationsCount = action.payload
     },
+   
     setRoles: (state, action) => {
       state.userRoles = action.payload
     },

@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Button, Chip, FormControlLabel, Pagination, Switch, Typography } from '@mui/material'
+import { Box, Button, Chip, FormControlLabel, Pagination, Switch, Tooltip, Typography } from '@mui/material'
 import { ChangeEvent, ReactNode, useContext, useEffect, useState } from 'react'
 import IconifyIcon from '../../components/icon'
 import { useTranslation } from 'react-i18next'
@@ -43,10 +43,9 @@ export default function GroupsPage() {
   const { smsTemps, getSMSTemps } = useSMS()
   const { queryParams, openSms } = useAppSelector(state => state.mentors)
 
-  const { data: teachers }  = useGet(`${ceoConfigs.employee_checklist}?role=teacher`)
+  const { data: teachers } = useGet(`${ceoConfigs.employee_checklist}?role=teacher`)
 
   const studentIds = teachers?.map((student: any) => student.id)
-
 
   const handleEditClickOpen = (value: ModalTypes) => {
     dispatch(setOpenSms(value))
@@ -115,7 +114,7 @@ export default function GroupsPage() {
       dataIndex: 'activated_at'
     },
     {
-      xs: 1,
+      xs: 0.9,
       dataIndex: 'id',
       title: '',
       render: actions => <RowOptions id={actions} status={queryParams?.status} />
@@ -182,7 +181,11 @@ export default function GroupsPage() {
           <FormControlLabel
             control={<Switch onChange={handleChangeStatus} />}
             checked={queryParams.status == 'archive'}
-            label={t('archive')}
+            label={
+              <Tooltip title={t('Arxivlangan o‘qituvchilar ro‘yxati.')}>
+                <span>{t('Arxiv')}</span>
+              </Tooltip>
+            }
             sx={{ marginLeft: isMobile ? '0' : '10px' }}
           />
         </Box>
@@ -205,7 +208,9 @@ export default function GroupsPage() {
             size='small'
             startIcon={<IconifyIcon icon='material-symbols-light:sms-outline' />}
           >
-            {t('Sms yuborish')}
+            <Tooltip title={t('Ro‘yxatdagi o‘qituvchilarga SMS yuborish.')}>
+              <span>{t('Sms yuborish')}</span>
+            </Tooltip>
           </Button>
           <Button
             onClick={() => dispatch(setOpenEdit('create'))}
@@ -214,7 +219,9 @@ export default function GroupsPage() {
             fullWidth={isMobile}
             startIcon={<IconifyIcon icon='ic:baseline-plus' />}
           >
-            {t("Yangi qo'shish")}
+            <Tooltip title={t('Yangi o‘qituvchi qo‘shish.')}>
+              <span>{t("Yangi qo'shish")}</span>
+            </Tooltip>
           </Button>
         </Box>
       </Box>

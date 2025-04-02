@@ -332,7 +332,7 @@ export default function GroupsPage() {
         </ButtonGroup>
         <Link href='/settings/ceo/users/attandance-table'>
           <Button variant='contained' size='medium'>
-            Xodimlar Davomati
+            {t("Xodimlar Davomati")}
           </Button>
         </Link>
         <FormControlLabel

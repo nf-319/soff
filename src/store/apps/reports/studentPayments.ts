@@ -45,6 +45,7 @@ interface IStudentsPaymentState {
   teachersData: TeacherPaymentType[]
   paymentsCount: number
   total_payments: number
+  total_bonus:number,
   isLoading: boolean
   groups: GroupsPaymentType[]
   queryParams: {
@@ -69,6 +70,7 @@ const initialState: IStudentsPaymentState = {
   queryParams: {bonus:'', payment_type: '', is_payment: true, page: '1', offset: '0', limit: '10', teacher: '', course: '' },
   paymentsCount: 0,
   total_payments: 0,
+  total_bonus: 0,
   isLoading: false
 }
 
@@ -91,6 +93,7 @@ export const studentPaymentsSlice = createSlice({
       .addCase(fetchStudentPaymentsList.fulfilled, (state, action) => {
         state.studentsPayment = action.payload.results
         state.total_payments = action.payload.total_payments
+        state.total_bonus = action.payload.total_bonus
         state.paymentsCount = action.payload.count
         state.isLoading = false
       })

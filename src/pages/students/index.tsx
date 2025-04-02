@@ -10,7 +10,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton
+  IconButton,
+  Tooltip
 } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import DataTable from '../../components/table'
@@ -218,7 +219,7 @@ export default function StudentsPage() {
 
     return () => {
       dispatch(setOpenEdit(null))
-      dispatch(updateStudentParams({ limit: '10', offset: '0', course:'',teacher:'',group:'' }))
+      dispatch(updateStudentParams({ limit: '10', offset: '0', course: '', teacher: '', group: '' }))
     }
   }, [])
 
@@ -238,7 +239,7 @@ export default function StudentsPage() {
           <Typography variant='h5'>{t("O'quvchilar")}</Typography>
           {!isLoading && <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' />}
           {!isLoading && queryParams.is_debtor && (
-            <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm" } variant='outlined' color='error' />
+            <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm"} variant='outlined' color='error' />
           )}
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
@@ -254,7 +255,9 @@ export default function StudentsPage() {
             size='small'
             startIcon={<IconifyIcon icon='ic:baseline-plus' />}
           >
-            {t("Yangi qo'shish")}
+            <Tooltip title={t("Yangi o‘quvchi qo‘shish.")}>
+              <span>{t("Yangi qo'shish")}</span>
+            </Tooltip>
           </Button>
         </Box>
       </Box>

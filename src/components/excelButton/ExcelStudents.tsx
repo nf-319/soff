@@ -1,12 +1,14 @@
-import { Button } from '@mui/material'
+import { Button, Tooltip } from '@mui/material'
 import { VscodeIconsFileTypeExcel2 } from './ExcelIcon'
 import api from '../../@core/utils/api'
 import { LoadingButton } from '@mui/lab'
 import { useState } from 'react'
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
 interface ExcelProps {
   queryString?: string
+  tooltip?: string
   url: string
   variant?: 'text' | 'outlined' | 'contained'
   color?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning'
@@ -17,6 +19,7 @@ interface ExcelProps {
 export default function ExcelStudents({
   queryString = '',
   variant = 'outlined',
+  tooltip = '',
   color = 'success',
   size = 'small',
   url,
@@ -24,6 +27,7 @@ export default function ExcelStudents({
 }: ExcelProps) {
   const [loading, setLoading] = useState(false)
   const [link, setLink] = useState('')
+  const {t} = useTranslation()
   const handleDownload = async () => {
     setLoading(true)
     try {
@@ -51,7 +55,9 @@ export default function ExcelStudents({
       color={color}
       fullWidth
     >
-      Excel
+      <Tooltip title={t(tooltip)}>
+        <span>Excel</span>
+      </Tooltip>
     </LoadingButton>
   )
 }
