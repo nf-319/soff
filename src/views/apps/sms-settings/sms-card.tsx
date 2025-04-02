@@ -21,6 +21,7 @@ type Props = {
   defaultValue?: string
   placeholders: PlaceholdersButtonsAreaTypes[]
   title: string
+  companyName: string
   onSwitch: string
   name: string
   onSwitchInfo: boolean
@@ -33,6 +34,7 @@ export const SmsCard: FC<Props> = ({
   updateSettings,
   defaultValue = '',
   name,
+  companyName,
   alert,
   onSwitch,
   title,
@@ -120,6 +122,7 @@ export const SmsCard: FC<Props> = ({
               editable={editable}
               loading={loading}
               alert={alert}
+              companyName={companyName}
               handleCancel={handleCancel}
               handleChange={handleSave}
               setEditable={setEditable}

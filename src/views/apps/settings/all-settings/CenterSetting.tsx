@@ -282,7 +282,7 @@ export default function AllSettings() {
                   </Typography>
                   {companyInfo?.logo ? (
                     <Image
-                      src={companyInfo.logo}
+                      src={companyInfo.logo || 'https://static-00.iconduck.com/assets.00/image-alt-text-icon-512x512-gm9in6oz.png'}
                       alt="Company Logo"
                       width={46}
                       height={46}
@@ -392,7 +392,6 @@ export default function AllSettings() {
               </CardContent>
             </Card>
           </div>
-          {/* Card 5 */}
           <div className='w-100'>
             <Card>
               <CardContent>
@@ -484,7 +483,6 @@ export default function AllSettings() {
               </CardContent>
             </Card>
           </div>
-          {/* Card 4 */}
           <div className='w-100'>
             <Card>
               <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -502,14 +500,14 @@ export default function AllSettings() {
                           defaultValue={companyInfo?.work_start_time}
                           onChange={e => setName(e.target.value)}
                           onBlur={e => {
-                            updateSettings('work_start_time', e.target.value)
+                            void updateSettings('work_start_time', e.target.value)
                           }}
                         />
                         <IconifyIcon
                           icon={loading === 'start-time' ? 'line-md:loading-loop' : 'ic:baseline-check'}
                           style={{ cursor: 'pointer' }}
                           onClick={() => {
-                            updateSettings('work_start_time', name)
+                            void updateSettings('work_start_time', name)
                           }}
                         />
                       </>
@@ -543,14 +541,14 @@ export default function AllSettings() {
                           focused
                           defaultValue={companyInfo?.work_end_time}
                           onBlur={e => {
-                            updateSettings('work_end_time', e.target.value)
+                            void updateSettings('work_end_time', e.target.value)
                           }}
                         />
                         <IconifyIcon
                           icon={loading === 'end-time' ? 'line-md:loading-loop' : 'ic:baseline-check'}
                           style={{ cursor: 'pointer' }}
                           onClick={() => {
-                            updateSettings('work_end_time', name)
+                            void updateSettings('work_end_time', name)
                           }}
                         />
                       </>
