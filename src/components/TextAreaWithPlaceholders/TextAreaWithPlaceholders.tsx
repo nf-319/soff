@@ -14,6 +14,7 @@ type Props = {
   placeholders: PlaceholdersButtonsAreaTypes[]
   defaultValue: string
   alert?: string
+  companyName?: string
   handleCancel?: () => void
   shortDescription?: string
   severity?: AlertProps['severity']
@@ -30,11 +31,13 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
   severity = 'info',
   handleChange,
   loading,
+  companyName,
   placeholders,
   defaultValue,
   onChange
 }) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
+  const [wasCompanyNameRemoved, setWasCompanyNameRemoved] = useState(false)
 
   const convertAPItoUIFormat = (text: string) => {
     if (!text) return ''
@@ -46,15 +49,30 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
     return result
   }
 
-  const [displayValue, setDisplayValue] = useState(convertAPItoUIFormat(defaultValue))
+  const initialDisplayValue =
+    !defaultValue || defaultValue.trim() === ''
+      ? companyName && !wasCompanyNameRemoved
+        ? `${companyName}: `
+        : ''
+      : convertAPItoUIFormat(defaultValue)
+
+  const [displayValue, setDisplayValue] = useState(initialDisplayValue)
   const [prevDisplayValue, setPrevDisplayValue] = useState(displayValue)
 
   useEffect(() => {
     if (!editable) {
-      setDisplayValue(convertAPItoUIFormat(value || defaultValue))
-      setPrevDisplayValue(convertAPItoUIFormat(value || defaultValue))
+      const newValue = value || defaultValue
+      const formattedValue =
+        !newValue || newValue.trim() === ''
+          ? companyName && !wasCompanyNameRemoved
+            ? `${companyName}: `
+            : ''
+          : convertAPItoUIFormat(newValue)
+
+      setDisplayValue(formattedValue)
+      setPrevDisplayValue(formattedValue)
     }
-  }, [value, defaultValue, editable, placeholders])
+  }, [value, defaultValue, editable, placeholders, companyName])
 
   function escapeRegExp(string: string): string {
     return string?.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -90,6 +108,7 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
   function convertToApiText(text: string): string {
     if (!text) return ''
     let result = text
+
     placeholders.forEach(p => {
       const regex = new RegExp(escapeRegExp(p.displayValue), 'g')
       result = result.replace(regex, p.value)
@@ -98,6 +117,14 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
   }
 
   const handleValueChange = (newDisplayValue: string) => {
+    if (
+      companyName &&
+      prevDisplayValue.startsWith(`${companyName}: `) &&
+      !newDisplayValue.startsWith(`${companyName}: `)
+    ) {
+      setWasCompanyNameRemoved(true)
+    }
+
     const placeholdersInPrev = findAllPlaceholdersInText(prevDisplayValue)
 
     if (Math.abs(newDisplayValue?.length - prevDisplayValue?.length) > 10) {
@@ -169,7 +196,8 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
   }
 
   const renderTextWithPlaceholders = () => {
-    if (!value) return null
+    if (!value && !defaultValue && companyName && !wasCompanyNameRemoved) return `${companyName}: `
+    if (!value) return defaultValue || ''
 
     return value.split(/(\$\{(?:group|balance|first_name|reason|score|amount|date)})/).map((part, index) => {
       const placeholder = placeholders.find(p => p.value === part)
@@ -193,8 +221,16 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
       handleCancel()
       return
     }
-    setDisplayValue(convertAPItoUIFormat(defaultValue))
-    onChange(defaultValue)
+
+    const resetValue =
+      !defaultValue || defaultValue.trim() === ''
+        ? companyName && !wasCompanyNameRemoved
+          ? `${companyName}: `
+          : ''
+        : convertAPItoUIFormat(defaultValue)
+
+    setDisplayValue(resetValue)
+    onChange(convertToApiText(resetValue)) // Reset qiymatni API ga yuboramiz
     setEditable(false)
   }
 
