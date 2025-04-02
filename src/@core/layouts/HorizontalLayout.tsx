@@ -22,6 +22,7 @@ import { useRouter } from 'next/router'
 import { Alert, Container } from 'react-bootstrap'
 import { Bell, MoveRight, X, XCircle } from 'lucide-react'
 import { Button } from '@mui/material'
+import AppBarWarning from 'src/components/AppBarWarning'
 
 const HorizontalLayoutWrapper = styled(Box)({
   height: '100%',
@@ -85,7 +86,7 @@ const HorizontalLayout = (props: LayoutProps) => {
   const formattedUserData = JSON.parse(userData as string)
 
   useEffect(() => {
-    if (formattedUserData.payment_days !== null) {
+    if (!formattedUserData.payment_days) {
       setShowWarning(true)
     } else {
       setShowWarning(false)
@@ -103,48 +104,7 @@ const HorizontalLayout = (props: LayoutProps) => {
   return (
     <HorizontalLayoutWrapper className='layout-wrapper'>
       <MainContentWrapper className='layout-content-wrapper' sx={{ ...(contentHeightFixed && { maxHeight: '100vh' }) }}>
-        {showWarning && (
-          <Alert
-          
-            variant='danger'
-            className='text-white m-0 p-0 position-relative'
-            style={{ height: '40px', backgroundColor: '#FF4D4D', borderRadius: 0 }}
-          >
-            <Container className='d-flex justify-content-between align-items-center'>
-              <div className='d-flex align-items-center gap-2 text-white'>
-                 <Bell size={14}/>
-                <span className='small fw-medium'>
-                  Tizimdan foydalanish muddati tugagungacha {formattedUserData.payment_days} kun qoldi, Tizimdan
-                  uzluksiz foydalanish uchun to'lovni amalga oshiring
-                </span>
-              </div>
-              {user?.currentRole == 'ceo' && (
-                <Button
-                  onClick={() => router.push('/crm-payments')}
-                  sx={{ color: 'white', fontSize: 10, padding: 2, display: 'flex', gap: 2 }}
-                >
-                  <span>To'lovni amalga oshirish</span>
-                  <MoveRight size={16} />
-                </Button>
-              )}
-            </Container>
-
-            {/* Close Button Positioned at the Top-Right */}
-            <Button
-              onClick={() => setShowWarning(false)}
-              className='position-absolute'
-              style={{
-                top: '2px',
-                right: '2px',
-                color: 'black',
-                background: 'transparent',
-                border: 'none'
-              }}
-            >
-              <X size={20} />
-            </Button>
-          </Alert>
-        )}
+        {showWarning && <AppBarWarning setShowWarning={setShowWarning} />}
         {!auth?.user?.payment_page && (
           <AppBar
             color='default'

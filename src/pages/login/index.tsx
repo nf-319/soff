@@ -45,7 +45,6 @@ const TypographyStyled = styled(Typography)<TypographyProps>(({ theme }) => ({
   [theme.breakpoints.down('md')]: { marginTop: theme.spacing(8) }
 }))
 
-
 const defaultValues = {
   phone: '',
   password: ''
@@ -61,7 +60,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState<boolean>(false)
   const dispatch = useAppDispatch()
   const auth = useAuth()
-  const { public_settings }  = useSelector((item: RootState) => item.page)
+  const { public_settings } = useSelector((item: RootState) => item.page)
   const router = useRouter()
   const { t } = useTranslation()
 
@@ -92,15 +91,16 @@ const LoginPage = () => {
     void pageLoad()
   }, [dispatch])
 
-  const handleLogin = async (params: { phone: string, password: string }) => {
+  const handleLogin = async (params: { phone: string; password: string }) => {
     try {
       setLoading(true)
       const response = await api.post(authConfig.loginEndpoint, params)
       window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.tokens.access)
       window.localStorage.setItem('userData', JSON.stringify({ ...response.data }))
       const userRoles = response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase())
-      
       dispatch(setRoles(userRoles))
+
+      console.table(response)
 
       if (
         !window.location.hostname.split('.').includes('c-panel') &&
@@ -121,11 +121,12 @@ const LoginPage = () => {
         ? returnUrl
         : '/'
 
-
       await router.push(redirectURL as string)
 
       dispatch(setRoles(userRoles))
+      console.log(response.data?.payment_days)
       auth.setUser({
+        payment_days: response.data?.payment_days,
         last_login: response.data?.last_login,
         phone: response.data.phone,
         gpa: response.data?.gpa,
@@ -140,6 +141,7 @@ const LoginPage = () => {
         branches: response.data?.branches,
         active_branch: response.data.active_branch
       })
+      console.log(auth.user?.payment_days)
       setLoading(false)
       auth.initAuth()
     } catch (err: any) {
@@ -167,22 +169,32 @@ const LoginPage = () => {
   }
 
   return (
-      <Box sx={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden' }}>
-        <Image
-          src='/images/request-form-bg.webp'
-          alt='Login Background'
-          fill
-          style={{objectFit: "cover"}}
-          priority
-        />
+    <Box sx={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+      <Image src='/images/request-form-bg.webp' alt='Login Background' fill style={{ objectFit: 'cover' }} priority />
 
       <Zoom in timeout={500}>
-        <Box className='content-right' sx={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Box
+          className='content-right'
+          sx={{
+            position: 'relative',
+            zIndex: 1,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%'
+          }}
+        >
           {public_settings && (
             <div className='login-card'>
               <Box sx={{ mb: 6, textAlign: 'center' }}>
                 {public_settings?.logo && (
-                  <Image src={public_settings?.logo} alt='Brand logo' width={100} height={80} style={{ objectFit: 'scale-down' }} />
+                  <Image
+                    src={public_settings?.logo}
+                    alt='Brand logo'
+                    width={100}
+                    height={80}
+                    style={{ objectFit: 'scale-down' }}
+                  />
                 )}
 
                 {public_settings ? (
@@ -195,8 +207,13 @@ const LoginPage = () => {
                 <Typography variant='body2'>Iltimos tizimga kirish uchun shaxsiy malumotlaringizni kiriting</Typography>
               </Box>
 
-              <form noValidate autoComplete='off' style={{ display: "grid", gap: 20 }} onSubmit={handleSubmit(onSubmit)}>
-                <Box display="grid" gap={5}>
+              <form
+                noValidate
+                autoComplete='off'
+                style={{ display: 'grid', gap: 20 }}
+                onSubmit={handleSubmit(onSubmit)}
+              >
+                <Box display='grid' gap={5}>
                   <FormControl fullWidth>
                     <InputLabel error={Boolean(errors.phone)} htmlFor='login-input'>
                       {t('phone')}
