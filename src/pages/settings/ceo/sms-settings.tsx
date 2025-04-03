@@ -231,9 +231,11 @@ const SmsSettings = () => {
     }
   }
 
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '100%' }}>
       <SmsCard
+        companyName={companyInfo.training_center_name}
         title="Tug'ilgan kunda sms bilan tabriklash"
         loading={loading === 'birthdate'}
         onSwitch='on_birthday'
@@ -245,6 +247,7 @@ const SmsSettings = () => {
       />
 
       <SmsCard
+        companyName={companyInfo.training_center_name}
         title="Darsga kelmaganlarga sms yuborish"
         alert="Kelmagan o'quvchiga sms xabarnoma ertasi kuni yuboriladi"
         loading={loading === 'absend'}
@@ -257,6 +260,7 @@ const SmsSettings = () => {
       />
 
       <SmsCard
+        companyName={companyInfo.training_center_name}
         title="Darsga kelganlarga sms yuborish"
         alert="Kelgan o'quvchiga ertasi kuni sms xabarnoma yuboriladi"
         loading={loading === 'attend'}
@@ -273,6 +277,7 @@ const SmsSettings = () => {
         alert="Sms xabarnoma o'quvchiga to'lovga 7 kun qolganda yuboriladi"
         loading={loading === 'payment'}
         onSwitch='payment_warning'
+        companyName={companyInfo.training_center_name}
         name='payment_text'
         onSwitchInfo={Boolean(companyInfo?.auto_sms?.payment_warning)}
         placeholders={PLACEHOLDERS.whosePayment}
@@ -286,6 +291,7 @@ const SmsSettings = () => {
         loading={loading === 'debtor'}
         onSwitch='for_debtor'
         name='debt_text'
+        companyName={companyInfo.training_center_name}
         onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_debtor)}
         placeholders={PLACEHOLDERS.deptStudents}
         updateSettings={updateSettings}
@@ -297,6 +303,7 @@ const SmsSettings = () => {
         alert="Kelmagan o'quvchiga ertasi kuni sms xabarnoma yuboriladi"
         loading={loading === 'debtor'}
         onSwitch='on_score'
+        companyName={companyInfo.training_center_name}
         name='debt_text'
         onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_score)}
         placeholders={PLACEHOLDERS.deptStudents}

@@ -27,10 +27,8 @@ import QrCodeModal from '../../components/qrCode-Modal'
 import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
-import { Alert, Container } from 'react-bootstrap'
-import { Button } from '@mui/material'
-import { Bell, MoveRight, X } from 'lucide-react'
 import useResponsive from '../hooks/useResponsive'
+import AppBarWarningVertical from 'src/components/AppBarWarningVertical'
 
 const VerticalLayoutWrapper = styled(Box)({
   height: '100%',
@@ -70,12 +68,11 @@ const VerticalLayout = (props: LayoutProps) => {
   const [navVisible, setNavVisible] = useState<boolean>(false)
   const [showWarning, setShowWarning] = useState(false)
   const userData = localStorage.getItem('userData')
-  const { isMobile } = useResponsive()
   const formattedUserData = JSON.parse(userData as string)
   const toggleNavVisibility = () => setNavVisible(!navVisible)
 
   useEffect(() => {
-    if (formattedUserData.payment_days !== null) {
+    if (formattedUserData.payment_days) {
       setShowWarning(true)
     } else {
       setShowWarning(false)
@@ -110,47 +107,8 @@ const VerticalLayout = (props: LayoutProps) => {
           className='layout-content-wrapper'
           sx={{ ...(contentHeightFixed && { maxHeight: '100vh' }) }}
         >
-          {showWarning && (
-            <Alert
-              variant='danger'
-              className='text-white m-0 p-0 position-relative'
-              style={{ height: isMobile ? 'auto' : '40px', backgroundColor: '#FF4D4D', borderRadius: 0 }}
-            >
-              <Container className='d-flex flex-wrap justify-content-around align-items-center'>
-                <div className='d-flex align-items-center gap-2 text-white'>
-                  <Bell size={14}/>
-                  <span className='small fw-medium'>
-                    Tizimdan foydalanish muddati tugagungacha {formattedUserData.payment_days} kun qoldi, Tizimdan
-                    uzluksiz foydalanish uchun to'lovni amalga oshiring
-                  </span>
-                </div>
-                {user?.currentRole == 'ceo' && (
-                  <Button
-                    onClick={() => router.push('/crm-payments')}
-                    sx={{ color: 'white', fontSize: 10, padding: 2, display: 'flex', gap: 2 }}
-                  >
-                    <span>To'lovni amalga oshirish</span>
-                    <MoveRight size={16} />
-                  </Button>
-                )}
-              </Container>
+          {showWarning && <AppBarWarningVertical setShowWarning={setShowWarning} />}
 
-              {/* Close Button Positioned at the Top-Right */}
-              <Button
-                onClick={() => setShowWarning(false)}
-                className='position-absolute'
-                style={{
-                  top: '2px',
-                  right: '2px',
-                  color: 'black',
-                  background: 'transparent',
-                  border: 'none'
-                }}
-              >
-                <X size={20} />
-              </Button>
-            </Alert>
-          )}
           {!auth?.user?.payment_page && (
             <AppBar
               toggleNavVisibility={toggleNavVisibility}
