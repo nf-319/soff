@@ -34,47 +34,50 @@ export default function AddGroupModal() {
   const { mutate, isPending } = usePost()
   const queryClient = useQueryClient()
 
-  const options = roomsData?.map((item: any) => ({
-    label: item?.name,
-    value: item?.id
-  }))
-
   const validationSchema = Yup.object({
     name: Yup.string().required(t('Guruh nomini kiriting') || 'Guruh nomini kiriting'),
     course: Yup.string().required(t('Kursni tanlang') || 'Kursni tanlang'),
     teacher: Yup.string().required(t("O'qituvchini tanlang") || "O'qituvchini tanlang"),
     room: Yup.string().required(t('Xonani tanlang') || 'Xonani tanlang'),
     start_date: Yup.string().required(t('Boshlanish sanasini tanlang') || 'Boshlanish sanasini tanlang'),
+    // end_date: Yup.string().required(t('Tugash sanasini tanlang') || 'Tugash sanasini tanlang'),
     start_at: Yup.string().required(t('Boshlanish vaqtini tanlang') || 'Boshlanish vaqtini tanlang'),
     day_of_week: Yup.string().required(t('Dars kunlarini tanlang') || 'Dars kunlarini tanlang'),
     end_at: Yup.string().required(t('Tugash vaqtini tanlang') || 'Tugash vaqtini tanlang')
   })
 
-  const formik: any = useFormik({
+  const formik = useFormik({
     initialValues,
     validationSchema,
     onSubmit: async values => {
-      dispatch(disablePage(true))
-      let obj = { ...values }
-      if (!formik.values.day_of_week || formik.values.day_of_week == '0') {
-        obj = { ...obj, day_of_week: customWeekdays }
+      dispatch(disablePage(true));
+      let obj = { ...values };
+      if (!values.day_of_week || values.day_of_week === '0') {
+        obj = { ...obj, day_of_week: customWeekdays };
       } else {
-        obj = { ...obj, day_of_week: formik.values.day_of_week.split(',') }
+        // @ts-ignore
+        obj = { ...obj, day_of_week: values.day_of_week.split(',').map((day: any) => day.trim()) };
       }
 
-      mutate(ceoConfigs.groups_create, obj, {
-        onSuccess: () => {
-          handleClose()
-          toast.success(t('Guruh muvaffaqiyatli yaratildi') || 'Guruh muvaffaqiyatli yaratildi')
-          queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
-        },
-        onError: err => {
-          formik.setErrors(err.response.data)
+
+      mutate(
+        ceoConfigs.groups_create,
+        obj,
+        {
+          onSuccess: () => {
+            handleClose();
+            toast.success(t('Guruh muvaffaqiyatli yaratildi') || 'Guruh muvaffaqiyatli yaratildi');
+            queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] });
+          },
+          onError: err => {
+            console.error('API xatosi:', err.response?.data);
+            formik.setErrors(err.response?.data || { general: 'Server xatosi' });
+          }
         }
-      })
-      dispatch(disablePage(false))
+      );
+      dispatch(disablePage(false));
     }
-  })
+  });
 
   const handleChangeField = async (
     name: string,
@@ -338,6 +341,23 @@ export default function AddGroupModal() {
                   {!!formik.errors.start_date && !!formik.touched.start_date && formik.errors.start_date}
                 </FormHelperText>
               </FormControl>
+
+              {/*<FormControl sx={{ width: '100%' }}>*/}
+              {/*  <TextField*/}
+              {/*    size='small'*/}
+              {/*    type='date'*/}
+              {/*    label={t('Tugash sanasi')}*/}
+              {/*    name='end_date'*/}
+              {/*    onChange={formik.handleChange}*/}
+              {/*    onBlur={formik.handleBlur}*/}
+              {/*    value={formik.values.end_date}*/}
+              {/*    error={!!formik.errors.start_date && !!formik.touched.end_date}*/}
+              {/*    InputLabelProps={{ shrink: true }}*/}
+              {/*  />*/}
+              {/*  <FormHelperText error={!!formik.errors.start_date && !!formik.touched.start_date}>*/}
+              {/*    {!!formik.errors.start_date && !!formik.touched.start_date && formik.errors.start_date}*/}
+              {/*  </FormHelperText>*/}
+              {/*</FormControl>*/}
 
               <FormControl sx={{ width: '100%' }}>
                 <TextField

@@ -60,8 +60,9 @@ const AuthProvider = ({ children }: Props) => {
             )
           }
           setUser({
+            payment_days: response.data?.payment_days,
             phone: response.data.phone,
-            last_login:response.data?.last_login,
+            last_login: response.data?.last_login,
             gpa: response.data.gpa,
             id: response.data.id,
             fullName: response.data.first_name,
@@ -77,9 +78,7 @@ const AuthProvider = ({ children }: Props) => {
           })
         })
         .catch(() => {
-          localStorage.removeItem('userData')
-          localStorage.removeItem('refreshToken')
-          localStorage.removeItem('accessToken')
+          localStorage.clear()
           setUser(null)
           setLoading(false)
           if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
@@ -105,8 +104,6 @@ const AuthProvider = ({ children }: Props) => {
   useEffect(() => {
     initAuth()
   }, [])
-
-
 
   useEffect(() => {
     router.push({ pathname, query }, asPath)
@@ -147,11 +144,12 @@ const AuthProvider = ({ children }: Props) => {
 
         dispatch(setRoles(userRoles))
         setUser({
-          last_login:response.data?.last_login,
+          last_login: response.data?.last_login,
           phone: response.data.phone,
           gpa: response.data.gpa,
           id: response.data.id,
           fullName: response.data.first_name,
+          payment_days: response.data.payment_days,
           username: response.data.phone,
           password: 'null',
           avatar: response.data.image,

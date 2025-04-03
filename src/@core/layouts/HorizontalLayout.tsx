@@ -15,10 +15,14 @@ import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 import { useAuth } from 'src/hooks/useAuth'
 import StaticsModal from '../../components/statics-modal'
 import QrCodeModal from '../../components/qrCode-Modal'
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
+import { Alert, Container } from 'react-bootstrap'
+import { Bell, MoveRight, X, XCircle } from 'lucide-react'
+import { Button } from '@mui/material'
+import AppBarWarning from 'src/components/AppBarWarning'
 
 const HorizontalLayoutWrapper = styled(Box)({
   height: '100%',
@@ -76,6 +80,18 @@ const HorizontalLayout = (props: LayoutProps) => {
   const userNavMenuContent = horizontalLayoutProps?.navMenu?.content
   const auth = useAuth()
   const { user } = useContext(AuthContext)
+  const [showWarning, setShowWarning] = useState(false)
+  const userData = localStorage.getItem('userData')
+
+  const formattedUserData = JSON.parse(userData as string)
+
+  useEffect(() => {
+    if (formattedUserData.payment_days) {
+      setShowWarning(true)
+    } else {
+      setShowWarning(false)
+    }
+  }, [window.location.pathname])
 
   let userAppBarStyle = {}
 
@@ -88,6 +104,7 @@ const HorizontalLayout = (props: LayoutProps) => {
   return (
     <HorizontalLayoutWrapper className='layout-wrapper'>
       <MainContentWrapper className='layout-content-wrapper' sx={{ ...(contentHeightFixed && { maxHeight: '100vh' }) }}>
+        {showWarning && <AppBarWarning setShowWarning={setShowWarning} />}
         {!auth?.user?.payment_page && (
           <AppBar
             color='default'
