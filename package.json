@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p 3132",
+    "start": "next start -p 3131",
     "lint": "echo Lint tekshiruvi o‘chirildi",
     "types": "tsc --noEmit",
     "typecheck": "tsc --noEmit --incremental false",
@@ -38,7 +38,6 @@
     "@mui/icons-material": "^6.3.1",
     "@mui/lab": "^5.0.0-alpha.105",
     "@mui/material": "^5.10.11",
-    "@mui/x-charts": "7.28.0",
     "@mui/x-data-grid": "5.17.9",
     "@mui/x-date-pickers": "^7.23.3",
     "@popperjs/core": "2.11.6",
