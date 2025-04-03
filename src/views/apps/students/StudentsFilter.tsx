@@ -35,13 +35,13 @@ import { useRouter } from 'next/router'
 
 type StudentsFilterProps = {
   isMobile: boolean
-  students?: any[]
+  students?:any[]
 }
 
 const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
   const router = useRouter()
   const dispatch = useAppDispatch()
-  const { queryParams } = useAppSelector(state => state.students)
+  const {  queryParams } = useAppSelector(state => state.students)
   const { schools } = useAppSelector(state => state.settings)
   const [key, setKey] = useState<string>('')
   const { getCourses, courses } = useCourses()
@@ -55,8 +55,6 @@ const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
   const [search, setSearch] = useState<string>(querySearch || '')
   const debounceSearch = useDebounce(search, 300)
   const studentIds = students?.map(student => student.id)
-  const [teacherId, setTeacherId] = useState<any>()
-  const [groupId, setGroupId] = useState<any>()
 
   const handleEditClickOpen = (value: ModalTypes) => {
     setOpenEdit(value)
@@ -69,13 +67,13 @@ const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
 
   async function getGroups() {
     await api
-      .get(`common/group-check-list/?teacher=${teacherId || ''}`)
+      .get('common/group-check-list/')
       .then(res => setGroups(res.data))
       .catch(error => console.log(error))
   }
   async function getTeachers() {
     await api
-      .get(`${ceoConfigs.employee_checklist}?role=teacher&group=${groupId || ''}`)
+      .get(`${ceoConfigs.employee_checklist}?role=teacher`)
       .then(res => setTeachers(res.data))
       .catch(error => console.log(error))
   }
@@ -115,7 +113,7 @@ const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
       void router.push(
         {
           pathname: '/students',
-          query: { ...restQuery, q: debounceSearch }
+          query: { ...restQuery, q: debounceSearch },
         },
         undefined,
         { shallow: true }
@@ -124,13 +122,14 @@ const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
       void router.push(
         {
           pathname: '/students',
-          query: restQuery
+          query: restQuery,
         },
         undefined,
         { shallow: true }
       )
     }
   }, [debounceSearch])
+
 
   useEffect(() => {
     if (key == 'course') {
@@ -535,9 +534,7 @@ const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
             sx={{ maxWidth: 180, width: '100%' }}
             disablePortal
             options={groupOptions || []}
-            onChange={(e: any, v: any) => {
-              handleFilter('group', v?.value), setGroupId(v?.value)
-            }}
+            onChange={(e: any, v: any) => handleFilter('group', v?.value)}
             size='small'
             renderInput={params => <TextField {...params} label={t('Guruh')} />}
           />
@@ -549,9 +546,7 @@ const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
             disablePortal
             value={teacherOptions?.find((option: any) => option.value === queryParams.teacher) || null}
             options={teacherOptions || []}
-            onChange={(e: any, v: any) => {
-              handleFilter('teacher', v?.value), setTeacherId(v?.value)
-            }}
+            onChange={(e: any, v: any) => handleFilter('teacher', v?.value)}
             size='small'
             renderInput={params => <TextField {...params} label={t('Ustoz')} />}
           />
