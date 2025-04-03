@@ -86,7 +86,7 @@ const HorizontalLayout = (props: LayoutProps) => {
   const formattedUserData = JSON.parse(userData as string)
 
   useEffect(() => {
-    if (!formattedUserData.payment_days) {
+    if (formattedUserData.payment_days) {
       setShowWarning(true)
     } else {
       setShowWarning(false)
