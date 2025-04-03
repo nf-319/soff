@@ -98,22 +98,16 @@ export default function Notifications() {
                 </Typography>
               </Box>
 
-              <Typography
-                variant='body2'
-                sx={{
-                  textAlign: 'left',
-                  color: '#444',
-                  lineHeight: 1.6,
-                  fontSize: '0.875rem',
-                  '& p': { marginBottom: '1rem' }
+              <div
+                style={{
+                  width: '100%',
+                  display: 'block',
+                  overflow: 'hidden'
                 }}
-              >
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: element.notification.body
-                  }}
-                />
-              </Typography>
+                dangerouslySetInnerHTML={{
+                  __html: element.notification.body
+                }}
+              />
 
               {element?.is_read == true && (
                 <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', mt: 2 }}>
