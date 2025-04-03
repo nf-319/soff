@@ -12,11 +12,11 @@ const CustomEditorr = () => {
   })
 
   if (cloud.status === 'error') {
-    return <div>Error!</div>
+    return <div>Xatolik!</div>
   }
 
   if (cloud.status === 'loading') {
-    return <div>Loading...</div>
+    return <div>Yuklanmoqda...</div>
   }
 
   const {
@@ -189,7 +189,7 @@ const CustomEditorr = () => {
             previewsInData: true
           },
           simpleUpload: {
-            uploadUrl: 'https://your-server.com/upload',
+            uploadUrl: 'http://c-panel.localhost:3000/upload',
             headers: {
               Authorization: 'Bearer YOUR_TOKEN'
             }
