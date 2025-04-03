@@ -93,6 +93,8 @@ export const appUsersSlice = createSlice({
       work_start_time: '00:00',
       work_end_time: '00:00',
       auto_sms: {
+        for_payment: null,
+        create_payment_text: null,
         on_attend: null,
         attend_text: null,
         debt_text: null,
@@ -100,6 +102,8 @@ export const appUsersSlice = createSlice({
         on_score: null,
         score_text: null,
         id: 1,
+        for_exam: null,
+        exam_text: null,
         on_absent: null,
         birthday_text: null,
         on_birthday: null,
@@ -118,7 +122,7 @@ export const appUsersSlice = createSlice({
     setNotifications: (state, action) => {
       state.notificationsCount = action.payload
     },
-   
+
     setRoles: (state, action) => {
       state.userRoles = action.payload
     },
