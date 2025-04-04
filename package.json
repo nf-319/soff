@@ -15,7 +15,6 @@
     "build:icons": "tsc -b src/iconify-bundle && node src/iconify-bundle/bundle-icons-react.js"
   },
   "dependencies": {
-    "@angular/cdk": "^19.0.5",
     "@casl/ability": "6.3.2",
     "@casl/react": "3.1.0",
     "@ckeditor/ckeditor5-build-classic": "^44.3.0",
@@ -23,9 +22,7 @@
     "@date-io/date-fns": "^3.0.0",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.5",
-    "@emotion/server": "11.10.0",
-    "@emotion/styled": "11.10.5",
-    "@fullcalendar/common": "5.11.3",
+    "@emotion/styled": "11.14.0",
     "@fullcalendar/core": "5.11.3",
     "@fullcalendar/daygrid": "5.11.3",
     "@fullcalendar/interaction": "5.11.3",
@@ -40,7 +37,6 @@
     "@mui/icons-material": "^6.3.1",
     "@mui/lab": "^5.0.0-alpha.105",
     "@mui/material": "^5.10.11",
-    "@mui/x-charts": "7.28.0",
     "@mui/x-data-grid": "5.17.9",
     "@mui/x-date-pickers": "^7.23.3",
     "@popperjs/core": "2.11.6",
