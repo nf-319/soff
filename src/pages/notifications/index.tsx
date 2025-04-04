@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { EmptyContent } from 'src/components/empty-content'
-import { NotificationsType } from 'src/@core/layouts/components/shared-components/NotificationDropdown'
+import { NotificationsType } from '@/@core/layouts/components/NotificationDropdown/model/types'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchNotification } from 'src/store/apps/user'
 import { ChevronLeft } from 'lucide-react'
@@ -76,13 +76,13 @@ export default function Notifications() {
           {notifications?.map((element: NotificationsType) => (
             <Box sx={{ bgcolor: '#F8EFE0', p: 3, borderRadius: '10px' }}>
               <Box sx={{ flex: '1 1', display: 'flex', fontSize: '12px', overflow: 'hidden', flexDirection: 'column' }}>
-                <MenuItemTitle>{element.notification_data.title}</MenuItemTitle>
+                <MenuItemTitle>{element.notification.title}</MenuItemTitle>
 
-                <MenuItemSubtitle variant='body2'>{element.notification_data.body}</MenuItemSubtitle>
+                <MenuItemSubtitle variant='body2'>{element.notification.body}</MenuItemSubtitle>
               </Box>
 
               <Typography variant='caption' sx={{ color: 'text.disabled' }}>
-                {element.date}
+                {element.notification.created_at}
               </Typography>
             </Box>
           ))}

@@ -12,7 +12,7 @@ import { setGlobalPay, setStudentId } from 'src/store/apps/students'
 import GlobalPaymentModal from 'src/views/apps/students/GlobalPaymentModal'
 import VideoModal from '../../../components/video-header'
 import { useTranslation } from 'react-i18next'
-import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
+import NotificationDropdown from '../../../@core/layouts/components/NotificationDropdown/NotificationDropdown'
 import api from 'src/@core/utils/api'
 
 import { Icon } from '@iconify/react'
