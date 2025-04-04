@@ -38,6 +38,8 @@ import useResponsive from 'src/@core/hooks/useResponsive'
 import { toast } from 'react-hot-toast'
 import { EmptyContent } from '../../components/empty-content'
 import { Close } from '@mui/icons-material'
+import { VscodeIconsFileTypeExcel2 } from '../../components/excelButton/ExcelIcon'
+import { useQuery } from '@tanstack/react-query'
 
 export function formatDateString(date: Date) {
   const day = String(date.getDate()).padStart(2, '0')
@@ -45,11 +47,6 @@ export function formatDateString(date: Date) {
   const year = date.getFullYear()
 
   return `${year}-${month}-${day}`
-}
-type Plan = {
-  done_amount: number
-  percentage: number
-  planned_amount: number
 }
 
 const CardStatistics = () => {
@@ -178,7 +175,6 @@ const CardStatistics = () => {
       render: date => date?.split('-').reverse().join('/')
     }
   ]
-
   const createExpenseCategroy = async () => {
     setLoading(true)
     try {
@@ -211,6 +207,17 @@ const CardStatistics = () => {
     setSalariesLoading(false)
   }
 
+  const fetchMonthlyReport = async () => {
+    const { data } = await api.get<{ file_url: string }>('finance/monthly-report/?is_export=true')
+    return data.file_url
+  }
+
+  const { refetch } = useQuery({
+    queryKey: ['monthlyReport'],
+    queryFn: fetchMonthlyReport,
+    enabled: false
+  })
+
   const confirmDeleteCategory = async () => {
     setLoading(true)
     try {
@@ -233,6 +240,20 @@ const CardStatistics = () => {
     const [wholePart] = num.toString().split('.')
     return new Intl.NumberFormat('en-US').format(Number.parseInt(wholePart))
   }
+
+  const handleDownload = async () => {
+    const { data } = await refetch()
+    if (data) {
+      const link = document.createElement('a')
+      link.href = data
+      link.target = '_blank'
+      link.download = 'monthly-report.xlsx'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
+
 
   useEffect(() => {
     if (
@@ -403,6 +424,16 @@ const CardStatistics = () => {
           <Grid item xs={12} md={12}>
             <Box sx={{ display: 'flex', gap: '10px', flexGrow: 1 }}>
               <Typography sx={{ fontSize: '20px', flexGrow: 1 }}>{t('Oyliklar hisoboti')}</Typography>
+
+              <Button
+                startIcon={<VscodeIconsFileTypeExcel2 />}
+                variant='outlined'
+                color='success'
+                onClick={handleDownload}
+                size={'medium'}
+              >
+                Excel
+              </Button>
             </Box>
 
             <DataTable

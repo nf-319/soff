@@ -42,7 +42,7 @@ export const fetchData = createAsyncThunk('appUsers/fetchData', async (params: D
 })
 
 export const fetchNotification = createAsyncThunk('appUsers/fetchNotification', async () => {
-  const response = await api.get('/common/notification-list/')
+  const response = await api.get('/common/notifications/')
   return response.data
 })
 
@@ -118,6 +118,7 @@ export const appUsersSlice = createSlice({
     setNotifications: (state, action) => {
       state.notificationsCount = action.payload
     },
+   
     setRoles: (state, action) => {
       state.userRoles = action.payload
     },

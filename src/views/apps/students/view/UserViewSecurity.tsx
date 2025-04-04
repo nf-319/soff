@@ -1,3 +1,5 @@
+'use client'
+
 import LoadingButton from '@mui/lab/LoadingButton'
 import {
   Box,
@@ -9,9 +11,7 @@ import {
   DialogContent,
   DialogTitle,
   Fade,
-  FormControl,
-  FormHelperText,
-  InputLabel,
+  IconButton,
   Menu,
   MenuItem,
   Select,
@@ -22,14 +22,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useContext, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { EmptyContent } from '../../../../components/empty-content'
-import IconifyIcon from '../../../../components/icon'
-import DataTable from '../../../../components/table'
+import { EmptyContent } from 'src/components/empty-content'
+import IconifyIcon from 'src/components/icon'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import getMontName from 'src/@core/utils/gwt-month-name'
 import usePayment from 'src/hooks/usePayment'
-import { customTableProps } from 'src/pages/groups'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchStudentDetail, fetchStudentGroups, fetchStudentPayment } from 'src/store/apps/students'
 import StudentPaymentEditForm from './StudentPaymentEdit'
@@ -42,31 +40,9 @@ import EditStudent from '../../groups/view/ViewStudents/EditStudent'
 import toast from 'react-hot-toast'
 import api from 'src/@core/utils/api'
 import ExportDetailStudent from '../../groups/view/ViewStudents/ExportDetailStudent'
-import DebtorsDataTable from 'src/components/table/debtorsTable'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { uzbekLocaleText } from '../../StudentsPoints/constants'
-import { MoreVertical } from 'lucide-react'
-
-export async function downloadImage(filename: string, url: string) {
-  await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-    }
-  })
-    .then(response => response.blob())
-    .then(blob => {
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'fileName'
-      a.style.position = 'fixed'
-      a.target = '_blank'
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-    })
-    .catch(console.error)
-}
+import { EllipsisVertical } from 'lucide-react'
 
 const UserViewSecurity = () => {
   const { t } = useTranslation()
@@ -96,6 +72,7 @@ const UserViewSecurity = () => {
     }
     setOpenEdit(value)
   }
+  console.log(payments)
 
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>, groupData: any) => {
@@ -199,7 +176,6 @@ const UserViewSecurity = () => {
   }
   const columns: GridColDef[] = [
     {
-      width: 70,
       headerName: t('ID'),
       field: 'id'
     },
@@ -214,7 +190,6 @@ const UserViewSecurity = () => {
     },
     {
       headerName: t('Turi'),
-      width: 115,
       field: 'condition',
       renderCell: params => (
         <Tooltip title={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}>
@@ -227,7 +202,6 @@ const UserViewSecurity = () => {
       )
     },
     {
-      width: 120,
       headerName: t('Summa'),
       field: 'amount',
       renderCell: params => (
@@ -260,7 +234,6 @@ const UserViewSecurity = () => {
     },
     {
       headerName: 'Yaratilgan vaqt',
-      width: 140,
       field: 'created_at',
       renderCell: params => (
         <Tooltip title={params.value || ''}>
@@ -391,12 +364,32 @@ const UserViewSecurity = () => {
     await dispatch(fetchStudentDetail(Number(query?.student)))
   }
 
+  const buttonStyles = {
+    color: 'white',
+    fontSize: 25,
+    position: 'absolute',
+    top: 10,
+    right: 20,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    padding: '5px',
+    borderRadius: '50%',
+    transition: 'color 0.3s ease, background-color 0.3s ease',
+    '&:hover': {
+      color: 'gray',
+      backgroundColor: '#f0f0f0',
+    },
+  };
+
   useEffect(() => {
     if (query?.student) {
       dispatch(fetchStudentGroups(query?.student))
     }
-    // dispatch(fetchStudentPayment(query?.student))
+    dispatch(fetchStudentPayment(query?.student))
   }, [query?.student])
+
+  const isTeacherOnly = user?.role?.length === 1 && user?.role.includes('teacher');
 
   return (
     <Box className='demo-space-y'>
@@ -404,34 +397,16 @@ const UserViewSecurity = () => {
         <div className='row w-100 row-gap-3'>
           {studentGroups.map((group: any) => (
             <div className='col-12 col-md-6 position-relative'>
-              <Typography
-                id='fade-button'
+              <IconButton
+                id="fade-button"
                 aria-controls={open ? 'fade-menu' : undefined}
-                aria-haspopup='true'
+                aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
-                sx={{
-                  color: 'white',
-                  fontSize: 25,
-                  position: 'absolute',
-                  top: 10,
-                  right: 20,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  transition: 'color 0.3s ease, background-color 0.3s ease',
-                  padding: '5px',
-                  borderRadius: '50%',
-                  '&:hover': {
-                    color: 'gray',
-                    backgroundColor: '#f0f0f0'
-                  }
-                }}
-                onClick={e =>
-                  !(user?.role.length === 1 && user?.role.includes('teacher')) ? handleClick(e, group) : undefined
-                }
+                onClick={(e) => !isTeacherOnly && handleClick(e, group)}
+                sx={buttonStyles}
               >
-                <MoreVertical size={15} />
-              </Typography>
+                <EllipsisVertical size={20} />
+              </IconButton>
 
               <Menu
                 id='fade-menu'
@@ -703,7 +678,7 @@ const UserViewSecurity = () => {
         <EmptyContent />
       )}
 
-      {/* <Typography sx={{ my: 3, fontSize: '20px' }}>{t("To'lov tarixi")}</Typography>
+      <Typography sx={{ my: 3, fontSize: '20px' }}>{t("To'lov tarixi")}</Typography>
       <Box style={{ height: 'auto', width: '100%', marginTop: 4 }}>
         <DataGrid
           autoHeight
@@ -714,7 +689,7 @@ const UserViewSecurity = () => {
           rows={payments ?? []}
           columns={columns}
         />
-      </Box> */}
+      </Box>
       <iframe src='' id='printFrame' style={{ height: 0 }}></iframe>
 
       <StudentPaymentEditForm openEdit={edit} setOpenEdit={setEdit} />

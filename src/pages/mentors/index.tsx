@@ -114,10 +114,14 @@ export default function GroupsPage() {
       dataIndex: 'activated_at'
     },
     {
-      xs: 1,
+      xs: 0.9,
       dataIndex: 'id',
       title: '',
-      render: actions => <RowOptions id={actions} status={queryParams?.status} />
+      render: actions => (
+        <Box sx={{ zIndex: 999, position: 'relative' }}>
+          <RowOptions id={actions} status={queryParams?.status} />
+        </Box>
+      )
     }
   ]
 

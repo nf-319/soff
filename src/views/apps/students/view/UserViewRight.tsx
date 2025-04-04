@@ -23,7 +23,7 @@ import UserViewSecurity from 'src/views/apps/students/view/UserViewSecurity'
 import UserSmsList from './UserSmsList'
 import { useTranslation } from 'react-i18next'
 import StudentHistory from './StudentHistory'
-import StudentParentList from './StudentParentList'
+
 
 // ** Styled Tab component
 const Tab = styled(MuiTab)<TabProps>(({ theme }) => ({
@@ -51,8 +51,7 @@ const UserViewRight = ({ tab, studentData }: any) => {
       .push({
         pathname: path,
         query: { student: studentData.id }
-      })
-      .finally(() => setIsLoading(false))
+      }).finally(() => setIsLoading(false))
   }
 
   useEffect(() => {
@@ -78,24 +77,19 @@ const UserViewRight = ({ tab, studentData }: any) => {
       >
         <Tab value='security' label={t('Guruhlar')} icon={<Icon icon='uil:layer-group' />} />
         <Tab value='comments' label={t('Izoh va Eslatmalar')} icon={<Icon icon='fluent:note-add-48-regular' />} />
-        <Tab value='sms' label={t('SMS')} icon={<Icon fontSize={'28px'} icon='bitcoin-icons:message-outline' />} />
-        <Tab
-          value='history'
-          label={t("O'quvchi tarixi")}
-          icon={<Icon fontSize={'22px'} icon='material-symbols:history' />}
-        />
-        <Tab value='parent' label={t('Ota-onasi')} icon={<Icon fontSize={'22px'} icon='material-symbols:person' />} />
+        <Tab value='sms' label={t('SMS')} icon={<Icon fontSize={"28px"} icon='bitcoin-icons:message-outline' />} />
+        <Tab value='history' label={t("O'quvchi tarixi")} icon={<Icon fontSize={"22px"} icon='material-symbols:history' />} />
       </TabList>
       <Box sx={{ mt: 6 }}>
         {isLoading ? (
           <Box sx={{ mt: 6, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
             <CircularProgress sx={{ mb: 4 }} />
-            <Typography>{t('Loading...')}</Typography>
+            <Typography>{t("Loading...")}</Typography>
           </Box>
         ) : (
           <>
             <TabPanel sx={{ p: 0 }} value='security'>
-              <UserViewSecurity />
+              <UserViewSecurity/>
             </TabPanel>
             <TabPanel sx={{ p: 0 }} value='comments'>
               <UserViewOverview data={studentData?.comments || []} />
@@ -105,9 +99,6 @@ const UserViewRight = ({ tab, studentData }: any) => {
             </TabPanel>
             <TabPanel sx={{ p: 0 }} value='history'>
               <StudentHistory />
-            </TabPanel>
-            <TabPanel sx={{ p: 0 }} value='parent'>
-              <StudentParentList />
             </TabPanel>
           </>
         )}

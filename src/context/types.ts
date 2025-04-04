@@ -14,6 +14,7 @@ export type RegisterParams = {
 
 export type UserDataType = {
   phone?: number
+  payment_days?: number
   id?: number
   last_login?: string
   gpa?: number

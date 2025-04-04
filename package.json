@@ -15,15 +15,14 @@
     "build:icons": "tsc -b src/iconify-bundle && node src/iconify-bundle/bundle-icons-react.js"
   },
   "dependencies": {
-    "@angular/cdk": "^19.0.5",
     "@casl/ability": "6.3.2",
     "@casl/react": "3.1.0",
+    "@ckeditor/ckeditor5-build-classic": "^44.3.0",
+    "@ckeditor/ckeditor5-react": "^9.5.0",
     "@date-io/date-fns": "^3.0.0",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.5",
-    "@emotion/server": "11.10.0",
-    "@emotion/styled": "11.10.5",
-    "@fullcalendar/common": "5.11.3",
+    "@emotion/styled": "11.14.0",
     "@fullcalendar/core": "5.11.3",
     "@fullcalendar/daygrid": "5.11.3",
     "@fullcalendar/interaction": "5.11.3",
@@ -51,6 +50,7 @@
     "bootstrap": "^5.3.3",
     "canvas-confetti": "^1.9.3",
     "chart.js": "3.9.1",
+    "ckeditor5-premium-features": "^44.3.0",
     "cleave.js": "1.6.0",
     "clipboard-copy": "4.0.1",
     "clsx": "1.2.1",
@@ -98,7 +98,8 @@
     "stylis-plugin-rtl": "2.1.1",
     "typewriter-effect": "^2.21.0",
     "uuid": "^11.0.5",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@iconify/iconify": "3.0.0",
