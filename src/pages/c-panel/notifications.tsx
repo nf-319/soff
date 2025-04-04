@@ -1,13 +1,12 @@
-// components/custom-editor.js
 'use client' // Required only in App Router.
 
 import React from 'react';
-import CustomEditorr from 'src/components/ckeditor';
+import CustomEditor from '../../components/ckeditor';
 
-const CustomEditor = () => {
+const Notifications = () => {
   return (
-   <CustomEditorr/>
+   <CustomEditor/>
  )
 }
 
-export default CustomEditor;
+export default Notifications;

@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { CKEditor, useCKEditorCloud } from '@ckeditor/ckeditor5-react'
 import { Box, Button } from '@mui/material'
 
-const CustomEditorr = () => {
+const CustomEditor = () => {
   const [editorData, setEditorData] = useState('<p>Hello world!</p>')
 
   const cloud = useCKEditorCloud({
@@ -206,4 +206,4 @@ const CustomEditorr = () => {
   )
 }
 
-export default CustomEditorr
+export default CustomEditor
