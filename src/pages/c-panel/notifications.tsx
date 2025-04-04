@@ -1,13 +1,19 @@
-// components/custom-editor.js
-'use client' // Required only in App Router.
+'use client'
 
-import React from 'react';
-import CustomEditorr from 'src/components/ckeditor';
+import { Box, Button } from '@mui/material'
+import { Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
+import React from 'react'
 
-const CustomEditor = () => {
+const Notifications = () => {
+  const router = useRouter()
   return (
-   <CustomEditorr/>
- )
+    <Box display={'flex'} justifyContent={'end'}>
+      <Button startIcon={<Plus size={16}/>}  onClick={() => router.push('/c-panel/add-notification')} variant='contained'>
+        Xabarnoma qo'shish
+      </Button>
+    </Box>
+  )
 }
 
-export default CustomEditor;
+export default Notifications
