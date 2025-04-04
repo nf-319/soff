@@ -1,21 +1,17 @@
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
-import Stomp from 'stompjs'
 import Icon from '../../../components/icon'
 import { Settings } from 'src/@core/context/settingsContext'
-import ModeToggler from 'src/@core/layouts/components/shared-components/ModeToggler'
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
 import LanguageDropdown from 'src/@core/layouts/components/shared-components/LanguageDropdown'
 import BranchDropdown from 'src/@core/layouts/components/shared-components/BranchDropdown'
-import Clock from '../../../components/clock'
-import { Autocomplete, Button, TextField, Tooltip, Typography } from '@mui/material'
+import { Autocomplete, Button, TextField, Tooltip } from '@mui/material'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useTranslation } from 'react-i18next'
-import { useAppDispatch, useAppSelector } from 'src/store'
+import { useAppDispatch } from 'src/store'
 import VideoModal from '../../../components/video-header'
 import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import { useContext, useEffect, useState } from 'react'
-import { setNotifications } from 'src/store/apps/user'
 import { AuthContext } from 'src/context/AuthContext'
 import { updateQueryParams } from 'src/store/apps/settings'
 import Link from 'next/link'
@@ -25,7 +21,7 @@ import GlobalPaymentModal from 'src/views/apps/students/GlobalPaymentModal'
 import { toggleQrCodeModal } from 'src/store/apps/page'
 import ceoConfigs from 'src/configs/ceo'
 import useDebounce from 'src/hooks/useDebounce'
-import { QrcodeScanner } from '../../../@core/layouts/components/shared-components/QrcodeScanner'
+import { QrcodeScanner } from 'src/@core/layouts/components/shared-components/QrcodeScanner'
 
 interface Props {
   hidden: boolean
@@ -44,7 +40,6 @@ const AppBarContent = (props: Props) => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState<boolean>(false)
-  const [stompClient, setStompClient] = useState<Stomp.Client | null>(null)
 
   const [employees, setEmployees] = useState<any>([])
 
