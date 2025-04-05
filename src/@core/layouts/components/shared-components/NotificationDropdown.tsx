@@ -98,7 +98,7 @@ const NotificationDropdown = (props: Props) => {
   const { direction } = settings
   const router = useRouter()
 
- 
+
 
   const handleDropdownOpen = async (event: SyntheticEvent) => {
     setAnchorEl(event.currentTarget)
@@ -117,7 +117,7 @@ const NotificationDropdown = (props: Props) => {
           color='error'
           variant='standard'
           badgeContent={data?.count}
-          invisible={!data?.results.length}
+          invisible={!data?.results?.length}
           sx={{
             '& .MuiBadge-badge': { top: 4, right: 4, boxShadow: theme => `0 0 0 2px ${theme.palette.background.paper}` }
           }}
@@ -141,7 +141,7 @@ const NotificationDropdown = (props: Props) => {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <Typography sx={{ cursor: 'text', fontWeight: 600 }}>{t('Xabarnomalar')}</Typography>
 
-            {data?.results.length  && (
+            {data?.results?.length  && (
               <CustomChip
                 skin='light'
                 size='small'

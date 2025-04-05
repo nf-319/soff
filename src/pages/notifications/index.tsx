@@ -47,7 +47,6 @@ const NotificationContainer = styled(Box)<BoxProps>(({ theme }) => ({
 
 export default function Notifications() {
   const { t } = useTranslation()
-  const { isMobile } = useResponsive()
   const { back } = useRouter()
   const { data, refetch } = useNotifications()
   useEffect(() => {
@@ -76,7 +75,7 @@ export default function Notifications() {
           <Typography variant='h5'>{t('Xabarnomalar')}</Typography>
         </Box>
       </Box>
-      {data?.results.length ? (
+      {data?.results?.length ? (
         <Box
           sx={{
             width: '100%',
