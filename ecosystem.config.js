@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   apps: [
     {
       name: 'prod-subdomain-soffcrm-uz-3132',
