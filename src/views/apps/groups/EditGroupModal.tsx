@@ -12,7 +12,8 @@ import {
   getDashboardLessons,
   updateGroup,
   updateFormParams,
-  updateParams
+  updateParams,
+  getMetaData
 } from 'src/store/apps/groups'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { useTranslation } from 'react-i18next'
@@ -57,7 +58,6 @@ export default function EditGroupModal() {
   const [customWeekdays, setCustomWeekDays] = useState<string[]>([])
   const { query } = useRouter()
   const queryClient = useQueryClient()
-
 
   const validationSchema = Yup.object({
     name: Yup.string().required(t('Guruh nomini kiriting')),
@@ -234,6 +234,7 @@ export default function EditGroupModal() {
     }
 
     getTeachers()
+    dispatch(getMetaData())
   }, [])
 
   return (
@@ -472,9 +473,9 @@ export default function EditGroupModal() {
                   <FormHelperText error={!!formik.errors.start_date && formik.touched.start_date}>
                     {!!formik.errors.start_date && formik.touched.start_date && formik.errors.start_date}
                   </FormHelperText>
-                  </FormControl>
+                </FormControl>
 
-                  <FormControl sx={{ width: '100%' }}>
+                <FormControl sx={{ width: '100%' }}>
                   <TextField
                     size='small'
                     type='date'
