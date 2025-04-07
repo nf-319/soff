@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, SyntheticEvent, Fragment, ReactNode, useEffect } from 'react'
+import { useState, SyntheticEvent, Fragment, ReactNode } from 'react'
 import Box from '@mui/material/Box'
 import Badge from '@mui/material/Badge'
 import Button from '@mui/material/Button'
@@ -17,8 +17,6 @@ import { useRouter } from 'next/router'
 import { useTranslation } from 'react-i18next'
 import { EmptyContent } from '../../../../components/empty-content'
 import { Bell } from 'lucide-react'
-import useNotificationStore from 'src/store/apps/notification'
-import { useGet } from 'src/hooks/useApi'
 import { Skeleton } from '@mui/material'
 import { useNotifications } from 'src/hooks/useNotification'
 

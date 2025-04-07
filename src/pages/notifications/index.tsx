@@ -5,13 +5,9 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { EmptyContent } from 'src/components/empty-content'
-import { useAppDispatch, useAppSelector } from 'src/store'
-import { fetchNotification } from 'src/store/apps/user'
 import { ChevronLeft } from 'lucide-react'
-import useNotificationStore from 'src/store/apps/notification'
 import { NotificationItemType } from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import { useNotifications } from 'src/hooks/useNotification'
-import useResponsive from 'src/@core/hooks/useResponsive'
 
 const MenuItemTitle = styled(Typography)<TypographyProps>(({ theme }) => ({
   fontWeight: 600,
