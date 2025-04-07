@@ -26,10 +26,6 @@ import DisabledProvider from 'src/@core/layouts/DisabledProvider';
 import { disableCache } from '@iconify/react'
 import { Providers } from '../providers'
 
-import 'prismjs';
-import 'prismjs/themes/prism-tomorrow.css';
-import 'prismjs/components/prism-jsx';
-import 'prismjs/components/prism-tsx';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import 'src/iconify-bundle/icons-bundle-react';
 import './globals.css';

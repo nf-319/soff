@@ -42,7 +42,7 @@ export const fetchData = createAsyncThunk('appUsers/fetchData', async (params: D
 })
 
 export const fetchNotification = createAsyncThunk('appUsers/fetchNotification', async () => {
-  const response = await api.get('/common/notification-list/')
+  const response = await api.get('/common/notifications/')
   return response.data
 })
 
@@ -93,8 +93,6 @@ export const appUsersSlice = createSlice({
       work_start_time: '00:00',
       work_end_time: '00:00',
       auto_sms: {
-        for_payment: null,
-        create_payment_text: null,
         on_attend: null,
         attend_text: null,
         debt_text: null,
@@ -102,8 +100,6 @@ export const appUsersSlice = createSlice({
         on_score: null,
         score_text: null,
         id: 1,
-        for_exam: null,
-        exam_text: null,
         on_absent: null,
         birthday_text: null,
         on_birthday: null,
@@ -132,10 +128,10 @@ export const appUsersSlice = createSlice({
     setCompanyInfo: (state, action) => {
       state.companyInfo = {
         ...action.payload,
-        work_start_time: `${action.payload.work_start_time.split(':')?.[0]}:${
-          action.payload.work_start_time.split(':')?.[1]
+        work_start_time: `${action.payload?.work_start_time.split(':')?.[0]}:${
+          action.payload?.work_start_time.split(':')?.[1]
         }`,
-        work_end_time: `${action.payload.work_end_time.split(':')?.[0]}:${action.payload.work_end_time.split(':')?.[1]}`
+        work_end_time: `${action.payload?.work_end_time.split(':')?.[0]}:${action.payload?.work_end_time.split(':')?.[1]}`
       }
     },
     setDepartmentsState: (state, action) => {

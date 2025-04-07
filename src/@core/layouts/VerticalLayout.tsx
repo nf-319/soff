@@ -27,6 +27,7 @@ import QrCodeModal from '../../components/qrCode-Modal'
 import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
+import useResponsive from '../hooks/useResponsive'
 import AppBarWarningVertical from 'src/components/AppBarWarningVertical'
 
 const VerticalLayoutWrapper = styled(Box)({

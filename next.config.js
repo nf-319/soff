@@ -4,10 +4,6 @@ const path = require('path')
 module.exports = {
   trailingSlash: false,
 
-  productionBrowserSourceMaps: false,
-  optimizeFonts: false,
-  swcMinify: true,
-
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
