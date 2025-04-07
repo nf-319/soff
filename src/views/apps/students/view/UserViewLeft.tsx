@@ -145,20 +145,7 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
             )
           )}
         </Grid>
-        <Grid item gap={2} xs={12}>
-          {studentDetailLoading ? (
-            <Skeleton height={300} />
-          ) : userData && userData?.comments?.length > 0 ? (
-            <Card>
-              <CardContent>
-                <UserViewStudentsList setOpenEdit={setOpenEdit} comment={userData?.comments[0]} />
-              </CardContent>
-            </Card>
-          ) : (
-            ''
-          )}
-          <StudentParentList />
-        </Grid>
+       
 
         <Dialog
           open={openEdit === 'group'}

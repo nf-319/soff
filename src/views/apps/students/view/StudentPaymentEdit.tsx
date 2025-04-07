@@ -50,6 +50,7 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
   const initialValues = {
     payment_type: '',
     group: '',
+    bonus: '0',
     amount: '',
     description: '',
     payment_date: today
@@ -63,7 +64,8 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
       const data = {
         ...values,
         student: query?.student,
-        amount: revereAmount(values.amount)
+        amount: revereAmount(values.amount),
+        bonus: revereAmount(values.bonus)
       }
 
       try {
@@ -85,7 +87,6 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
     }
   })
 
-
   const { errors, values, handleSubmit, handleBlur, touched, handleChange } = formik
 
   const handleEditClose = () => {
@@ -105,6 +106,7 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
   useEffect(() => {
     if (openEdit) {
       formik.setValues({
+        bonus: openEdit.bonus || '0',
         amount: openEdit.amount < 0 ? openEdit.amount * -1 : openEdit.amount,
         payment_date: openEdit.payment_date,
         payment_type: openEdit.payment_type || '',
@@ -116,6 +118,8 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
       }, 1000)
     }
   }, [openEdit])
+
+  console.log(openEdit)
 
   return (
     <div>
@@ -159,7 +163,6 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
                 </Select>
                 {!!errors.group && touched.group && <FormHelperText error>{errors.group}</FormHelperText>}
               </FormControl>
-
               {/* <FormControl fullWidth>
                 <InputLabel
                   size='small'
@@ -192,7 +195,6 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
                   <FormHelperText error>{errors.payment_type}</FormHelperText>
                 )}
               </FormControl> */}
-
               <FormControl fullWidth>
                 <AmountInput
                   label={t('Summa')}
@@ -205,7 +207,20 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
                 />
                 {!!errors.amount && touched.amount && <FormHelperText error>{errors.amount}</FormHelperText>}
               </FormControl>
-
+              {openEdit?.condition == 'payment' && (
+                <FormControl fullWidth>
+                  <AmountInput
+                    label={t('Bonus')}
+                    size='small'
+                    name='bonus'
+                    error={!!errors.bonus && touched.bonus}
+                    value={values.bonus}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {!!errors.bonus && touched.bonus && <FormHelperText error>{errors.bonus}</FormHelperText>}
+                </FormControl>
+              )}
               <FormControl fullWidth>
                 <TextField
                   rows={4}
@@ -222,7 +237,6 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
                   <FormHelperText error>{errors.description}</FormHelperText>
                 )}
               </FormControl>
-
               {Number(openEdit?.amount) > 0 && (
                 <FormControl sx={{ width: '100%' }}>
                   <input
@@ -244,7 +258,6 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
                   )}
                 </FormControl>
               )}
-
               <DialogActions sx={{ justifyContent: 'center' }}>
                 <LoadingButton loading={loading} type='submit' variant='contained' sx={{ mr: 1 }}>
                   {t('Saqlash')}

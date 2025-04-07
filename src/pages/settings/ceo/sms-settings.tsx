@@ -13,8 +13,6 @@ const SmsSettings = () => {
   const dispatch = useAppDispatch()
   const { companyInfo } = useAppSelector((state: any) => state.user)
 
-  console.log(companyInfo?.auto_sms)
-
   const [loading, setLoading] = useState<
     | 'name'
     | 'branch'
