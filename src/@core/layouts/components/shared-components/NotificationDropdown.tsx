@@ -12,19 +12,22 @@ import MuiMenuItem, { MenuItemProps } from '@mui/material/MenuItem'
 import Typography, { TypographyProps } from '@mui/material/Typography'
 import PerfectScrollbarComponent from 'react-perfect-scrollbar'
 import { Settings } from 'src/@core/context/settingsContext'
-import CustomChip from '../../../../components/mui/chip'
+import CustomChip from 'src/components/mui/chip'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'react-i18next'
-import { useAppDispatch, useAppSelector } from 'src/store'
-import { fetchNotification } from 'src/store/apps/user'
-import { EmptyContent } from '../../../../components/empty-content'
+import { EmptyContent } from 'src/components/empty-content'
 import { Bell } from 'lucide-react'
+import { Skeleton } from '@mui/material'
+import { useNotifications } from 'src/hooks/useNotification'
 
-export type NotificationsType = {
-  date: string
-  notification_data: {
+export type NotificationItemType = {
+  id: number
+  is_read: boolean
+  link: string | null
+  notification: {
     title: string
     body: string
+    created_at: string
   }
 }
 
@@ -86,18 +89,18 @@ const ScrollWrapper = ({ children, hidden }: { children: ReactNode; hidden: bool
 const NotificationDropdown = (props: Props) => {
   const { settings } = props
   const { t } = useTranslation()
-  const { notifications, notificationsCount } = useAppSelector(state => state.user)
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
-  const dispatch = useAppDispatch()
-
+  const { data, isLoading, refetch } = useNotifications()
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
 
   const { direction } = settings
   const router = useRouter()
 
+
+
   const handleDropdownOpen = async (event: SyntheticEvent) => {
     setAnchorEl(event.currentTarget)
-    await dispatch(fetchNotification())
+    refetch()
   }
 
   const handleDropdownClose = () => {
@@ -111,8 +114,8 @@ const NotificationDropdown = (props: Props) => {
         <Badge
           color='error'
           variant='standard'
-          badgeContent={notificationsCount}
-          invisible={!notificationsCount}
+          badgeContent={data?.count}
+          invisible={!data?.results?.length}
           sx={{
             '& .MuiBadge-badge': { top: 4, right: 4, boxShadow: theme => `0 0 0 2px ${theme.palette.background.paper}` }
           }}
@@ -136,27 +139,30 @@ const NotificationDropdown = (props: Props) => {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <Typography sx={{ cursor: 'text', fontWeight: 600 }}>{t('Xabarnomalar')}</Typography>
 
-            <CustomChip
-              skin='light'
-              size='small'
-              color='primary'
-              label={`${notifications.length} ` + t('Yangi')}
-              sx={{ height: 20, fontSize: '0.75rem', fontWeight: 500, borderRadius: '10px' }}
-            />
+            {data?.results?.length  && (
+              <CustomChip
+                skin='light'
+                size='small'
+                color='primary'
+                label={`${data?.count} ` + t('Yangi')}
+                sx={{ height: 20, fontSize: '0.75rem', fontWeight: 500, borderRadius: '10px' }}
+              />
+            )}
           </Box>
         </MenuItem>
 
         <ScrollWrapper hidden={hidden}>
-          {notifications.length ? (
-            notifications.map((notification: NotificationsType, index: number) => (
+          {isLoading ? (
+            <Skeleton height={80} sx={{ marginX: 2 }} />
+          ) : data?.results?.length ? (
+            data?.results.map((notification: NotificationItemType, index: number) => (
               <MenuItem key={index} onClick={handleDropdownClose}>
                 <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
                   <Box sx={{ mx: 4, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
-                    <MenuItemTitle>{notification?.notification_data.title}</MenuItemTitle>
-                    <MenuItemSubtitle variant='body2'>{notification?.notification_data?.body}</MenuItemSubtitle>
+                    <MenuItemTitle>{notification?.notification.title}</MenuItemTitle>
                   </Box>
                   <Typography variant='caption' sx={{ color: 'text.disabled' }}>
-                    {notification?.date}
+                    {notification?.notification.created_at}
                   </Typography>
                 </Box>
               </MenuItem>
@@ -166,7 +172,6 @@ const NotificationDropdown = (props: Props) => {
           )}
         </ScrollWrapper>
 
-        {notifications.length > 5 && (
           <MenuItem
             disableRipple
             disableTouchRipple
@@ -183,7 +188,6 @@ const NotificationDropdown = (props: Props) => {
               Barcha xabarnomalar
             </Button>
           </MenuItem>
-        )}
       </Menu>
     </Fragment>
   )

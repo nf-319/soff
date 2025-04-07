@@ -1,17 +1,5 @@
-
-
-// ** Styles Import
-import 'react-credit-cards/es/styles-compiled.css'
 import TableStickyHeader from 'src/views/table/mui/TableStickyHeader'
 
-
-const UserViewBilling = () => {
-
-  return (
-    <>
-      <TableStickyHeader />
-    </>
-  )
-}
+const UserViewBilling = () => <TableStickyHeader />
 
 export default UserViewBilling
