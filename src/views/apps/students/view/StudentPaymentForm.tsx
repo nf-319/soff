@@ -130,7 +130,7 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
     }
   }, [openEdit])
 
-  const formatNumber = (num: any) => {
+   const formatNumber = (num: any) => {
     return new Intl.NumberFormat('uz-UZ').format(num)
   }
 
@@ -251,11 +251,11 @@ export default function StudentPaymentForm({ openEdit, setOpenEdit, student_id, 
               <TextField
                 rows={4}
                 type="text"
-                label="O'quvchiga bonus"
+                label="O'quvchiga bonus (pul miqdorida)"
                 name='bonus'
                 size='small'
                 defaultValue={''}
-                value={values.bonus ? `${t('Ball')} ${formatNumber(values.bonus)}` : ''}
+                value={values.bonus ? formatNumber(values.bonus) : ''}
                 onChange={(e) => {
                   const rawValue = e.target.value.replace(/\D/g, '')
                   handleChange({ target: { name: 'bonus', value: rawValue } })

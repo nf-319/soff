@@ -13,6 +13,7 @@ import CustomAvatar from '../../mui/avatar'
 import { CardStatsHorizontalProps } from '../types'
 import { formatCurrency } from '../../../@core/utils/format-currency'
 import { Icon } from '@iconify/react'
+import { Tooltip } from '@mui/material'
 
 // ** Styled Avatar component
 const Avatar = styled(CustomAvatar)<AvatarProps>(({ theme }) => ({
@@ -23,37 +24,45 @@ const Avatar = styled(CustomAvatar)<AvatarProps>(({ theme }) => ({
 
 const CardStatsHorizontal = (props: CardStatsHorizontalProps) => {
   // ** Props
-  const { title, icon, iconplus, stats, bgColor, trendNumber, color = 'primary', trend = 'positive' } = props
+  const { title, tooltip, icon, iconplus, stats, bgColor, trendNumber, color = 'primary', trend = 'positive' } = props
 
   return (
-    <Card sx={{ height: '100%' }} className={bgColor}>
-      <CardContent
-        sx={{height:'100%', display: 'flex',justifyContent: 'space-between',alignItems:'center', py: theme => `${theme.spacing(4.125)} !important` }}
-      >
-        <Box sx={{height:'100%', display: 'flex', alignItems: 'center', gap: '30px' }}>
-          <Avatar skin='light' color={color} variant='rounded' sx={{ margin: '0' }}>
-            {icon}
-          </Avatar>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-              <Typography variant='h6'>{formatCurrency(stats)} UZS</Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                {/* <Box sx={{ display: 'inline-flex', color: trend === 'positive' ? 'success.main' : 'error.main' }}>
+    <Tooltip title={tooltip}>
+      <Card sx={{ height: '100%' }} className={bgColor}>
+        <CardContent
+          sx={{
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            py: theme => `${theme.spacing(4.125)} !important`
+          }}
+        >
+          <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', gap: '30px' }}>
+            <Avatar skin='light' color={color} variant='rounded' sx={{ margin: '0' }}>
+              {icon}
+            </Avatar>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+                <Typography variant='h6'>{formatCurrency(stats)} UZS</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  {/* <Box sx={{ display: 'inline-flex', color: trend === 'positive' ? 'success.main' : 'error.main' }}>
                   <Icon icon={trend === 'positive' ? 'mdi:chevron-up' : 'mdi:chevron-down'} />
                 </Box>
                 <Typography variant='caption' sx={{ color: trend === 'positive' ? 'success.main' : 'error.main' }}>
                   {trendNumber}
                 </Typography> */}
+                </Box>
               </Box>
+              <Typography sx={{ fontSize: '14px' }} variant='caption'>
+                {title}
+              </Typography>
             </Box>
-            <Typography sx={{ fontSize: '14px' }} variant='caption'>
-              {title}
-            </Typography>
           </Box>
-        </Box>
-        <Box>{iconplus?.props?.icon && <Icon icon={`${iconplus.props.icon}`} />}</Box>
-      </CardContent>
-    </Card>
+          <Box>{iconplus?.props?.icon && <Icon icon={`${iconplus.props.icon}`} />}</Box>
+        </CardContent>
+      </Card>
+    </Tooltip>
   )
 }
 

@@ -1,5 +1,5 @@
 // ** React Imports
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 // ** MUI Imports
 import Fab from '@mui/material/Fab'
@@ -27,6 +27,7 @@ import QrCodeModal from '../../components/qrCode-Modal'
 import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
+import AppBarWarningVertical from 'src/components/AppBarWarningVertical'
 
 const VerticalLayoutWrapper = styled(Box)({
   height: '100%',
@@ -64,8 +65,18 @@ const VerticalLayout = (props: LayoutProps) => {
   const { user } = useContext(AuthContext)
   const router = useRouter()
   const [navVisible, setNavVisible] = useState<boolean>(false)
-
+  const [showWarning, setShowWarning] = useState(false)
+  const userData = localStorage.getItem('userData')
+  const formattedUserData = JSON.parse(userData as string)
   const toggleNavVisibility = () => setNavVisible(!navVisible)
+
+  useEffect(() => {
+    if (formattedUserData.payment_days) {
+      setShowWarning(true)
+    } else {
+      setShowWarning(false)
+    }
+  }, [window.location.pathname])
 
   return (
     <>
@@ -95,6 +106,8 @@ const VerticalLayout = (props: LayoutProps) => {
           className='layout-content-wrapper'
           sx={{ ...(contentHeightFixed && { maxHeight: '100vh' }) }}
         >
+          {showWarning && <AppBarWarningVertical setShowWarning={setShowWarning} />}
+
           {!auth?.user?.payment_page && (
             <AppBar
               toggleNavVisibility={toggleNavVisibility}
@@ -124,8 +137,9 @@ const VerticalLayout = (props: LayoutProps) => {
           </ContentWrapper>
 
           <Footer footerStyles={footerProps?.sx} footerContent={footerProps?.content} {...props} />
-          {(user?.role.includes('ceo') || user?.role.includes('admin')) &&
-            !router.pathname.includes('/c-panel') && <DraggableIcon />}
+          {(user?.role.includes('ceo') || user?.role.includes('admin')) && !router.pathname.includes('/c-panel') && (
+            <DraggableIcon />
+          )}
         </MainContentWrapper>
       </VerticalLayoutWrapper>
 
@@ -141,8 +155,9 @@ const VerticalLayout = (props: LayoutProps) => {
         </ScrollToTop>
       )}
 
-      {(user?.role.includes('admin') || user?.role.includes('ceo')) &&
-        !router.pathname.includes('/c-panel') && <StaticsModal />}
+      {(user?.role.includes('admin') || user?.role.includes('ceo')) && !router.pathname.includes('/c-panel') && (
+        <StaticsModal />
+      )}
       <QrCodeModal />
     </>
   )

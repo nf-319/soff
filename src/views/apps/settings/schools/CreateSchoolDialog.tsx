@@ -25,7 +25,7 @@ export default function CreateSchoolDialog({ openModal, setOpenModal }: Props) {
     dispatch(setOpenCreateSms(null))
   }
   const validationSchema = Yup.object({
-    name: Yup.string().required('Maktab nomini kiriting')
+    name: Yup.string().required(t('Maktab nomini kiriting')||"Maktab nomini kiriting")
   })
 
   const formik: any = useFormik({
@@ -95,7 +95,7 @@ export default function CreateSchoolDialog({ openModal, setOpenModal }: Props) {
       >
         <FormControl fullWidth>
           <TextField
-            label={t('Maktab nomi')}
+            label={t('Maktab')}
             size='small'
             name='name'
             error={!!errors.name && touched.name}

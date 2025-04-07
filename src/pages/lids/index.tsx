@@ -1,7 +1,18 @@
 'use client'
 
 import { Fragment, useEffect, useState } from 'react'
-import { Box, Button, IconButton, MenuItem, Select, SelectChangeEvent, Skeleton, Tab, Tabs } from '@mui/material'
+import {
+  Box,
+  Button,
+  IconButton,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Skeleton,
+  Tab,
+  Tabs,
+  Tooltip
+} from '@mui/material'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from 'src/store'
 import { setOpenActionModal, setOpenItem, setOpenLid } from 'src/store/apps/leads'
@@ -17,6 +28,7 @@ import { LeadsKanban, LeadsType, LidsHeader } from 'src/entities/lids'
 import { useAuth } from 'src/hooks/useAuth'
 import { LidsEditModal } from 'src/entities/lids/modals'
 import useResponsive from 'src/@core/hooks/useResponsive'
+import { useTranslation } from 'react-i18next'
 
 export type DepartmentsResultType = {
   id: number
@@ -34,7 +46,7 @@ const Lids = () => {
   const [openDialog, setOpenDialog] = useState<'edit' | 'recover' | null>(null)
   const { isMobile } = useResponsive()
   const { user } = useAuth()
-
+  const { t } = useTranslation()
   const {
     data: leadData,
     isLoading,
@@ -44,7 +56,6 @@ const Lids = () => {
     params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
 
-  // Modified approach
   useEffect(() => {
     if (!leadData || leadData.results.length === 0) return
 
@@ -86,8 +97,6 @@ const Lids = () => {
 
   const currentDepartmentId = currentData?.id ? String(currentData.id) : null
 
-  console.log(currentData?.id)
-
   return (
     <div>
       <LidsHeader />
@@ -119,28 +128,34 @@ const Lids = () => {
             onClick={() => dispatch(setOpenItem(currentDepartmentId))}
             startIcon={<Plus />}
           >
-            <b>{currentData?.name}</b>ga yangi bo'lim qo'shish
+            <b>{currentData?.name}</b>
+            {t('ga yangi bo‘lim qo‘shish')}
           </Button>
 
           {queryParams.is_active && (
             <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
               <div>
-                <IconButton
-                  onClick={() => dispatch(setOpenLid(currentDepartmentId))}
-                  sx={{ cursor: 'pointer', marginLeft: 'auto' }}
-                >
-                  <IconifyIcon icon={'fluent:person-add-24-filled'} color='#84cc16' />
-                </IconButton>
+                <Tooltip title={t("Yangi lead qo'shish")}>
+                  <IconButton
+                    onClick={() => dispatch(setOpenLid(currentDepartmentId))}
+                    sx={{ cursor: 'pointer', marginLeft: 'auto' }}
+                  >
+                    <IconifyIcon icon={'fluent:person-add-24-filled'} color='#84cc16' />
+                  </IconButton>
+                </Tooltip>
 
                 {currentData?.name?.toLowerCase() !== 'leads' && (
                   <Fragment>
-                    <IconButton onClick={() => setOpen('edit')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
-                      <IconifyIcon icon={'fluent:text-bullet-list-square-edit-20-filled'} color='orange' />
-                    </IconButton>
-
-                    <IconButton onClick={() => setOpen('delete')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
-                      <IconifyIcon icon={'icon-park-solid:delete-four'} color='red' style={{ padding: 1 }} />
-                    </IconButton>
+                    <Tooltip title={t('Bo‘lim nomini tahrirlash')}>
+                      <IconButton onClick={() => setOpen('edit')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
+                        <IconifyIcon icon={'fluent:text-bullet-list-square-edit-20-filled'} color='orange' />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('Bo‘limni o‘chirish')}>
+                      <IconButton onClick={() => setOpen('delete')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
+                        <IconifyIcon icon={'icon-park-solid:delete-four'} color='red' style={{ padding: 1 }} />
+                      </IconButton>
+                    </Tooltip>
                   </Fragment>
                 )}
               </div>
