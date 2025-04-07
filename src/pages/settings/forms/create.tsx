@@ -68,7 +68,6 @@ export function CreatedComponent({
 }
 
 export default function CreateForm({}: Props) {
-  const { isMobile } = useResponsive()
   const { t } = useTranslation()
 
   const [open, setOpen] = useState<any>(null)
@@ -83,6 +82,7 @@ export default function CreateForm({}: Props) {
   const [addSource, setAddSource] = useState<boolean>(false)
   const [department, setDepartment] = useState<any>(null)
   const [loading, setLoading] = useState(false)
+  const { isMobile } = useResponsive()
   const [selectType, setSelectType] = useState<'single' | 'multiple'>('single')
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const { push } = useRouter()
@@ -163,9 +163,9 @@ export default function CreateForm({}: Props) {
     <div>
       <VideoHeader item={videoUrls.forms} />
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-around' }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around' }}>
         <Box sx={{ flex: 0.4 }}>
-          <Box sx={{ display: 'block', maxWidth: 400, mx: 'auto' }}>
+          <Box sx={{ display: 'block', maxWidth: isMobile ? 350 : 400, mx: 'auto' }}>
             <Box
               sx={{
                 display: 'flex',
