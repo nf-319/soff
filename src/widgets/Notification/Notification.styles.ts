@@ -10,6 +10,7 @@ export const NotificationContainer = styled.div<{ isRead: boolean }>`
   ? '0 2px 8px rgba(0, 0, 0, 0.04)'
   : '0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(83, 78, 155, 0.1)'};
   margin-bottom: 16px;
+  height: 100%;
   transition: all 0.2s ease;
   border: 1px solid ${props => props.isRead ? '#ecedef' : '#e9ecff'};
   position: relative;

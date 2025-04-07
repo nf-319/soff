@@ -24,6 +24,7 @@ import { Editor } from 'src/components/Editor'
 import { Notification } from 'src/widgets/Notification'
 import useDebounce from 'src/hooks/useDebounce'
 import { toast } from 'react-hot-toast'
+import { useQueryClient } from '@tanstack/react-query'
 
 const receiversList: { label: string; value: 'ceo_admin' | 'all' }[] = [
   { label: 'Barchaga', value: 'all' },
@@ -40,6 +41,7 @@ const CreateNotification: FC = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const debouncedSearch = useDebounce(searchQuery, 500)
+  const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
   const [selectedTenant, setSelectedTenant] = useState<any>(null)
 
@@ -88,14 +90,14 @@ const CreateNotification: FC = () => {
         tenant: tenant || undefined
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           setIsConfirmOpen(false)
           toast.success('Muvofaqiyatli yuborildi!')
-          router.push('/c-panel/notifications')
+          await queryClient.refetchQueries({ queryKey: ['all-notification'] })
+          await router.push('/c-panel/notifications')
         },
       }
     )
-
   }
 
   const handleCancel = () => {

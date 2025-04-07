@@ -118,7 +118,7 @@ export const appUsersSlice = createSlice({
     setNotifications: (state, action) => {
       state.notificationsCount = action.payload
     },
-   
+
     setRoles: (state, action) => {
       state.userRoles = action.payload
     },
@@ -128,10 +128,10 @@ export const appUsersSlice = createSlice({
     setCompanyInfo: (state, action) => {
       state.companyInfo = {
         ...action.payload,
-        work_start_time: `${action.payload.work_start_time.split(':')?.[0]}:${
-          action.payload.work_start_time.split(':')?.[1]
+        work_start_time: `${action.payload?.work_start_time.split(':')?.[0]}:${
+          action.payload?.work_start_time.split(':')?.[1]
         }`,
-        work_end_time: `${action.payload.work_end_time.split(':')?.[0]}:${action.payload.work_end_time.split(':')?.[1]}`
+        work_end_time: `${action.payload?.work_end_time.split(':')?.[0]}:${action.payload?.work_end_time.split(':')?.[1]}`
       }
     },
     setDepartmentsState: (state, action) => {

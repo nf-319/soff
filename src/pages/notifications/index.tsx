@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, BoxProps, IconButton, styled, Typography, TypographyProps } from '@mui/material'
+import { Box, IconButton, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -8,38 +8,6 @@ import { EmptyContent } from 'src/components/empty-content'
 import { ChevronLeft } from 'lucide-react'
 import { NotificationItemType } from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import { useNotifications } from 'src/hooks/useNotification'
-
-const MenuItemTitle = styled(Typography)<TypographyProps>(({ theme }) => ({
-  fontWeight: 600,
-  flex: '1 1 100%',
-  overflow: 'hidden',
-  fontSize: '1.2rem',
-  textOverflow: 'initial',
-  marginBottom: theme.spacing(0.75),
-  [theme.breakpoints.down('sm')]: {
-    fontSize: '1rem'
-  }
-}))
-
-const MenuItemSubtitle = styled(Typography)<TypographyProps>(({ theme }) => ({
-  flex: '1 1 100%',
-  overflow: 'hidden',
-  textOverflow: 'initial',
-  fontSize: '1rem',
-  [theme.breakpoints.down('sm')]: {
-    fontSize: '0.8rem'
-  }
-}))
-
-const NotificationContainer = styled(Box)<BoxProps>(({ theme }) => ({
-  [theme.breakpoints.down('lg')]: {
-    maxWidth: '100%'
-  },
-  [theme.breakpoints.up('lg')]: {
-    maxWidth: 'fit-content',
-    minWidth: '500px'
-  }
-}))
 
 export default function Notifications() {
   const { t } = useTranslation()
