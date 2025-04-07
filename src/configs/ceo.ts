@@ -13,7 +13,7 @@ const ceoConfigs = {
   courses_update: 'common/course/update',
   courses_detail: 'common/course/detail',
   employee_attendances:'employee/attendances/',
-
+  notification:"common/notifications/",
   barnchs: 'common/branches/',
   parents_checklist : 'employee/parents-check-list/',
   teachers: 'employee/teachers/',

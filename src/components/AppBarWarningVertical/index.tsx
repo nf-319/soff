@@ -5,7 +5,6 @@ import { useContext } from 'react'
 import { Alert, Container } from 'react-bootstrap'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { AuthContext } from 'src/context/AuthContext'
-
 const AppBarWarningVertical = ({ setShowWarning }: { setShowWarning: (status: boolean) => void }) => {
   const router = useRouter()
   const { user } = useContext(AuthContext)
