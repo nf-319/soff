@@ -16,13 +16,13 @@ import useSMS from 'src/hooks/useSMS'
 import { useDelete, useGet, usePatch } from 'src/hooks/useApi'
 import ceoConfigs from 'src/configs/ceo'
 import { useQueryClient } from '@tanstack/react-query'
-import { EllipsisVertical } from 'lucide-react'
 
 const RowOptions = ({ id, status }: { id: number | string; status: string }) => {
   const { t } = useTranslation()
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
+  const { queryParams } = useAppSelector(state => state.mentors)
   const dispatch = useAppDispatch()
   const [openSms, setOpenSms] = useState<any>()
   const rowOptionsOpen = Boolean(anchorEl)
@@ -86,9 +86,8 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
   return (
     <>
       <IconButton size='small' onClick={handleRowOptionsClick}>
-        <EllipsisVertical size={18} />
+        <IconifyIcon icon='mdi:dots-vertical' />
       </IconButton>
-
       <Menu
         keepMounted
         anchorEl={anchorEl}

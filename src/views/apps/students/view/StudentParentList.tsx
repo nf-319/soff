@@ -20,9 +20,7 @@ export default function StudentParentList() {
   const { studentData } = useAppSelector(state => state.students)
   const dispatch = useAppDispatch()
   const { query } = useRouter()
-  const [deleteLoading,setDeleteLoading] = useState(false)
-
-
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   async function handleDelete() {
     setDeleteLoading(true)
@@ -72,15 +70,15 @@ export default function StudentParentList() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant='h6'>{t('Ota-onalari')}</Typography>
         {
-          <Button onClick={() => setOpen('create')} variant='contained'>
+          <Button size='small' onClick={() => setOpen('create')} variant='contained'>
             {t('Yaratish')}
           </Button>
         }
       </Box>
       <DataTable maxWidth='100%' minWidth='100%' data={studentData?.parent_data || []} columns={columns} />
-      <UserSuspendDialog isDeleting={deleteLoading}  handleOk={handleDelete} open={deleteOpen} setOpen={setDeleteOpen} />
+      <UserSuspendDialog isDeleting={deleteLoading} handleOk={handleDelete} open={deleteOpen} setOpen={setDeleteOpen} />
 
-      <AddStudentParent open={open}  setOpen={setOpen} />
+      <AddStudentParent open={open} setOpen={setOpen} />
     </Box>
   )
 }
