@@ -16,7 +16,7 @@ const SalesFunnel = () => {
     { id: 'Enrolled', value: 320, label: 'Enrolled' }
   ]
   return (
-    <Card style={{ height: 400 }}>
+    <Card style={{ height: 400,overflow:'auto' }}>
       <div style={{ padding: 10 }}>
         <FormControl>
           <InputLabel id='duration-label'>Duration</InputLabel>
@@ -70,7 +70,6 @@ const SalesFunnel = () => {
           },
         }}
           animate={true}
-          height={350}
       />
       </div>
     </Card>
