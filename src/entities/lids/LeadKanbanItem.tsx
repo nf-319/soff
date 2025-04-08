@@ -1,4 +1,4 @@
-import { Ellipsis, EyeIcon, Phone, User } from 'lucide-react'
+import { Ellipsis, EyeIcon, Phone, Shield, User, UserRound } from 'lucide-react'
 import { Box, IconButton, Typography } from '@mui/material'
 import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd'
 import { FC, useState } from 'react'
@@ -6,8 +6,7 @@ import { useSettings } from '../../@core/hooks/useSettings'
 import { LeadsMenu } from './Menu'
 import { MenuOpenType } from './LeadsKanban'
 import { LidsDragonModal } from '../../views/apps/lids/LidsDragonModal'
-
-type Props = {
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';type Props = {
   provided?: DraggableProvided
   snapshot?: DraggableStateSnapshot
   lead: any
@@ -62,6 +61,12 @@ export const LeadKanbanItem: FC<Props> = ({ provided, snapshot, lead, onClose })
             <Phone width={18} height={18} color='blue' />
             <Typography fontSize={12}>{lead?.phone}</Typography>
           </div>
+          {lead?.admin_name && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3 }}>
+              <AdminPanelSettingsOutlinedIcon style={{ fontSize: 13}} />
+              <Typography fontSize={11}>{lead?.admin_name}</Typography>
+            </div>
+          )}
         </div>
 
         <Box display='flex' alignItems='center'>
@@ -89,7 +94,11 @@ export const LeadKanbanItem: FC<Props> = ({ provided, snapshot, lead, onClose })
         anchorEl={anchorEl}
       />
 
-      <LidsDragonModal handleClose={() => setStudentModalOpen(false)} openModal={studentModalOpen} selectedLead={selectedLead} />
+      <LidsDragonModal
+        handleClose={() => setStudentModalOpen(false)}
+        openModal={studentModalOpen}
+        selectedLead={selectedLead}
+      />
     </>
   )
 }
