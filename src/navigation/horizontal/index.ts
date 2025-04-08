@@ -1,3 +1,4 @@
+import path from 'path'
 import { useContext, useEffect } from 'react'
 import { HorizontalNavItemsType } from 'src/@core/layouts/types'
 import { AuthContext } from 'src/context/AuthContext'
@@ -123,6 +124,10 @@ const Navigation = (t: any): HorizontalNavItemsType => {
           path: '/reports/student-points'
         },
         {
+          title: 'Lidlar Hisoboti',
+          path: '/reports/lids'
+        },
+        {
           title: t('Davomatlar'),
           path: '/reports/attendances'
         },
@@ -235,6 +240,10 @@ const Navigation = (t: any): HorizontalNavItemsType => {
         {
           title: "O'quvchilar Bonuslari",
           path: '/reports/student-points'
+        },
+        {
+          title: 'Lidlar Hisoboti',
+          path: '/reports/lids'
         },
         {
           title: t('Davomatlar'),
