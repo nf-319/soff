@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 type CreateNotification = {
   title: string,
   body: string,
-  receivers: "ceo_admin" | "all"
+  receivers: string[]
   tenant?: number
 }
 

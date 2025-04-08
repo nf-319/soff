@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, SyntheticEvent, Fragment } from 'react'
+import { useState, SyntheticEvent, Fragment, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'react-i18next'
 import {
@@ -25,6 +25,7 @@ import { NotificationsType } from './model/types'
 import { useGetNotificationList } from './api/notifications'
 import NotificationEmpty from './ui/NotificationEmpty'
 import parse from 'html-react-parser'
+import { useAuth } from '@hooks/useAuth'
 
 type Props = {
   settings: Settings
@@ -34,7 +35,10 @@ const NotificationDropdown = (props: Props) => {
   const { settings } = props
   const { direction } = settings
   const { t } = useTranslation()
+  const [messages, setMessages] = useState<any[]>([])
+  const socketRef = useRef<WebSocket | null>(null)
   const router = useRouter()
+  const { user } = useAuth()
 
   const { notificationsCount } = useAppSelector(state => state.user)
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
@@ -74,6 +78,41 @@ const NotificationDropdown = (props: Props) => {
     }
   }
 
+  useEffect(() => {
+    if (!user?.id) return
+
+    const socket = new WebSocket(`ws://192.168.1.15:8000/ws/notifications/${user.id}/`)
+    socketRef.current = socket
+
+    socket.onopen = () => {
+      console.log('WebSocket ulanishi ochildi')
+    }
+
+    socket.onmessage = (event) => {
+      console.log('Yangi xabar keldi:', event.data)
+      try {
+        const data = JSON.parse(event.data)
+        setMessages(prev => [...prev, data])
+      } catch (err) {
+        console.error('Xatolik: JSON ni parse qilishda muammo:', err)
+      }
+    }
+
+    socket.onclose = (event) => {
+      console.log('WebSocket ulanishi yopildi:', event.reason)
+    }
+
+    socket.onerror = (error) => {
+      console.error('WebSocket xatolik yuz berdi:', error)
+    }
+
+    return () => {
+      socket.close()
+    }
+  }, [user?.id])
+
+  console.log(messages)
+
   return (
     <Fragment>
       <Tooltip title={t('Xabarnomalar')} arrow>
@@ -94,9 +133,10 @@ const NotificationDropdown = (props: Props) => {
             color='error'
             variant='standard'
             badgeContent={notificationsCount}
+            max={9}
             invisible={!notificationsCount}
           >
-            <Bell size={22} />
+            <Bell size={24} />
           </StyledBadge>
         </IconButton>
       </Tooltip>

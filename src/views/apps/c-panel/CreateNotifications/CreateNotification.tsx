@@ -2,6 +2,7 @@
 
 import { FC, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import CloseIcon from '@mui/icons-material/Close'
 import {
   Box,
   Typography,
@@ -17,7 +18,7 @@ import {
   Fade,
   Select,
   MenuItem,
-  CircularProgress,
+  CircularProgress, Checkbox
 } from '@mui/material'
 import { useGetListClient, usePostNotification } from './api/notification'
 import { Editor } from 'src/components/Editor'
@@ -25,17 +26,23 @@ import { Notification } from 'src/widgets/Notification'
 import useDebounce from 'src/hooks/useDebounce'
 import { toast } from 'react-hot-toast'
 import { useQueryClient } from '@tanstack/react-query'
+import Chip from '@components/mui/chip'
+import ListItemText from '@mui/material/ListItemText'
 
-const receiversList: { label: string; value: 'ceo_admin' | 'all' }[] = [
-  { label: 'Barchaga', value: 'all' },
-  { label: 'Faqat CEO va Admin uchun', value: 'ceo_admin' },
+const receiverRoles = [
+  { label: 'Admin', value: 'admin' },
+  { label: 'CEO', value: 'ceo' },
+  { label: 'O‘qituvchi', value: 'teacher' },
+  { label: 'Talaba', value: 'student' },
+  { label: 'Kasser', value: 'cacher' }
 ]
+
 
 const CreateNotification: FC = () => {
   const router = useRouter()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [receivers, setReceivers] = useState<'ceo_admin' | 'all'>('all')
+  const [receivers, setReceivers] = useState<string[]>([])
   const [tenant, setTenant] = useState<number | ''>('')
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
@@ -86,7 +93,7 @@ const CreateNotification: FC = () => {
       {
         title,
         body: content,
-        receivers,
+        receivers: receivers,
         tenant: tenant || undefined
       },
       {
@@ -103,7 +110,7 @@ const CreateNotification: FC = () => {
   const handleCancel = () => {
     setTitle('')
     setContent('')
-    setReceivers('all')
+    setReceivers([])
     setIsConfirmOpen(false)
     setTenant('')
     setSelectedTenant(null)
@@ -128,14 +135,33 @@ const CreateNotification: FC = () => {
       <FormControl fullWidth sx={{ mb: 3 }}>
         <InputLabel id='receivers-label'>Qabul qiluvchilar</InputLabel>
         <Select
-          labelId='receivers-label'
+          label="Qabul qiluvchilar"
+          multiple
           value={receivers}
-          onChange={e => setReceivers(e.target.value as 'ceo_admin' | 'all')}
-          label='Qabul qiluvchilar'
+          onChange={e => setReceivers(e.target.value as string[])}
+          renderValue={(selected) => (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+              {selected.map((value) => (
+                <Chip
+                  key={value}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  label={receiverRoles.find(r => r.value === value)?.label || value}
+                  onDelete={() => {
+                    setReceivers(prev => prev.filter(item => item !== value))
+                  }}
+                  deleteIcon={<CloseIcon />}
+                />
+              ))}
+            </Box>
+          )}
+          MenuProps={{
+            disableAutoFocusItem: true,
+          }}
         >
-          {receiversList.map(r => (
-            <MenuItem key={r.value} value={r.value}>
-              {r.label}
+          {receiverRoles.map((role) => (
+            <MenuItem key={role.value} value={role.value}>
+              <Checkbox checked={receivers.indexOf(role.value) > -1} />
+              <ListItemText primary={role.label} />
             </MenuItem>
           ))}
         </Select>
