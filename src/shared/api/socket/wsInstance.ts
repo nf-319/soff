@@ -6,7 +6,7 @@ class WebSocketService {
     const subdomain = typeof window !== 'undefined' ? window.location.hostname.split('.')[0] : ''
     const envUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || ''
 
-    this.baseUrl = `ws://${envUrl}`
+    this.baseUrl = `wss://${subdomain}.${envUrl}`
     if (!this.baseUrl) {
       throw new Error('WebSocket base URL is not defined in the environment variables.');
     }
