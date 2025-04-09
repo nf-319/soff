@@ -7,7 +7,6 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import { setCompanyInfo } from 'src/store/apps/user'
 import { SmsCard } from 'src/views/apps/sms-settings'
 import { PLACEHOLDERS } from 'src/views/apps/sms-settings/constants'
-import { ComingSoon } from '../../../components/CommingSoon'
 
 const SmsSettings = () => {
   const dispatch = useAppDispatch()
@@ -362,33 +361,29 @@ const SmsSettings = () => {
         updateSettings={updateSettings}
         defaultValue={companyInfo?.auto_sms?.birthday_text}
       />
-      <ComingSoon hidden>
-        <SmsCard
-          companyName={companyInfo.training_center_name}
-          title='Imtihon natijasini sms yuborish'
-          loading={loading === 'exam'}
-          onSwitch='for_exam'
-          name='exam_text'
-          onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_exam)}
-          placeholders={PLACEHOLDERS.exam}
-          updateSettings={updateSettings}
-          defaultValue={companyInfo?.auto_sms?.exam_text}
-        />
-      </ComingSoon>
+      <SmsCard
+        companyName={companyInfo.training_center_name}
+        title='Imtihon natijasini sms yuborish'
+        loading={loading === 'exam'}
+        onSwitch='for_exam'
+        name='exam_text'
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_exam)}
+        placeholders={PLACEHOLDERS.exam}
+        updateSettings={updateSettings}
+        defaultValue={companyInfo?.auto_sms?.exam_text}
+      />
 
-      <ComingSoon hidden>
-        <SmsCard
-          companyName={companyInfo.training_center_name}
-          title="To'lov qilgandan so'ng sms yuborish"
-          loading={loading === 'create_payment'}
-          onSwitch='for_payment'
-          name='create_payment_text'
-          onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_payment)}
-          placeholders={PLACEHOLDERS.for_payment}
-          updateSettings={updateSettings}
-          defaultValue={companyInfo?.auto_sms?.create_payment_text}
-        />
-      </ComingSoon>
+      <SmsCard
+        companyName={companyInfo.training_center_name}
+        title="To'lov qilgandan so'ng sms yuborish"
+        loading={loading === 'create_payment'}
+        onSwitch='for_payment'
+        name='create_payment_text'
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_payment)}
+        placeholders={PLACEHOLDERS.for_payment}
+        updateSettings={updateSettings}
+        defaultValue={companyInfo?.auto_sms?.create_payment_text}
+      />
 
       <SmsCard
         companyName={companyInfo.training_center_name}
