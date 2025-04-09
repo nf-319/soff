@@ -25,17 +25,38 @@ jobs:
       - name: Create env file
         run: echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
 
-      - name: Deploy to test server
+      - name: Build application locally
+        run: npm run build
+
+      - name: Create deployment archive
+        run: |
+          tar -czf deployment.tar.gz \
+            --exclude=".git" \
+            --exclude="node_modules" \
+            .next/ public/ package.json package-lock.json .env next.config.js ecosystem.config.js
+
+      - name: Upload build files to server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.TEST_SERVER_IP }}
+          username: root
+          password: ${{ secrets.TEST_SERVER_PASSWORD }}
+          source: "deployment.tar.gz"
+          target: "/tmp"
+
+      - name: Deploy to test server with zero-downtime
         uses: appleboy/ssh-action@v0.1.2
         with:
           host: ${{ secrets.TEST_SERVER_IP }}
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
+            # Mavjud NVM ni ishlatish
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 20.10.0
 
+            # Deployment papkalarini tayyorlash
             APP_NAME="${{ secrets.REPO_NAME }}"
             BASE_DIR="/projects/crm-front"
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -43,43 +64,46 @@ jobs:
             CURRENT_LINK="${BASE_DIR}/${APP_NAME}_current"
             PREVIOUS_LINK="${BASE_DIR}/${APP_NAME}_previous"
 
-            echo "For new deployment: ${DEPLOY_DIR}"
+            echo "Yangi deployment uchun: ${DEPLOY_DIR}"
             mkdir -p ${DEPLOY_DIR}
 
-            if [ -L "${CURRENT_LINK}" ] && [ -d "$(readlink -f ${CURRENT_LINK})/.git" ]; then
-              echo "Git repository already exists - moving"
-              cp -a $(readlink -f ${CURRENT_LINK})/. ${DEPLOY_DIR}/
-              cd ${DEPLOY_DIR}
-              git fetch origin test
-              git reset --hard origin/test
-            else
-              echo "Git repository doesn't exist - cloning"
-              git clone --branch test --depth 1 https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${APP_NAME}.git ${DEPLOY_DIR}
-              cd ${DEPLOY_DIR}
-            fi
+            # Build fayllarni arxivdan olish
+            cd ${DEPLOY_DIR}
+            tar -xzf /tmp/deployment.tar.gz
+            rm -f /tmp/deployment.tar.gz
 
-            echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
-            npm ci --production
-            npm run build
+            # Production dependency'larni o'rnatish (build qilmasdan)
+            echo "Production dependency'larni o'rnatish..."
+            NODE_ENV=production npm ci --omit=dev
 
+            # Oldingi versiyani saqlash (rollback uchun)
             if [ -L "${CURRENT_LINK}" ]; then
+              if [ -L "${PREVIOUS_LINK}" ]; then
+                echo "Eski previous linki o'chirilmoqda"
+                rm ${PREVIOUS_LINK}
+              fi
+              echo "Joriy versiya previous sifatida saqlanmoqda"
               mv ${CURRENT_LINK} ${PREVIOUS_LINK}
             fi
 
+            # Yangi versiyaga symbolic link yaratish
             ln -sfn ${DEPLOY_DIR} ${CURRENT_LINK}
 
+            # PM2 ecosystem orqali ishga tushirish
             cd ${CURRENT_LINK}
             if pm2 show ${APP_NAME}-test > /dev/null 2>&1; then
-              echo "Update existing PM2 process"
+              echo "Mavjud PM2 jarayonini yangilash"
               pm2 reload ecosystem.config.js --only ${APP_NAME}-test --update-env
             else
-              echo "Launching new PM2 process"
+              echo "Yangi PM2 jarayon ishga tushirilmoqda"
               pm2 start ecosystem.config.js --only ${APP_NAME}-test
             fi
 
+            # PM2 konfiguratsiyani saqlash
             pm2 save
 
+            # Eski deploymentlarni tozalash (faqat oxirgi 3 tasini saqlash)
             cd ${BASE_DIR}
             ls -dt ${APP_NAME}_2* | grep -v "$(basename $(readlink -f ${CURRENT_LINK}))" | grep -v "$(basename $(readlink -f ${PREVIOUS_LINK} 2>/dev/null || echo 'no-previous'))" | tail -n +3 | xargs -r rm -rf
 
-            echo "Deployment completed successfully! Current deployment: $(readlink -f ${CURRENT_LINK})"
+            echo "Deployment muvaffaqiyatli yakunlandi! Current deployment: $(readlink -f ${CURRENT_LINK})"
