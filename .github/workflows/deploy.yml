@@ -51,12 +51,12 @@ jobs:
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
-            # Mavjud NVM ni ishlatish
+            # Load NVM
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 20.10.0
 
-            # Deployment papkalarini tayyorlash
+            # Setup deployment directories
             APP_NAME="${{ secrets.REPO_NAME }}"
             BASE_DIR="/projects/crm-front"
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -64,46 +64,68 @@ jobs:
             CURRENT_LINK="${BASE_DIR}/${APP_NAME}_current"
             PREVIOUS_LINK="${BASE_DIR}/${APP_NAME}_previous"
 
-            echo "Yangi deployment uchun: ${DEPLOY_DIR}"
+            echo "Preparing for new deployment: ${DEPLOY_DIR}"
             mkdir -p ${DEPLOY_DIR}
 
-            # Build fayllarni arxivdan olish
+            # First pull latest code in a separate directory to maintain git history
+            REPO_DIR="${BASE_DIR}/${APP_NAME}_repo"
+            if [ -d "${REPO_DIR}" ]; then
+              echo "Updating existing git repository..."
+              cd ${REPO_DIR}
+              git fetch origin test
+              git reset --hard origin/test
+            else
+              echo "Cloning repository..."
+              git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${APP_NAME}.git ${REPO_DIR}
+              cd ${REPO_DIR}
+            fi
+
+            # Copy necessary git info to deployment directory
+            echo "Copying git info for future reference..."
+            mkdir -p ${DEPLOY_DIR}/.git
+            cp -a ${REPO_DIR}/.git/logs ${DEPLOY_DIR}/.git/
+            cp -a ${REPO_DIR}/.git/HEAD ${DEPLOY_DIR}/.git/
+            cp -a ${REPO_DIR}/.git/refs ${DEPLOY_DIR}/.git/
+
+            # Extract pre-built files from the archive
             cd ${DEPLOY_DIR}
+            echo "Extracting deployment archive..."
             tar -xzf /tmp/deployment.tar.gz
             rm -f /tmp/deployment.tar.gz
 
-            # Production dependency'larni o'rnatish (build qilmasdan)
-            echo "Production dependency'larni o'rnatish..."
-            npm ci
+            # Install production dependencies
+            echo "Installing production dependencies..."
+            npm ci --prefer-offline --no-audit
 
-            # Oldingi versiyani saqlash (rollback uchun)
+            # Handle previous versions for rollback capability
             if [ -L "${CURRENT_LINK}" ]; then
               if [ -L "${PREVIOUS_LINK}" ]; then
-                echo "Eski previous linki o'chirilmoqda"
+                echo "Removing old previous link"
                 rm ${PREVIOUS_LINK}
               fi
-              echo "Joriy versiya previous sifatida saqlanmoqda"
+              echo "Moving current version to previous for rollback capability"
               mv ${CURRENT_LINK} ${PREVIOUS_LINK}
             fi
 
-            # Yangi versiyaga symbolic link yaratish
+            # Create symbolic link to new version
             ln -sfn ${DEPLOY_DIR} ${CURRENT_LINK}
 
-            # PM2 ecosystem orqali ishga tushirish
+            # Start or reload the application with PM2
             cd ${CURRENT_LINK}
             if pm2 show ${APP_NAME}-test > /dev/null 2>&1; then
-              echo "Mavjud PM2 jarayonini yangilash"
+              echo "Reloading existing PM2 process with zero downtime"
               pm2 reload ecosystem.config.js --only ${APP_NAME}-test --update-env
             else
-              echo "Yangi PM2 jarayon ishga tushirilmoqda"
+              echo "Starting new PM2 process"
               pm2 start ecosystem.config.js --only ${APP_NAME}-test
             fi
 
-            # PM2 konfiguratsiyani saqlash
+            # Save PM2 configuration
             pm2 save
 
-            # Eski deploymentlarni tozalash (faqat oxirgi 3 tasini saqlash)
+            # Cleanup old deployments (keep only the most recent 3)
             cd ${BASE_DIR}
             ls -dt ${APP_NAME}_2* | grep -v "$(basename $(readlink -f ${CURRENT_LINK}))" | grep -v "$(basename $(readlink -f ${PREVIOUS_LINK} 2>/dev/null || echo 'no-previous'))" | tail -n +3 | xargs -r rm -rf
 
-            echo "Deployment muvaffaqiyatli yakunlandi! Current deployment: $(readlink -f ${CURRENT_LINK})"
+            echo "Deployment completed successfully! Current deployment: $(readlink -f ${CURRENT_LINK})"
+            echo "Last commit: $(cd ${REPO_DIR} && git log -1 --oneline)"
