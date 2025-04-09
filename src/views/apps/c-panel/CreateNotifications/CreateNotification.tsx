@@ -93,7 +93,7 @@ const CreateNotification: FC = () => {
       {
         title,
         body: content,
-        receivers: receivers,
+        receivers: receivers.map((item) => item.toUpperCase()),
         tenant: tenant || undefined
       },
       {

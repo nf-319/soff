@@ -18,6 +18,7 @@ import {
   ExpandButton,
   Timestamp
 } from './Notification.styles'
+import { getFormatTimestamp } from '@utils/getFormatTimestamp'
 
 export type NotificationProps = {
   title: string;
@@ -39,17 +40,6 @@ export const Notification: FC<NotificationProps> = ({ title, content, hiddenIsRe
       setContentOverflows(hasOverflow)
     }
   }, [content, truncate])
-
-  const formatTimestamp = (timestamp?: string | Date): string => {
-    if (!timestamp) return ''
-
-    try {
-      const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp
-      return format(date, 'MMM d, HH:mm')
-    } catch (error) {
-      return ''
-    }
-  }
 
   const shouldTruncate = truncate && !expanded
 
@@ -74,7 +64,7 @@ export const Notification: FC<NotificationProps> = ({ title, content, hiddenIsRe
         {created_at && (
           <Timestamp style={{ display: 'flex', alignItems: 'center', gap: 1, color: '#666' }}>
             <Clock size={16} />
-            {formatTimestamp(created_at)}
+            {getFormatTimestamp(created_at)}
           </Timestamp>
         )}
       </NotificationHeader>

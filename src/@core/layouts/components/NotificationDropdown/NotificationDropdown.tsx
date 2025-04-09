@@ -26,21 +26,28 @@ import { useGetNotificationList } from './api/notifications'
 import NotificationEmpty from './ui/NotificationEmpty'
 import parse from 'html-react-parser'
 import { useAuth } from '@hooks/useAuth'
+import wsService from '@api/socket/wsInstance'
 
 type Props = {
   settings: Settings
 }
 
+interface NotificaitonsSockerType {
+  notifications: {
+    count: number
+    notifications: any[]
+  }
+}
+
+
 const NotificationDropdown = (props: Props) => {
   const { settings } = props
   const { direction } = settings
   const { t } = useTranslation()
-  const [messages, setMessages] = useState<any[]>([])
-  const socketRef = useRef<WebSocket | null>(null)
+  const [messages, setMessages] = useState<NotificaitonsSockerType[]>([])
   const router = useRouter()
   const { user } = useAuth()
 
-  const { notificationsCount } = useAppSelector(state => state.user)
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
   const [notifications, setNotifications] = useState<{ results: NotificationsType[] } | null>(null)
 
@@ -79,37 +86,24 @@ const NotificationDropdown = (props: Props) => {
   }
 
   useEffect(() => {
-    if (!user?.id) return
+    if (!user?.id) return;
 
-    const socket = new WebSocket(`ws://192.168.1.15:8000/ws/notifications/${user.id}/`)
-    socketRef.current = socket
+    const handleMessage = (message: any) => {
+      console.info('New notification:', message);
+      setMessages((prev) => [...prev, message]);
+    };
 
-    socket.onopen = () => {
-      console.log('WebSocket ulanishi ochildi')
-    }
+    const handleError = (error: any) => {
+      console.error('WebSocket error:', error);
+    };
 
-    socket.onmessage = (event) => {
-      console.log('Yangi xabar keldi:', event.data)
-      try {
-        const data = JSON.parse(event.data)
-        setMessages(prev => [...prev, data])
-      } catch (err) {
-        console.error('Xatolik: JSON ni parse qilishda muammo:', err)
-      }
-    }
-
-    socket.onclose = (event) => {
-      console.log('WebSocket ulanishi yopildi:', event.reason)
-    }
-
-    socket.onerror = (error) => {
-      console.error('WebSocket xatolik yuz berdi:', error)
-    }
+    const endpoint = `/notifications/${user.id}/`;
+    wsService.connect(endpoint, handleMessage, handleError);
 
     return () => {
-      socket.close()
-    }
-  }, [user?.id])
+      wsService.disconnect();
+    };
+  }, [user?.id]);
 
   console.log(messages)
 
@@ -132,9 +126,8 @@ const NotificationDropdown = (props: Props) => {
           <StyledBadge
             color='error'
             variant='standard'
-            badgeContent={notificationsCount}
+            badgeContent={messages[0]?.notifications?.count}
             max={9}
-            invisible={!notificationsCount}
           >
             <Bell size={24} />
           </StyledBadge>
@@ -169,7 +162,7 @@ const NotificationDropdown = (props: Props) => {
             size='small'
             color='primary'
             variant='outlined'
-            label={`${notifications?.results?.length || 0} ta yangi xabar`}
+            label={`${messages[0]?.notifications?.count} ta yangi xabar`}
             sx={{ height: 24, fontSize: '0.75rem', fontWeight: 500, borderRadius: '12px' }}
           />
         </Box>
@@ -180,8 +173,8 @@ const NotificationDropdown = (props: Props) => {
           </Box>
         ) : (
           <ScrollWrapper hidden={hidden}>
-            {notifications?.results?.length ? (
-              notifications.results.map((notification: NotificationsType, index: number) => (
+            {messages[0]?.notifications?.notifications.length ? (
+              messages[0]?.notifications?.notifications.map((notification: NotificationsType, index: number) => (
                 <StyledMenuItem
                   key={notification.id || index}
                   onClick={() => handleClickNotification(notification.id)}
