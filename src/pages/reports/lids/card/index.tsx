@@ -1,5 +1,5 @@
 import { Box, Button, Card, Typography } from '@mui/material'
-import { Award, ChartLine, Clock, TriangleAlert, User } from 'lucide-react'
+import { ArrowRightLeft, Award, ChartLine, Clock, TrendingDown, TrendingUp, TriangleAlert, User } from 'lucide-react'
 
 const LidsReportsCard = () => {
   return (
@@ -22,13 +22,24 @@ const LidsReportsCard = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <div className='d-flex justify-content-between align-items-start'>
               <User size={40} color='black' />
-              <Box sx={{ background: '#29bf12', px: 3, py: 1, borderRadius: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  background: '#29bf12',
+                  px: 3,
+                  py: 1,
+                  borderRadius: 1
+                }}
+              >
+                <TrendingUp size={16} color='white' />
                 <Typography color='white' fontSize={13} fontWeight={500}>
                   12.5%
                 </Typography>
               </Box>
             </div>
-            <Typography sx={{ fontWeight: 700, fontSize: 28, color: 'black' }}>1245</Typography>
+            <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>1245</Typography>
             <Typography sx={{ fontSize: 15 }}>New Leads</Typography>
             <Typography
               sx={{
@@ -36,6 +47,12 @@ const LidsReportsCard = () => {
                 color: 'black',
                 marginTop: 2,
                 cursor: 'pointer',
+                padding: '4px 8px',
+                borderRadius: '6px',
+                transition: 'background-color 0.3s ease', // smooth hover transition
+                '&:hover': {
+                  backgroundColor: '#f0f0f0'
+                }
               }}
             >
               View Details
@@ -61,14 +78,25 @@ const LidsReportsCard = () => {
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <div className='d-flex justify-content-between align-items-start'>
-              <User size={40} color='black' />
-              <Box sx={{ background: '#29bf12', paddingX: 3, paddingY: 1, borderRadius: 1 }}>
+              <ArrowRightLeft size={40} color='#29bf12' />
+              <Box
+                sx={{
+                  background: '#29bf12',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  paddingX: 3,
+                  paddingY: 1,
+                  borderRadius: 1
+                }}
+              >
+                <TrendingUp size={16} color='white' />
                 <Typography color={'white'} fontSize={13} fontWeight={500}>
                   12.5%
                 </Typography>
               </Box>
             </div>
-            <Typography sx={{ fontWeight: 700, fontSize: 28, color: 'black' }}>1245</Typography>
+            <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>1245</Typography>
             <Typography sx={{ fontSize: 15 }}>New Leads</Typography>
             <Typography sx={{ fontSize: 15, color: 'black', marginTop: 2, cursor: 'pointer' }}>View Details</Typography>
           </div>
@@ -93,13 +121,24 @@ const LidsReportsCard = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <div className='d-flex justify-content-between align-items-start'>
               <TriangleAlert size={40} color='#ef233c' />
-              <Box sx={{ background: '#ef233c', paddingX: 3, paddingY: 1, borderRadius: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  background: '#ef233c',
+                  paddingX: 3,
+                  paddingY: 1,
+                  borderRadius: 1
+                }}
+              >
+                <TrendingDown size={16} color='white' />
                 <Typography color={'white'} fontSize={13} fontWeight={500}>
                   12.5%
                 </Typography>
               </Box>
             </div>
-            <Typography sx={{ fontWeight: 700, fontSize: 28, color: 'black' }}>1245</Typography>
+            <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>1245</Typography>
             <Typography sx={{ fontSize: 15 }}>New Leads</Typography>
             <Typography sx={{ fontSize: 15, color: 'black', marginTop: 2, cursor: 'pointer' }}>View Details</Typography>
           </div>
@@ -124,13 +163,25 @@ const LidsReportsCard = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <div className='d-flex justify-content-between align-items-start'>
               <Clock size={40} color='#ffc300' />
-              <Box sx={{ background: '#ef233c', paddingX: 3, paddingY: 1, borderRadius: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  background: '#ef233c',
+                  paddingX: 3,
+                  paddingY: 1,
+                  borderRadius: 1
+                }}
+              >
+                <TrendingDown size={16} color='white' />
+
                 <Typography color={'white'} fontSize={13} fontWeight={500}>
                   12.5%
                 </Typography>
               </Box>
             </div>
-            <Typography sx={{ fontWeight: 700, fontSize: 28, color: 'black' }}>12 min</Typography>
+            <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>12 min</Typography>
             <Typography sx={{ fontSize: 15 }}>Response Time</Typography>
             <Typography sx={{ fontSize: 15, color: 'black', marginTop: 2, cursor: 'pointer' }}>View Details</Typography>
           </div>
@@ -155,13 +206,25 @@ const LidsReportsCard = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <div className='d-flex justify-content-between align-items-start'>
               <TriangleAlert size={40} color='#ef233c' />
-              <Box sx={{ background: '#ef233c', paddingX: 3, paddingY: 1, borderRadius: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  background: '#ef233c',
+                  paddingX: 3,
+                  paddingY: 1,
+                  borderRadius: 1
+                }}
+              >
+                <TrendingDown size={16} color='white' />
+
                 <Typography color={'white'} fontSize={13} fontWeight={500}>
                   12.5%
                 </Typography>
               </Box>
             </div>
-            <Typography sx={{ fontWeight: 700, fontSize: 28, color: 'black' }}>1245</Typography>
+            <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>1245</Typography>
             <Typography sx={{ fontSize: 15 }}>New Leads</Typography>
             <Typography sx={{ fontSize: 15, color: 'black', marginTop: 2, cursor: 'pointer' }}>View Details</Typography>
           </div>
@@ -186,13 +249,24 @@ const LidsReportsCard = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <div className='d-flex justify-content-between align-items-start'>
               <Award size={40} color='#7209b7' />
-              <Box sx={{ background: '#29bf12', paddingX: 3, paddingY: 1, borderRadius: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: '#29bf12',
+                  gap: 1,
+                  paddingX: 3,
+                  paddingY: 1,
+                  borderRadius: 1
+                }}
+              >
+                <TrendingUp size={16} color='white' />
                 <Typography color={'white'} fontSize={13} fontWeight={500}>
                   12.5%
                 </Typography>
               </Box>
             </div>
-            <Typography sx={{ fontWeight: 700, fontSize: 28, color: 'black' }}>John Doe</Typography>
+            <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>John Doe</Typography>
             <Typography sx={{ fontSize: 15 }}>Best Sales Rep</Typography>
             <Typography sx={{ fontSize: 15, color: 'black', marginTop: 2, cursor: 'pointer' }}>View Details</Typography>
           </div>

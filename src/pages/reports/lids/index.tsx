@@ -16,6 +16,7 @@ const LidsReports = () => {
           <SalesFunnel />
         </div>
         <div className='col-12 col-md-6'>
+          
           <YearlyTrend />
         </div>
         <div className='col-12 col-md-6'>
