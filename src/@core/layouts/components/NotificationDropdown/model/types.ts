@@ -1,10 +1,7 @@
 export type NotificationsType = {
+  body: string
+  created_at: string
+  global_notification_id: number
   id: number
-  is_read: boolean
-  link: string | null
-  notification: {
-    title: string
-    created_at: string
-    body: string
-  }
+  title: string
 }

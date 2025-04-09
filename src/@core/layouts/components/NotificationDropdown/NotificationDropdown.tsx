@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, SyntheticEvent, Fragment, useEffect, useRef } from 'react'
+import { useState, Fragment, useEffect, useRef, MouseEvent } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'react-i18next'
 import {
@@ -12,56 +12,86 @@ import {
   Tooltip,
   Fade,
   Divider,
-  CircularProgress,
-  Chip, Avatar
+  Chip,
+  Avatar,
 } from '@mui/material'
-import { Theme } from '@mui/material/styles'
-import { Bell, BellRing, ChevronRight } from 'lucide-react'
+import { Theme, alpha } from '@mui/material/styles'
+import { Bell, BellRing, ChevronRight, Check } from 'lucide-react'
 import { Settings } from '@/@core/context/settingsContext'
-import { useAppSelector } from 'src/store'
 import { ScrollWrapper } from './ui/ScrollWrapper'
-import { StyledBadge, StyledMenuItem, StyledMenu } from './NotificationDropdown.style'
 import { NotificationsType } from './model/types'
-import { useGetNotificationList } from './api/notifications'
 import NotificationEmpty from './ui/NotificationEmpty'
 import parse from 'html-react-parser'
 import { useAuth } from '@hooks/useAuth'
 import wsService from '@api/socket/wsInstance'
+import { getFormatTimestamp } from '@utils/getFormatTimestamp'
+import {
+  NotificationContent,
+  StyledMenu,
+  StyledMenuItem,
+  ActionButton,
+} from './NotificationDropdown.style'
+import Badge from '@mui/material/Badge'
 
 type Props = {
   settings: Settings
 }
 
-interface NotificaitonsSockerType {
-  notifications: {
-    count: number
-    notifications: any[]
-  }
+interface NotificationSocketType {
+  count: number
+  notifications: NotificationsType[]
 }
-
 
 const NotificationDropdown = (props: Props) => {
   const { settings } = props
   const { direction } = settings
   const { t } = useTranslation()
-  const [messages, setMessages] = useState<NotificaitonsSockerType[]>([])
+  const [notificationData, setNotificationData] = useState<NotificationSocketType | null>(null)
   const router = useRouter()
   const { user } = useAuth()
+  const notificationPermissionRef = useRef<boolean>(false)
 
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
-  const [notifications, setNotifications] = useState<{ results: NotificationsType[] } | null>(null)
-
-  const { refetch, isLoading } = useGetNotificationList()
 
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
 
   const isMenuOpen = Boolean(anchorEl)
 
-  const handleDropdownOpen = async (event: SyntheticEvent) => {
-    setAnchorEl(event.currentTarget)
-    const data = await refetch()
-    setNotifications(data.data)
-  }
+  useEffect(() => {
+    const requestNotificationPermission = async () => {
+      if (!("Notification" in window)) {
+        console.log("This browser does not support desktop notification");
+        return;
+      }
+
+      if (Notification.permission === "granted") {
+        notificationPermissionRef.current = true;
+      } else if (Notification.permission !== "denied") {
+        const permission = await Notification.requestPermission();
+        notificationPermissionRef.current = permission === "granted";
+      }
+    };
+
+    void requestNotificationPermission();
+  }, []);
+
+  const showBrowserNotification = (title: string, body: string) => {
+    if (!notificationPermissionRef.current) return;
+
+    try {
+      const notification = new Notification(title, {
+        body: body.replace(/<[^>]*>?/gm, ''),
+        icon: '/favicon.ico'
+      });
+
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
+    } catch (error) {
+      console.error("Error showing notification:", error);
+    }
+  };
 
   const handleDropdownClose = () => {
     setAnchorEl(null)
@@ -73,8 +103,13 @@ const NotificationDropdown = (props: Props) => {
   }
 
   const handleClickNotification = (id: number) => {
-    void router.push(`/notifications/${id}`)
+    void router.push(`/notifications?id=${id}`)
     setAnchorEl(null)
+  }
+
+  const handleMarkAsRead = (id: number, event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    console.log('Marked as read:', id)
   }
 
   const renderHTML = (htmlContent: string) => {
@@ -90,7 +125,15 @@ const NotificationDropdown = (props: Props) => {
 
     const handleMessage = (message: any) => {
       console.info('New notification:', message);
-      setMessages((prev) => [...prev, message]);
+      setNotificationData(message);
+
+      if (message?.notifications?.length > 0) {
+        const newestNotification = message.notifications[0];
+        showBrowserNotification(
+          newestNotification.title || 'Yangi xabarnoma',
+          newestNotification.body || ''
+        );
+      }
     };
 
     const handleError = (error: any) => {
@@ -105,7 +148,8 @@ const NotificationDropdown = (props: Props) => {
     };
   }, [user?.id]);
 
-  console.log(messages)
+  const notificationCount = notificationData?.count || 0;
+  const notificationItems = notificationData?.notifications || [];
 
   return (
     <Fragment>
@@ -114,7 +158,7 @@ const NotificationDropdown = (props: Props) => {
           color='inherit'
           aria-label='Notifications'
           aria-haspopup='true'
-          onClick={handleDropdownOpen}
+          onClick={(event) => setAnchorEl(event.currentTarget)}
           aria-controls='notification-menu'
           aria-expanded={isMenuOpen ? 'true' : undefined}
           sx={{
@@ -123,14 +167,9 @@ const NotificationDropdown = (props: Props) => {
             '&:hover': { transform: 'scale(1.05)' }
           }}
         >
-          <StyledBadge
-            color='error'
-            variant='standard'
-            badgeContent={messages[0]?.notifications?.count}
-            max={9}
-          >
+          <Badge color='error' variant='standard' badgeContent={notificationCount} max={9}>
             <Bell size={24} />
-          </StyledBadge>
+          </Badge>
         </IconButton>
       </Tooltip>
 
@@ -151,106 +190,113 @@ const NotificationDropdown = (props: Props) => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            borderBottom: theme => `1px solid ${theme.palette.divider}`
+            borderBottom: theme => `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+            backgroundColor: 'white'
           }}
         >
-          <Typography variant='body1' sx={{ fontWeight: 600 }}>
+          <Typography variant='h6' sx={{ fontWeight: 600, fontSize: '1rem', color: 'text.primary' }}>
             {t('Xabarnomalar')}
           </Typography>
 
-          <Chip
-            size='small'
-            color='primary'
-            variant='outlined'
-            label={`${messages[0]?.notifications?.count} ta yangi xabar`}
-            sx={{ height: 24, fontSize: '0.75rem', fontWeight: 500, borderRadius: '12px' }}
-          />
+          {notificationCount > 0 && (
+            <Chip
+              size='small'
+              color='primary'
+              variant='outlined'
+              label={`${notificationCount} ta yangi xabar`}
+              sx={{
+                height: 24,
+                fontSize: '0.75rem',
+                fontWeight: 500,
+                borderRadius: '12px',
+                backgroundColor: alpha('#f5f5f5', 0.8),
+                borderColor: alpha('#e0e0e0', 0.5)
+              }}
+            />
+          )}
         </Box>
 
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-            <CircularProgress size={40} />
-          </Box>
-        ) : (
-          <ScrollWrapper hidden={hidden}>
-            {messages[0]?.notifications?.notifications?.length ? (
-              messages[0]?.notifications?.notifications.map((notification: NotificationsType, index: number) => (
-                <StyledMenuItem
-                  key={notification.id || index}
-                  onClick={() => handleClickNotification(notification.id)}
-                  read={!notification.is_read}
-                >
-                  <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                    <Box width='100%' display='flex' alignItems='center' justifyContent='start' gap={3}>
-                      <Avatar
+        <ScrollWrapper hidden={hidden}>
+          {notificationItems.length > 0 ? (
+            notificationItems.map((notification: NotificationsType, index: number) => (
+              <StyledMenuItem
+                key={notification.id || index}
+                onClick={() => handleClickNotification(notification.id)}
+              >
+                <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2, pl: 1.5 }}>
+                  <Box width='100%' display='flex' alignItems='flex-start' gap={2}>
+                    <Avatar
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        backgroundColor: theme => theme.palette.primary.main,
+                        color: 'white',
+                        flexShrink: 0,
+                        border: theme => `1px solid ${alpha(theme.palette.primary.main, 0.1)}`
+                      }}
+                    >
+                      <BellRing size={20} />
+                    </Avatar>
+
+                    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', overflow: 'hidden' }}>
+                      <Typography
                         sx={{
-                          width: 40,
-                          height: 40,
-                          backgroundColor: notification.is_read ? '#666CFF' : 'default',
-                          color: notification.is_read ? 'white' : 'inherit'
+                          fontWeight: 600,
+                          fontSize: '0.9rem',
+                          mb: 0.5,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          color: 'text.primary'
                         }}
                       >
-                        {notification.is_read ? <BellRing size={20} /> : <Bell size={20} />}
-                      </Avatar>
+                        {notification?.title}
+                      </Typography>
 
-                      <Box sx={{ display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
-                        <Typography
-                          sx={{
-                            fontWeight: notification.is_read ? 500 : 600,
-                            fontSize: '0.9rem',
-                            mb: 0.5,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                          }}
-                        >
-                          {notification?.notification.title}
-                        </Typography>
+                      <NotificationContent>{renderHTML(notification?.body || '')}</NotificationContent>
 
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          mt: 1.5
+                        }}
+                      >
                         <Typography
                           variant='caption'
                           sx={{
-                            color: 'text.disabled',
-                            mt: 0.5,
-                            display: 'block',
-                            textAlign: 'right'
+                            color: 'text.disabled'
                           }}
                         >
-                          {notification?.notification.created_at}
+                          {getFormatTimestamp(notification?.created_at)}
                         </Typography>
+
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Button
+                            size='small'
+                            variant='outlined'
+                            onClick={e => handleMarkAsRead(notification.id, e)}
+                            startIcon={<Check size={14} />}
+                          >
+                            {t("O'qildi")}
+                          </Button>
+                        </Box>
                       </Box>
                     </Box>
-
-                    <Box
-                      className='notification-body'
-                      sx={{
-                        color: 'text.secondary',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        fontSize: '0.875rem',
-                        '& a': { color: 'primary.main' },
-                        '& img': { maxWidth: '100%', height: 'auto' },
-                        '& p': { margin: 0 }
-                      }}
-                    >
-                      {renderHTML(notification?.notification?.body || '')}
-                    </Box>
                   </Box>
-                </StyledMenuItem>
-              ))
-            ) : (
-              <NotificationEmpty />
-            )}
-          </ScrollWrapper>
-        )}
+                </Box>
+              </StyledMenuItem>
+            ))
+          ) : (
+            <NotificationEmpty />
+          )}
+        </ScrollWrapper>
 
-        {Array.isArray(notifications?.results) && notifications.results.length > 0 && (
+        {notificationItems.length > 0 && (
           <Fragment>
             <Divider sx={{ m: 0 }} />
-            <Box sx={{ p: 2 }}>
+            <Box sx={{ p: 2, backgroundColor: 'white' }}>
               <Button
                 fullWidth
                 variant='contained'
@@ -258,9 +304,11 @@ const NotificationDropdown = (props: Props) => {
                 endIcon={<ChevronRight size={16} />}
                 sx={{
                   borderRadius: '8px',
-                  boxShadow: 2,
+                  boxShadow: 1,
+                  backgroundColor: theme => theme.palette.primary.main,
                   '&:hover': {
-                    boxShadow: 4
+                    boxShadow: 2,
+                    backgroundColor: theme => theme.palette.primary.dark
                   }
                 }}
               >

@@ -56,7 +56,6 @@ const CreateNotification: FC = () => {
   const { data: clientsData, isLoading, refetch } = useGetListClient({
     search: debouncedSearch,
     page: 1,
-    paid: true
   })
 
   useEffect(() => {

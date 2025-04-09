@@ -2,7 +2,6 @@
 
 import { FC, useState, useRef, useEffect } from 'react'
 import parse from 'html-react-parser';
-import { format } from 'date-fns';
 import { Bell, BellRing, Check, CheckCheck, ChevronDown, ChevronUp, Clock } from 'lucide-react'
 import Divider from '@mui/material/Divider'
 import Avatar from '@mui/material/Avatar'
@@ -20,6 +19,12 @@ import {
 } from './Notification.styles'
 import { getFormatTimestamp } from '@utils/getFormatTimestamp'
 
+const stripHtml = (html: string): string => {
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+  return tempDiv.textContent || tempDiv.innerText || '';
+};
+
 export type NotificationProps = {
   title: string;
   content: string;
@@ -27,9 +32,25 @@ export type NotificationProps = {
   isRead: boolean;
   truncate?: boolean;
   hiddenIsRead?: boolean;
-}
+  displayAsText?: boolean;
+  sx?: any;
+  compact?: boolean;
+  onClick?: () => void;
+};
 
-export const Notification: FC<NotificationProps> = ({ title, content, hiddenIsRead, created_at, isRead, truncate = false }) => {
+export const Notification: FC<NotificationProps> = ({
+  title,
+  content,
+  hiddenIsRead,
+  created_at,
+  isRead,
+  truncate = false,
+  displayAsText = false,
+  sx = {},
+  compact = false,
+  onClick
+}) => {
+
   const [expanded, setExpanded] = useState(!truncate)
   const [contentOverflows, setContentOverflows] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -44,53 +65,88 @@ export const Notification: FC<NotificationProps> = ({ title, content, hiddenIsRe
   const shouldTruncate = truncate && !expanded
 
   return (
-    <NotificationContainer isRead={isRead}>
+    <NotificationContainer
+      isRead={isRead}
+      style={{
+        ...sx,
+        cursor: onClick ? 'pointer' : 'default'
+      }}
+      onClick={onClick}
+    >
       <NotificationHeader>
-        <HeaderContent style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <HeaderContent
+          style={{
+            display: 'flex',
+            gap: compact ? 8 : 12,
+            alignItems: 'center'
+          }}
+        >
           <Avatar
             sx={{
-              width: 40,
-              height: 40,
+              width: compact ? 32 : 40,
+              height: compact ? 32 : 40,
               backgroundColor: isRead ? '#f0f0f0' : '#666CFF',
               color: isRead ? '#666' : 'white'
             }}
           >
-            {isRead ? <Bell size={22} /> : <BellRing size={22} />}
+            {isRead ? <Bell size={compact ? 18 : 22} /> : <BellRing size={compact ? 18 : 22} />}
           </Avatar>
 
-          <Title style={{ fontSize: '1.1rem', fontWeight: 500 }}>{title}</Title>
+          <Title
+            style={{
+              fontSize: compact ? '1rem' : '1.1rem',
+              fontWeight: 500,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              maxWidth: compact ? 'calc(100% - 40px)' : undefined
+            }}
+          >
+            {title}
+          </Title>
         </HeaderContent>
 
         {created_at && (
-          <Timestamp style={{ display: 'flex', alignItems: 'center', gap: 1, color: '#666' }}>
-            <Clock size={16} />
+          <Timestamp
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              color: '#666',
+              fontSize: compact ? '0.75rem' : '0.8rem'
+            }}
+          >
+            <Clock size={compact ? 14 : 16} />
             {getFormatTimestamp(created_at)}
           </Timestamp>
         )}
       </NotificationHeader>
 
-      <Divider sx={{ my: 1.5 }} />
+      {!compact && <Divider sx={{ my: 1.5 }} />}
 
-      <Box sx={{ minHeight: '80px' }}>
+      <Box sx={{ minHeight: compact ? '40px' : '80px' }}>
         <Content
           ref={contentRef}
           truncate={shouldTruncate}
           style={{
-            padding: '8px 16px',
+            padding: compact ? '4px 8px' : '8px 16px',
             lineHeight: 1.6,
-            fontSize: '0.95rem',
-            maxHeight: shouldTruncate ? '120px' : 'none',
+            fontSize: displayAsText ? '0.85rem' : '0.95rem',
+            maxHeight: shouldTruncate ? (compact ? '60px' : '120px') : 'none',
             overflow: shouldTruncate ? 'hidden' : 'visible'
           }}
         >
-          {parse(content)}
+          {displayAsText ? stripHtml(content) : parse(content)}
         </Content>
       </Box>
 
-      {truncate && contentOverflows ? (
+      {truncate && contentOverflows && !compact ? (
         expanded ? (
           <ExpandButton
-            onClick={() => setExpanded(!expanded)}
+            onClick={e => {
+              e.stopPropagation()
+              setExpanded(!expanded)
+            }}
             style={{
               color: '#666CFF',
               marginTop: 1,
@@ -106,7 +162,10 @@ export const Notification: FC<NotificationProps> = ({ title, content, hiddenIsRe
           </ExpandButton>
         ) : (
           <ExpandButton
-            onClick={() => setExpanded(!expanded)}
+            onClick={e => {
+              e.stopPropagation()
+              setExpanded(!expanded)
+            }}
             style={{
               color: '#666CFF',
               marginTop: 1,
@@ -123,7 +182,7 @@ export const Notification: FC<NotificationProps> = ({ title, content, hiddenIsRe
         )
       ) : null}
 
-      {!hiddenIsRead && (
+      {!hiddenIsRead && !compact && (
         <ActionFooter style={{ marginTop: 2, display: 'flex', justifyContent: 'flex-end' }}>
           {isRead ? (
             <ActionButton
@@ -140,12 +199,15 @@ export const Notification: FC<NotificationProps> = ({ title, content, hiddenIsRe
             </ActionButton>
           ) : (
             <ActionButton
+              onClick={e => {
+                e.stopPropagation()
+              }}
               style={{
                 color: '#666CFF',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 1,
+                gap: 1
               }}
             >
               <Check size={18} />
