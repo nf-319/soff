@@ -95,7 +95,7 @@ jobs:
 
             # Install production dependencies
             echo "Installing production dependencies..."
-            npm ci --prefer-offline --no-audit
+            npm ci --prefer-offline --no-audit --legacy-peer-deps
 
             # Handle previous versions for rollback capability
             if [ -L "${CURRENT_LINK}" ]; then
