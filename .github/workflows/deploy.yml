@@ -74,7 +74,7 @@ jobs:
 
             # Production dependency'larni o'rnatish (build qilmasdan)
             echo "Production dependency'larni o'rnatish..."
-            NODE_ENV=production npm ci --omit=dev
+            npm ci
 
             # Oldingi versiyani saqlash (rollback uchun)
             if [ -L "${CURRENT_LINK}" ]; then
