@@ -173,7 +173,7 @@ const NotificationDropdown = (props: Props) => {
           </Box>
         ) : (
           <ScrollWrapper hidden={hidden}>
-            {messages[0]?.notifications?.notifications.length ? (
+            {messages[0]?.notifications?.notifications?.length ? (
               messages[0]?.notifications?.notifications.map((notification: NotificationsType, index: number) => (
                 <StyledMenuItem
                   key={notification.id || index}
