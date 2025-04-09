@@ -1,7 +1,7 @@
 import { Box, Typography, List, Divider, Chip, Avatar, alpha, useTheme, Theme, Paper } from '@mui/material'
-import { Circle, Bell, Info, AlertCircle, Check, MessageSquare } from 'lucide-react'
+import { Circle, Bell, BellRing } from 'lucide-react'
 import { styled } from '@mui/material/styles'
-import { NotificationListProps, NotificationType } from '../modal/types'
+import { NotificationListProps } from '../modal/types'
 
 type Props = {
   theme?: Theme;
@@ -18,7 +18,7 @@ const NotificationListItem = styled('div')<Props>(({ theme, selected, isread }) 
     ? alpha(theme.palette.primary.main, 0.08)
     : isread
       ? theme.palette.background.paper
-      : alpha(theme.palette.primary.main, 0.04),
+      : alpha(theme.palette.primary.main, 0.01),
   borderLeft: selected
     ? `3px solid ${theme.palette.primary.main}`
     : 'none',
@@ -29,7 +29,10 @@ const NotificationListItem = styled('div')<Props>(({ theme, selected, isread }) 
   },
   cursor: 'pointer',
   position: 'relative',
-  overflow: 'hidden'
+  overflow: 'hidden',
+  '&:not(:last-of-type)': {
+    borderBottom: `1px solid ${alpha(theme.palette.divider, 0.2)}`
+  }
 }));
 
 const TimeLabel = styled('div')(({ theme }) => ({
@@ -45,17 +48,6 @@ const NotificationAvatar = styled(Avatar)(({ theme }) => ({
   backgroundColor: alpha(theme.palette.primary.main, 0.1),
   color: theme.palette.primary.main,
 }));
-
-const getNotificationIcon = (type: NotificationType) => {
-  switch(type) {
-    case 'info': return <Info size={14} />;
-    case 'warning': return <AlertCircle size={14} />;
-    case 'success': return <Check size={14} />;
-    case 'error': return <AlertCircle size={14} />;
-    case 'message': return <MessageSquare size={14} />;
-    default: return <Bell size={14} />;
-  }
-};
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -117,7 +109,7 @@ export const NotificationList = ({
             onClick={() => handleReadNotification(item)}
           >
             <Box sx={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
-              <NotificationAvatar>{getNotificationIcon(item.notification.type)}</NotificationAvatar>
+              <NotificationAvatar>{item.notification.is_read ? <Bell size={14} /> : <BellRing size={14} />}</NotificationAvatar>
               <Box sx={{ width: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   {!item.notification.is_read && (

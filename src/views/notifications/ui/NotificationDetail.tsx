@@ -1,5 +1,7 @@
-import { Box, Typography, Divider, Chip, Fade, Paper, IconButton, Tooltip, alpha, useTheme } from '@mui/material'
-import { Calendar, Check, Circle, Bookmark, Bell } from 'lucide-react'
+'use client'
+
+import { Box, Typography, Divider, Chip, Fade, Paper, alpha, useTheme } from '@mui/material'
+import { Bell } from 'lucide-react'
 import { styled } from '@mui/material/styles'
 import { NotificationDetailProps } from '../modal/types'
 import { getFormatTimestamp } from '@utils/getFormatTimestamp'
@@ -92,22 +94,6 @@ export const NotificationDetail = ({ selectedNotification }: NotificationDetailP
         <NotificationContent>
           <div dangerouslySetInnerHTML={{ __html: selectedNotification.notification.body }} />
         </NotificationContent>
-
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Tooltip title="Saqlab qo'yish">
-            <IconButton
-              color="primary"
-              size="small"
-              sx={{
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1)
-                }
-              }}
-            >
-              <Bookmark size={18} />
-            </IconButton>
-          </Tooltip>
-        </Box>
       </Paper>
     </Fade>
   );

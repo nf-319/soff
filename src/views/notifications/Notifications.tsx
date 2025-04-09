@@ -8,8 +8,8 @@ import { EmptyContent } from 'src/components/empty-content'
 import { NotificationList } from './ui/NotificationsList'
 import { NotificationDetail } from './ui/NotificationDetail'
 import { LoadingSkeleton } from './ui/LoadingSkeleton'
-import { generateFakeNotifications } from './modal/constants'
 import { NotificationItem } from './modal/types'
+import { useNotificationRead, useNotifications } from '@hooks/useNotification'
 
 export const Notifications = () => {
   const router = useRouter();
@@ -17,32 +17,45 @@ export const Notifications = () => {
 
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { data, isLoading, refetch: refetchNotifications } = useNotifications();
+  const { refetch: refetchNotificationRead, isSuccess: isReadSuccess } = useNotificationRead(selectedId as string);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const fakeData = generateFakeNotifications();
-      setNotifications(fakeData);
-      setLoading(false);
+    if (data) {
+      const formattedNotifications = data?.map((item: any) => ({
+        id: item.id,
+        notification: {
+          title: item.title,
+          body: item.body,
+          created_at: item.created_at,
+          is_read: item.is_read,
+        }
+      }));
 
-      if (selectedId) {
-        const selected = fakeData.find(item => item.id === parseInt(selectedId as string));
-        if (selected) {
-          setSelectedNotification(selected);
+      setNotifications(formattedNotifications);
+    }
+  }, [data]);
 
-          if (!selected.notification.is_read) {
-            handleReadNotification(selected);
-          }
+  useEffect(() => {
+    if (selectedId && notifications.length > 0) {
+      const selected = notifications.find(item => item.id === parseInt(selectedId as string));
+      if (selected) {
+        setSelectedNotification(selected);
+        if (!selected.notification.is_read) {
+          handleReadNotification(selected);
         }
       }
-    }, 800);
+    }
+  }, [selectedId, notifications]);
 
-    return () => clearTimeout(timer);
-  }, [selectedId]);
+  useEffect(() => {
+    if (isReadSuccess) {
+      void refetchNotifications();
+    }
+  }, [isReadSuccess, refetchNotifications]);
 
   const handleReadNotification = (notificationItem: NotificationItem) => {
     void router.push(`/notifications?id=${notificationItem.id}`, undefined, { shallow: true });
-
     setSelectedNotification(notificationItem);
 
     if (!notificationItem.notification.is_read) {
@@ -59,6 +72,9 @@ export const Notifications = () => {
             : item
         )
       );
+
+      // Since we already check selectedId in the enabled option, we can call refetch directly
+      void refetchNotificationRead();
     }
   };
 
@@ -69,7 +85,7 @@ export const Notifications = () => {
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
-      height: '100vh',
+      height: '80vh',
       backgroundColor: 'background.default',
       p: { xs: 1, sm: 2 }
     }}>
@@ -89,7 +105,7 @@ export const Notifications = () => {
         </Typography>
       </Box>
 
-      {loading ? (
+      {isLoading ? (
         <LoadingSkeleton />
       ) : notifications.length ? (
         <Box sx={{
