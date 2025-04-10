@@ -1,106 +1,131 @@
-name: CI and Deploy to Server
+name: CI and Deploy to Test Server
 
 on:
   push:
     branches:
       - test
-      - main
 
 jobs:
-  build-and-deploy:
+  build-and-deploy-test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js (local runner)
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 'v20.12.2'
+          node-version: '20.12.2'
+          cache: 'npm'
 
-      - name: Install dependencies (local runner)
-        run: npm install
+      - name: Install dependencies
+        run: npm ci
 
-      - name: create env file
+      - name: Create env file
+        run: echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
+
+      - name: Build application locally
+        run: npm run build
+
+      - name: Create deployment archive
         run: |
-          touch .env
-          echo "${{ secrets.TEST_ENV_CONTENT }}" >> .env
-          touch .env
-          echo "${{ secrets.PROD_ENV_CONTENT }}" >> .env
+          tar -czf deployment.tar.gz \
+            --exclude=".git" \
+            --exclude="node_modules" \
+            .next/ public/ package.json package-lock.json .env next.config.js ecosystem.config.js
 
-      - name: Deploy to production server (for main branch)
-        if: github.ref == 'refs/heads/main'
-        uses: appleboy/ssh-action@v0.1.2
+      - name: Upload build files to server
+        uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ secrets.PROD_SERVER_IP }}
-          username: ubuntu
-          password: ${{ secrets.PROD_SERVER_PASSWORD }}
-          script: |
-            # NVM o'rnatilganligini tekshirish va kerakli Node.js versiyasini tanlash
-            if [ ! -d "$HOME/.nvm" ]; then
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
-              source ~/.nvm/nvm.sh
-            else
-              source ~/.nvm/nvm.sh
-            fi
-            nvm use 20.10.0
+          host: ${{ secrets.TEST_SERVER_IP }}
+          username: root
+          password: ${{ secrets.TEST_SERVER_PASSWORD }}
+          source: "deployment.tar.gz"
+          target: "/tmp"
 
-            # Loyihaning joylashuvini yaratish va loyihani olish
-            mkdir -p ~/CRMFrondEnd/cicd/${{ secrets.REPO_NAME }}
-            cd ~/CRMFrondEnd/cicd/${{ secrets.REPO_NAME }}
-            if [ ! -d ".git" ]; then
-                git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
-            else
-                git stash
-                git pull origin main
-            fi
-
-            # .env faylini yuklash
-            echo "${{ secrets.PROD_ENV_CONTENT }}" > .env
-
-            # Kerakli kutubxonalarni o'rnatish va loyihani build qilish
-            npm install
-            npm run build
-
-            # PM2 orqali jarayonlarni boshqarish
-            pm2 restart subdomain-soffcrm-uz-3132 || pm2 start npm --name subdomain-soffcrm-uz-3132 -- start
-            pm2 save
-
-      - name: Deploy to development server (for test branch)
-        if: github.ref == 'refs/heads/test'
+      - name: Deploy to test server with zero-downtime
         uses: appleboy/ssh-action@v0.1.2
         with:
           host: ${{ secrets.TEST_SERVER_IP }}
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
-            # NVM o'rnatilganligini tekshirish va kerakli Node.js versiyasini tanlash
-            if [ ! -d "$HOME/.nvm" ]; then
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
-              source ~/.nvm/nvm.sh
-            else
-              source ~/.nvm/nvm.sh
-            fi
+            # Load NVM
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 20.10.0
 
-            # Loyihaning joylashuvini yaratish va loyihani olish
-            mkdir -p /projects/crm-front/${{ secrets.REPO_NAME }}
-            cd /projects/crm-front/${{ secrets.REPO_NAME }}
-            if [ ! -d ".git" ]; then
-                git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
+            # Setup deployment directories
+            APP_NAME="${{ secrets.REPO_NAME }}"
+            BASE_DIR="/projects/crm-front"
+            TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+            DEPLOY_DIR="${BASE_DIR}/${APP_NAME}_${TIMESTAMP}"
+            CURRENT_LINK="${BASE_DIR}/${APP_NAME}_current"
+            PREVIOUS_LINK="${BASE_DIR}/${APP_NAME}_previous"
+
+            echo "Preparing for new deployment: ${DEPLOY_DIR}"
+            mkdir -p ${DEPLOY_DIR}
+
+            # First pull latest code in a separate directory to maintain git history
+            REPO_DIR="${BASE_DIR}/${APP_NAME}_repo"
+            if [ -d "${REPO_DIR}" ]; then
+              echo "Updating existing git repository..."
+              cd ${REPO_DIR}
+              git fetch origin test
+              git reset --hard origin/test
             else
-                git stash
-                git pull origin test
+              echo "Cloning repository..."
+              git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${APP_NAME}.git ${REPO_DIR}
+              cd ${REPO_DIR}
             fi
 
-            # .env faylini yuklash
-            echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
+            # Copy necessary git info to deployment directory
+            echo "Copying git info for future reference..."
+            mkdir -p ${DEPLOY_DIR}/.git
+            cp -a ${REPO_DIR}/.git/logs ${DEPLOY_DIR}/.git/
+            cp -a ${REPO_DIR}/.git/HEAD ${DEPLOY_DIR}/.git/
+            cp -a ${REPO_DIR}/.git/refs ${DEPLOY_DIR}/.git/
 
-            # Kerakli kutubxonalarni o'rnatish va loyihani build qilish
-            npm install
-            npm run build
+            # Extract pre-built files from the archive
+            cd ${DEPLOY_DIR}
+            echo "Extracting deployment archive..."
+            tar -xzf /tmp/deployment.tar.gz
+            rm -f /tmp/deployment.tar.gz
 
-            # PM2 orqali jarayonlarni boshqarish
-            pm2 restart ${{ secrets.REPO_NAME }}-test || pm2 start npm --name ${{ secrets.REPO_NAME }}-test -- start
+            # Install production dependencies
+            echo "Installing production dependencies..."
+            npm ci --prefer-offline --no-audit --legacy-peer-deps
+
+            # Handle previous versions for rollback capability
+            if [ -L "${CURRENT_LINK}" ]; then
+              if [ -L "${PREVIOUS_LINK}" ]; then
+                echo "Removing old previous link"
+                rm ${PREVIOUS_LINK}
+              fi
+              echo "Moving current version to previous for rollback capability"
+              mv ${CURRENT_LINK} ${PREVIOUS_LINK}
+            fi
+
+            # Create symbolic link to new version
+            ln -sfn ${DEPLOY_DIR} ${CURRENT_LINK}
+
+            # Start or reload the application with PM2
+            cd ${CURRENT_LINK}
+            if pm2 show ${APP_NAME}-test > /dev/null 2>&1; then
+              echo "Reloading existing PM2 process with zero downtime"
+              pm2 reload ecosystem.config.js --only ${APP_NAME}-test --update-env
+            else
+              echo "Starting new PM2 process"
+              pm2 start ecosystem.config.js --only ${APP_NAME}-test
+            fi
+
+            # Save PM2 configuration
             pm2 save
+
+            # Cleanup old deployments (keep only the most recent 3)
+            cd ${BASE_DIR}
+            ls -dt ${APP_NAME}_2* | grep -v "$(basename $(readlink -f ${CURRENT_LINK}))" | grep -v "$(basename $(readlink -f ${PREVIOUS_LINK} 2>/dev/null || echo 'no-previous'))" | tail -n +3 | xargs -r rm -rf
+
+            echo "Deployment completed successfully! Current deployment: $(readlink -f ${CURRENT_LINK})"
+            echo "Last commit: $(cd ${REPO_DIR} && git log -1 --oneline)"
