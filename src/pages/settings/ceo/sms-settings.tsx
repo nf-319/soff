@@ -443,11 +443,11 @@ const SmsSettings = () => {
         loading={loading === 'debtor'}
         onSwitch='on_score'
         companyName={companyInfo.training_center_name}
-        name='debt_text'
+        name='score_text'
         onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_score)}
         placeholders={PLACEHOLDERS.deptStudents}
         updateSettings={updateSettings}
-        defaultValue={companyInfo?.auto_sms?.debt_text}
+        defaultValue={companyInfo?.auto_sms?.score_text}
       />
     </Box>
   )
