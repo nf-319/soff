@@ -388,7 +388,7 @@ const SmsSettings = () => {
       <SmsCard
         companyName={companyInfo.training_center_name}
         title='Darsga kelmaganlarga sms yuborish'
-        alert="Kelmagan o'quvchiga sms xabarnoma ertasi kuni yuboriladi"
+        alert="Darsga kelmagan o‘quvchilarga yo‘qlama yakunlangach SMS xabarnoma yuboriladi."
         loading={loading === 'absend'}
         onSwitch='on_absent'
         name='absent_text'
@@ -401,7 +401,7 @@ const SmsSettings = () => {
       <SmsCard
         companyName={companyInfo.training_center_name}
         title='Darsga kelganlarga sms yuborish'
-        alert="Kelgan o'quvchiga ertasi kuni sms xabarnoma yuboriladi"
+        alert="Kelgan o‘quvchiga dars tugagach SMS xabarnoma yuboriladi."
         loading={loading === 'attend'}
         onSwitch='on_attend'
         name='attend_text'
@@ -439,7 +439,7 @@ const SmsSettings = () => {
 
       <SmsCard
         title="O'quvchi baholarini yuborish"
-        alert="Kelmagan o'quvchiga ertasi kuni sms xabarnoma yuboriladi"
+        alert="Baholar qo‘yilgach, SMS xabarnoma yuboriladi."
         loading={loading === 'debtor'}
         onSwitch='on_score'
         companyName={companyInfo.training_center_name}
