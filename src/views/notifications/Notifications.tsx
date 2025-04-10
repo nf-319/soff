@@ -13,12 +13,15 @@ import { useNotificationRead, useNotifications } from '@hooks/useNotification'
 
 export const Notifications = () => {
   const router = useRouter();
-  const { id: selectedId } = router.query;
+  const { id: selectedIdParam } = router.query;
+
+  const selectedId = selectedIdParam ? Number(selectedIdParam) : undefined;
+  const isValidId = selectedId !== undefined && !isNaN(selectedId) && selectedId > 0;
 
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
   const { data, isLoading, refetch: refetchNotifications } = useNotifications();
-  const { refetch: refetchNotificationRead, isSuccess: isReadSuccess } = useNotificationRead(selectedId as string);
+  const { refetch: refetchNotificationRead, isSuccess: isReadSuccess } = useNotificationRead(Number(selectedId));
 
   useEffect(() => {
     if (data) {
@@ -38,7 +41,7 @@ export const Notifications = () => {
 
   useEffect(() => {
     if (selectedId && notifications.length > 0) {
-      const selected = notifications.find(item => item.id === parseInt(selectedId as string));
+      const selected = notifications.find(item => item.id === parseInt(String(selectedId)));
       if (selected) {
         setSelectedNotification(selected);
         if (!selected.notification.is_read) {
@@ -53,6 +56,12 @@ export const Notifications = () => {
       void refetchNotifications();
     }
   }, [isReadSuccess, refetchNotifications]);
+
+  useEffect(() => {
+    if (isValidId) {
+      void refetchNotificationRead();
+    }
+  }, [isValidId, selectedId, refetchNotificationRead]);
 
   const handleReadNotification = (notificationItem: NotificationItem) => {
     void router.push(`/notifications?id=${notificationItem.id}`, undefined, { shallow: true });
@@ -73,7 +82,6 @@ export const Notifications = () => {
         )
       );
 
-      // Since we already check selectedId in the enabled option, we can call refetch directly
       void refetchNotificationRead();
     }
   };
@@ -91,7 +99,7 @@ export const Notifications = () => {
     }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1 }}>
         <IconButton
-          onClick={() => router.back()}
+          onClick={() => router.push('/')}
           sx={{
             color: 'primary.main',
             '&:hover': { transform: 'translateX(-3px)' },

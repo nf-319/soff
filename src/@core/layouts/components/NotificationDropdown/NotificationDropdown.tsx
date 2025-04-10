@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Fragment, useEffect, useRef, MouseEvent } from 'react'
+import { useState, Fragment, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'react-i18next'
 import {
@@ -16,7 +16,7 @@ import {
   Avatar,
 } from '@mui/material'
 import { Theme, alpha } from '@mui/material/styles'
-import { Bell, BellRing, ChevronRight, Check } from 'lucide-react'
+import { Bell, BellRing, ChevronRight } from 'lucide-react'
 import { Settings } from '@/@core/context/settingsContext'
 import { ScrollWrapper } from './ui/ScrollWrapper'
 import { NotificationsType } from './model/types'
@@ -24,14 +24,13 @@ import NotificationEmpty from './ui/NotificationEmpty'
 import parse from 'html-react-parser'
 import { useAuth } from '@hooks/useAuth'
 import wsService from '@api/socket/wsInstance'
+import Badge from '@mui/material/Badge'
 import { getFormatTimestamp } from '@utils/getFormatTimestamp'
 import {
   NotificationContent,
   StyledMenu,
   StyledMenuItem,
-  ActionButton,
 } from './NotificationDropdown.style'
-import Badge from '@mui/material/Badge'
 
 type Props = {
   settings: Settings
@@ -60,7 +59,7 @@ const NotificationDropdown = (props: Props) => {
   useEffect(() => {
     const requestNotificationPermission = async () => {
       if (!("Notification" in window)) {
-        console.log("This browser does not support desktop notification");
+        console.error("This browser does not support desktop notification");
         return;
       }
 
@@ -107,11 +106,6 @@ const NotificationDropdown = (props: Props) => {
     setAnchorEl(null)
   }
 
-  const handleMarkAsRead = (id: number, event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation()
-    console.log('Marked as read:', id)
-  }
-
   const renderHTML = (htmlContent: string) => {
     try {
       return parse(htmlContent)
@@ -124,7 +118,6 @@ const NotificationDropdown = (props: Props) => {
     if (!user?.id) return;
 
     const handleMessage = (message: any) => {
-      console.info('New notification:', message);
       setNotificationData(message);
 
       if (message?.notifications?.length > 0) {
@@ -271,17 +264,6 @@ const NotificationDropdown = (props: Props) => {
                         >
                           {getFormatTimestamp(notification?.created_at)}
                         </Typography>
-
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                          <Button
-                            size='small'
-                            variant='outlined'
-                            onClick={e => handleMarkAsRead(notification.id, e)}
-                            startIcon={<Check size={14} />}
-                          >
-                            {t("O'qildi")}
-                          </Button>
-                        </Box>
                       </Box>
                     </Box>
                   </Box>

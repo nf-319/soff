@@ -1,9 +1,6 @@
-// ** React Imports
 import { useState } from 'react'
 
-// ** MUI Imports
 import Radio from '@mui/material/Radio'
-import Switch from '@mui/material/Switch'
 import Divider from '@mui/material/Divider'
 import { styled } from '@mui/material/styles'
 import IconButton from '@mui/material/IconButton'
@@ -13,14 +10,11 @@ import Box, { BoxProps } from '@mui/material/Box'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import MuiDrawer, { DrawerProps } from '@mui/material/Drawer'
 
-// ** Icon Imports
 import Icon from '../icon'
 
-// ** Type Import
-import { Settings } from '../../@core/context/settingsContext'
+import { Settings } from '@/@core/context/settingsContext'
 
-// ** Hook Import
-import { useSettings } from '../../@core/hooks/useSettings'
+import { useSettings } from '@/@core/hooks/useSettings'
 import { useTranslation } from 'react-i18next'
 
 const Toggler = styled(Box)<BoxProps>(({ theme }) => ({
@@ -56,41 +50,17 @@ const CustomizerSpacing = styled('div')(({ theme }) => ({
   padding: theme.spacing(5, 6)
 }))
 
-const ColorBox = styled(Box)<BoxProps>(({ theme }) => ({
-  width: 40,
-  height: 40,
-  display: 'flex',
-  borderRadius: 8,
-  cursor: 'pointer',
-  alignItems: 'center',
-  justifyContent: 'center',
-  margin: theme.spacing(0, 1.5),
-  color: theme.palette.common.white,
-  transition: 'box-shadow .25s ease'
-}))
-
 const Customizer = () => {
-  // ** State
   const [open, setOpen] = useState<boolean>(false)
 
-  // ** Hook
   const { settings, saveSettings } = useSettings()
   const { t } = useTranslation()
 
-  // ** Vars
   const {
     mode,
-    skin,
     appBar,
-    footer,
     layout,
-    navHidden,
-    direction,
-    appBarBlur,
-    themeColor,
-    navCollapsed,
     contentWidth,
-    verticalNavToggleType
   } = settings
 
   const handleChange = (field: keyof Settings, value: Settings[keyof Settings]): void => {
@@ -130,21 +100,6 @@ const Customizer = () => {
         </Box>
         <Box>
           <CustomizerSpacing className='customizer-body'>
-            {/* Skin */}
-            <Box sx={{ mb: 4 }}>
-              <Typography>{t("Asosiy ko'rinish")}</Typography>
-              <RadioGroup
-                row
-                value={skin}
-                onChange={e => handleChange('skin', e.target.value as Settings['skin'])}
-                sx={{ '& .MuiFormControlLabel-label': { fontSize: '.875rem', color: 'text.secondary' } }}
-              >
-                <FormControlLabel value='default' label={t('Soyali')} control={<Radio />} />
-                <FormControlLabel value='bordered' label={t('Chiziqli')} control={<Radio />} />
-              </RadioGroup>
-            </Box>
-
-            {/* Mode */}
             <Box sx={{ mb: 4 }}>
               <Typography>{t('Rejim')}</Typography>
               <RadioGroup
@@ -160,75 +115,11 @@ const Customizer = () => {
                 )}
               </RadioGroup>
             </Box>
-
-            {/* Color Picker */}
-            <div>
-              <Typography sx={{ mb: 2.5 }}>{t('Asosiy rang')}</Typography>
-              <Box sx={{ display: 'flex' }}>
-                <ColorBox
-                  onClick={() => handleChange('themeColor', 'primary')}
-                  sx={{
-                    ml: 0,
-                    backgroundColor: '#666CFF',
-                    ...(themeColor === 'primary' ? { boxShadow: 9 } : { '&:hover': { boxShadow: 4 } })
-                  }}
-                >
-                  {themeColor === 'primary' ? <Icon icon='mdi:check' fontSize='1.25rem' /> : null}
-                </ColorBox>
-                <ColorBox
-                  onClick={() => handleChange('themeColor', 'secondary')}
-                  sx={{
-                    backgroundColor: 'secondary.main',
-                    ...(themeColor === 'secondary' ? { boxShadow: 9 } : { '&:hover': { boxShadow: 4 } })
-                  }}
-                >
-                  {themeColor === 'secondary' ? <Icon icon='mdi:check' fontSize='1.25rem' /> : null}
-                </ColorBox>
-                <ColorBox
-                  onClick={() => handleChange('themeColor', 'success')}
-                  sx={{
-                    backgroundColor: 'success.main',
-                    ...(themeColor === 'success' ? { boxShadow: 9 } : { '&:hover': { boxShadow: 4 } })
-                  }}
-                >
-                  {themeColor === 'success' ? <Icon icon='mdi:check' fontSize='1.25rem' /> : null}
-                </ColorBox>
-                <ColorBox
-                  onClick={() => handleChange('themeColor', 'error')}
-                  sx={{
-                    backgroundColor: 'error.main',
-                    ...(themeColor === 'error' ? { boxShadow: 9 } : { '&:hover': { boxShadow: 4 } })
-                  }}
-                >
-                  {themeColor === 'error' ? <Icon icon='mdi:check' fontSize='1.25rem' /> : null}
-                </ColorBox>
-                <ColorBox
-                  onClick={() => handleChange('themeColor', 'warning')}
-                  sx={{
-                    backgroundColor: 'warning.main',
-                    ...(themeColor === 'warning' ? { boxShadow: 9 } : { '&:hover': { boxShadow: 4 } })
-                  }}
-                >
-                  {themeColor === 'warning' ? <Icon icon='mdi:check' fontSize='1.25rem' /> : null}
-                </ColorBox>
-                <ColorBox
-                  onClick={() => handleChange('themeColor', 'info')}
-                  sx={{
-                    mr: 0,
-                    backgroundColor: 'info.main',
-                    ...(themeColor === 'info' ? { boxShadow: 9 } : { '&:hover': { boxShadow: 4 } })
-                  }}
-                >
-                  {themeColor === 'info' ? <Icon icon='mdi:check' fontSize='1.25rem' /> : null}
-                </ColorBox>
-              </Box>
-            </div>
           </CustomizerSpacing>
 
           <Divider sx={{ m: '0 !important' }} />
 
           <CustomizerSpacing className='customizer-body'>
-            {/* Content Width */}
             <Box sx={{ mb: 4 }}>
               <Typography>{t("Sahifa o'lchami")}</Typography>
               <RadioGroup
@@ -241,64 +132,11 @@ const Customizer = () => {
                 <FormControlLabel value='boxed' label={t('Chegaralangan')} control={<Radio />} />
               </RadioGroup>
             </Box>
-
-            {/* AppBar */}
-            {/* <Box sx={{ mb: 4 }}>
-              <Typography>AppBar Type</Typography>
-              <RadioGroup
-                row
-                value={appBar}
-                onChange={e => handleChange('appBar', e.target.value as Settings['appBar'])}
-                sx={{ '& .MuiFormControlLabel-label': { fontSize: '.875rem', color: 'text.secondary' } }}
-              >
-                <FormControlLabel value='fixed' label='Fixed' control={<Radio />} />
-                <FormControlLabel value='static' label='Static' control={<Radio />} />
-                {layout === 'horizontal' ? null : (
-                  <FormControlLabel value='hidden' label='Hidden' control={<Radio />} />
-                )}
-              </RadioGroup>
-            </Box> */}
-
-            {/* Footer */}
-            {/* <Box sx={{ mb: 4 }}>
-              <Typography>Footer Type</Typography>
-              <RadioGroup
-                row
-                value={footer}
-                onChange={e => handleChange('footer', e.target.value as Settings['footer'])}
-                sx={{ '& .MuiFormControlLabel-label': { fontSize: '.875rem', color: 'text.secondary' } }}
-              >
-                <FormControlLabel value='fixed' label='Fixed' control={<Radio />} />
-                <FormControlLabel value='static' label='Static' control={<Radio />} />
-                <FormControlLabel value='hidden' label='Hidden' control={<Radio />} />
-              </RadioGroup>
-            </Box> */}
-
-            {/* AppBar Blur */}
-            {/* <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Typography>AppBar Blur</Typography>
-              <Switch
-                name='appBarBlur'
-                checked={appBarBlur}
-                onChange={e => handleChange('appBarBlur', e.target.checked)}
-              />
-            </Box> */}
-
-            {/* RTL */}
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Typography>{t("O'ngdan Chapga")}</Typography>
-              <Switch
-                name='direction'
-                checked={direction === 'rtl'}
-                onChange={e => handleChange('direction', e.target.checked ? 'rtl' : 'ltr')}
-              />
-            </Box>
           </CustomizerSpacing>
 
           <Divider sx={{ m: '0 !important' }} />
 
           <CustomizerSpacing className='customizer-body'>
-            {/* Menu Layout */}
             <Box sx={{ mb: layout === 'horizontal' && appBar === 'hidden' ? {} : 4 }}>
               <Typography>{t('Menyu joylashuvi')}</Typography>
               <RadioGroup
@@ -317,48 +155,6 @@ const Customizer = () => {
                 <FormControlLabel value='horizontal' label={t('Gorizontal')} control={<Radio />} />
               </RadioGroup>
             </Box>
-
-            {/* Menu Toggle */}
-            {/* {navHidden || layout === 'horizontal' ? null : (
-              <Box sx={{ mb: 4 }}>
-                <Typography>Menu Toggle</Typography>
-                <RadioGroup
-                  row
-                  value={verticalNavToggleType}
-                  onChange={e =>
-                    handleChange('verticalNavToggleType', e.target.value as Settings['verticalNavToggleType'])
-                  }
-                  sx={{ '& .MuiFormControlLabel-label': { fontSize: '.875rem', color: 'text.secondary' } }}
-                >
-                  <FormControlLabel value='accordion' label='Accordion' control={<Radio />} />
-                  <FormControlLabel value='collapse' label='Collapse' control={<Radio />} />
-                </RadioGroup>
-              </Box>
-            )} */}
-
-            {/* Menu Collapsed */}
-            {/* {navHidden || layout === 'horizontal' ? null : (
-              <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Typography>Menu Collapsed</Typography>
-                <Switch
-                  name='navCollapsed'
-                  checked={navCollapsed}
-                  onChange={e => handleChange('navCollapsed', e.target.checked)}
-                />
-              </Box>
-            )} */}
-
-            {/* Menu Hidden */}
-            {layout === 'horizontal' && appBar === 'hidden' ? null : (
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Typography>{t('Menu ni yashirish')}</Typography>
-                <Switch
-                  name='navHidden'
-                  checked={navHidden}
-                  onChange={e => handleChange('navHidden', e.target.checked)}
-                />
-              </Box>
-            )}
           </CustomizerSpacing>
         </Box>
       </Drawer>
@@ -366,4 +162,5 @@ const Customizer = () => {
   )
 }
 
+Customizer.displayName = 'Customizer'
 export default Customizer

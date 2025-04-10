@@ -17,9 +17,9 @@ const fetchNotifications = async (params: { page?: number; limit?: number }) => 
   }
 };
 
-const fetchNotificationRead = async (id: string) => {
+const fetchNotificationRead = async (id: number) => {
   try {
-    const url = Endpoints.NotificationRead.replace("{id}", id);
+    const url = Endpoints.NotificationRead.replace("{id}", String(id));
     const response = await api.get(url)
     return response.data;
   } catch (error: any) {
@@ -36,11 +36,18 @@ export const useNotifications = (page?: number, limit?: number) => {
   });
 };
 
-export const useNotificationRead = (id: string) => {
+export const useNotificationRead = (id: number | undefined) => {
+  const isValidId = id !== undefined && !isNaN(Number(id)) && Number(id) > 0;
+
   return useQuery({
-    queryKey: ['notification-read'],
-    queryFn: () => fetchNotificationRead(id),
+    queryKey: ['notification-read', id],
+    queryFn: () => {
+      if (!isValidId) {
+        return Promise.resolve(null);
+      }
+      return fetchNotificationRead(Number(id));
+    },
     staleTime: 1000 * 60 * 5,
-    enabled: !!id
+    enabled: isValidId && false,
   });
 };

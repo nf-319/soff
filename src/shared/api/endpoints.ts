@@ -3,6 +3,6 @@ export const enum Endpoints {
   GlobalNotifications = 'owner/global-notifications/',
   OwnerListClient = 'owner/list/client/',
   Notifications = 'common/notifications/',
-  NotificationRead = 'common/notifications-read/{id}/',
+  NotificationRead = 'common/notification-read/{id}/',
 
 }
