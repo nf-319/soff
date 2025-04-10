@@ -190,11 +190,13 @@ const AppBarContent = (props: Props) => {
             )}
           </Box>
         )}
-        {isMobile && user?.currentRole !== 'student' && (
+
+        {(user?.currentRole !== 'student' && user?.currentRole !== 'teacher') && isMobile && (
           <Button variant='contained' size='small' sx={{ margin: '0 7px', height: '32px' }} onClick={clickGlobalPay}>
             <span>{t("To'lov")}</span>
           </Button>
         )}
+
         <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
           {/*<LanguageDropdown settings={settings} saveSettings={saveSettings} />*/}
           {user?.currentRole === 'student' && <QrcodeScanner />}

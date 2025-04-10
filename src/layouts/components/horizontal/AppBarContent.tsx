@@ -161,16 +161,19 @@ const AppBarContent = (props: Props) => {
                 </svg>
               </span>
             </Tooltip>
-          <Tooltip enterDelay={2000} title={t("O'quvchi to'lovni qabul qilish")} arrow>
-              <Button
-                variant='contained'
-                size='small'
-                sx={{ margin: '0 7px', height: '32px' }}
-                onClick={clickGlobalPay}
-              >
-                <span>{t("To'lov")}</span>
-              </Button>
-            </Tooltip>
+
+            {user?.currentRole !== 'student' && user?.currentRole !== 'teacher' && (
+              <Tooltip enterDelay={2000} title={t("O'quvchi to'lovni qabul qilish")} arrow>
+                <Button
+                  variant='contained'
+                  size='small'
+                  sx={{ margin: '0 7px', height: '32px' }}
+                  onClick={clickGlobalPay}
+                >
+                  <span>{t("To'lov")}</span>
+                </Button>
+              </Tooltip>
+            )}
           </>
         )}
 

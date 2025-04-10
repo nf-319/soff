@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
