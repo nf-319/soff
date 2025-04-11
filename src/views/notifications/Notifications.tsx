@@ -93,7 +93,7 @@ export const Notifications = () => {
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
-      height: '80vh',
+      height: '100%',
       backgroundColor: 'background.default',
       p: { xs: 1, sm: 2 }
     }}>
@@ -118,7 +118,7 @@ export const Notifications = () => {
       ) : notifications.length ? (
         <Box sx={{
           display: 'flex',
-          height: 'calc(100vh - 80px)',
+          height: 'calc(100vh - 191px)',
           gap: 2,
           flexDirection: { xs: 'column', md: 'row' }
         }}>

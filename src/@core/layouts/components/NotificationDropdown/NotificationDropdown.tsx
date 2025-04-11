@@ -31,6 +31,7 @@ import {
   StyledMenu,
   StyledMenuItem,
 } from './NotificationDropdown.style'
+import { useNotificationsNotRead } from '@hooks/useNotification'
 
 type Props = {
   settings: Settings
@@ -45,12 +46,14 @@ const NotificationDropdown = (props: Props) => {
   const { settings } = props
   const { direction } = settings
   const { t } = useTranslation()
-  const [notificationData, setNotificationData] = useState<NotificationSocketType | null>(null)
+  const [notificationData, setNotificationData] = useState<any>()
+  const [notificationCount, setNotificationCount] = useState<NotificationSocketType | null>(null)
   const router = useRouter()
   const { user } = useAuth()
   const notificationPermissionRef = useRef<boolean>(false)
 
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
+  const { refetch, isLoading } = useNotificationsNotRead()
 
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
 
@@ -74,6 +77,17 @@ const NotificationDropdown = (props: Props) => {
     void requestNotificationPermission();
   }, []);
 
+  const handleNotificationDropdownOpen = async (value: any) => {
+     setAnchorEl(value)
+    try {
+      const message = await refetch()
+      setNotificationData(message.data)
+    } catch (error) {
+      console.error("Error showing notification:", error);
+      throw error;
+    }
+  }
+
   const showBrowserNotification = (title: string, body: string) => {
     if (!notificationPermissionRef.current) return;
 
@@ -92,7 +106,7 @@ const NotificationDropdown = (props: Props) => {
     }
   };
 
-  const handleDropdownClose = () => {
+  const handleDropdownClose = async () => {
     setAnchorEl(null)
   }
 
@@ -118,7 +132,7 @@ const NotificationDropdown = (props: Props) => {
     if (!user?.id) return;
 
     const handleMessage = (message: any) => {
-      setNotificationData(message);
+      setNotificationCount(message);
 
       if (message?.notifications?.length > 0) {
         const newestNotification = message.notifications[0];
@@ -141,8 +155,8 @@ const NotificationDropdown = (props: Props) => {
     };
   }, [user?.id]);
 
-  const notificationCount = notificationData?.count || 0;
-  const notificationItems = notificationData?.notifications || [];
+  const notificationCounts = notificationCount?.count || 0;
+  const notificationItems = notificationData || [];
 
   return (
     <Fragment>
@@ -151,7 +165,7 @@ const NotificationDropdown = (props: Props) => {
           color='inherit'
           aria-label='Notifications'
           aria-haspopup='true'
-          onClick={(event) => setAnchorEl(event.currentTarget)}
+          onClick={(event) => handleNotificationDropdownOpen(event.currentTarget)}
           aria-controls='notification-menu'
           aria-expanded={isMenuOpen ? 'true' : undefined}
           sx={{
@@ -160,7 +174,7 @@ const NotificationDropdown = (props: Props) => {
             '&:hover': { transform: 'scale(1.05)' }
           }}
         >
-          <Badge color='error' variant='standard' badgeContent={notificationCount} max={9}>
+          <Badge color='error' variant='standard' badgeContent={notificationCounts} max={9}>
             <Bell size={24} />
           </Badge>
         </IconButton>
@@ -191,12 +205,12 @@ const NotificationDropdown = (props: Props) => {
             {t('Xabarnomalar')}
           </Typography>
 
-          {notificationCount > 0 && (
+          {notificationCounts > 0 && (
             <Chip
               size='small'
               color='primary'
               variant='outlined'
-              label={`${notificationCount} ta yangi xabar`}
+              label={`${notificationCounts} ta yangi xabar`}
               sx={{
                 height: 24,
                 fontSize: '0.75rem',

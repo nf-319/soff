@@ -2,6 +2,7 @@ import { Box, Typography, List, Divider, Chip, Avatar, alpha, useTheme, Theme, P
 import { Circle, Bell, BellRing } from 'lucide-react'
 import { styled } from '@mui/material/styles'
 import { NotificationListProps } from '../modal/types'
+import { getFormatTimestamp } from '@utils/getFormatTimestamp'
 
 type Props = {
   theme?: Theme;
@@ -49,17 +50,6 @@ const NotificationAvatar = styled(Avatar)(({ theme }) => ({
   color: theme.palette.primary.main,
 }));
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('uz', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(date);
-};
-
 export const NotificationList = ({
   notifications,
   selectedNotification,
@@ -67,6 +57,16 @@ export const NotificationList = ({
   unreadCount
 }: NotificationListProps) => {
   const theme = useTheme()
+
+  const sortedNotifications = [...notifications].sort((a, b) => {
+    if (a.notification.is_read !== b.notification.is_read) {
+      return a.notification.is_read ? 1 : -1
+    }
+
+    const dateA = new Date(a.notification.created_at).getTime()
+    const dateB = new Date(b.notification.created_at).getTime()
+    return dateB - dateA
+  })
 
   return (
     <Box
@@ -100,8 +100,8 @@ export const NotificationList = ({
 
       <Divider sx={{ mb: 2 }} />
 
-      <List sx={{ flex: 1, overflow: 'auto', p: 0 }}>
-        {notifications.map(item => (
+      <List sx={{ flex: 1, overflowY: 'auto', overflowX: "hidden", p: 0 }}>
+        {sortedNotifications.map(item => (
           <NotificationListItem
             key={item.id}
             selected={selectedNotification?.id === item.id}
@@ -109,7 +109,9 @@ export const NotificationList = ({
             onClick={() => handleReadNotification(item)}
           >
             <Box sx={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
-              <NotificationAvatar>{item.notification.is_read ? <Bell size={14} /> : <BellRing size={14} />}</NotificationAvatar>
+              <NotificationAvatar>
+                {item.notification.is_read ? <Bell size={14} /> : <BellRing size={14} />}
+              </NotificationAvatar>
               <Box sx={{ width: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   {!item.notification.is_read && (
@@ -138,7 +140,7 @@ export const NotificationList = ({
                 >
                   {item.notification.body.replace(/<[^>]*>?/gm, '').substring(0, 60)}...
                 </Typography>
-                <TimeLabel>{formatDate(item.notification.created_at)}</TimeLabel>
+                <TimeLabel>{getFormatTimestamp(item.notification.created_at)}</TimeLabel>
               </Box>
             </Box>
           </NotificationListItem>

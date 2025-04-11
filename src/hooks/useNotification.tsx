@@ -17,6 +17,20 @@ const fetchNotifications = async (params: { page?: number; limit?: number }) => 
   }
 };
 
+const fetchNotificationsNotRead = async () => {
+  try {
+    const res = await api.get(ceoConfigs.notification, {
+      params: {
+        is_read: false,
+      },
+    });
+
+    return res.data;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
 const fetchNotificationRead = async (id: number) => {
   try {
     const url = Endpoints.NotificationRead.replace("{id}", String(id));
@@ -33,6 +47,15 @@ export const useNotifications = (page?: number, limit?: number) => {
     queryKey: ['notification', page, limit],
     queryFn: () => fetchNotifications({ page, limit }),
     staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useNotificationsNotRead = () => {
+  return useQuery({
+    queryKey: ['notification-not-read'],
+    queryFn: fetchNotificationsNotRead,
+    staleTime: 1000 * 60 * 5,
+    enabled: false
   });
 };
 
