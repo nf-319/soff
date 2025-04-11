@@ -10,7 +10,7 @@ import useResponsive from 'src/@core/hooks/useResponsive'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch } from 'src/store'
 import VideoModal from '../../../components/video-header'
-import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
+import NotificationDropdown from '../../../@core/layouts/components/NotificationDropdown/NotificationDropdown'
 import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
 import { updateQueryParams } from 'src/store/apps/settings'
@@ -190,11 +190,13 @@ const AppBarContent = (props: Props) => {
             )}
           </Box>
         )}
-        {isMobile && user?.currentRole !== 'student' && (
+
+        {(user?.currentRole !== 'student' && user?.currentRole !== 'teacher') && isMobile && (
           <Button variant='contained' size='small' sx={{ margin: '0 7px', height: '32px' }} onClick={clickGlobalPay}>
             <span>{t("To'lov")}</span>
           </Button>
         )}
+
         <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
           {/*<LanguageDropdown settings={settings} saveSettings={saveSettings} />*/}
           {user?.currentRole === 'student' && <QrcodeScanner />}

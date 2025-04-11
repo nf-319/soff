@@ -174,50 +174,30 @@ export default function CreateForm({}: Props) {
                 py: '20px'
               }}
             >
-              {/* <FormControl fullWidth>
-                                <InputLabel size='small' id='user-view-language-label'>{t("Bo'lim")}</InputLabel>
-                                <Select
-                                    size='small'
-                                    label={t("Bo'lim")}
-
-                                    id='user-view-language'
-                                    labelId='user-view-language-label'
-                                    name='departmentParent'
-                                    defaultValue={''}
-                                    onChange={(e: any) => setSelectedDepartment(e.target.value)}
-                                >
-                                    {
-                                        departments.map(item => <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>)
-                                    }
-                                </Select>
-                            </FormControl> */}
-
-              {
-                <FormControl fullWidth>
-                  <InputLabel size='small' id='user-view-language-label'>
-                    {t("Bo'lim")}
-                  </InputLabel>
-                  <Select
-                    size='small'
-                    label={t("Bo'lim")}
-                    id='user-view-language'
-                    labelId='user-view-language-label'
-                    name='department'
-                    defaultValue={''}
-                    onChange={e => setDepartment(e.target.value)}
-                  >
-                    {departments?.map((item: any) => (
-                      <MenuItem key={item.id} value={item.id}>
-                        {item.name}
-                      </MenuItem>
-                    ))}
-                    <MenuItem sx={{ fontWeight: 600 }} onClick={() => push('/lids')}>
-                      {t('Yangi yaratish')}
-                      <IconifyIcon icon={'ion:add-sharp'} />
+              <FormControl fullWidth>
+                <InputLabel size='small' id='user-view-language-label'>
+                  {t("Bo'lim")}
+                </InputLabel>
+                <Select
+                  size='small'
+                  label={t("Bo'lim")}
+                  id='user-view-language'
+                  labelId='user-view-language-label'
+                  name='department'
+                  defaultValue={''}
+                  onChange={e => setDepartment(e.target.value)}
+                >
+                  {departments?.map((item: any) => (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.name}
                     </MenuItem>
-                  </Select>
-                </FormControl>
-              }
+                  ))}
+                  <MenuItem sx={{ fontWeight: 600 }} onClick={() => push('/lids')}>
+                    {t('Yangi yaratish')}
+                    <IconifyIcon icon={'ion:add-sharp'} />
+                  </MenuItem>
+                </Select>
+              </FormControl>
 
               <FormControl fullWidth>
                 <InputLabel size='small' id='fsdgsdgsgsdfsd-label'>

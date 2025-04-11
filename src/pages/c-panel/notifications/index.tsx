@@ -1,6 +1,5 @@
-import { Notifications } from 'src/views/apps/c-panel/Notifications'
+import { Notifications } from '@/views/apps/c-panel/Notifications'
 
-const NotificationsPage = () => <Notifications />
+const CPanelNotifications = () => <Notifications />
 
-NotificationsPage.displayName = 'NotificationsPage'
-export default NotificationsPage
+export default CPanelNotifications

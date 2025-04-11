@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.12.2'
+          node-version: '20.10.0'
           cache: 'npm'
 
       - name: Install dependencies
@@ -58,7 +58,7 @@ jobs:
 
             # Setup deployment directories
             APP_NAME="${{ secrets.REPO_NAME }}"
-            BASE_DIR="/projects/crm-front"
+            BASE_DIR="frontend/test-subdomain-soffcrm-uz-3132"
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
             DEPLOY_DIR="${BASE_DIR}/${APP_NAME}_${TIMESTAMP}"
             CURRENT_LINK="${BASE_DIR}/${APP_NAME}_current"
