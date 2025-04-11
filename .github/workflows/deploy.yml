@@ -131,7 +131,7 @@ jobs:
             ln -sfn ${DEPLOY_DIR} ${TARGET_ENV}
 
             # Start/reload the application with PM2
-            PM2_NAME="${APP_NAME}-test-${TARGET_NAME}"
+            PM2_NAME="test-subdomain-soffcrm-uz-3132"
 
             # Adjust ecosystem.config.js for the specific environment
             sed -i "s/name: \"${APP_NAME}-test\"/name: \"${PM2_NAME}\"/" ecosystem.config.js
