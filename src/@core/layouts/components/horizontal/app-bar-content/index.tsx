@@ -30,10 +30,10 @@ const AppBarContent = (props: Props) => {
         userAppBarBranding(props)
       ) : (
         <StyledLink href='/'>
-          <img src={companyInfo?.logo} height={35} />
+          <img src={companyInfo?.logo || '/images/default-logo.jpg'} height={35} />
 
           <Typography variant='h6' sx={{ ml: 2, fontWeight: 700, lineHeight: 1.2 }}>
-            {companyInfo.training_center_name}
+            {companyInfo.training_center_name || 'SOFF CRM'}
           </Typography>
         </StyledLink>
       )}

@@ -3,6 +3,9 @@ const path = require('path')
 /** @type {import('next').NextConfig} */
 module.exports = {
   trailingSlash: false,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
 
   webpack: (config) => {
     config.resolve.alias = {
