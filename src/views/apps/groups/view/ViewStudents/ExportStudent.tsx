@@ -95,7 +95,7 @@ export default function ExportStudent({
 
   useEffect(() => {
     if (modalRef === 'export' && !groupChecklist?.length) {
-      dispatch(fetchGroupChecklist())
+      dispatch(fetchGroupChecklist(''))
     }
   }, [modalRef])
 

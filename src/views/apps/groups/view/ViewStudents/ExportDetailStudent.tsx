@@ -26,6 +26,7 @@ import { getAttendance, getStudents, setGettingAttendance } from 'src/store/apps
 import { useRouter } from 'next/router'
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
 import { fetchStudentDetail, fetchStudentGroups } from 'src/store/apps/students'
+import useBranches from 'src/hooks/useBranch'
 
 export default function ExportDetailStudent({
   id,
@@ -42,14 +43,14 @@ export default function ExportDetailStudent({
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
   const { query } = useRouter()
-
+  const { getBranches, branches } = useBranches()
   const [isDiscount, setIsDiscount] = useState<boolean>(false)
+  const [selectedBranch, setSelectedBranch] = useState<any>(null)
 
   const formik: any = useFormik({
     initialValues: { new_group: '', fixed_price: '0' },
     validationSchema: () =>
       Yup.object({
-        // added_at: Yup.string().required(t("Maydonni to'ldiring") as string),
         new_group: Yup.string().required(t("Maydonni to'ldiring") as string),
         fixed_price: Yup.number().required("To'ldiring")
       }),
@@ -70,12 +71,16 @@ export default function ExportDetailStudent({
           group_student: id,
           ...discountConfig
         })
-        if (response.status == 201) {
-          toast.success(t("O'quvchi guruhga ko'chirildi") as string)
+        console.log(response.status)
+
+        if (response.status == 200) {
+          toast.success(t("O'quvchi boshqa guruhga ko'chirildi") as string)
           if (query.id) {
             await dispatch(fetchStudentDetail(Number(query?.id)))
           }
-          await dispatch(fetchStudentGroups(Number(query?.id||query.student)))
+          await dispatch(fetchStudentGroups(Number(query?.id || query.student)))
+          formik.resetForm()
+          setSelectedBranch(null)
         }
         setLoading(false)
         setModalRef(null)
@@ -87,10 +92,14 @@ export default function ExportDetailStudent({
   })
 
   useEffect(() => {
-    if (modalRef === 'export' && !groupChecklist?.length) {
-      dispatch(fetchGroupChecklist())
-    }
-  }, [modalRef])
+    getBranches()
+  }, [])
+
+  console.log(selectedBranch)
+
+  useEffect(() => {
+    dispatch(fetchGroupChecklist({ branch: selectedBranch }))
+  }, [selectedBranch])
 
   return (
     <Dialog
@@ -106,42 +115,64 @@ export default function ExportDetailStudent({
       <DialogContent>
         <form style={{ marginTop: 10 }} onSubmit={formik.handleSubmit}>
           <FormControl sx={{ maxWidth: '100%', mb: 3 }} fullWidth>
-            <InputLabel
-              error={!!formik.errors.new_group && formik.touched.new_group}
-              size='small'
-              id='demo-simple-select-outlined-label'
-            >
-              Yangi guruh
+            <InputLabel size='small' id='demo-simple-select-outlined-label'>
+              Filial
             </InputLabel>
             <Select
-              error={!!formik.errors.new_group && formik.touched.new_group}
               size='small'
-              label={t('Yangi guruh')}
+              label={t('Filial')}
               id='demo-simple-select-outlined'
               labelId='demo-simple-select-outlined-label'
               name='new_group'
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.new_group}
+              onChange={e => setSelectedBranch(e.target.value)}
+              value={selectedBranch}
             >
-              {groupChecklist
-                ?.filter(el => el.id !== groupData?.id)
-                ?.map((el: any) => (
-                  <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
-                    <span style={{ maxWidth: '250px', wordBreak: 'break-word' }}>
-                      {el.name}{' '}
-                      {`[${el.start_at?.split(':').slice(0, 2).join(':')} - ${el.end_at
-                        ?.split(':')
-                        .slice(0, 2)
-                        .join(':')}]`}
-                    </span>
-                  </MenuItem>
-                ))}
+              {branches.map((el: any) => (
+                <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
+                  {el.name}
+                </MenuItem>
+              ))}
             </Select>
-            <FormHelperText error>
-              {!!formik.errors.new_group && formik.touched.new_group && formik.errors.new_group}
-            </FormHelperText>
           </FormControl>
+          {selectedBranch && (
+            <FormControl sx={{ maxWidth: '100%', mb: 3 }} fullWidth>
+              <InputLabel
+                error={!!formik.errors.new_group && formik.touched.new_group}
+                size='small'
+                id='demo-simple-select-outlined-label'
+              >
+                Yangi guruh
+              </InputLabel>
+              <Select
+                error={!!formik.errors.new_group && formik.touched.new_group}
+                size='small'
+                label={t('Yangi guruh')}
+                id='demo-simple-select-outlined'
+                labelId='demo-simple-select-outlined-label'
+                name='new_group'
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.new_group}
+              >
+                {groupChecklist
+                  ?.filter(el => el.id !== groupData?.id)
+                  ?.map((el: any) => (
+                    <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
+                      <span style={{ maxWidth: '250px', wordBreak: 'break-word' }}>
+                        {el.name}{' '}
+                        {`[${el.start_at?.split(':').slice(0, 2).join(':')} - ${el.end_at
+                          ?.split(':')
+                          .slice(0, 2)
+                          .join(':')}]`}
+                      </span>
+                    </MenuItem>
+                  ))}
+              </Select>
+              <FormHelperText error>
+                {!!formik.errors.new_group && formik.touched.new_group && formik.errors.new_group}
+              </FormHelperText>
+            </FormControl>
+          )}
 
           {formik.values?.new_group && (
             <Box className='w-100'>
@@ -216,7 +247,7 @@ export default function ExportDetailStudent({
                     </FormControl> */}
 
           <DialogActions sx={{ justifyContent: 'center' }}>
-            <Button variant='outlined' type='button' color='secondary' onClick={() => setModalRef(null)}>
+            <Button variant='outlined' type='button' color='secondary' onClick={() => {setModalRef(null),formik.resetForm(),setSelectedBranch(null)}}>
               {t('Bekor Qilish')}
             </Button>
             <LoadingButton loading={isLoading} type='submit' variant='contained' sx={{ mr: 1 }}>
