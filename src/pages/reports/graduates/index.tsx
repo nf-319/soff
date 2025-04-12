@@ -58,7 +58,7 @@ export default function GraduatesPage() {
   }, [page, selectedGroup])
 
   useEffect(() => {
-    dispatch(fetchGroupChecklist())
+    dispatch(fetchGroupChecklist(''))
   }, [])
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {

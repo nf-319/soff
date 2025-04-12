@@ -25,6 +25,7 @@ import { today } from '../../../../../components/card-statistics/kanban-item'
 import { getAttendance, getStudents, setGettingAttendance } from 'src/store/apps/groupDetails'
 import { useRouter } from 'next/router'
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
+import useBranches from 'src/hooks/useBranch'
 
 export default function ExportStudent({
   id,
@@ -37,12 +38,13 @@ export default function ExportStudent({
 }) {
   const [isLoading, setLoading] = useState(false)
   const { groupChecklist } = useAppSelector(state => state.groups)
-  const { groupData } = useAppSelector(state => state.groupDetails)
+  const { groupData, queryParams } = useAppSelector(state => state.groupDetails)
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
   const { query } = useRouter()
-
+  const { getBranches, branches } = useBranches()
   const [isDiscount, setIsDiscount] = useState<boolean>(false)
+  const [selectedBranch, setSelectedBranch] = useState<any>(null)
 
   const formik: any = useFormik({
     initialValues: { new_group: '', fixed_price: '0' },
@@ -69,10 +71,12 @@ export default function ExportStudent({
           group_student: id,
           ...discountConfig
         })
-        if (response.status == 201) {
+        if (response.status == 200) {
+          const queryStringAttendance = new URLSearchParams(queryParams).toString()
           toast.success(t("O'quvchi guruhga ko'chirildi") as string)
-          await dispatch(getStudents({ id: groupData?.id, queryString: '' }))
+          await dispatch(getStudents({ id: groupData?.id, queryString: queryStringAttendance }))
           dispatch(setGettingAttendance(true))
+
           if (query.month && query?.id) {
             await dispatch(
               getAttendance({
@@ -94,8 +98,12 @@ export default function ExportStudent({
   })
 
   useEffect(() => {
-    if (modalRef === 'export' && !groupChecklist?.length) {
-      dispatch(fetchGroupChecklist())
+    dispatch(fetchGroupChecklist({ branch: selectedBranch }))
+  }, [selectedBranch])
+
+  useEffect(() => {
+    if (modalRef == 'export') {
+      getBranches()
     }
   }, [modalRef])
 
@@ -114,48 +122,70 @@ export default function ExportStudent({
       <DialogContent>
         <form style={{ marginTop: 10 }} onSubmit={formik.handleSubmit}>
           <FormControl sx={{ maxWidth: '100%', mb: 3 }} fullWidth>
-            <InputLabel
-              error={!!formik.errors.new_group && formik.touched.new_group}
-              size='small'
-              id='demo-simple-select-outlined-label'
-            >
-              Yangi guruh
+            <InputLabel size='small' id='demo-simple-select-outlined-label'>
+              Filial
             </InputLabel>
             <Select
-              error={!!formik.errors.new_group && formik.touched.new_group}
               size='small'
-              label={t('Yangi guruh')}
+              label={t('Filial')}
               id='demo-simple-select-outlined'
               labelId='demo-simple-select-outlined-label'
               name='new_group'
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.new_group}
+              onChange={e => setSelectedBranch(e.target.value)}
+              value={selectedBranch}
             >
-              {groupChecklist
-                ?.filter(el => el.id !== groupData?.id)
-                ?.map((el: any) => (
-                  <MenuItem
-                    key={el.id}
-                    value={el.id}
-                    sx={{
-                      wordBreak: 'normal',
-                      whiteSpace: 'normal',
-                      borderBottom: '1px solid #e0e0e0',
-                      '&:last-of-type': {
-                        borderBottom: 'none',
-                      },
-                    }}
-                  >
-                    <span>{el.name}</span>
-                  </MenuItem>
-                ))}
+              {branches?.map((el: any) => (
+                <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
+                  {el.name}
+                </MenuItem>
+              ))}
             </Select>
-
-            <FormHelperText error>
-              {!!formik.errors.new_group && formik.touched.new_group && formik.errors.new_group}
-            </FormHelperText>
           </FormControl>
+          {selectedBranch && (
+            <FormControl sx={{ maxWidth: '100%', mb: 3 }} fullWidth>
+              <InputLabel
+                error={!!formik.errors.new_group && formik.touched.new_group}
+                size='small'
+                id='demo-simple-select-outlined-label'
+              >
+                Yangi guruh
+              </InputLabel>
+              <Select
+                error={!!formik.errors.new_group && formik.touched.new_group}
+                size='small'
+                label={t('Yangi guruh')}
+                id='demo-simple-select-outlined'
+                labelId='demo-simple-select-outlined-label'
+                name='new_group'
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.new_group}
+              >
+                {groupChecklist
+                  ?.filter(el => el.id !== groupData?.id)
+                  ?.map((el: any) => (
+                    <MenuItem
+                      key={el.id}
+                      value={el.id}
+                      sx={{
+                        wordBreak: 'normal',
+                        whiteSpace: 'normal',
+                        borderBottom: '1px solid #e0e0e0',
+                        '&:last-of-type': {
+                          borderBottom: 'none'
+                        }
+                      }}
+                    >
+                      <span>{el.name}</span>
+                    </MenuItem>
+                  ))}
+              </Select>
+
+              <FormHelperText error>
+                {!!formik.errors.new_group && formik.touched.new_group && formik.errors.new_group}
+              </FormHelperText>
+            </FormControl>
+          )}
 
           {/* {formik.values?.new_group && (
             <Box className='w-100'>

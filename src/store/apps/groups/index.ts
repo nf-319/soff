@@ -65,8 +65,8 @@ export const fetchGroups = createAsyncThunk('groups/fetchGroups', async (params?
   return (await api.get(ceoConfigs.groups, { params })).data
 })
 
-export const fetchGroupChecklist = createAsyncThunk('groups/fetchGroupChecklist', async () => {
-  const resp = await api.get('common/group-check-list/')
+export const fetchGroupChecklist = createAsyncThunk('groups/fetchGroupChecklist', async (params?:any) => {
+  const resp = await api.get('common/group-check-list/',{params})
   return resp.data
 })
 
