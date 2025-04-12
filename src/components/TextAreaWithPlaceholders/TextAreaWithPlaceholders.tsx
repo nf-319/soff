@@ -42,7 +42,7 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
   const convertAPItoUIFormat = (text: string) => {
     if (!text) return ''
     let result = text
-    placeholders.forEach(p => {
+    placeholders?.forEach(p => {
       const regex = new RegExp(escapeRegExp(p.value), 'g')
       result = result.replace(regex, p.displayValue)
     })
@@ -230,7 +230,7 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
         : convertAPItoUIFormat(defaultValue)
 
     setDisplayValue(resetValue)
-    onChange(convertToApiText(resetValue)) // Reset qiymatni API ga yuboramiz
+    onChange(convertToApiText(resetValue))
     setEditable(false)
   }
 
@@ -250,7 +250,7 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
 
       <Box component='div' display='flex' alignItems='center' justifyContent='space-between' marginBottom={2}>
         <Stack direction='row' spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-          {placeholders.map((placeholder, index) => (
+          {placeholders?.map((placeholder, index) => (
             <Tooltip key={`${placeholder.label}-${index}`} title={placeholder.placeholder} placement='top'>
               <Button
                 variant='contained'
