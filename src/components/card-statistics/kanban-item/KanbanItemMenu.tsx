@@ -3,6 +3,7 @@ import { useAppSelector } from '../../../store'
 import IconifyIcon from '../../icon'
 import { useTranslation } from 'react-i18next'
 import { FC } from 'react'
+import { useRouter } from 'next/router'
 
 type Props = {
   anchorEl: any
@@ -24,7 +25,7 @@ export const KanbanItemMenu: FC<Props> = ({
   const { queryParams } = useAppSelector(state => state.leads)
   const { t } = useTranslation()
   const rowOptionsOpen = Boolean(anchorEl)
-
+  const router = useRouter()
   const handleRowOptionsClose = () => {
     setAnchorEl(null)
   }
@@ -97,6 +98,12 @@ export const KanbanItemMenu: FC<Props> = ({
                 <IconifyIcon icon='mdi:delete' fontSize={20} />
                 {t("O'chirish")}
               </MenuItem>
+              {router.query.is_active == 'false' && (
+                <MenuItem onClick={() => setOpen('recover')} sx={{ '& svg': { mr: 2 } }}>
+                  <IconifyIcon icon='mdi:reload' fontSize={20} />
+                  {t('Arxivdan chiqarish')}
+                </MenuItem>
+              )}
             </>
           )}
         </Box>

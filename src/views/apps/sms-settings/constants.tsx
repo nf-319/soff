@@ -75,6 +75,7 @@ export const PLACEHOLDERS: any = {
   birthdate: [FIRST_NAME],
   notComeLesson: [FIRST_NAME],
   comeLesson: [FIRST_NAME],
+  exam: [FIRST_NAME, GROUP, SCORE],
   whosePayment: [FIRST_NAME, WHOSE_PAYMENT_DATE, DEPT_AMOUNT],
   deptStudents: [FIRST_NAME, WHOSE_PAYMENT_DATE, DEPT_AMOUNT],
   gradeStudents: [FIRST_NAME, GROUP, SCORE],

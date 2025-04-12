@@ -1,18 +1,16 @@
 import Box from '@mui/material/Box'
 import { Settings } from 'src/@core/context/settingsContext'
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
-import LanguageDropdown from 'src/@core/layouts/components/shared-components/LanguageDropdown'
 import BranchDropdown from 'src/@core/layouts/components/shared-components/BranchDropdown'
 import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
-import IconifyIcon from '../../../components/icon'
-import { Autocomplete, Button, Input, TextField, Tooltip } from '@mui/material'
-import { useAppDispatch, useAppSelector } from 'src/store'
+import { Autocomplete, Button, TextField, Tooltip } from '@mui/material'
+import { useAppDispatch } from 'src/store'
 import { setGlobalPay, setStudentId } from 'src/store/apps/students'
 import GlobalPaymentModal from 'src/views/apps/students/GlobalPaymentModal'
 import VideoModal from '../../../components/video-header'
 import { useTranslation } from 'react-i18next'
-import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
+import NotificationDropdown from '../../../@core/layouts/components/NotificationDropdown/NotificationDropdown'
 import api from 'src/@core/utils/api'
 
 import { Icon } from '@iconify/react'
@@ -21,7 +19,7 @@ import { updateQueryParams } from 'src/store/apps/settings'
 import { toggleQrCodeModal } from 'src/store/apps/page'
 import ceoConfigs from 'src/configs/ceo'
 import useDebounce from 'src/hooks/useDebounce'
-import { QrcodeScanner } from '../../../@core/layouts/components/shared-components/QrcodeScanner'
+import { QrcodeScanner } from 'src/@core/layouts/components/shared-components/QrcodeScanner'
 
 interface Props {
   hidden: boolean
@@ -30,7 +28,7 @@ interface Props {
 }
 
 const AppBarContent = (props: Props) => {
-  const { settings, saveSettings } = props
+  const { settings } = props
   const { user } = useContext(AuthContext)
   const dispatch = useAppDispatch()
   const [employees, setEmployees] = useState<any>([])
@@ -85,7 +83,7 @@ const AppBarContent = (props: Props) => {
     }
   }, [search])
   useEffect(() => {
-    handleSearch(debouncedSearch)
+    void handleSearch(debouncedSearch)
   }, [debouncedSearch])
 
   return (
@@ -161,16 +159,19 @@ const AppBarContent = (props: Props) => {
                 </svg>
               </span>
             </Tooltip>
-          <Tooltip enterDelay={2000} title={t("O'quvchi to'lovni qabul qilish")} arrow>
-              <Button
-                variant='contained'
-                size='small'
-                sx={{ margin: '0 7px', height: '32px' }}
-                onClick={clickGlobalPay}
-              >
-                <span>{t("To'lov")}</span>
-              </Button>
-            </Tooltip>
+
+            {user?.currentRole !== 'student' && user?.currentRole !== 'teacher' && (
+              <Tooltip enterDelay={2000} title={t("O'quvchi to'lovni qabul qilish")} arrow>
+                <Button
+                  variant='contained'
+                  size='small'
+                  sx={{ margin: '0 7px', height: '32px' }}
+                  onClick={clickGlobalPay}
+                >
+                  <span>{t("To'lov")}</span>
+                </Button>
+              </Tooltip>
+            )}
           </>
         )}
 
@@ -180,7 +181,7 @@ const AppBarContent = (props: Props) => {
 
       {/*<LanguageDropdown settings={settings} saveSettings={saveSettings} />*/}
       {user?.currentRole === 'student' && <QrcodeScanner />}
-      <NotificationDropdown settings={settings} />
+      {location.hostname.split('.')[0] !== 'c-panel' && <NotificationDropdown settings={settings} />}
       <UserDropdown settings={settings} />
       <GlobalPaymentModal />
     </Box>

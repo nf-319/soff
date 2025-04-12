@@ -22,7 +22,7 @@ const AppBarWarning = ({ setShowWarning }: { setShowWarning: (status: boolean) =
         <div className='d-flex align-items-center gap-2 text-white'>
           <Bell size={14} />
           <span className='small fw-medium'>
-            Tizimdan foydalanish muddati tugagungacha {formattedUserData?.payment_days} kun qoldi, Tizimdan uzluksiz foydalanish
+            Tizimdan foydalanish muddati tugagungacha {formattedUserData.payment_days||0} kun qoldi, Tizimdan uzluksiz foydalanish
             uchun to'lovni amalga oshiring
           </span>
         </div>

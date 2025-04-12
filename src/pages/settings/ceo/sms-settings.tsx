@@ -380,7 +380,7 @@ const SmsSettings = () => {
         onSwitch='for_payment'
         name='create_payment_text'
         onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_payment)}
-        placeholders={PLACEHOLDERS.for_payment}
+        placeholders={PLACEHOLDERS.exam}
         updateSettings={updateSettings}
         defaultValue={companyInfo?.auto_sms?.create_payment_text}
       />

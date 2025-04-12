@@ -1,17 +1,17 @@
 import api from 'src/@core/utils/api'
-import { Endpoint } from 'src/shared/api/endpoints'
+import { Endpoints } from '@api/endpoints'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
 type CreateNotification = {
   title: string,
   body: string,
-  receivers: "ceo_admin" | "all"
+  receivers: string[]
   tenant?: number
 }
 
 const postNotification = async (requestParams: CreateNotification) => {
   try {
-    await api.post(Endpoint.SendGlobalNotification, requestParams)
+    await api.post(Endpoints.SendGlobalNotification, requestParams)
   } catch (error) {
     console.error(error)
     throw error
@@ -20,7 +20,7 @@ const postNotification = async (requestParams: CreateNotification) => {
 
 const getAllNotification = async () => {
   try {
-    const response = await api.get(Endpoint.GlobalNotifications)
+    const response = await api.get(Endpoints.GlobalNotifications)
     return response.data
   } catch (error) {
     console.error(error)
@@ -30,7 +30,7 @@ const getAllNotification = async () => {
 
 const getListClient = async (params?: any) => {
   try {
-    const response = await api.get(Endpoint.OwnerListClient, { params })
+    const response = await api.get(Endpoints.OwnerListClient, { params })
     return response.data
   } catch (error) {
     console.error(error)
@@ -40,7 +40,7 @@ const getListClient = async (params?: any) => {
 
 const getNotificationDetail = async (id: string) => {
   try {
-    const endpoint = Endpoint.GlobalNotifications.replace("{id}", id)
+    const endpoint = Endpoints.GlobalNotifications.replace("{id}", id)
     const response = await api.get(endpoint)
     return response.data
   } catch (error) {
