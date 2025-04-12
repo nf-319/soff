@@ -210,7 +210,7 @@ jobs:
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.PROD_SERVER_IP }}
-          username: root
+          username: crmroot
           password: ${{ secrets.PROD_SERVER_PASSWORD }}
           source: "deployment.tar.gz"
           target: "/tmp"
