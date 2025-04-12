@@ -8,11 +8,11 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
-  FormHelperText,
+  FormHelperText, IconButton,
   InputLabel,
   MenuItem,
   Select,
-  TextField,
+  TextField, Tooltip,
   Typography
 } from '@mui/material'
 import { customTableProps } from 'src/pages/groups'
@@ -30,9 +30,11 @@ import showResponseError from 'src/@core/utils/show-response-error'
 import CustomDialog from 'src/views/apps/settings/form/CustomDialog'
 import { useFormik } from 'formik'
 import { AuthContext } from 'src/context/AuthContext'
+import { Edit, Trash2 } from 'lucide-react'
+import { ComingSoon } from '../../../components/CommingSoon'
 
 export default function FormsPage() {
-  const [open, setOpen] = useState<null | 'new' | 'integration' | 'delete'>(null)
+  const [open, setOpen] = useState<null | 'new' | 'integration' | 'delete' | 'edit'>(null)
   const [departments, setDepartments] = useState<any[]>([])
   const [selectedDepartment, setSelectedDepartment] = useState<any>(null)
   const [error, setError] = useState<any>({})
@@ -96,9 +98,21 @@ export default function FormsPage() {
       title: t('Amallar'),
       dataIndex: 'id',
       render: id => (
-        <Button size='small' color='error' onClick={() => (setDeleteId(id), setOpen('delete'))}>
-          <IconifyIcon style={{ color: 'red' }} icon={'material-symbols-light:delete-outline'} />
-        </Button>
+        <Box display='flex' alignItems='center'>
+          <ComingSoon hidden>
+            <Tooltip title="O'zgartirish" enterDelay={500}>
+              <IconButton size='medium' color='primary' onClick={() => (setDeleteId(id), setOpen('edit'))}>
+                <Edit color='blue' size={18} />
+              </IconButton>
+            </Tooltip>
+          </ComingSoon>
+
+          <Tooltip title="O'chirish" enterDelay={500} leaveDelay={200}>
+            <IconButton size='medium' color='error' onClick={() => (setDeleteId(id), setOpen('delete'))}>
+              <Trash2 color='red' size={18} />
+            </IconButton>
+          </Tooltip>
+        </Box>
       )
     }
   ]
@@ -137,12 +151,6 @@ export default function FormsPage() {
     if (resp?.data) {
       setSourceData(resp.data.results)
     }
-  }
-
-  const openDialog = () => {
-    setOpen('new')
-    getDepartments()
-    getSources()
   }
 
   async function onSubmit(values: any) {
@@ -211,9 +219,8 @@ export default function FormsPage() {
   return (
     <Box>
       <VideoHeader item={videoUrls.forms} />
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography fontSize={'18px'}>{t('Formalar')}</Typography>
-        {/* <Button size='small' variant='contained' startIcon={<IconifyIcon icon={'ic:baseline-add'} />} onClick={openDialog}>Yangi</Button> */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
+        <Typography variant='h5'>{t('Formalar')}</Typography>
         <Button
           size='small'
           variant='contained'
@@ -348,6 +355,18 @@ export default function FormsPage() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
+      <CustomDialog
+        open={open === 'delete'}
+        onClose={() => setOpen(null)}
+        title={t("Formani o'chirmoqchimisiz")}
+        content={
+          <Typography sx={{ fontSize: '20px', margin: '30px 20px' }}>{t("Formani o'chirmoqchimisiz")}?</Typography>
+        }
+        loading={loading}
+        onConfirm={onDelete}
+        confirmText={t("O'chirish")}
+        cancelText={t('Bekor qilish')}
+      />
       <CustomDialog
         open={open === 'delete'}
         onClose={() => setOpen(null)}
