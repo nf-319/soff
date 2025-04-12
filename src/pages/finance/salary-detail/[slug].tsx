@@ -1,20 +1,24 @@
-//@ts-nocheck
-import LoadingButton from "@mui/lab/LoadingButton";
+import LoadingButton from '@mui/lab/LoadingButton'
 import { Box, Button, Dialog, DialogContent, IconButton, Typography } from '@mui/material'
-import { useRouter } from "next/router";
-import { GetServerSidePropsContext, InferGetStaticPropsType } from "next/types";
-import { useContext, useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import { formatAmount, revereAmount } from "../../../components/amount-input";
-import IconifyIcon from "../../../components/icon";
-import DataTable, { customTableDataProps } from "../../../components/table";
-import api from "src/@core/utils/api";
-import { formatCurrency } from "src/@core/utils/format-currency";
-import { AuthContext } from "src/context/AuthContext";
-import { useAppDispatch, useAppSelector } from "src/store";
-import { fetchCalculatedSalary, fetchModerationSalaries, updateSalaryBonus, updateSalaryFine } from "src/store/apps/finance";
-import TeacherGroupsModal from "src/views/apps/finance/TeacherGroupsModal";
+import { useRouter } from 'next/router'
+import { GetServerSidePropsContext, InferGetStaticPropsType } from 'next/types'
+import { useContext, useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
+import { formatAmount, revereAmount } from '../../../components/amount-input'
+import IconifyIcon from '../../../components/icon'
+import DataTable, { customTableDataProps } from '../../../components/table'
+import api from 'src/@core/utils/api'
+import { formatCurrency } from 'src/@core/utils/format-currency'
+import { AuthContext } from 'src/context/AuthContext'
+import { useAppDispatch, useAppSelector } from 'src/store'
+import {
+  fetchCalculatedSalary,
+  fetchModerationSalaries,
+  updateSalaryBonus,
+  updateSalaryFine
+} from 'src/store/apps/finance'
+import TeacherGroupsModal from 'src/views/apps/finance/TeacherGroupsModal'
 import { VscodeIconsFileTypeExcel2 } from '../../../components/excelButton/ExcelIcon'
 import { useQuery } from '@tanstack/react-query'
 
@@ -29,6 +33,7 @@ const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) 
   const [open, setOpen] = useState<boolean>(false)
   const [id, setId] = useState<number | null>(null)
   const { user } = useContext(AuthContext)
+  const router = useRouter()
 
   const handleGetSalary = async (teacherId: number) => {
     setId(teacherId)
@@ -142,7 +147,7 @@ const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) 
       xs: 0.1,
       title: t(''),
       dataIndex: 'employee_data',
-      render: employee_data => {
+      render: (employee_data:any) => {
         const teacherID = employee_data.id
         return (
           <LoadingButton
@@ -185,7 +190,7 @@ const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) 
   }
 
   const fetchMonthlyReport = async () => {
-    const { data } = await api.get<{ file_url: string }>(`finance/calculated-salary/${teacherId}/?is_export=true`)
+    const { data } = await api.get<{ file_url: string }>(`finance/employee-salaries/?date=${slug}&is_export=true`)
     return data.file_url
   }
 
@@ -290,15 +295,14 @@ const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) 
   )
 }
 
-
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const { params } = context;
+  const { params } = context
 
-    return {
-        props: {
-            slug: params?.slug
-        },
-    };
+  return {
+    props: {
+      slug: params?.slug
+    }
+  }
 }
 
 export default UserView

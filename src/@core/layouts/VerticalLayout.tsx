@@ -72,7 +72,7 @@ const VerticalLayout = (props: LayoutProps) => {
   const toggleNavVisibility = () => setNavVisible(!navVisible)
 
   useEffect(() => {
-    if (formattedUserData.payment_days) {
+    if (formattedUserData.payment_days >= 0) {
       setShowWarning(true)
     } else {
       setShowWarning(false)
