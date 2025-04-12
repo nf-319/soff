@@ -92,10 +92,10 @@ export default function ExportDetailStudent({
   })
 
   useEffect(() => {
-    getBranches()
-  }, [])
-
-  console.log(selectedBranch)
+    if (modalRef == 'export') {
+      getBranches()
+    }
+  }, [modalRef])
 
   useEffect(() => {
     dispatch(fetchGroupChecklist({ branch: selectedBranch }))
@@ -247,7 +247,14 @@ export default function ExportDetailStudent({
                     </FormControl> */}
 
           <DialogActions sx={{ justifyContent: 'center' }}>
-            <Button variant='outlined' type='button' color='secondary' onClick={() => {setModalRef(null),formik.resetForm(),setSelectedBranch(null)}}>
+            <Button
+              variant='outlined'
+              type='button'
+              color='secondary'
+              onClick={() => {
+                setModalRef(null), formik.resetForm(), setSelectedBranch(null)
+              }}
+            >
               {t('Bekor Qilish')}
             </Button>
             <LoadingButton loading={isLoading} type='submit' variant='contained' sx={{ mr: 1 }}>
