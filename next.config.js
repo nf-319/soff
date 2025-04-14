@@ -14,6 +14,11 @@ module.exports = {
     }
     return config
   },
+  i18n: {
+    locales: ['uz', 'ru', 'en'],
+    defaultLocale: 'uz',
+  },
+  localePath: './public/locales',
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*' },
