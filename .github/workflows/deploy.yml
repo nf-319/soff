@@ -32,7 +32,8 @@ jobs:
 
       - name: Create deployment archive
         run: |
-          tar -czf deployment.tar.gz \
+          echo "Creating archive with public directory..."
+          tar -czvf deployment.tar.gz \
             --exclude=".git" \
             --exclude="node_modules" \
             .next/ public/ package.json package-lock.json .env next.config.js ecosystem.config.js
@@ -53,28 +54,23 @@ jobs:
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
-            # Load NVM
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 20.10.0
 
-            # Setup deployment variables
             APP_NAME="${{ secrets.REPO_NAME }}"
             BASE_DIR="frontend/test-subdomain-soffcrm-uz-3131"
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-            # Blue-green deployment directories
             DEPLOY_DIR="${BASE_DIR}/releases/${TIMESTAMP}"
             BLUE_LINK="${BASE_DIR}/blue"
             GREEN_LINK="${BASE_DIR}/green"
             CURRENT_LINK="${BASE_DIR}/current"
 
-            # Create directory structure
             echo "Creating deployment directory structure..."
             mkdir -p ${BASE_DIR}/releases
             mkdir -p ${DEPLOY_DIR}
 
-            # Store git information separately from deployments
             GIT_DIR="${BASE_DIR}/repo"
             if [ -d "${GIT_DIR}" ]; then
               echo "Updating existing git repository..."
@@ -86,13 +82,11 @@ jobs:
               git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${APP_NAME}.git ${GIT_DIR}
             fi
 
-            # Copy git revision info to deployment
             cd ${GIT_DIR}
             GIT_REV=$(git rev-parse HEAD)
             GIT_BRANCH=$(git symbolic-ref --short HEAD)
             GIT_MESSAGE=$(git log -1 --pretty=%B)
 
-            # Create revision info file
             echo "Creating revision info file..."
             cat > ${DEPLOY_DIR}/REVISION.txt <<EOL
             Branch: ${GIT_BRANCH}
@@ -101,17 +95,28 @@ jobs:
             Deployed: $(date)
             EOL
 
-            # Extract pre-built files from the archive
             cd ${DEPLOY_DIR}
             echo "Extracting deployment archive..."
             tar -xzf /tmp/deployment.tar.gz
             rm -f /tmp/deployment.tar.gz
 
-            # Install production dependencies
+            echo "Verifying deployment contents..."
+            if [ -d "public" ]; then
+              echo "Public directory exists in deployment"
+              ls -la public/
+            else
+              echo "ERROR: Public directory is missing from deployment!"
+              ls -la
+            fi
+
             echo "Installing production dependencies..."
             npm ci --prefer-offline --no-audit --production --legacy-peer-deps
 
-            # Determine which environment (blue/green) is currently active
+            if [ ! -d "public" ] || [ -z "$(ls -A public 2>/dev/null)" ]; then
+              echo "Public directory missing or empty, copying from git repository..."
+              cp -r ${GIT_DIR}/public ./
+            fi
+
             if [ -L "${CURRENT_LINK}" ]; then
               CURRENT_ENV=$(basename $(readlink -f ${CURRENT_LINK}))
               if [[ "${CURRENT_ENV}" == "blue" ]]; then
@@ -122,20 +127,16 @@ jobs:
                 TARGET_NAME="blue"
               fi
             else
-              # Default to blue for first deployment
               TARGET_ENV="${BLUE_LINK}"
               TARGET_NAME="blue"
             fi
 
             echo "Targeting ${TARGET_NAME} environment for new deployment"
 
-            # Update the target environment link to the new release
             ln -sfn ${DEPLOY_DIR} ${TARGET_ENV}
 
-            # Start/reload the application with PM2
             PM2_NAME="test-subdomain-soffcrm-uz-3132"
 
-            # Adjust ecosystem.config.js for the specific environment
             sed -i "s/name: \"${APP_NAME}-test\"/name: \"${PM2_NAME}\"/" ecosystem.config.js
 
             if pm2 show ${PM2_NAME} > /dev/null 2>&1; then
@@ -146,18 +147,14 @@ jobs:
               pm2 start ecosystem.config.js --only ${PM2_NAME}
             fi
 
-            # Wait for the new instance to fully start
             echo "Waiting for new instance to initialize (10 seconds)..."
             sleep 10
 
-            # Switch traffic to the new environment
             echo "Switching traffic to ${TARGET_NAME} environment"
             ln -sfn ${TARGET_ENV} ${CURRENT_LINK}
 
-            # Save PM2 configuration
             pm2 save
 
-            # Stop the old environment after a grace period if it exists
             OLD_ENV_NAME="${APP_NAME}-test-$([ "${TARGET_NAME}" == "blue" ] && echo "green" || echo "blue")"
             if pm2 show ${OLD_ENV_NAME} > /dev/null 2>&1; then
               echo "Waiting 30 seconds before stopping old environment..."
@@ -166,7 +163,6 @@ jobs:
               pm2 stop ${OLD_ENV_NAME}
             fi
 
-            # Cleanup old releases (keep only the 5 most recent)
             echo "Cleaning up old releases..."
             cd ${BASE_DIR}/releases
             ls -t | tail -n +6 | xargs -r rm -rf
@@ -201,7 +197,8 @@ jobs:
 
       - name: Create deployment archive
         run: |
-          tar -czf deployment.tar.gz \
+          echo "Creating archive with public directory..."
+          tar -czvf deployment.tar.gz \
             --exclude=".git" \
             --exclude="node_modules" \
             .next/ public/ package.json package-lock.json .env next.config.js ecosystem.config.js
@@ -222,28 +219,23 @@ jobs:
           username: crmroot
           password: ${{ secrets.PROD_SERVER_PASSWORD }}
           script: |
-            # Load NVM
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 20.10.0
 
-            # Setup deployment variables
             APP_NAME="${{ secrets.REPO_NAME }}"
             BASE_DIR="frontend/prod-subdomain-soffcrm-uz-3132"
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-            # Blue-green deployment directories
             DEPLOY_DIR="${BASE_DIR}/releases/${TIMESTAMP}"
             BLUE_LINK="${BASE_DIR}/blue"
             GREEN_LINK="${BASE_DIR}/green"
             CURRENT_LINK="${BASE_DIR}/current"
 
-            # Create directory structure
             echo "Creating deployment directory structure..."
             mkdir -p ${BASE_DIR}/releases
             mkdir -p ${DEPLOY_DIR}
 
-            # Store git information separately from deployments
             GIT_DIR="${BASE_DIR}/repo"
             if [ -d "${GIT_DIR}" ]; then
               echo "Updating existing git repository..."
@@ -255,13 +247,11 @@ jobs:
               git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${APP_NAME}.git ${GIT_DIR}
             fi
 
-            # Copy git revision info to deployment
             cd ${GIT_DIR}
             GIT_REV=$(git rev-parse HEAD)
             GIT_BRANCH=$(git symbolic-ref --short HEAD)
             GIT_MESSAGE=$(git log -1 --pretty=%B)
 
-            # Create revision info file
             echo "Creating revision info file..."
             cat > ${DEPLOY_DIR}/REVISION.txt <<EOL
             Branch: ${GIT_BRANCH}
@@ -270,17 +260,28 @@ jobs:
             Deployed: $(date)
             EOL
 
-            # Extract pre-built files from the archive
             cd ${DEPLOY_DIR}
             echo "Extracting deployment archive..."
             tar -xzf /tmp/deployment.tar.gz
             rm -f /tmp/deployment.tar.gz
 
-            # Install production dependencies
+            echo "Verifying deployment contents..."
+            if [ -d "public" ]; then
+              echo "Public directory exists in deployment"
+              ls -la public/
+            else
+              echo "ERROR: Public directory is missing from deployment!"
+              ls -la
+            fi
+
             echo "Installing production dependencies..."
             npm ci --prefer-offline --no-audit --production --legacy-peer-deps
 
-            # Determine which environment (blue/green) is currently active
+            if [ ! -d "public" ] || [ -z "$(ls -A public 2>/dev/null)" ]; then
+              echo "Public directory missing or empty, copying from git repository..."
+              cp -r ${GIT_DIR}/public ./
+            fi
+
             if [ -L "${CURRENT_LINK}" ]; then
               CURRENT_ENV=$(basename $(readlink -f ${CURRENT_LINK}))
               if [[ "${CURRENT_ENV}" == "blue" ]]; then
@@ -291,20 +292,16 @@ jobs:
                 TARGET_NAME="blue"
               fi
             else
-              # Default to blue for first deployment
               TARGET_ENV="${BLUE_LINK}"
               TARGET_NAME="blue"
             fi
 
             echo "Targeting ${TARGET_NAME} environment for new deployment"
 
-            # Update the target environment link to the new release
             ln -sfn ${DEPLOY_DIR} ${TARGET_ENV}
 
-            # Start/reload the application with PM2
             PM2_NAME="prod-subdomain-soffcrm-uz-3132"
 
-            # Adjust ecosystem.config.js for the specific environment
             sed -i "s/name: \"${APP_NAME}-test\"/name: \"${PM2_NAME}\"/" ecosystem.config.js
 
             if pm2 show ${PM2_NAME} > /dev/null 2>&1; then
@@ -315,18 +312,14 @@ jobs:
               pm2 start ecosystem.config.js --only ${PM2_NAME}
             fi
 
-            # Wait for the new instance to fully start
             echo "Waiting for new instance to initialize (10 seconds)..."
             sleep 10
 
-            # Switch traffic to the new environment
             echo "Switching traffic to ${TARGET_NAME} environment"
             ln -sfn ${TARGET_ENV} ${CURRENT_LINK}
 
-            # Save PM2 configuration
             pm2 save
 
-            # Stop the old environment after a grace period if it exists
             OLD_ENV_NAME="${APP_NAME}-prod-$([ "${TARGET_NAME}" == "blue" ] && echo "green" || echo "blue")"
             if pm2 show ${OLD_ENV_NAME} > /dev/null 2>&1; then
               echo "Waiting 30 seconds before stopping old environment..."
@@ -335,7 +328,6 @@ jobs:
               pm2 stop ${OLD_ENV_NAME}
             fi
 
-            # Cleanup old releases (keep only the 5 most recent)
             echo "Cleaning up old releases..."
             cd ${BASE_DIR}/releases
             ls -t | tail -n +6 | xargs -r rm -rf
