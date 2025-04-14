@@ -43,7 +43,7 @@ export const getAttendanceTeacher = createAsyncThunk(
 export const getStudentsGrades = createAsyncThunk(
   'getStudentsGrades/getStudentsGrades',
   async ({ id, queryString }: { id: any; queryString?: string }) => {
-    const resp = await api.get(`common/group-student/rating/list/${id}/?${queryString}`);
+    const resp = await api.get(`common/group-student/rating/list/${id}/?${queryString}`)
     return resp.data
   }
 )
@@ -108,20 +108,21 @@ export const getResults = createAsyncThunk(
 const initialState: IGroupDetailsState = {
   courses: null,
   exams: null,
+  openDebtorsModal: false,
   open: null,
   groupData: null,
   smsTemps: null,
   teachers: null,
   isOpenDelete: null,
   students: null,
-  meet_link:null,
+  meet_link: null,
   attendance: null,
   grades: null,
   days: null,
-  onlineLessonLoading:false,
+  onlineLessonLoading: false,
   rooms: null,
   results: null,
-  updateStatusModal:null,
+  updateStatusModal: null,
   resultId: null,
   examStudentId: null,
   editData: null,
@@ -172,6 +173,9 @@ export const groupDetailsSlice = createSlice({
     },
     setGettingGroupDetails: (state, action) => {
       state.isGettingGroupDetails = action.payload
+    },
+    setOpenDebtorsModal: (state, action) => {
+      state.openDebtorsModal = action.payload
     },
     handleEditClickOpen: (state, action) => {
       state.openEdit = action.payload
@@ -311,6 +315,7 @@ export const {
   setOnlineLessonLoading,
   setOpenLeadModal,
   setDays,
+  setOpenDebtorsModal,
   setGettingGroupDetails
 } = groupDetailsSlice.actions
 

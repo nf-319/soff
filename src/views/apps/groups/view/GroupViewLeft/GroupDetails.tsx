@@ -11,6 +11,7 @@ import EditGroupModal from "../../EditGroupModal"
 import { getDashboardLessons, getGroupsDetails, handleOpenEdit } from "src/store/apps/groups"
 import api from "src/@core/utils/api"
 import GroupDetailsWrapper from "./GroupDetailsWrapper"
+import DebtorsModal from "../../DebtorsModal"
 
 
 export default function GroupDetails() {
@@ -64,6 +65,7 @@ export default function GroupDetails() {
         handleGetMeetLink={handleGetMeetLink}
       />
       <EditGroupModal />
+      <DebtorsModal/>
     </>
   )
 }
