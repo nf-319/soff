@@ -21,17 +21,18 @@ jobs:
           node-version: '20.10.0'
           cache: 'npm'
 
-      - name: Verify public directory before upload
+      - name: Verify localization files before upload
         run: |
-          echo "Checking public directory contents:"
-          ls -la public/
-          if [ -d "public/locales" ]; then
-            echo "Locales directory exists:"
-            ls -la public/locales/
-          else
-            echo "ERROR: public/locales directory missing!"
-            exit 1
-          fi
+          echo "Checking localization files:"
+          ls -la public/locales/
+          for lang in uz ru en; do
+            if [ -f "public/locales/$lang/common.json" ]; then
+              echo "Found $lang/common.json"
+            else
+              echo "ERROR: Missing $lang/common.json"
+              exit 1
+            fi
+          done
 
       - name: Upload repository to server
         uses: appleboy/scp-action@v0.1.4
@@ -63,58 +64,46 @@ jobs:
             GREEN_LINK="${BASE_DIR}/green"
             CURRENT_LINK="${BASE_DIR}/current"
 
-            # Create deployment directory structure
             mkdir -p ${BASE_DIR}/releases
             mkdir -p ${DEPLOY_DIR}
 
-            # Copy uploaded repository to deployment directory
             echo "Copying repository to deployment directory..."
             cp -R /tmp/repo-temp/* ${DEPLOY_DIR}/
             rm -rf /tmp/repo-temp
 
-            # Navigate to deployment directory
             cd ${DEPLOY_DIR}
-
-            # Create env file
             echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
 
-            # Debug: Check repository structure
             echo "Repository structure:"
             ls -la
-
-            # Debug: Check public directory
             echo "Public directory:"
             ls -la public/
+            echo "Locales directory:"
+            ls -la public/locales/
 
-            # Install dependencies
             echo "Installing dependencies..."
             npm ci
 
-            # Verify public directory before build
-            echo "Verifying public directory before build..."
-            if [ ! -d "public/locales" ]; then
-              echo "ERROR: public/locales directory missing!"
-              exit 1
-            fi
+            echo "Verifying localization files before build..."
+            for lang in uz ru en; do
+              if [ ! -f "public/locales/$lang/common.json" ]; then
+                echo "ERROR: Missing public/locales/$lang/common.json"
+                exit 1
+              fi
+            done
 
-            # Build application
             echo "Building application..."
             npm run build
 
-            # Debug: Check build output
             echo "Build output:"
             ls -la .next/
-
-            # Debug: Verify static assets
-            echo "Static assets after build:"
+            echo "Static assets:"
             ls -la .next/static/
 
-            # Install production dependencies
             echo "Installing production dependencies..."
             rm -rf node_modules
             npm ci --prefer-offline --no-audit --production --legacy-peer-deps
 
-            # Determine target environment (blue/green)
             if [ -L "${CURRENT_LINK}" ] && [ -e "${CURRENT_LINK}" ]; then
               CURRENT_ENV=$(basename $(readlink -f ${CURRENT_LINK}))
               if [[ "${CURRENT_ENV}" == "blue" ]]; then
@@ -129,33 +118,23 @@ jobs:
               TARGET_NAME="blue"
             fi
 
-            echo "Targeting ${TARGET_NAME} environment for new deployment"
             ln -sfn ${DEPLOY_DIR} ${TARGET_ENV}
 
-            # Update PM2 name in ecosystem config
             PM2_NAME="test-subdomain-soffcrm-uz-3132"
             sed -i "s/name: \"${APP_NAME}-test\"/name: \"${PM2_NAME}\"/" ecosystem.config.js
 
-            # Start or reload PM2 process
             if pm2 show ${PM2_NAME} > /dev/null 2>&1; then
-              echo "Reloading ${PM2_NAME} with new deployment..."
+              echo "Reloading ${PM2_NAME}..."
               pm2 reload ecosystem.config.js --only ${PM2_NAME} --update-env
             else
-              echo "Starting new PM2 process: ${PM2_NAME}"
+              echo "Starting ${PM2_NAME}..."
               pm2 start ecosystem.config.js --only ${PM2_NAME}
             fi
 
-            # Wait for app to initialize
-            echo "Waiting for service initialization (5 seconds)..."
             sleep 5
-
-            # Switch traffic to new environment
-            echo "Switching traffic to ${TARGET_NAME} environment"
             ln -sfn ${TARGET_ENV} ${CURRENT_LINK}
             pm2 save
 
-            # Clean up old releases (keep only 5 most recent)
-            echo "Cleaning up old releases..."
             cd ${BASE_DIR}/releases
             ls -t | tail -n +6 | xargs -r rm -rf
 

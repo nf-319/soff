@@ -8,12 +8,12 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
+    debug: process.env.NODE_ENV === 'development',
     lng: 'uz',
     backend: {
       loadPath: '/locales/{{lng}}.json'
     },
     fallbackLng: 'uz',
-    debug: false,
     keySeparator: false,
     react: {
       useSuspense: false
