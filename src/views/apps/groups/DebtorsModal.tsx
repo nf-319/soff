@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  Input,
   TextField,
   Typography
 } from '@mui/material'
@@ -20,7 +19,7 @@ export default function DebtorsModal() {
   const { openDebtorsModal } = useAppSelector(state => state.groupDetails)
   const [isEditing, setIsEditing] = useState(false)
   const [amount, setAmount] = useState('300 000')
-  const [date] = useState('12/04/2024') 
+  const [date] = useState('12/04/2024')
 
   const handleSave = () => {
     setIsEditing(false)
