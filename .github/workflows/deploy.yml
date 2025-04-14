@@ -43,15 +43,17 @@ jobs:
 
       - name: Create deployment archive
         run: |
-          echo "Creating archive with public directory..."
-          # Ensure public directory exists before packaging
-          mkdir -p public
-          # Create separate archive for public directory to ensure it's transferred
-          tar -czvf public_dir.tar.gz public/
+          # Check public directory existence
+          if [ ! -d "public" ]; then
+            echo "WARNING: Public directory not found! Creating an empty one for now."
+            mkdir -p public
+          fi
+
+          # Create deployment archive including public directory
           tar -czvf deployment.tar.gz \
             --exclude=".git" \
             --exclude="node_modules" \
-            .next/ package.json package-lock.json .env next.config.js ecosystem.config.js
+            .next/ package.json package-lock.json .env next.config.js ecosystem.config.js public/
 
       - name: Upload build files to server
         uses: appleboy/scp-action@v0.1.4
@@ -59,7 +61,7 @@ jobs:
           host: ${{ secrets.TEST_SERVER_IP }}
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
-          source: "deployment.tar.gz,public_dir.tar.gz"
+          source: "deployment.tar.gz"
           target: "/tmp"
 
       - name: Deploy to test server with blue-green deployment
@@ -102,6 +104,14 @@ jobs:
             GIT_BRANCH=$(git symbolic-ref --short HEAD)
             GIT_MESSAGE=$(git log -1 --pretty=%B)
 
+            # Check if public directory exists in repo
+            if [ ! -d "public" ]; then
+              echo "WARNING: Public directory not found in repository!"
+            else
+              echo "Public directory found in repository:"
+              ls -la public/
+            fi
+
             echo "Creating revision info file..."
             cat > ${DEPLOY_DIR}/REVISION.txt <<EOL
             Branch: ${GIT_BRANCH}
@@ -115,21 +125,15 @@ jobs:
             tar -xzf /tmp/deployment.tar.gz
             rm -f /tmp/deployment.tar.gz
 
-            # Extract public directory archive
-            echo "Extracting public directory archive..."
-            tar -xzf /tmp/public_dir.tar.gz
-            rm -f /tmp/public_dir.tar.gz
-
             echo "Verifying deployment contents..."
             if [ -d "public" ]; then
               echo "Public directory exists in deployment"
               ls -la public/
             else
-              echo "Public directory still missing after extraction! Copying from git repository..."
-              # Force copy public directory from git repository
-              cp -r ${GIT_DIR}/public ./
+              echo "Public directory missing after extraction! Copying from git repository..."
+              mkdir -p public
+              cp -r ${GIT_DIR}/public/* ./public/
               echo "After copying from git repository:"
-              ls -la
               ls -la public/
             fi
 
@@ -227,15 +231,17 @@ jobs:
 
       - name: Create deployment archive
         run: |
-          echo "Creating archive with public directory..."
-          # Ensure public directory exists before packaging
-          mkdir -p public
-          # Create separate archive for public directory to ensure it's transferred
-          tar -czvf public_dir.tar.gz public/
+          # Check public directory existence
+          if [ ! -d "public" ]; then
+            echo "WARNING: Public directory not found! Creating an empty one for now."
+            mkdir -p public
+          fi
+
+          # Create deployment archive including public directory
           tar -czvf deployment.tar.gz \
             --exclude=".git" \
             --exclude="node_modules" \
-            .next/ package.json package-lock.json .env next.config.js ecosystem.config.js
+            .next/ package.json package-lock.json .env next.config.js ecosystem.config.js public/
 
       - name: Upload build files to server
         uses: appleboy/scp-action@v0.1.4
@@ -243,7 +249,7 @@ jobs:
           host: ${{ secrets.PROD_SERVER_IP }}
           username: crmroot
           password: ${{ secrets.PROD_SERVER_PASSWORD }}
-          source: "deployment.tar.gz,public_dir.tar.gz"
+          source: "deployment.tar.gz"
           target: "/tmp"
 
       - name: Deploy to production server with blue-green deployment
@@ -286,6 +292,14 @@ jobs:
             GIT_BRANCH=$(git symbolic-ref --short HEAD)
             GIT_MESSAGE=$(git log -1 --pretty=%B)
 
+            # Check if public directory exists in repo
+            if [ ! -d "public" ]; then
+              echo "WARNING: Public directory not found in repository!"
+            else
+              echo "Public directory found in repository:"
+              ls -la public/
+            fi
+
             echo "Creating revision info file..."
             cat > ${DEPLOY_DIR}/REVISION.txt <<EOL
             Branch: ${GIT_BRANCH}
@@ -299,21 +313,15 @@ jobs:
             tar -xzf /tmp/deployment.tar.gz
             rm -f /tmp/deployment.tar.gz
 
-            # Extract public directory archive
-            echo "Extracting public directory archive..."
-            tar -xzf /tmp/public_dir.tar.gz
-            rm -f /tmp/public_dir.tar.gz
-
             echo "Verifying deployment contents..."
             if [ -d "public" ]; then
               echo "Public directory exists in deployment"
               ls -la public/
             else
-              echo "Public directory still missing after extraction! Copying from git repository..."
-              # Force copy public directory from git repository
-              cp -r ${GIT_DIR}/public ./
+              echo "Public directory missing after extraction! Copying from git repository..."
+              mkdir -p public
+              cp -r ${GIT_DIR}/public/* ./public/
               echo "After copying from git repository:"
-              ls -la
               ls -la public/
             fi
 
