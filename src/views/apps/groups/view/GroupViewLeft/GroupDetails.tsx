@@ -63,7 +63,7 @@ export default function GroupDetails() {
         handleEditClickOpen={(type: any) => dispatch(handleEditClickOpen(type))}
         handleGetMeetLink={handleGetMeetLink}
       />
-      <EditGroupModal />
+      <EditGroupModal  />
     </>
   )
 }

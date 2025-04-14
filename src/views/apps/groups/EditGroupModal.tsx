@@ -13,7 +13,7 @@ import {
   updateGroup,
   updateFormParams,
   updateParams,
-  getMetaData, setRoomsData
+  getMetaData,
 } from 'src/store/apps/groups'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { useTranslation } from 'react-i18next'
@@ -37,10 +37,10 @@ import {
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
 import { useQueryClient } from '@tanstack/react-query'
 import ceoConfigs from 'src/configs/ceo'
-import { setTeacherData } from '../../../store/apps/mentors'
+import { setTeacherData } from '@store/apps/mentors'
 import api from '../../../@core/utils/api'
-import { useGet } from '../../../hooks/useApi'
-import { Endpoints } from '../../../hooks/endpoints'
+import { useGet } from '@hooks/useApi'
+import { Endpoints } from '@hooks/endpoints'
 
 export default function EditGroupModal() {
   const {
@@ -440,7 +440,7 @@ export default function EditGroupModal() {
                     value={formik.values.teacher}
                     error={!!formik.errors.teacher && formik.touched.teacher}
                   >
-                    {teachersData?.results.map(teacher => (
+                    {teachersData?.map(teacher => (
                       <MenuItem key={teacher.id} value={+teacher?.id}>
                         {teacher.first_name}
                       </MenuItem>
