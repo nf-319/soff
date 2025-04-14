@@ -55,7 +55,6 @@ export default function StudentsPage() {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const querySearch = new URLSearchParams(window.location.search).get('q')
   const { search, ...filteredParams } = queryParams
-
   const queryString = new URLSearchParams(
     Object.fromEntries(
       Object.entries({ ...filteredParams, ...(querySearch ? { search: querySearch } : { search: '' }) })
