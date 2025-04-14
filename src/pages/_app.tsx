@@ -29,6 +29,7 @@ import { Providers } from '../providers'
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import 'src/iconify-bundle/icons-bundle-react';
 import './globals.css';
+import { Toaster as SonnetToaster } from 'sonner'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -91,12 +92,14 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
                           <Guard authGuard={authGuard} guestGuard={guestGuard}>
                             <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
                               {getLayout(<Component {...pageProps} />)}
+
                             </AclGuard>
                           </Guard>
                         </WindowWrapper>
                         <ReactHotToast>
                           <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
                         </ReactHotToast>
+                        <SonnetToaster richColors position="top-right" />
                       </ThemeComponent>
                     )
                   }}

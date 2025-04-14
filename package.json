@@ -62,6 +62,7 @@
     "react-qr-reader": "^3.0.0-beta-1",
     "react-redux": "8.0.4",
     "rsuite": "^5.62.1",
+    "sonner": "2.0.3",
     "stylis-plugin-rtl": "2.1.1",
     "typewriter-effect": "^2.21.0",
     "uuid": "^11.0.5",
