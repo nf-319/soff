@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Full history for better versioning
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -32,22 +30,23 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Verify public directory for localization
+      - name: Debug directories
         run: |
-          if [ -d "public/locales" ]; then
-            echo "✅ Localization directory exists:"
-            ls -la public/locales/
-          else
-            echo "⚠️ Warning: Localization directory not found in public/"
-            ls -la public/
-          fi
+          echo "Content of root directory:"
+          ls -la
+          echo "Content of public directory:"
+          ls -la public/ || echo "Public directory not found"
+          echo "Content of .next directory:"
+          ls -la .next/ || echo ".next directory not found"
 
       - name: Create deployment archive
         run: |
-          # Create a single comprehensive archive including public directory
+          # Make sure we include BOTH .next and public directories explicitly
+          echo "Creating comprehensive deployment archive..."
           tar -czvf deployment.tar.gz \
             --exclude=".git" \
             --exclude="node_modules" \
+            --exclude="src" \
             .next/ package.json package-lock.json .env next.config.js ecosystem.config.js public/
 
       - name: Upload build files to server
@@ -59,7 +58,7 @@ jobs:
           source: "deployment.tar.gz"
           target: "/tmp"
 
-      - name: Deploy to test server with blue-green deployment
+      - name: Deploy to test server
         uses: appleboy/ssh-action@v0.1.2
         with:
           host: ${{ secrets.TEST_SERVER_IP }}
@@ -82,20 +81,26 @@ jobs:
             mkdir -p ${BASE_DIR}/releases
             mkdir -p ${DEPLOY_DIR}
 
-            # Extract deployment archive with public directory
+            # Extract deployment archive
             cd ${DEPLOY_DIR}
             echo "Extracting deployment archive..."
             tar -xzf /tmp/deployment.tar.gz
             rm -f /tmp/deployment.tar.gz
 
-            # Verify localization directory exists
-            echo "Checking localization files..."
+            # Debug deployment contents
+            echo "Deployed files:"
+            ls -la
+            echo "Public directory contents:"
+            ls -la public/ || echo "Public directory missing after extraction!"
+            echo ".next directory contents:"
+            ls -la .next/ || echo ".next directory missing after extraction!"
+
+            # Check for localization files specifically
             if [ -d "public/locales" ]; then
-              echo "✅ Localization directory exists in deployment:"
+              echo "Localization directory exists:"
               ls -la public/locales/
             else
-              echo "⚠️ Warning: Localization directory not found in deployment"
-              ls -la public/
+              echo "WARNING: Localization directory not found in deployed files!"
             fi
 
             # Install production dependencies
@@ -120,6 +125,17 @@ jobs:
             echo "Targeting ${TARGET_NAME} environment for new deployment"
             ln -sfn ${DEPLOY_DIR} ${TARGET_ENV}
 
+            # Ensure the public directory is properly copied to the deployment directory
+            echo "Verifying public directory structure..."
+            if [ ! -d "public" ]; then
+              echo "Public directory missing in deployment, creating it..."
+              mkdir -p public
+            fi
+
+            # Ensure NextJS can find static files in the correct location
+            echo "Checking next.config.js settings..."
+            grep -q "distDir" next.config.js || echo "Note: No custom distDir found in next.config.js"
+
             # Update PM2 name in ecosystem config
             PM2_NAME="test-subdomain-soffcrm-uz-3132"
             sed -i "s/name: \"${APP_NAME}-test\"/name: \"${PM2_NAME}\"/" ecosystem.config.js
@@ -134,20 +150,13 @@ jobs:
             fi
 
             # Wait for app to initialize
-            echo "Waiting for service initialization (10 seconds)..."
-            sleep 10
+            echo "Waiting for service initialization (5 seconds)..."
+            sleep 5
 
             # Switch traffic to new environment
             echo "Switching traffic to ${TARGET_NAME} environment"
             ln -sfn ${TARGET_ENV} ${CURRENT_LINK}
             pm2 save
-
-            # Create revision info file
-            cat > ${DEPLOY_DIR}/REVISION.txt <<EOL
-            Branch: test
-            Deployed: $(date)
-            Environment: ${TARGET_NAME}
-            EOL
 
             # Clean up old releases (keep only 5 most recent)
             echo "Cleaning up old releases..."
@@ -164,8 +173,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Full history for better versioning
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -182,22 +189,23 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Verify public directory for localization
+      - name: Debug directories
         run: |
-          if [ -d "public/locales" ]; then
-            echo "✅ Localization directory exists:"
-            ls -la public/locales/
-          else
-            echo "⚠️ Warning: Localization directory not found in public/"
-            ls -la public/
-          fi
+          echo "Content of root directory:"
+          ls -la
+          echo "Content of public directory:"
+          ls -la public/ || echo "Public directory not found"
+          echo "Content of .next directory:"
+          ls -la .next/ || echo ".next directory not found"
 
       - name: Create deployment archive
         run: |
-          # Create a single comprehensive archive including public directory
+          # Make sure we include BOTH .next and public directories explicitly
+          echo "Creating comprehensive deployment archive..."
           tar -czvf deployment.tar.gz \
             --exclude=".git" \
             --exclude="node_modules" \
+            --exclude="src" \
             .next/ package.json package-lock.json .env next.config.js ecosystem.config.js public/
 
       - name: Upload build files to server
@@ -209,7 +217,7 @@ jobs:
           source: "deployment.tar.gz"
           target: "/tmp"
 
-      - name: Deploy to production server with blue-green deployment
+      - name: Deploy to production server
         uses: appleboy/ssh-action@v0.1.2
         with:
           host: ${{ secrets.PROD_SERVER_IP }}
@@ -232,20 +240,26 @@ jobs:
             mkdir -p ${BASE_DIR}/releases
             mkdir -p ${DEPLOY_DIR}
 
-            # Extract deployment archive with public directory
+            # Extract deployment archive
             cd ${DEPLOY_DIR}
             echo "Extracting deployment archive..."
             tar -xzf /tmp/deployment.tar.gz
             rm -f /tmp/deployment.tar.gz
 
-            # Verify localization directory exists
-            echo "Checking localization files..."
+            # Debug deployment contents
+            echo "Deployed files:"
+            ls -la
+            echo "Public directory contents:"
+            ls -la public/ || echo "Public directory missing after extraction!"
+            echo ".next directory contents:"
+            ls -la .next/ || echo ".next directory missing after extraction!"
+
+            # Check for localization files specifically
             if [ -d "public/locales" ]; then
-              echo "✅ Localization directory exists in deployment:"
+              echo "Localization directory exists:"
               ls -la public/locales/
             else
-              echo "⚠️ Warning: Localization directory not found in deployment"
-              ls -la public/
+              echo "WARNING: Localization directory not found in deployed files!"
             fi
 
             # Install production dependencies
@@ -270,6 +284,17 @@ jobs:
             echo "Targeting ${TARGET_NAME} environment for new deployment"
             ln -sfn ${DEPLOY_DIR} ${TARGET_ENV}
 
+            # Ensure the public directory is properly copied to the deployment directory
+            echo "Verifying public directory structure..."
+            if [ ! -d "public" ]; then
+              echo "Public directory missing in deployment, creating it..."
+              mkdir -p public
+            fi
+
+            # Ensure NextJS can find static files in the correct location
+            echo "Checking next.config.js settings..."
+            grep -q "distDir" next.config.js || echo "Note: No custom distDir found in next.config.js"
+
             # Update PM2 name in ecosystem config
             PM2_NAME="prod-subdomain-soffcrm-uz-3132"
             sed -i "s/name: \"${APP_NAME}-test\"/name: \"${PM2_NAME}\"/" ecosystem.config.js
@@ -284,20 +309,13 @@ jobs:
             fi
 
             # Wait for app to initialize
-            echo "Waiting for service initialization (10 seconds)..."
-            sleep 10
+            echo "Waiting for service initialization (5 seconds)..."
+            sleep 5
 
             # Switch traffic to new environment
             echo "Switching traffic to ${TARGET_NAME} environment"
             ln -sfn ${TARGET_ENV} ${CURRENT_LINK}
             pm2 save
-
-            # Create revision info file
-            cat > ${DEPLOY_DIR}/REVISION.txt <<EOL
-            Branch: main
-            Deployed: $(date)
-            Environment: ${TARGET_NAME}
-            EOL
 
             # Clean up old releases (keep only 5 most recent)
             echo "Cleaning up old releases..."
