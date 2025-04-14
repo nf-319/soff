@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Full history for better versioning
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -27,31 +29,26 @@ jobs:
       - name: Create env file
         run: echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
 
-      - name: Build application locally
+      - name: Build application
         run: npm run build
 
-      - name: Debug project structure
+      - name: Verify public directory for localization
         run: |
-          echo "Current directory structure before packaging:"
-          ls -la
-          echo "Public directory contents:"
-          if [ -d "public" ]; then
-            ls -la public/
+          if [ -d "public/locales" ]; then
+            echo "✅ Localization directory exists:"
+            ls -la public/locales/
           else
-            echo "Public directory doesn't exist in source project!"
+            echo "⚠️ Warning: Localization directory not found in public/"
+            ls -la public/
           fi
 
       - name: Create deployment archive
         run: |
-          echo "Creating archive with public directory..."
-          # Ensure public directory exists before packaging
-          mkdir -p public
-          # Create separate archive for public directory to ensure it's transferred
-          tar -czvf public_dir.tar.gz public/
+          # Create a single comprehensive archive including public directory
           tar -czvf deployment.tar.gz \
             --exclude=".git" \
             --exclude="node_modules" \
-            .next/ package.json package-lock.json .env next.config.js ecosystem.config.js
+            .next/ package.json package-lock.json .env next.config.js ecosystem.config.js public/
 
       - name: Upload build files to server
         uses: appleboy/scp-action@v0.1.4
@@ -59,7 +56,7 @@ jobs:
           host: ${{ secrets.TEST_SERVER_IP }}
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
-          source: "deployment.tar.gz,public_dir.tar.gz"
+          source: "deployment.tar.gz"
           target: "/tmp"
 
       - name: Deploy to test server with blue-green deployment
@@ -74,69 +71,39 @@ jobs:
             nvm use 20.10.0
 
             APP_NAME="${{ secrets.REPO_NAME }}"
-            BASE_DIR="frontend/test-subdomain-soffcrm-uz-3131"
+            BASE_DIR="frontend/test-subdomain-soffcrm-uz-3132"
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-
             DEPLOY_DIR="${BASE_DIR}/releases/${TIMESTAMP}"
             BLUE_LINK="${BASE_DIR}/blue"
             GREEN_LINK="${BASE_DIR}/green"
             CURRENT_LINK="${BASE_DIR}/current"
 
-            echo "Creating deployment directory structure..."
+            # Create deployment directory structure
             mkdir -p ${BASE_DIR}/releases
             mkdir -p ${DEPLOY_DIR}
 
-            GIT_DIR="${BASE_DIR}/repo"
-            if [ -d "${GIT_DIR}" ]; then
-              echo "Updating existing git repository..."
-              cd ${GIT_DIR}
-              git fetch origin test
-              git reset --hard origin/test
-            else
-              echo "Cloning repository..."
-              git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${APP_NAME}.git ${GIT_DIR}
-            fi
-
-            cd ${GIT_DIR}
-            GIT_REV=$(git rev-parse HEAD)
-            GIT_BRANCH=$(git symbolic-ref --short HEAD)
-            GIT_MESSAGE=$(git log -1 --pretty=%B)
-
-            echo "Creating revision info file..."
-            cat > ${DEPLOY_DIR}/REVISION.txt <<EOL
-            Branch: ${GIT_BRANCH}
-            Commit: ${GIT_REV}
-            Message: ${GIT_MESSAGE}
-            Deployed: $(date)
-            EOL
-
+            # Extract deployment archive with public directory
             cd ${DEPLOY_DIR}
             echo "Extracting deployment archive..."
             tar -xzf /tmp/deployment.tar.gz
             rm -f /tmp/deployment.tar.gz
 
-            # Extract public directory archive
-            echo "Extracting public directory archive..."
-            tar -xzf /tmp/public_dir.tar.gz
-            rm -f /tmp/public_dir.tar.gz
-
-            echo "Verifying deployment contents..."
-            if [ -d "public" ]; then
-              echo "Public directory exists in deployment"
-              ls -la public/
+            # Verify localization directory exists
+            echo "Checking localization files..."
+            if [ -d "public/locales" ]; then
+              echo "✅ Localization directory exists in deployment:"
+              ls -la public/locales/
             else
-              echo "Public directory still missing after extraction! Copying from git repository..."
-              # Force copy public directory from git repository
-              cp -r ${GIT_DIR}/public ./
-              echo "After copying from git repository:"
-              ls -la
+              echo "⚠️ Warning: Localization directory not found in deployment"
               ls -la public/
             fi
 
+            # Install production dependencies
             echo "Installing production dependencies..."
             npm ci --prefer-offline --no-audit --production --legacy-peer-deps
 
-            if [ -L "${CURRENT_LINK}" ]; then
+            # Determine target environment (blue/green)
+            if [ -L "${CURRENT_LINK}" ] && [ -e "${CURRENT_LINK}" ]; then
               CURRENT_ENV=$(basename $(readlink -f ${CURRENT_LINK}))
               if [[ "${CURRENT_ENV}" == "blue" ]]; then
                 TARGET_ENV="${GREEN_LINK}"
@@ -151,45 +118,44 @@ jobs:
             fi
 
             echo "Targeting ${TARGET_NAME} environment for new deployment"
-
             ln -sfn ${DEPLOY_DIR} ${TARGET_ENV}
 
+            # Update PM2 name in ecosystem config
             PM2_NAME="test-subdomain-soffcrm-uz-3132"
-
             sed -i "s/name: \"${APP_NAME}-test\"/name: \"${PM2_NAME}\"/" ecosystem.config.js
 
+            # Start or reload PM2 process
             if pm2 show ${PM2_NAME} > /dev/null 2>&1; then
-              echo "Reloading ${TARGET_NAME} environment with new deployment"
+              echo "Reloading ${PM2_NAME} with new deployment..."
               pm2 reload ecosystem.config.js --only ${PM2_NAME} --update-env
             else
-              echo "Starting new ${TARGET_NAME} environment"
+              echo "Starting new PM2 process: ${PM2_NAME}"
               pm2 start ecosystem.config.js --only ${PM2_NAME}
             fi
 
-            echo "Waiting for new instance to initialize (10 seconds)..."
+            # Wait for app to initialize
+            echo "Waiting for service initialization (10 seconds)..."
             sleep 10
 
+            # Switch traffic to new environment
             echo "Switching traffic to ${TARGET_NAME} environment"
             ln -sfn ${TARGET_ENV} ${CURRENT_LINK}
-
             pm2 save
 
-            OLD_ENV_NAME="${APP_NAME}-test-$([ "${TARGET_NAME}" == "blue" ] && echo "green" || echo "blue")"
-            if pm2 show ${OLD_ENV_NAME} > /dev/null 2>&1; then
-              echo "Waiting 30 seconds before stopping old environment..."
-              sleep 30
-              echo "Stopping old environment: ${OLD_ENV_NAME}"
-              pm2 stop ${OLD_ENV_NAME}
-            fi
+            # Create revision info file
+            cat > ${DEPLOY_DIR}/REVISION.txt <<EOL
+            Branch: test
+            Deployed: $(date)
+            Environment: ${TARGET_NAME}
+            EOL
 
+            # Clean up old releases (keep only 5 most recent)
             echo "Cleaning up old releases..."
             cd ${BASE_DIR}/releases
             ls -t | tail -n +6 | xargs -r rm -rf
 
             echo "Deployment completed successfully!"
             echo "Current environment: ${TARGET_NAME}"
-            echo "Deployed commit: ${GIT_REV}"
-            echo "Commit message: ${GIT_MESSAGE}"
 
   build-and-deploy-production:
     runs-on: ubuntu-latest
@@ -198,6 +164,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Full history for better versioning
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -211,31 +179,26 @@ jobs:
       - name: Create env file
         run: echo "${{ secrets.PROD_ENV_CONTENT }}" > .env
 
-      - name: Build application locally
+      - name: Build application
         run: npm run build
 
-      - name: Debug project structure
+      - name: Verify public directory for localization
         run: |
-          echo "Current directory structure before packaging:"
-          ls -la
-          echo "Public directory contents:"
-          if [ -d "public" ]; then
-            ls -la public/
+          if [ -d "public/locales" ]; then
+            echo "✅ Localization directory exists:"
+            ls -la public/locales/
           else
-            echo "Public directory doesn't exist in source project!"
+            echo "⚠️ Warning: Localization directory not found in public/"
+            ls -la public/
           fi
 
       - name: Create deployment archive
         run: |
-          echo "Creating archive with public directory..."
-          # Ensure public directory exists before packaging
-          mkdir -p public
-          # Create separate archive for public directory to ensure it's transferred
-          tar -czvf public_dir.tar.gz public/
+          # Create a single comprehensive archive including public directory
           tar -czvf deployment.tar.gz \
             --exclude=".git" \
             --exclude="node_modules" \
-            .next/ package.json package-lock.json .env next.config.js ecosystem.config.js
+            .next/ package.json package-lock.json .env next.config.js ecosystem.config.js public/
 
       - name: Upload build files to server
         uses: appleboy/scp-action@v0.1.4
@@ -243,7 +206,7 @@ jobs:
           host: ${{ secrets.PROD_SERVER_IP }}
           username: crmroot
           password: ${{ secrets.PROD_SERVER_PASSWORD }}
-          source: "deployment.tar.gz,public_dir.tar.gz"
+          source: "deployment.tar.gz"
           target: "/tmp"
 
       - name: Deploy to production server with blue-green deployment
@@ -260,67 +223,37 @@ jobs:
             APP_NAME="${{ secrets.REPO_NAME }}"
             BASE_DIR="frontend/prod-subdomain-soffcrm-uz-3132"
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-
             DEPLOY_DIR="${BASE_DIR}/releases/${TIMESTAMP}"
             BLUE_LINK="${BASE_DIR}/blue"
             GREEN_LINK="${BASE_DIR}/green"
             CURRENT_LINK="${BASE_DIR}/current"
 
-            echo "Creating deployment directory structure..."
+            # Create deployment directory structure
             mkdir -p ${BASE_DIR}/releases
             mkdir -p ${DEPLOY_DIR}
 
-            GIT_DIR="${BASE_DIR}/repo"
-            if [ -d "${GIT_DIR}" ]; then
-              echo "Updating existing git repository..."
-              cd ${GIT_DIR}
-              git fetch origin main
-              git reset --hard origin/main
-            else
-              echo "Cloning repository..."
-              git clone --branch main https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${APP_NAME}.git ${GIT_DIR}
-            fi
-
-            cd ${GIT_DIR}
-            GIT_REV=$(git rev-parse HEAD)
-            GIT_BRANCH=$(git symbolic-ref --short HEAD)
-            GIT_MESSAGE=$(git log -1 --pretty=%B)
-
-            echo "Creating revision info file..."
-            cat > ${DEPLOY_DIR}/REVISION.txt <<EOL
-            Branch: ${GIT_BRANCH}
-            Commit: ${GIT_REV}
-            Message: ${GIT_MESSAGE}
-            Deployed: $(date)
-            EOL
-
+            # Extract deployment archive with public directory
             cd ${DEPLOY_DIR}
             echo "Extracting deployment archive..."
             tar -xzf /tmp/deployment.tar.gz
             rm -f /tmp/deployment.tar.gz
 
-            # Extract public directory archive
-            echo "Extracting public directory archive..."
-            tar -xzf /tmp/public_dir.tar.gz
-            rm -f /tmp/public_dir.tar.gz
-
-            echo "Verifying deployment contents..."
-            if [ -d "public" ]; then
-              echo "Public directory exists in deployment"
-              ls -la public/
+            # Verify localization directory exists
+            echo "Checking localization files..."
+            if [ -d "public/locales" ]; then
+              echo "✅ Localization directory exists in deployment:"
+              ls -la public/locales/
             else
-              echo "Public directory still missing after extraction! Copying from git repository..."
-              # Force copy public directory from git repository
-              cp -r ${GIT_DIR}/public ./
-              echo "After copying from git repository:"
-              ls -la
+              echo "⚠️ Warning: Localization directory not found in deployment"
               ls -la public/
             fi
 
+            # Install production dependencies
             echo "Installing production dependencies..."
             npm ci --prefer-offline --no-audit --production --legacy-peer-deps
 
-            if [ -L "${CURRENT_LINK}" ]; then
+            # Determine target environment (blue/green)
+            if [ -L "${CURRENT_LINK}" ] && [ -e "${CURRENT_LINK}" ]; then
               CURRENT_ENV=$(basename $(readlink -f ${CURRENT_LINK}))
               if [[ "${CURRENT_ENV}" == "blue" ]]; then
                 TARGET_ENV="${GREEN_LINK}"
@@ -335,42 +268,41 @@ jobs:
             fi
 
             echo "Targeting ${TARGET_NAME} environment for new deployment"
-
             ln -sfn ${DEPLOY_DIR} ${TARGET_ENV}
 
+            # Update PM2 name in ecosystem config
             PM2_NAME="prod-subdomain-soffcrm-uz-3132"
-
             sed -i "s/name: \"${APP_NAME}-test\"/name: \"${PM2_NAME}\"/" ecosystem.config.js
 
+            # Start or reload PM2 process
             if pm2 show ${PM2_NAME} > /dev/null 2>&1; then
-              echo "Reloading ${TARGET_NAME} environment with new deployment"
+              echo "Reloading ${PM2_NAME} with new deployment..."
               pm2 reload ecosystem.config.js --only ${PM2_NAME} --update-env
             else
-              echo "Starting new ${TARGET_NAME} environment"
+              echo "Starting new PM2 process: ${PM2_NAME}"
               pm2 start ecosystem.config.js --only ${PM2_NAME}
             fi
 
-            echo "Waiting for new instance to initialize (10 seconds)..."
+            # Wait for app to initialize
+            echo "Waiting for service initialization (10 seconds)..."
             sleep 10
 
+            # Switch traffic to new environment
             echo "Switching traffic to ${TARGET_NAME} environment"
             ln -sfn ${TARGET_ENV} ${CURRENT_LINK}
-
             pm2 save
 
-            OLD_ENV_NAME="${APP_NAME}-prod-$([ "${TARGET_NAME}" == "blue" ] && echo "green" || echo "blue")"
-            if pm2 show ${OLD_ENV_NAME} > /dev/null 2>&1; then
-              echo "Waiting 30 seconds before stopping old environment..."
-              sleep 30
-              echo "Stopping old environment: ${OLD_ENV_NAME}"
-              pm2 stop ${OLD_ENV_NAME}
-            fi
+            # Create revision info file
+            cat > ${DEPLOY_DIR}/REVISION.txt <<EOL
+            Branch: main
+            Deployed: $(date)
+            Environment: ${TARGET_NAME}
+            EOL
 
+            # Clean up old releases (keep only 5 most recent)
             echo "Cleaning up old releases..."
             cd ${BASE_DIR}/releases
             ls -t | tail -n +6 | xargs -r rm -rf
 
             echo "Deployment completed successfully!"
             echo "Current environment: ${TARGET_NAME}"
-            echo "Deployed commit: ${GIT_REV}"
-            echo "Commit message: ${GIT_MESSAGE}"
