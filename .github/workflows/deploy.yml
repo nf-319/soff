@@ -30,13 +30,28 @@ jobs:
       - name: Build application locally
         run: npm run build
 
+      - name: Debug project structure
+        run: |
+          echo "Current directory structure before packaging:"
+          ls -la
+          echo "Public directory contents:"
+          if [ -d "public" ]; then
+            ls -la public/
+          else
+            echo "Public directory doesn't exist in source project!"
+          fi
+
       - name: Create deployment archive
         run: |
           echo "Creating archive with public directory..."
+          # Ensure public directory exists before packaging
+          mkdir -p public
+          # Create separate archive for public directory to ensure it's transferred
+          tar -czvf public_dir.tar.gz public/
           tar -czvf deployment.tar.gz \
             --exclude=".git" \
             --exclude="node_modules" \
-            .next/ public/ package.json package-lock.json .env next.config.js ecosystem.config.js
+            .next/ package.json package-lock.json .env next.config.js ecosystem.config.js
 
       - name: Upload build files to server
         uses: appleboy/scp-action@v0.1.4
@@ -44,7 +59,7 @@ jobs:
           host: ${{ secrets.TEST_SERVER_IP }}
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
-          source: "deployment.tar.gz"
+          source: "deployment.tar.gz,public_dir.tar.gz"
           target: "/tmp"
 
       - name: Deploy to test server with blue-green deployment
@@ -100,22 +115,26 @@ jobs:
             tar -xzf /tmp/deployment.tar.gz
             rm -f /tmp/deployment.tar.gz
 
+            # Extract public directory archive
+            echo "Extracting public directory archive..."
+            tar -xzf /tmp/public_dir.tar.gz
+            rm -f /tmp/public_dir.tar.gz
+
             echo "Verifying deployment contents..."
             if [ -d "public" ]; then
               echo "Public directory exists in deployment"
               ls -la public/
             else
-              echo "ERROR: Public directory is missing from deployment!"
+              echo "Public directory still missing after extraction! Copying from git repository..."
+              # Force copy public directory from git repository
+              cp -r ${GIT_DIR}/public ./
+              echo "After copying from git repository:"
               ls -la
+              ls -la public/
             fi
 
             echo "Installing production dependencies..."
             npm ci --prefer-offline --no-audit --production --legacy-peer-deps
-
-            if [ ! -d "public" ] || [ -z "$(ls -A public 2>/dev/null)" ]; then
-              echo "Public directory missing or empty, copying from git repository..."
-              cp -r ${GIT_DIR}/public ./
-            fi
 
             if [ -L "${CURRENT_LINK}" ]; then
               CURRENT_ENV=$(basename $(readlink -f ${CURRENT_LINK}))
@@ -195,13 +214,28 @@ jobs:
       - name: Build application locally
         run: npm run build
 
+      - name: Debug project structure
+        run: |
+          echo "Current directory structure before packaging:"
+          ls -la
+          echo "Public directory contents:"
+          if [ -d "public" ]; then
+            ls -la public/
+          else
+            echo "Public directory doesn't exist in source project!"
+          fi
+
       - name: Create deployment archive
         run: |
           echo "Creating archive with public directory..."
+          # Ensure public directory exists before packaging
+          mkdir -p public
+          # Create separate archive for public directory to ensure it's transferred
+          tar -czvf public_dir.tar.gz public/
           tar -czvf deployment.tar.gz \
             --exclude=".git" \
             --exclude="node_modules" \
-            .next/ public/ package.json package-lock.json .env next.config.js ecosystem.config.js
+            .next/ package.json package-lock.json .env next.config.js ecosystem.config.js
 
       - name: Upload build files to server
         uses: appleboy/scp-action@v0.1.4
@@ -209,7 +243,7 @@ jobs:
           host: ${{ secrets.PROD_SERVER_IP }}
           username: crmroot
           password: ${{ secrets.PROD_SERVER_PASSWORD }}
-          source: "deployment.tar.gz"
+          source: "deployment.tar.gz,public_dir.tar.gz"
           target: "/tmp"
 
       - name: Deploy to production server with blue-green deployment
@@ -265,22 +299,26 @@ jobs:
             tar -xzf /tmp/deployment.tar.gz
             rm -f /tmp/deployment.tar.gz
 
+            # Extract public directory archive
+            echo "Extracting public directory archive..."
+            tar -xzf /tmp/public_dir.tar.gz
+            rm -f /tmp/public_dir.tar.gz
+
             echo "Verifying deployment contents..."
             if [ -d "public" ]; then
               echo "Public directory exists in deployment"
               ls -la public/
             else
-              echo "ERROR: Public directory is missing from deployment!"
+              echo "Public directory still missing after extraction! Copying from git repository..."
+              # Force copy public directory from git repository
+              cp -r ${GIT_DIR}/public ./
+              echo "After copying from git repository:"
               ls -la
+              ls -la public/
             fi
 
             echo "Installing production dependencies..."
             npm ci --prefer-offline --no-audit --production --legacy-peer-deps
-
-            if [ ! -d "public" ] || [ -z "$(ls -A public 2>/dev/null)" ]; then
-              echo "Public directory missing or empty, copying from git repository..."
-              cp -r ${GIT_DIR}/public ./
-            fi
 
             if [ -L "${CURRENT_LINK}" ]; then
               CURRENT_ENV=$(basename $(readlink -f ${CURRENT_LINK}))
