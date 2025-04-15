@@ -19,6 +19,7 @@ import usePayment from 'src/hooks/usePayment'
 import { formatDateString } from 'src/pages/finance'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchStudentPaymentsList, GroupsPaymentType, updateParams } from 'src/store/apps/reports/studentPayments'
+import { useGet } from '@hooks/useApi'
 
 export default function FilterBlock() {
   const [search, setSearch] = useState<string>('')
@@ -29,11 +30,11 @@ export default function FilterBlock() {
   const { course_list } = useAppSelector(state => state.settings)
   const [teacher, setTeacher] = useState<string | null>(null)
 
-  const queryString = new URLSearchParams({ ...queryParams }).toString()
 
   const dispatch = useAppDispatch()
   const [date, setDate] = useState<any>('')
   const searchVal = useDebounce(search, 800)
+  const { data: roles } = useGet('employee/check-list/?roles=admin,ceo&type=employee')
 
   const memoizedQueryString = useMemo(() => {
     return new URLSearchParams({ ...queryParams, search: searchVal, page: '1' }).toString()
@@ -92,6 +93,10 @@ export default function FilterBlock() {
     dispatch(updateParams({ bonus: e.target.value, page: '1' }))
     // const queryString = new URLSearchParams({ ...queryParams, payment_type: e.target.value, page: '1' }).toString()
     // await dispatch(fetchStudentPaymentsList(queryString))
+  }
+
+  const handleFilterRole = async (e: SelectChangeEvent<string>) => {
+    dispatch(updateParams({ admin: e.target.value, page: '1' }))
   }
 
   const filterGroup = (group: GroupsPaymentType[]) => {
@@ -281,7 +286,27 @@ export default function FilterBlock() {
         size='lg'
         value={date}
       />
-      <ExcelStudents queryString={queryString} url='/common/student/payments/' />
+      <FormControl fullWidth>
+        <InputLabel size='small' id='group-filter-label-roles'>
+          Qabul qilgan xodim
+        </InputLabel>
+
+        <Select
+          sx={{ bgcolor: 'white' }}
+          size='small'
+          label={t('Qabul qilgan xodim')}
+          value={queryParams.admin || ''}
+          id='group-filter-roles'
+          labelId='group-filter-label-roles'
+          onChange={handleFilterRole}
+        >
+          {roles?.length ? (
+            roles.map((item: any) => <MenuItem value={item.id}>{item.first_name}</MenuItem>)
+          ) : (
+            <MenuItem>Malumot yo'q</MenuItem>
+          )}
+        </Select>
+      </FormControl>
     </Box>
   )
 }

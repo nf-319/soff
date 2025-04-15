@@ -97,7 +97,7 @@ const NotificationDropdown = (props: Props) => {
     try {
       const notification = new Notification(title, {
         body: body.replace(/<[^>]*>?/gm, ''),
-        icon: '/default-logo.jpg',
+        icon: '/images/default-logo.jpg',
       })
 
       notification.onclick = () => {
