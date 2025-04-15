@@ -301,7 +301,7 @@ export default function FilterBlock() {
           onChange={handleFilterRole}
         >
           {roles?.length ? (
-            roles.map((item: any) => <MenuItem value={item.id}>{item.first_name} ({item.role})</MenuItem>)
+            roles.map((item: any) => <MenuItem value={item.id}>{item.first_name}</MenuItem>)
           ) : (
             <MenuItem>Malumot yo'q</MenuItem>
           )}
