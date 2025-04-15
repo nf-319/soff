@@ -22,6 +22,7 @@ import { fetchTeachersList } from 'src/store/apps/mentors'
 import { fetchCoursesList } from 'src/store/apps/settings'
 import api from 'src/@core/utils/api'
 import ceoConfigs from 'src/configs/ceo'
+import ExcelStudents from '@components/excelButton/ExcelStudents'
 
 export type customTableProps = {
   xs: number
@@ -41,8 +42,10 @@ const StudentPaymentsPage = () => {
   )
   const router = useRouter()
 
+  const queryString = new URLSearchParams({ ...queryParams }).toString()
+
   const [page, setPage] = useState<number>(queryParams.page ? Number(queryParams.page) - 1 : 1)
-  const { limit, offset, is_payment, page: paramPage, group, start_date, end_date } = queryParams
+  const { offset, is_payment, group, start_date, end_date } = queryParams
 
   const handleRowsPerPageChange = async (value: string) => {
     const limit = value
@@ -126,6 +129,11 @@ const StudentPaymentsPage = () => {
     },
     {
       xs: 1.7,
+      title: "Qabul qilgan xodim",
+      dataIndex: 'admin'
+    },
+    {
+      xs: 1.7,
       title: t("To'lov turi"),
       dataIndex: 'payment_type_name'
     }
@@ -184,22 +192,39 @@ const StudentPaymentsPage = () => {
       <Box
         className='groups-page-header'
         sx={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr 1fr',
           gap: 2,
           alignItems: 'center',
+          width: '100%',
           margin: '10px 0'
         }}
         py={2}
       >
-        <Box gap={5} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
-          <Box display='flex' width='100%' alignItems='center' gap='10px'>
-            <Typography variant='h5'>{t("O'quvchilar to'lovi")}</Typography>
-            {!isLoading && <Chip label={`${paymentsCount}`} variant='outlined' color='primary' size='medium' />}
+        <Box display='flex' alignItems='center' justifyContent='space-between' sx={{ width: '100%' }}>
+          <Box gap={5} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
+            <Box display='flex' width='100%' alignItems='center' gap='10px'>
+              <Typography variant='h5'>{t("O'quvchilar to'lovi")}</Typography>
+              {!isLoading && <Chip label={`${paymentsCount}`} variant='outlined' color='primary' size='medium' />}
+              <Chip
+                variant='outlined'
+                size='medium'
+                sx={{ fontSize: '14px', display: isMobile ? 'flex' : 'none', fontWeight: 'bold' }}
+                color='success'
+                label={`${formatCurrency(total_payments)} UZS`}
+              />
+              {total_bonus && (
+                <Chip
+                  variant='outlined'
+                  size='medium'
+                  sx={{ fontSize: '14px', display: isMobile ? 'flex' : 'none', fontWeight: 'bold' }}
+                  color='success'
+                  label={`${formatCurrency(total_bonus)} UZS`}
+                />
+              )}
+            </Box>
             <Chip
               variant='outlined'
               size='medium'
-              sx={{ fontSize: '14px', display: isMobile ? 'flex' : 'none', fontWeight: 'bold' }}
+              sx={{ fontSize: '14px', display: isMobile ? 'none' : 'flex', fontWeight: 'bold' }}
               color='success'
               label={`${formatCurrency(total_payments)} UZS`}
             />
@@ -207,29 +232,18 @@ const StudentPaymentsPage = () => {
               <Chip
                 variant='outlined'
                 size='medium'
-                sx={{ fontSize: '14px', display: isMobile ? 'flex' : 'none', fontWeight: 'bold' }}
-                color='success'
-                label={`${formatCurrency(total_bonus)} UZS`}
+                sx={{ fontSize: '14px', display: isMobile ? 'none' : 'flex', fontWeight: 'bold' }}
+                color='warning'
+                label={`${formatCurrency(total_bonus)} UZS (Bonus)`}
               />
             )}
           </Box>
-          <Chip
-            variant='outlined'
-            size='medium'
-            sx={{ fontSize: '14px', display: isMobile ? 'none' : 'flex', fontWeight: 'bold' }}
-            color='success'
-            label={`${formatCurrency(total_payments)} UZS`}
-          />
-          {total_bonus && (
-            <Chip
-              variant='outlined'
-              size='medium'
-              sx={{ fontSize: '14px', display: isMobile ? 'none' : 'flex', fontWeight: 'bold' }}
-              color='warning'
-              label={`${formatCurrency(total_bonus)} UZS (Bonus)`}
-            />
-          )}
+
+          <Box>
+            <ExcelStudents queryString={queryString} url='/common/student/payments/' />
+          </Box>
         </Box>
+
         <FilterBlock />
       </Box>
 
