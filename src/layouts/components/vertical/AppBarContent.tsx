@@ -105,7 +105,7 @@ const AppBarContent = (props: Props) => {
 
         <VideoModal />
 
-        {user?.role !== 'student' && (
+        {user?.role !== 'student' && user?.currentRole !== "teacher"  && (
           <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px' }}>
             {!isMobile && (
               <>
