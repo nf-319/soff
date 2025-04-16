@@ -151,7 +151,7 @@ export default function AllSettings() {
   const createBranch = async () => {
     setLoading('branch')
     try {
-      await api.post(`/common/branch/create`, { name })
+      await api.post(`common/branch/create`, { name })
       await reloadProfile()
       setTimeout(() => {
         setLoading(null)
@@ -167,7 +167,7 @@ export default function AllSettings() {
   const updateBranch = async () => {
     setLoading('branch')
     try {
-      await api.patch(`/common/branch/update/${id?.id}`, { name })
+      await api.patch(`common/branch/update/${id?.id}`, { name })
       await reloadProfile()
       setCreatable(null)
       setLoading(null)
@@ -282,16 +282,19 @@ export default function AllSettings() {
                   </Typography>
                   {companyInfo?.logo ? (
                     <Image
-                      src={companyInfo.logo || 'https://static-00.iconduck.com/assets.00/image-alt-text-icon-512x512-gm9in6oz.png'}
-                      alt="Company Logo"
+                      src={
+                        companyInfo.logo ||
+                        'https://static-00.iconduck.com/assets.00/image-alt-text-icon-512x512-gm9in6oz.png'
+                      }
+                      alt='Company Logo'
                       width={46}
                       height={46}
                       priority={false}
-                      placeholder="blur"
-                      style={{ objectFit: "contain" }}
-                      blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/+F9PQAI/wNPb9WipgAAAABJRU5ErkJggg==" // Blur uchun placeholder (ixtiyoriy)
+                      placeholder='blur'
+                      style={{ objectFit: 'contain' }}
+                      blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/+F9PQAI/wNPb9WipgAAAABJRU5ErkJggg==' // Blur uchun placeholder (ixtiyoriy)
                     />
-                  ): (
+                  ) : (
                     <Typography variant='body2'>Logosi mavjuda emas</Typography>
                   )}
                   <Button

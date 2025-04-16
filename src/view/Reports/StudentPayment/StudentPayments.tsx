@@ -129,7 +129,7 @@ export const StudentPayments = () => {
     },
     {
       xs: 1.7,
-      title: "Qabul qilgan xodim",
+      title: 'Qabul qilgan xodim',
       dataIndex: 'admin'
     },
     {
@@ -208,7 +208,7 @@ export const StudentPayments = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
             marginBottom: 5,
-            width: '100%',
+            width: '100%'
           }}
         >
           <Box gap={5} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -255,7 +255,7 @@ export const StudentPayments = () => {
           </Box>
 
           <Box>
-            <ExcelStudents queryString={queryString} url='/common/student/payments/' />
+            <ExcelStudents queryString={queryString} url='common/student/payments/' />
           </Box>
         </Box>
 

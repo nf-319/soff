@@ -65,9 +65,10 @@ export const addStudentToGroup = createAsyncThunk('updateGroup/addStudent', asyn
     return rejectWithValue(err.message)
   }
 })
-export const deleteGroup = createAsyncThunk('delete/group', async (id: any, { rejectWithValue }) => {
+export const deleteGroup = createAsyncThunk('delete/group', async (data: any, { rejectWithValue }) => {
   try {
-    const resp = await api.delete(`/common/group/delete/${id}`)
+    const resp = await api.post(`system/group-students/bulk-delete/`, data)
+
     return resp.data
   } catch (err: any) {
     if (err.response) {
@@ -78,7 +79,7 @@ export const deleteGroup = createAsyncThunk('delete/group', async (id: any, { re
 })
 export const deleteNote = createAsyncThunk('delete/Note', async (id: any, { rejectWithValue }) => {
   try {
-    const resp = await api.delete(`/common/group-description/delete/${id}`)
+    const resp = await api.delete(`common/group-description/delete/${id}`)
     return resp.data
   } catch (err: any) {
     if (err.response) {

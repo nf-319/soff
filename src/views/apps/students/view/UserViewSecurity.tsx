@@ -130,7 +130,7 @@ const UserViewSecurity = () => {
             : subdomain.length < 3
             ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
             : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }/common/generate-check/${id}/`,
+        }common/generate-check/${id}/`,
         {
           method: 'GET',
           headers: {
@@ -164,7 +164,7 @@ const UserViewSecurity = () => {
             : subdomain.length < 3
             ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
             : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }/common/generate-check/${id}/`,
+        }common/generate-check/${id}/`,
         {
           method: 'GET',
           headers: {
@@ -622,12 +622,12 @@ const UserViewSecurity = () => {
                         </Box>
                       </Box>
                       <Box sx={{ marginBottom: 2 }}>
-                        <Box sx={{marginBottom:2}} display={'flex'} alignItems={'center'} gap={2}>
-                          <Typography sx={{fontSize:15, color: 'black' }}>Dars vaqti :</Typography>
+                        <Box sx={{ marginBottom: 2 }} display={'flex'} alignItems={'center'} gap={2}>
+                          <Typography sx={{ fontSize: 15, color: 'black' }}>Dars vaqti :</Typography>
                           <Typography fontSize={12}>{group.lesson_time}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', marginBottom: 2 }}>
-                          <Typography  sx={{fontSize:15, color: 'black' }}>Dars kunlari :</Typography>
+                          <Typography sx={{ fontSize: 15, color: 'black' }}>Dars kunlari :</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', paddingBottom: 2 }}>
                           {group?.lesson_days?.map((day: any) => (
