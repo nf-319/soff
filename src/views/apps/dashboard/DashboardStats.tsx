@@ -19,7 +19,7 @@ const DashboardStats = () => {
   const { statsData } = useAppSelector(state => state.dashboard)
 
   const dispatch = useAppDispatch()
-  const { isMobile, isTablet } = useResponsive()
+  const { isMobile } = useResponsive()
   const { push } = useRouter()
   const { t } = useTranslation()
   const { user } = useContext(AuthContext)
