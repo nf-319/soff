@@ -49,6 +49,8 @@ jobs:
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
+            #!/bin/bash
+
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 20.10.0
@@ -59,16 +61,23 @@ jobs:
             CURRENT_LINK="${BASE_DIR}/current"
 
             mkdir -p ${BASE_DIR}/releases
-            mv /tmp/deploy_package ${DEPLOY_DIR}
+            mkdir -p ${BASE_DIR}
+
+            mv /tmp/deploy_package/* ${DEPLOY_DIR}
 
             cd ${DEPLOY_DIR}
+
+            if [ ! -f "package-lock.json" ]; then
+            npm install
+            fi
+
             npm ci --production --legacy-peer-deps
 
             PM2_NAME="test-subdomain-soffcrm-uz-3132"
-
             pm2 startOrReload ecosystem.config.js --only ${PM2_NAME} --update-env
 
             ln -sfn ${DEPLOY_DIR} ${CURRENT_LINK}
+
             pm2 save
 
             cd ${BASE_DIR}/releases
