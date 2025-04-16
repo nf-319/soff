@@ -26,9 +26,10 @@ import IconifyIcon from '../../../../components/icon'
 type Props = {
   openEdit: any
   setOpenEdit: any
+  setEditSuccess?: (status: boolean) => void
 }
 
-export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props) {
+export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOpenEdit }: Props) {
   const [loading, setLoading] = useState<boolean>(false)
   const [open, setOpen] = useState<boolean>(false)
 
@@ -74,9 +75,10 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
         setLoading(false)
         setOpenEdit(null)
         formik.resetForm()
-
+        if (setEditSuccess) {
+          setEditSuccess(true)
+        }
         await dispatch(fetchStudentDetail(userData.id))
-
         await dispatch(fetchStudentPayment(userData.id))
       } catch (err: any) {
         if (err?.response?.data) {
@@ -119,8 +121,6 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
     }
   }, [openEdit])
 
-  console.log(openEdit)
-
   return (
     <div>
       <Dialog
@@ -155,7 +155,7 @@ export default function StudentPaymentEditForm({ openEdit, setOpenEdit }: Props)
                   onChange={handleChange}
                   onBlur={handleBlur}
                 >
-                  {userData?.groups.map((branch: any) => (
+                  {userData?.groups?.map((branch: any) => (
                     <MenuItem key={branch.id} value={branch.group_data.id}>
                       {branch.group_data.name}
                     </MenuItem>
