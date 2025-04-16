@@ -7,7 +7,6 @@ import { useAppSelector } from 'src/store';
 import NProgress from 'nprogress';
 import { CacheProvider } from '@emotion/react';
 import type { EmotionCache } from '@emotion/cache';
-import 'src/configs/i18n';
 import { defaultACLObj } from 'src/configs/acl';
 import themeConfig from 'src/configs/themeConfig';
 import { Toaster } from 'react-hot-toast';
@@ -24,12 +23,14 @@ import ReactHotToast from 'src/@core/styles/libs/react-hot-toast';
 import { createEmotionCache } from 'src/@core/utils/create-emotion-cache';
 import DisabledProvider from 'src/@core/layouts/DisabledProvider';
 import { disableCache } from '@iconify/react'
-import { Providers } from '../providers'
+import { Providers } from '@/providers'
+import { Toaster as SonnetToaster } from 'sonner'
+
+import 'src/configs/i18n';
 
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import 'src/iconify-bundle/icons-bundle-react';
 import './globals.css';
-import { Toaster as SonnetToaster } from 'sonner'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -92,10 +93,10 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
                           <Guard authGuard={authGuard} guestGuard={guestGuard}>
                             <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
                               {getLayout(<Component {...pageProps} />)}
-
                             </AclGuard>
                           </Guard>
                         </WindowWrapper>
+
                         <ReactHotToast>
                           <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
                         </ReactHotToast>
