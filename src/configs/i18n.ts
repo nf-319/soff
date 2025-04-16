@@ -10,9 +10,6 @@ i18n
   .init({
     debug: false,
     lng: 'uz',
-    backend: {
-      loadPath: '/locales/{{lng}}.json'
-    },
     fallbackLng: 'uz',
     keySeparator: false,
     react: {
@@ -21,7 +18,18 @@ i18n
     interpolation: {
       escapeValue: false,
       formatSeparator: ','
-    }
+    },
+    resources: {
+      uz: {
+        translation: require('@/locales/uz.json'),
+      },
+      en: {
+        translation: require('@/locales/en.json'),
+      },
+      ru: {
+        translation: require('@/locales/ru.json'),
+      },
+    },
   })
 
 export default i18n
