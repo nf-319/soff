@@ -352,7 +352,6 @@ const UserViewSecurity = () => {
     setLoading(true)
     try {
       await api.delete(`common/group-student-delete/${group_data?.id}/`).then(res => {})
-      // await dispatch(fetchStudentDetail(Number(query?.student)))
       await dispatch(fetchStudentGroups(query?.student))
       toast.success("O'quvchi guruhdan chetlatildi", { position: 'top-center' })
       setLoading(false)

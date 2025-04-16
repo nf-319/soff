@@ -2,7 +2,7 @@
 
 import { useContext } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
-import VideoHeader, { videoUrls } from '../../../components/video-header/video-header'
+import VideoHeader, { videoUrls } from 'src/components/video-header/video-header'
 import { Icon } from '@iconify/react'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { updateEyeVisible } from 'src/store/apps/dashboard'
@@ -21,7 +21,7 @@ export default function DashboardPage() {
   return (
     <Box display='flex' flexDirection='column' gap={5} width='100%'>
       <Box display={!isMobile ? 'flex' : 'block'} alignItems='center' gap={5} justifyContent='flex-end'>
-        <Box sx={{mb:isMobile?3:0, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <Box sx={{ mb: isMobile ? 3 : 0, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <Button
             fullWidth={isMobile}
             onClick={() => dispatch(updateEyeVisible(!eyeVisible))}

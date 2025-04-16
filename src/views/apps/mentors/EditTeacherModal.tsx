@@ -201,7 +201,7 @@ export default function EditTeacherModal() {
         </TeacherAvatar>
 
         <FormControl sx={{ width: '100%' }}>
-          
+
           <TextField
             label={t('first_name')}
             name='first_name'
@@ -300,7 +300,7 @@ export default function EditTeacherModal() {
           </FormControl>
           <FormControl sx={{ width: '100%' }}>
             <AmountInput
-              label={t('Darslar soni')}
+              label={t('Dars haqi')}
               name='lesson_amount'
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}

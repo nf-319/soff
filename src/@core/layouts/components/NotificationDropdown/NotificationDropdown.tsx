@@ -55,6 +55,8 @@ const NotificationDropdown = (props: Props) => {
   const { user } = useAuth()
   const notificationPermissionRef = useRef<boolean>(false)
   const { companyInfo } = useAppSelector((state: any) => state.user)
+  const shownNotificationsRef = useRef<Set<number>>(new Set())
+  const wsConnectedRef = useRef<boolean>(false)
 
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
   const { refetch } = useNotificationsNotRead()
@@ -97,7 +99,7 @@ const NotificationDropdown = (props: Props) => {
     try {
       const notification = new Notification(title, {
         body: body.replace(/<[^>]*>?/gm, ''),
-        icon: '/default-logo.jpg',
+        icon: companyInfo?.logo || '/images/default-logo.jpg',
       })
 
       notification.onclick = () => {
@@ -105,17 +107,15 @@ const NotificationDropdown = (props: Props) => {
         notification.close()
       }
     } catch (error) {
-      console.error('Error showing notification:', error)
+      console.error('Error showing browser notification:', error)
     }
   }
-
-  console.log(companyInfo?.logo)
 
   const showToastNotification = (title: string, body: string) => {
     toast(
       <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
         <Image
-          src={companyInfo?.logo}
+          src={companyInfo?.logo || '/images/default-logo.jpg'}
           alt='User'
           width={24}
           height={24}
@@ -147,7 +147,7 @@ const NotificationDropdown = (props: Props) => {
     )
   }
 
-  const handleDropdownClose = async () => {
+  const handleDropdownClose = () => {
     setAnchorEl(null)
   }
 
@@ -169,38 +169,52 @@ const NotificationDropdown = (props: Props) => {
     }
   }
 
-  useEffect(() => {
-    if (!user?.id) return
+  const handleNewNotifications = (message: NotificationSocketType) => {
+    setNotificationCount(message.count)
 
-    const handleMessage = (message: NotificationSocketType) => {
-      setNotificationCount(message.count)
+    if (message?.notifications?.length > 0) {
+      setNotificationData((prev) => [
+        ...message.notifications,
+        ...prev.filter(
+          (item) => !message.notifications.some((newItem) => newItem.id === item.id)
+        ),
+      ])
 
-      if (message?.notifications?.length > 0) {
-        setNotificationData((prev) => [
-          ...message.notifications,
-          ...prev.filter(
-            (item) => !message.notifications.some((newItem) => newItem.id === item.id)
-          ),
-        ])
-
-        message.notifications.forEach((notification) => {
+      message.notifications.forEach((notification) => {
+        if (notification.id && !shownNotificationsRef.current.has(notification.id)) {
           const title = notification.title || 'Yangi xabarnoma'
           const body = notification.body || ''
+
           showBrowserNotification(title, body)
           showToastNotification(title, body)
-        })
-      }
+
+          if (notification.id) {
+            shownNotificationsRef.current.add(notification.id)
+          }
+        }
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (!user?.id || wsConnectedRef.current) return
+
+    const handleMessage = (message: NotificationSocketType) => {
+      handleNewNotifications(message)
     }
 
     const handleError = (error: any) => {
       console.error('WebSocket error:', error)
+      wsConnectedRef.current = false
     }
 
     const endpoint = `/notifications/${user.id}/`
     wsService.connect(endpoint, handleMessage, handleError)
+    wsConnectedRef.current = true
 
     return () => {
       wsService.disconnect()
+      wsConnectedRef.current = false
     }
   }, [user?.id])
 
