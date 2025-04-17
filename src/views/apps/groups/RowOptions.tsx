@@ -16,16 +16,18 @@ import {
   getGroupsDetails,
   handleOpenEdit,
   handleChangeBranchOpenEdit,
-  updateParams
+  updateParams,
+  setDeleteGroupId
 } from 'src/store/apps/groups'
 import { disablePage } from 'src/store/apps/page'
 import { toast } from 'react-hot-toast'
 import Excel from '../../../components/excelButton/Excel'
 import axios from 'axios'
-import { studentsUpdateParams } from 'src/store/apps/groupDetails'
+import { handleEditClickOpen, studentsUpdateParams } from 'src/store/apps/groupDetails'
 import { useQueryClient } from '@tanstack/react-query'
 import ceoConfigs from 'src/configs/ceo'
 import { GroupType } from '../../../types/types'
+import Delete from './view/GroupViewLeft/Delete'
 
 const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }) => {
   const { queryParams } = useAppSelector(state => state.groups)
@@ -37,6 +39,8 @@ const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }
   const [suspendDialogOpen2, setSuspendDialogOpen2] = useState<boolean>(false)
   const [group, setGroup] = useState<any>()
   const rowOptionsOpen = Boolean(anchorEl)
+
+
 
   useEffect(() => {
     if (groups && id !== undefined) {
@@ -153,7 +157,7 @@ const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }
                 </MenuItem>} */}
 
         {group?.status !== 'archived' && (
-          <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
+          <MenuItem onClick={() => { dispatch(handleEditClickOpen('delete')),dispatch(setDeleteGroupId(id)) }} sx={{ '& svg': { mr: 2 } }}>
             <IconifyIcon icon='material-symbols-light:recommend-outline' fontSize={20} />
             {t('Guruhni yakunlash')}
           </MenuItem>
@@ -165,7 +169,7 @@ const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }
           </MenuItem>
         )}
         <Excel
-          url={`/common/group/export/${id}`}
+          url={`common/group/export/${id}`}
           // fullWidth
           variant='text'
           sx={{ width: '100%', py: 2, px: 5, borderRadius: '0px', display: 'flex', justifyContent: 'start' }}

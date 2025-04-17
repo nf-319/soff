@@ -65,8 +65,8 @@ export const fetchGroups = createAsyncThunk('groups/fetchGroups', async (params?
   return (await api.get(ceoConfigs.groups, { params })).data
 })
 
-export const fetchGroupChecklist = createAsyncThunk('groups/fetchGroupChecklist', async (params?:any) => {
-  const resp = await api.get('common/group-check-list/',{params})
+export const fetchGroupChecklist = createAsyncThunk('groups/fetchGroupChecklist', async (params?: any) => {
+  const resp = await api.get('common/group-check-list/', { params })
   return resp.data
 })
 
@@ -91,6 +91,7 @@ const initialState: IGroupsState = {
   groupChecklist: null,
   groupData: null,
   roomsData: null,
+  deleteGroupId: null,
   courses: null,
   teachers: null,
   teacherSalaries: null,
@@ -153,6 +154,9 @@ export const groupsSlice = createSlice({
     },
     setGroupData: (state, action) => {
       state.groupData = action.payload
+    },
+    setDeleteGroupId: (state, action) => {
+      state.deleteGroupId = action.payload
     },
     setTeacherData: (state, action) => {
       state.teachersData = action.payload
@@ -259,6 +263,7 @@ export const {
   handleOpenAddModal,
   updateParams,
   setGroupData,
+  setDeleteGroupId,
   setTeacherData,
   setRoomsData,
   resetGroupParams,
