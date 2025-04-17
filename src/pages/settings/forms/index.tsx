@@ -32,6 +32,7 @@ import { useFormik } from 'formik'
 import { AuthContext } from 'src/context/AuthContext'
 import { Edit, Trash2 } from 'lucide-react'
 import { ComingSoon } from '../../../components/CommingSoon'
+import { FormUpdateModal } from '@/entities/FormsUpdateModal'
 
 export default function FormsPage() {
   const [open, setOpen] = useState<null | 'new' | 'integration' | 'delete' | 'edit'>(null)
@@ -42,6 +43,8 @@ export default function FormsPage() {
   const [loading, setLoading] = useState<boolean>(false)
   const [data, setData] = useState<any[]>([])
   const [sourceData, setSourceData] = useState<any>([])
+  const [selectedForm, setSelectedForm] = useState<any>(null);
+  const [updateOpen, setUpdateOpen] = useState<boolean>(false)
   const [addSource, setAddSource] = useState<boolean>(false)
 
   const bgColors = UseBgColor()
@@ -99,13 +102,19 @@ export default function FormsPage() {
       dataIndex: 'id',
       render: id => (
         <Box display='flex' alignItems='center'>
-          <ComingSoon hidden>
-            <Tooltip title="O'zgartirish" enterDelay={500}>
-              <IconButton size='medium' color='primary' onClick={() => (setDeleteId(id), setOpen('edit'))}>
-                <Edit color='blue' size={18} />
-              </IconButton>
-            </Tooltip>
-          </ComingSoon>
+          <Tooltip title="O'zgartirish" enterDelay={500}>
+            <IconButton
+              size='medium'
+              color='primary'
+              onClick={() => {
+                const form = data.find(item => item.id === id);
+                setSelectedForm(form);
+                setUpdateOpen(true);
+              }}
+            >
+              <Edit color='blue' size={18} />
+            </IconButton>
+          </Tooltip>
 
           <Tooltip title="O'chirish" enterDelay={500} leaveDelay={200}>
             <IconButton size='medium' color='error' onClick={() => (setDeleteId(id), setOpen('delete'))}>
@@ -141,18 +150,6 @@ export default function FormsPage() {
     setData(resp.data)
   }
 
-  async function getDepartments() {
-    const resp = await api.get(`leads/department/list/`)
-    setDepartments(resp.data)
-  }
-
-  const getSources = async () => {
-    const resp = await api.get('leads/source/')
-    if (resp?.data) {
-      setSourceData(resp.data.results)
-    }
-  }
-
   async function onSubmit(values: any) {
     setLoading(true)
     try {
@@ -186,7 +183,7 @@ export default function FormsPage() {
       !user?.role.includes('watcher') &&
       !user?.role.includes('marketolog')
     ) {
-      push('/')
+      void push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
     }
     getForms()
@@ -241,6 +238,13 @@ export default function FormsPage() {
 
       <DataTable columns={columns} data={data} rowClick={handleClick} />
 
+      <FormUpdateModal
+        open={updateOpen}
+        onClose={() => setUpdateOpen(false)}
+        formData={selectedForm}
+        onSuccess={getForms}
+      />
+
       <Dialog open={open === 'new'} onClose={() => setOpen(null)}>
         <DialogTitle minWidth={'300px'} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography fontSize={'18px'}>{t('Yangi forma')}</Typography>
@@ -248,6 +252,7 @@ export default function FormsPage() {
             <IconifyIcon icon={'ic:baseline-add'} style={{ transform: 'rotate(45deg)', cursor: 'pointer' }} />
           </span>
         </DialogTitle>
+
         <DialogContent>
           <Form
             setError={setError}
@@ -265,6 +270,7 @@ export default function FormsPage() {
               <InputLabel size='small' id='user-view-language-label'>
                 {t("Bo'lim")}
               </InputLabel>
+
               <Select
                 size='small'
                 error={error.departmentParent?.error}
@@ -281,6 +287,7 @@ export default function FormsPage() {
                   </MenuItem>
                 ))}
               </Select>
+
               <FormHelperText error={error.departmentParent?.error}>{error.departmentParent?.message}</FormHelperText>
             </FormControl>
 
@@ -334,18 +341,14 @@ export default function FormsPage() {
                 </Select>
                 <FormHelperText error={error.source?.error}>{error.source?.message}</FormHelperText>
               </FormControl>
-            ) : (
-              ''
-            )}
+            ) : null}
 
             {addSource ? (
               <FormControl fullWidth>
                 <TextField fullWidth error={error.first_name?.error} size='small' label={t('Manba')} name='source' />
                 <FormHelperText error={error.source?.error}>{error.source?.message}</FormHelperText>
               </FormControl>
-            ) : (
-              ''
-            )}
+            ) : null}
 
             <LoadingButton loading={loading} variant='contained' type='submit'>
               {t('Yaratish')}
@@ -354,7 +357,6 @@ export default function FormsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
       <CustomDialog
         open={open === 'delete'}
         onClose={() => setOpen(null)}
