@@ -49,6 +49,7 @@ import { studentsUpdateParams } from 'src/store/apps/groupDetails'
 import DataTable from '../../components/table'
 import { useGet, usePatch } from 'src/hooks/useApi'
 import { useQueryClient } from '@tanstack/react-query'
+import Delete from '@/views/apps/groups/view/GroupViewLeft/Delete'
 
 const IconifyIcon = dynamic(() => import('../../components/icon'))
 const RowOptions = dynamic(() => import('src/views/apps/groups/RowOptions'))
@@ -185,6 +186,7 @@ export default function GroupsPage() {
       xs: 0.4,
       dataIndex: 'id',
       title: t(''),
+
       render: actions => <RowOptions groups={data?.results} id={actions} />
     }
   ]
@@ -335,7 +337,7 @@ export default function GroupsPage() {
           >
             {t('Filterlash')}
           </Button>
-          <Excel size='small' url='/common/groups/export/' queryString={queryString} />
+          <Excel size='small' url='common/groups/export/' queryString={queryString} />
         </>
       )}
 
@@ -441,6 +443,7 @@ export default function GroupsPage() {
         </form>
       </Dialog>
       <OnlineLessonModal />
+      <Delete />
     </div>
   )
 }

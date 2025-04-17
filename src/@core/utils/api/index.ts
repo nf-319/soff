@@ -12,21 +12,26 @@ api.interceptors.request.use(
       process.env.NODE_ENV === 'development'
         ? process.env.NEXT_PUBLIC_TEST_BASE_URL
         : subdomain.length < 3
-          ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-          : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
+          ? `https://${process.env.NEXT_PUBLIC_BASE_URL}/api`
+          : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}/api`
 
     config.baseURL = baseURL
 
+    const version = config.headers?.['x-api-version'] === 'v2' ? 'v2' : 'v1'
+
+    if (!config.url.startsWith(`/v1`) && !config.url.startsWith(`/v2`)) {
+      config.url = `/${version}/${config.url}`
+    }
+
     if (storedToken) {
       config.headers['Authorization'] = `Bearer ${storedToken}`
-      config.headers['Accept-Language'] = localStorage.getItem('i18nextLng')
     }
-    if (typeof window !== 'undefined') {
-      const language = localStorage.getItem('i18nextLng')
-      if (language) {
-        config.headers['Accept-Language'] = language
-      }
+
+    const language = localStorage.getItem('i18nextLng')
+    if (language) {
+      config.headers['Accept-Language'] = language
     }
+
     return config
   },
   err => Promise.reject(err)

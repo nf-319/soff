@@ -461,7 +461,7 @@ export const AttandanceFilters = ({ isMobile }: AttandanceFiltersProps) => {
 
       {/* {!isMobile && (
         <Box display={'flex'} justifyContent='flex-end' marginTop={2}>
-          <Excel url='/common/attendances/export/' queryString={queryString} />
+          <Excel url='common/attendances/export/' queryString={queryString} />
         </Box>
       )} */}
     </Box>

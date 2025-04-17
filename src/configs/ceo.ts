@@ -18,7 +18,7 @@ const ceoConfigs = {
   parents_checklist : 'employee/parents-check-list/',
   teachers: 'employee/teachers/',
   teachers_update: 'employee/teachers/update/',
-
+  groupDebtors:'common/group/students/',
   create_teacher:'employee/create/teacher/',
   rooms_posts: 'common/room/create',
   rooms_update: 'common/room/update',
