@@ -30,6 +30,7 @@ jobs:
           cp -R .next deploy_package/
           cp -R public deploy_package/
           cp package.json deploy_package/
+          cp package-lock.json deploy_package/
           cp ecosystem.config.js deploy_package/
 
       - name: Deploy to test server
@@ -39,7 +40,7 @@ jobs:
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           source: "deploy_package/*"
-          target: "/tmp/deploy_package"
+          target: "/tmp/"
           rm: true
 
       - name: Execute deployment script
@@ -55,23 +56,23 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 20.10.0
 
-            BASE_DIR="frontend/test-subdomain-soffcrm-uz-3132"
+            BASE_DIR="/root/frontend/test-subdomain-soffcrm-uz-3132"
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
             DEPLOY_DIR="${BASE_DIR}/releases/${TIMESTAMP}"
             CURRENT_LINK="${BASE_DIR}/current"
 
-            mkdir -p ${BASE_DIR}/releases
-            mkdir -p ${BASE_DIR}
+            mkdir -p ${DEPLOY_DIR}
 
-            mv /tmp/deploy_package/* ${DEPLOY_DIR}
+            cp -R /tmp/deploy_package/* ${DEPLOY_DIR}/
 
+            # Navigate to deployment directory
             cd ${DEPLOY_DIR}
 
-            if [ ! -f "package-lock.json" ]; then
-            npm install
+            if [ -f "package-lock.json" ]; then
+              npm ci
+            else
+              npm install --production
             fi
-
-            npm ci --production --legacy-peer-deps
 
             PM2_NAME="test-subdomain-soffcrm-uz-3132"
             pm2 startOrReload ecosystem.config.js --only ${PM2_NAME} --update-env
@@ -80,7 +81,6 @@ jobs:
 
             pm2 save
 
-            cd ${BASE_DIR}/releases
-            ls -t | tail -n +6 | xargs -r rm -rf
+            find ${BASE_DIR}/releases -maxdepth 1 -type d | sort -r | tail -n +6 | xargs -r rm -rf
 
             echo "Deployment completed successfully with zero downtime!"
