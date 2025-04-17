@@ -1,4 +1,4 @@
-name: CI and Deploy to Test Server with Zero Downtime
+name: CI and Deploy to Server
 
 on:
   push:
@@ -8,79 +8,55 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Set up Node.js (local runner)
         uses: actions/setup-node@v3
         with:
-          node-version: '20.10.0'
-          cache: 'npm'
+          node-version: 'v20.12.2'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install dependencies (local runner)
+        run: npm install
 
-      - name: Build application
-        run: npm run build
-
-      - name: Prepare deployment package
+      - name: create env file
         run: |
-          mkdir -p deploy_package
-          cp -R .next deploy_package/
-          cp -R public deploy_package/
-          cp package.json deploy_package/
-          cp package-lock.json deploy_package/
-          cp ecosystem.config.js deploy_package/
+          touch .env
+          echo "${{ secrets.TEST_ENV_CONTENT }}" >> .env
+          touch .env
+          echo "${{ secrets.PROD_ENV_CONTENT }}" >> .env
 
-      - name: Deploy to test server
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.TEST_SERVER_IP }}
-          username: root
-          password: ${{ secrets.TEST_SERVER_PASSWORD }}
-          source: "deploy_package/*"
-          target: "/tmp/"
-          rm: true
-
-      - name: Execute deployment script
+      - name: Deploy to development server (for test branch)
+        if: github.ref == 'refs/heads/test'
         uses: appleboy/ssh-action@v0.1.2
         with:
           host: ${{ secrets.TEST_SERVER_IP }}
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
-            #!/bin/bash
-
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            if [ ! -d "$HOME/.nvm" ]; then
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+              source ~/.nvm/nvm.sh
+            else
+              source ~/.nvm/nvm.sh
+            fi
             nvm use 20.10.0
 
-            BASE_DIR="/root/frontend/test-subdomain-soffcrm-uz-3132"
-            TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-            DEPLOY_DIR="${BASE_DIR}/releases/${TIMESTAMP}"
-            CURRENT_LINK="${BASE_DIR}/current"
-
-            mkdir -p ${DEPLOY_DIR}
-
-            cp -R /tmp/deploy_package/* ${DEPLOY_DIR}/
-
-            # Navigate to deployment directory
-            cd ${DEPLOY_DIR}
-
-            if [ -f "package-lock.json" ]; then
-              npm ci
+            mkdir -p frontend/prod-subdomain-soffcrm-uz-3132/${{ secrets.REPO_NAME }}
+            cd frontend/prod-subdomain-soffcrm-uz-3132/${{ secrets.REPO_NAME }}
+            if [ ! -d ".git" ]; then
+                git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
             else
-              npm install --production
+                git stash
+                git pull origin test
             fi
 
-            PM2_NAME="test-subdomain-soffcrm-uz-3132"
-            pm2 startOrReload ecosystem.config.js --only ${PM2_NAME} --update-env
+            echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
 
-            ln -sfn ${DEPLOY_DIR} ${CURRENT_LINK}
+            npm install
+            npm run build
 
+            pm2 startOrReload ecosystem.config.js --only test-subdomain-soffcrm-uz-3132
             pm2 save
-
-            find ${BASE_DIR}/releases -maxdepth 1 -type d | sort -r | tail -n +6 | xargs -r rm -rf
-
-            echo "Deployment completed successfully with zero downtime!"
