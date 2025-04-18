@@ -2,7 +2,6 @@
 import { Dispatch } from 'redux'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
-// ** Axios Imports
 import axios from 'axios'
 import api from 'src/@core/utils/api'
 
@@ -13,26 +12,11 @@ interface DataParams {
   currentPlan: string
 }
 
-interface AutoSmsType {
-  on_attend: boolean
-  attend_text: string
-  on_score: boolean
-  score_text: string
-  id?: any
-  on_absent: boolean
-  birthday_text: string
-  on_birthday: boolean
-  absent_text: string
-  payment_warning: boolean
-  payment_text: string
-}
-
 interface Redux {
   getState: any
   dispatch: Dispatch<any>
 }
 
-// ** Fetch Users
 export const fetchData = createAsyncThunk('appUsers/fetchData', async (params: DataParams) => {
   const response = await axios.get('/apps/users/list', {
     params
@@ -42,29 +26,15 @@ export const fetchData = createAsyncThunk('appUsers/fetchData', async (params: D
 })
 
 export const fetchNotification = createAsyncThunk('appUsers/fetchNotification', async () => {
-  const response = await api.get('/common/notifications/')
+  const response = await api.get('common/notifications/')
   return response.data
 })
 
-// ** Add User
 export const addUser = createAsyncThunk(
   'appUsers/addUser',
   async (data: { [key: string]: number | string }, { getState, dispatch }: Redux) => {
     const response = await axios.post('/apps/users/add-user', {
       data
-    })
-    dispatch(fetchData(getState().user.params))
-
-    return response.data
-  }
-)
-
-// ** Delete User
-export const deleteUser = createAsyncThunk(
-  'appUsers/deleteUser',
-  async (id: number | string, { getState, dispatch }: Redux) => {
-    const response = await axios.delete('/apps/users/delete', {
-      data: id
     })
     dispatch(fetchData(getState().user.params))
 
@@ -118,7 +88,7 @@ export const appUsersSlice = createSlice({
     setNotifications: (state, action) => {
       state.notificationsCount = action.payload
     },
-   
+
     setRoles: (state, action) => {
       state.userRoles = action.payload
     },
@@ -128,10 +98,12 @@ export const appUsersSlice = createSlice({
     setCompanyInfo: (state, action) => {
       state.companyInfo = {
         ...action.payload,
-        work_start_time: `${action.payload.work_start_time.split(':')?.[0]}:${
-          action.payload.work_start_time.split(':')?.[1]
+        work_start_time: `${action.payload?.work_start_time.split(':')?.[0]}:${
+          action.payload?.work_start_time.split(':')?.[1]
         }`,
-        work_end_time: `${action.payload.work_end_time.split(':')?.[0]}:${action.payload.work_end_time.split(':')?.[1]}`
+        work_end_time: `${action.payload?.work_end_time.split(':')?.[0]}:${
+          action.payload?.work_end_time.split(':')?.[1]
+        }`
       }
     },
     setDepartmentsState: (state, action) => {
@@ -158,6 +130,5 @@ export const appUsersSlice = createSlice({
   }
 })
 
-export const { setNotifications, addUserData, addOpenedUser, setRoles, setCompanyInfo, setDepartmentsState } =
-  appUsersSlice.actions
+export const { setRoles, setCompanyInfo } = appUsersSlice.actions
 export default appUsersSlice.reducer

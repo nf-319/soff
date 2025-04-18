@@ -23,8 +23,8 @@ const Home = () => {
   useEffect(() => {
     if (auth.user && auth.user.role) {
       const homeRoute = getHomeRoute(auth.user.role)
-      if (auth.user.payment_page) router.replace('/crm-payments')
-      else router.replace(homeRoute)
+      if (auth.user.payment_page) void router.push('/crm-payments')
+      else void router.push(homeRoute)
     }
   }, [])
 

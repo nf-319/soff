@@ -102,11 +102,6 @@ export default function GroupDetailRowOptions({ id }: Props) {
   }
 
   const handleLeft = async () => {
-    if (student?.student?.balance < 0) {
-      toast.error("Qarzdor o'quvchini guruhdan chetlatib bo'lmaydi")
-    } else {
-      setLoading(true)
-
       try {
         await api.delete(`common/group-student-delete/${student?.id}/`)
         toast.success("O'quvchi guruhdan chetlatildi", { position: 'top-center' })
@@ -130,8 +125,7 @@ export default function GroupDetailRowOptions({ id }: Props) {
         toast.error(err.response.data.msg)
         setLoading(false)
       }
-      setOpenLeft(false)
-    }
+    setOpenLeft(false)
   }
 
   async function getGroups() {
@@ -139,24 +133,6 @@ export default function GroupDetailRowOptions({ id }: Props) {
       .get(`common/group-check-list/?student=${student?.student?.id}`)
       .then(res => dispatch(setGroupChecklist(res.data)))
       .catch(error => console.error(error))
-  }
-
-  async function submitDelete() {
-    setLoading(true)
-    dispatch(disablePage(true))
-    await api
-      .delete(`student/destroy/${id}/`)
-      .then(res => {
-        toast.success("O'quvchi muvaffaqiyatli o'chirildi")
-        dispatch(fetchStudentsList({ status: queryParams.status }))
-      })
-      .catch(err => {
-        toast.error(err.response.data.msg || "O'quvchini o'chirib bo'lmadi")
-        console.error(err)
-      })
-
-    dispatch(disablePage(false))
-    setLoading(false)
   }
 
   return (

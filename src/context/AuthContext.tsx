@@ -81,11 +81,9 @@ const AuthProvider = ({ children }: Props) => {
           localStorage.clear()
           setUser(null)
           setLoading(false)
-          if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
-            localStorage.clear()
-            router.replace('/login')
-          }
+          router.replace('/login')
         })
+
 
       if (
         !window.location.hostname.split('.').includes('c-panel') &&
@@ -102,11 +100,11 @@ const AuthProvider = ({ children }: Props) => {
   }
 
   useEffect(() => {
-    initAuth()
+    void initAuth()
   }, [])
 
   useEffect(() => {
-    router.push({ pathname, query }, asPath)
+    void router.push({ pathname, query }, asPath)
   }, [i18n.language])
 
   const handleLogin = (params: LoginParams, errorCallback?: ErrCallbackType) => {

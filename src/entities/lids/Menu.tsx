@@ -12,6 +12,7 @@ import { EditAnonimDialogDialog } from '../../views/apps/lids/anonimUser/EditAno
 import { AddGroup } from './modals/AddGroupModal'
 import { LeadDeleteModal } from './modals/LeadDeleteModal'
 import { AddDepartmantModal } from './modals/AddDepartmantModal'
+import { LeadRecoverModal } from './modals/LeadRecoverModal'
 
 type Props = {
   anchorEl: HTMLElement | null
@@ -23,7 +24,15 @@ type Props = {
   onClose?: boolean
 }
 
-export const LeadsMenu: FC<Props> = ({ anchorEl, setAnchorEl, onClose, currentLead, currentId, menuOpen, setMenuOpen }) => {
+export const LeadsMenu: FC<Props> = ({
+  anchorEl,
+  setAnchorEl,
+  onClose,
+  currentLead,
+  currentId,
+  menuOpen,
+  setMenuOpen
+}) => {
   const { getSMSTemps } = useSMS()
   const { getBranches } = useBranches()
 
@@ -37,7 +46,6 @@ export const LeadsMenu: FC<Props> = ({ anchorEl, setAnchorEl, onClose, currentLe
         getBranches={getBranches}
         setOpen={setMenuOpen}
       />
-
 
       {currentLead && (
         <Fragment>
@@ -70,6 +78,14 @@ export const LeadsMenu: FC<Props> = ({ anchorEl, setAnchorEl, onClose, currentLe
             leadFirstName={currentLead.first_name}
             leadPhone={currentLead.phone}
           />
+          <LeadRecoverModal
+            onClose={onClose}
+            open={menuOpen}
+            setOpen={setMenuOpen}
+            leadId={currentLead.id}
+            leadFirstName={currentLead.first_name}
+            leadPhone={currentLead.phone}
+          />
 
           <AddDepartmantModal
             onClose={onClose}
@@ -85,4 +101,3 @@ export const LeadsMenu: FC<Props> = ({ anchorEl, setAnchorEl, onClose, currentLe
 }
 
 LeadsMenu.displayName = 'LeadsMenu'
-

@@ -1,21 +1,12 @@
-// ** React Imports
 import { useContext, useEffect, useState } from 'react'
 
-// ** MUI Imports
 import Fab from '@mui/material/Fab'
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
-
-// ** Icon Imports
 import Icon from '../../components/icon'
-
-// ** Theme Config Import
 import themeConfig from 'src/configs/themeConfig'
-
-// ** Type Import
 import { LayoutProps } from 'src/@core/layouts/types'
 
-// ** Components
 import AppBar from './components/vertical/appBar'
 import Customizer from '../../components/customizer'
 import Navigation from './components/vertical/navigation'
@@ -27,7 +18,6 @@ import QrCodeModal from '../../components/qrCode-Modal'
 import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
-import useResponsive from '../hooks/useResponsive'
 import AppBarWarningVertical from 'src/components/AppBarWarningVertical'
 
 const VerticalLayoutWrapper = styled(Box)({
@@ -70,9 +60,10 @@ const VerticalLayout = (props: LayoutProps) => {
   const userData = localStorage.getItem('userData')
   const formattedUserData = JSON.parse(userData as string)
   const toggleNavVisibility = () => setNavVisible(!navVisible)
+  const subdomain = location.hash.split('.')[0]
 
   useEffect(() => {
-    if (formattedUserData.payment_days) {
+    if (subdomain !== 'c-panel' && formattedUserData.payment_days >= 0) {
       setShowWarning(true)
     } else {
       setShowWarning(false)

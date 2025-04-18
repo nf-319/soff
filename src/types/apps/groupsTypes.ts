@@ -60,7 +60,8 @@ export interface TeacherSalariesResponse {
 }
 
 export interface IGroupsState {
-  roomsData:any,
+  roomsData: any,
+  deleteGroupId:any,
   teachersData:TacherItemType[]|null,
   isTableLoading: boolean
   isOpenEdit: boolean

@@ -1,60 +1,114 @@
-import { useState, useEffect } from 'react';
-import { CSSTransition } from 'react-transition-group';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import Typography from '@mui/material/Typography';
-import CardContent from '@mui/material/CardContent';
-import CustomAvatar from '../../mui/avatar';
-import { CardStatsVerticalProps } from '../types';
-import useResponsive from '../../../@core/hooks/useResponsive';
-import { formatCurrency } from '../../../@core/utils/format-currency';
-import { useAppSelector } from '../../../store';
+'use client'
 
-const CardStatsVertical = ({ title, color, icon, stats }: CardStatsVerticalProps) => {
-  const { eyeVisible } = useAppSelector(state => state.dashboard);
-  const { isMobile, isTablet } = useResponsive();
+import Box from '@mui/material/Box'
+import Card from '@mui/material/Card'
+import Typography from '@mui/material/Typography'
+import CardContent from '@mui/material/CardContent'
+import CustomAvatar from '../../mui/avatar'
+import { CardStatsVerticalProps } from '../types'
+import useResponsive from '../../../@core/hooks/useResponsive'
+import { formatCurrency } from '@utils/format-currency'
+import { useAppSelector } from '@/store'
+
+const CardStatsVertical = ({ title, color, icon, stats, data_key }: CardStatsVerticalProps): JSX.Element => {
+  const { eyeVisible } = useAppSelector(state => state.dashboard)
+  const { isMobile } = useResponsive()
+
+  const isFinancial = data_key?.includes('amount') || data_key?.includes('debts')
+  const formattedTitle = isFinancial ? formatCurrency(title) : title
+
+  const getColorValue = (colorName: string): string => {
+    const colorMap: Record<string, string> = {
+      primary: '#7367F0',
+      success: '#28C76F',
+      error: '#EA5455',
+      warning: '#FF9F43',
+      info: '#00CFE8',
+      secondary: '#82868B'
+    }
+    return colorMap[colorName] || colorMap.primary
+  }
+
+  const mainColor = getColorValue(color || 'primary')
 
   return (
-    <Card sx={{ width: '100%', height: '100%' }}>
+    <Card
+      sx={{
+        width: '100%',
+        height: '100%',
+        borderRadius: '8px',
+        boxShadow: 'none',
+        border: '1px solid',
+        borderColor: 'rgba(0, 0, 0, 0.06)',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
       <CardContent
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
           height: '100%',
-          gap: '5px',
-          alignItems: 'center',
-          p: isMobile ? '10px 0px !important' : '15px 10px !important'
+          p: isMobile ? '12px 12px 12px 16px' : '14px 14px 14px 18px',
+          '&:last-child': { pb: isMobile ? '12px' : '14px' }
         }}
       >
-        <Box display='grid' alignItems='center' gap={2}>
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <CustomAvatar
-              sx={{ width: '30px', height: '30px', p: 1 }}
-              skin='light'
-              variant='rounded'
-              color={color}
-            >
-              {icon}
-            </CustomAvatar>
-          </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <CustomAvatar
+            sx={{
+              width: isMobile ? '24px' : '28px',
+              height: isMobile ? '24px' : '28px',
+              backgroundColor: `${mainColor}15`,
+              color: mainColor
+            }}
+            skin='light'
+            variant='rounded'
+          >
+            {icon}
+          </CustomAvatar>
 
           <Typography
             variant='caption'
-            sx={{ fontSize: isMobile ? '12px !important' : isTablet ? '14px !important' : '16px !important', textAlign: 'center' }}
+            sx={{
+              fontSize: isMobile ? '10px' : '14px',
+              color: 'text.secondary',
+              textAlign: 'right',
+              maxWidth: '70%',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
           >
             {stats}
           </Typography>
         </Box>
 
-        <CSSTransition in={eyeVisible} timeout={300} classNames='fade'>
-          <Typography variant='h4' sx={{ fontSize: '16px !important', textAlign: 'center' }}>
-            {eyeVisible ? formatCurrency(title) : '****'}
-          </Typography>
-        </CSSTransition>
+        <Typography
+          sx={{
+            fontSize: isMobile ? '10px' : '14px',
+            fontWeight: 600,
+            textAlign: 'center',
+            color: 'text.primary',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          {eyeVisible ? formattedTitle : '***'}
+        </Typography>
+
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default CardStatsVertical;
+export default CardStatsVertical

@@ -163,7 +163,7 @@ const UserView = ({ tab, student }: any) => {
             : subdomain.length < 3
             ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
             : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }/common/generate-check/${id}/`,
+        }common/generate-check/${id}/`,
         {
           method: 'GET',
           headers: {
@@ -208,7 +208,7 @@ const UserView = ({ tab, student }: any) => {
             : subdomain.length < 3
             ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
             : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }/common/generate-check/${id}/`,
+        }common/generate-check/${id}/`,
         {
           method: 'GET',
           headers: {

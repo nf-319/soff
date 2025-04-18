@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, SyntheticEvent, Fragment, ReactNode, useEffect } from 'react'
+import { useState, SyntheticEvent, Fragment, ReactNode } from 'react'
 import Box from '@mui/material/Box'
 import Badge from '@mui/material/Badge'
 import Button from '@mui/material/Button'
@@ -12,13 +12,11 @@ import MuiMenuItem, { MenuItemProps } from '@mui/material/MenuItem'
 import Typography, { TypographyProps } from '@mui/material/Typography'
 import PerfectScrollbarComponent from 'react-perfect-scrollbar'
 import { Settings } from 'src/@core/context/settingsContext'
-import CustomChip from '../../../../components/mui/chip'
+import CustomChip from 'src/components/mui/chip'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'react-i18next'
-import { EmptyContent } from '../../../../components/empty-content'
+import { EmptyContent } from 'src/components/empty-content'
 import { Bell } from 'lucide-react'
-import useNotificationStore from 'src/store/apps/notification'
-import { useGet } from 'src/hooks/useApi'
 import { Skeleton } from '@mui/material'
 import { useNotifications } from 'src/hooks/useNotification'
 
@@ -98,7 +96,7 @@ const NotificationDropdown = (props: Props) => {
   const { direction } = settings
   const router = useRouter()
 
- 
+
 
   const handleDropdownOpen = async (event: SyntheticEvent) => {
     setAnchorEl(event.currentTarget)
@@ -117,7 +115,7 @@ const NotificationDropdown = (props: Props) => {
           color='error'
           variant='standard'
           badgeContent={data?.count}
-          invisible={!data?.results.length}
+          invisible={!data?.results?.length}
           sx={{
             '& .MuiBadge-badge': { top: 4, right: 4, boxShadow: theme => `0 0 0 2px ${theme.palette.background.paper}` }
           }}
@@ -141,7 +139,7 @@ const NotificationDropdown = (props: Props) => {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <Typography sx={{ cursor: 'text', fontWeight: 600 }}>{t('Xabarnomalar')}</Typography>
 
-            {data?.results.length  && (
+            {data?.results?.length  && (
               <CustomChip
                 skin='light'
                 size='small'

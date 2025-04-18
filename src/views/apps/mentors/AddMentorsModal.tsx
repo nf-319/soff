@@ -287,7 +287,7 @@ const AddMentorsModal = () => {
           </FormControl>
           <FormControl sx={{ width: '100%' }}>
             <AmountInput
-              label={t('Darslar soni')}
+              label={t('Dars haqi')}
               name='lesson_amount'
               onChange={e => handleCheckboxChange('lesson_amount', e.target.value)}
               onBlur={formik.handleBlur}

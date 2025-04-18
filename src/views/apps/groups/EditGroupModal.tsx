@@ -12,7 +12,8 @@ import {
   getDashboardLessons,
   updateGroup,
   updateFormParams,
-  updateParams
+  updateParams,
+  getMetaData,
 } from 'src/store/apps/groups'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { useTranslation } from 'react-i18next'
@@ -36,14 +37,14 @@ import {
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
 import { useQueryClient } from '@tanstack/react-query'
 import ceoConfigs from 'src/configs/ceo'
-import { setTeacherData } from '../../../store/apps/mentors'
+import { setTeacherData } from '@store/apps/mentors'
 import api from '../../../@core/utils/api'
+import { useGet } from '@hooks/useApi'
+import { Endpoints } from '@hooks/endpoints'
 
 export default function EditGroupModal() {
   const {
     isOpenEdit,
-    teachersData,
-    roomsData,
     groupData,
     courses,
     initialValues,
@@ -57,7 +58,8 @@ export default function EditGroupModal() {
   const [customWeekdays, setCustomWeekDays] = useState<string[]>([])
   const { query } = useRouter()
   const queryClient = useQueryClient()
-
+  const { data: roomsData, isLoading } = useGet(Endpoints.CommonRooms)
+  const { data: teachersData } = useGet(Endpoints.EmployeeTeachers)
 
   const validationSchema = Yup.object({
     name: Yup.string().required(t('Guruh nomini kiriting')),
@@ -71,6 +73,7 @@ export default function EditGroupModal() {
     day_of_week: Yup.string().required(t('Dars kunlarini tanlang')),
     end_at: Yup.string().required(t('Tugash vaqtini tanlang'))
   })
+
 
   const formik: any = useFormik({
     initialValues,
@@ -96,7 +99,6 @@ export default function EditGroupModal() {
 
       if (response.meta.requestStatus === 'rejected') {
         formik.setErrors(response.payload)
-        console.log(response.payload)
 
         toast.error(response.payload.msg)
       } else {
@@ -126,7 +128,7 @@ export default function EditGroupModal() {
           dispatch(setGettingAttendance(false))
           dispatch(setGettingGroupDetails(false))
         } else {
-          queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
+          void queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
         }
         formik.resetForm()
       }
@@ -234,6 +236,7 @@ export default function EditGroupModal() {
     }
 
     getTeachers()
+    dispatch(getMetaData())
   }, [])
 
   return (
@@ -400,11 +403,17 @@ export default function EditGroupModal() {
                     value={formik.values?.room}
                     error={!!formik.errors.room && !!formik.touched.room}
                   >
-                    {roomsData?.map(room => (
-                      <MenuItem key={room.id} value={+room.id}>
-                        {room.name}
-                      </MenuItem>
-                    ))}
+                    {isLoading
+                      ? [...Array(5)].map((_, index) => (
+                        <MenuItem key={index} disabled>
+                          <Skeleton variant="text" width={120} height={24} />
+                        </MenuItem>
+                      ))
+                      : roomsData?.results.map(room => (
+                        <MenuItem key={room.id} value={+room.id}>
+                          {room.name}
+                        </MenuItem>
+                      ))}
                     <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router?.push('/settings/office/rooms')}>
                       {t('Yangi yaratish')}
                       <IconifyIcon icon={'ion:add-sharp'} />
@@ -414,22 +423,6 @@ export default function EditGroupModal() {
                     {!!formik.errors.room && !!formik.touched.room && formik.errors.room}
                   </FormHelperText>
                 </FormControl>
-
-                {/* <FormControl fullWidth>
-                  <Autocomplete
-                    placeholder={t('Xonalar')}
-                    size='small'
-                    onBlur={formik.handleBlur}
-                    disablePortal
-                    onChange={(e, v) => handleChangeField('room', v?.value)}
-                    value={(options?.length > 0 && options.find(option => option.value === formik.values.room)) || null}
-                    options={options}
-                    renderInput={params => <TextField {...params} label={t('Xonalar')} />}
-                  />
-                  <FormHelperText error={!!formik.errors.room && formik.touched.room}>
-                    {!!formik.errors.room && formik.touched.room && formik.errors.room}
-                  </FormHelperText>
-                </FormControl> */}
 
                 <FormControl fullWidth>
                   <InputLabel size='small' id='user-view-language-label'>
@@ -441,7 +434,7 @@ export default function EditGroupModal() {
                     id='user-view-language'
                     labelId='user-view-language-label'
                     name='teacher'
-                    disabled={!!!formik.values.room}
+                    disabled={!formik.values.room}
                     onChange={e => handleChangeField('teacher', e)}
                     onBlur={formik.handleBlur}
                     value={formik.values.teacher}
@@ -472,9 +465,9 @@ export default function EditGroupModal() {
                   <FormHelperText error={!!formik.errors.start_date && formik.touched.start_date}>
                     {!!formik.errors.start_date && formik.touched.start_date && formik.errors.start_date}
                   </FormHelperText>
-                  </FormControl>
+                </FormControl>
 
-                  <FormControl sx={{ width: '100%' }}>
+                <FormControl sx={{ width: '100%' }}>
                   <TextField
                     size='small'
                     type='date'

@@ -19,9 +19,6 @@ import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
-import { Alert, Container } from 'react-bootstrap'
-import { Bell, MoveRight, X, XCircle } from 'lucide-react'
-import { Button } from '@mui/material'
 import AppBarWarning from 'src/components/AppBarWarning'
 
 const HorizontalLayoutWrapper = styled(Box)({
@@ -40,6 +37,7 @@ const MainContentWrapper = styled(Box)<BoxProps>({
 
 const Toolbar = styled(MuiToolbar)<ToolbarProps>(({ theme }) => ({
   width: '100%',
+  marginTop: "10px !important",
   padding: `${theme.spacing(0, 6)} !important`,
   [theme.breakpoints.down('sm')]: {
     paddingLeft: theme.spacing(2),
@@ -82,11 +80,12 @@ const HorizontalLayout = (props: LayoutProps) => {
   const { user } = useContext(AuthContext)
   const [showWarning, setShowWarning] = useState(false)
   const userData = localStorage.getItem('userData')
+  const subdomin = location.hostname.split(".")[0]
 
   const formattedUserData = JSON.parse(userData as string)
 
   useEffect(() => {
-    if (formattedUserData.payment_days) {
+    if (subdomin !== "c-panel" && formattedUserData.payment_days >= 0) {
       setShowWarning(true)
     } else {
       setShowWarning(false)
@@ -105,6 +104,7 @@ const HorizontalLayout = (props: LayoutProps) => {
     <HorizontalLayoutWrapper className='layout-wrapper'>
       <MainContentWrapper className='layout-content-wrapper' sx={{ ...(contentHeightFixed && { maxHeight: '100vh' }) }}>
         {showWarning && <AppBarWarning setShowWarning={setShowWarning} />}
+
         {!auth?.user?.payment_page && (
           <AppBar
             color='default'
@@ -139,6 +139,7 @@ const HorizontalLayout = (props: LayoutProps) => {
             >
               <Toolbar
                 className='navbar-content-container'
+                style={{ marginTop: '10px' }}
                 sx={{
                   mx: 'auto',
                   ...(contentWidth === 'boxed' && { '@media (min-width:1440px)': { maxWidth: 1440 } }),
@@ -161,6 +162,7 @@ const HorizontalLayout = (props: LayoutProps) => {
                 className='layout-horizontal-nav'
                 sx={{
                   width: '100%',
+                  marginTop: 1,
                   ...horizontalLayoutProps?.navMenu?.sx
                 }}
               >
@@ -168,6 +170,7 @@ const HorizontalLayout = (props: LayoutProps) => {
                   className='horizontal-nav-content-container'
                   sx={{
                     mx: 'auto',
+                    marginTop: 1,
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',

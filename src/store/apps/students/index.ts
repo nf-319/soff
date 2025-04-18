@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import api from 'src/@core/utils/api'
 import { IStudentState, StudentsQueryParamsTypes } from 'src/types/apps/studentsTypes'
 
-// ** Fetch All Departments
 export const fetchStudentsList = createAsyncThunk(
   'students/fetchStudentsList',
   async (params?: StudentsQueryParamsTypes | undefined) => {
@@ -172,14 +171,10 @@ export const studentsSlice = createSlice({
 export const {
   setGroupChecklist,
   setOpenEdit,
-  setIsGettingStudentGroups,
-  setOpenLeadModal,
   setStudentId,
   setStudentData,
   updateStudentParams,
-  clearStudentParams,
   setGlobalPay,
-  resetStudentsState
 } = studentsSlice.actions
 
 export default studentsSlice.reducer

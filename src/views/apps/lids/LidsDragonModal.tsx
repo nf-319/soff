@@ -124,7 +124,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
 
   useEffect(() => {
     if (openModal) {
-      dispatch(fetchGroupChecklist())
+      dispatch(fetchGroupChecklist(''))
       handleGetUserDetails(value, selectedLead?.id)
     }
   }, [selectedLead?.id])

@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "rootDir": "src",
     "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -17,9 +15,20 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+
+    "baseUrl": ".",
+    "rootDir": "src",
     "paths": {
       "apexcharts": ["./node_modules/apexcharts-clevision"],
-      "apexcharts/*": ["./node_modules/apexcharts-clevision/*"]
+      "apexcharts/*": ["./node_modules/apexcharts-clevision/*"],
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@utils/*": ["src/@core/utils/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@services/*": ["src/services/*"],
+      "@store/*": ["src/store/*"],
+
+      "@api/*": ["src/shared/api/*"]
     }
   },
   "include": ["src", "declaration.d.ts"],

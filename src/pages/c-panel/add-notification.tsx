@@ -6,10 +6,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Button } from '@mui/material'
 import { useRouter } from 'next/router'
 
-const CustomEditor = dynamic(() => import('src/components/ckeditor'), {
-  ssr: false,
-  loading: () => <p>Yuklanmoqda</p>
-})
+
 
 const AddNotification = () => {
   const router = useRouter()
@@ -21,7 +18,6 @@ const AddNotification = () => {
         Ortga
       </Button>
 
-      <CustomEditor />
     </div>
   )
 }

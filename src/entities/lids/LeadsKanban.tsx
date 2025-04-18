@@ -373,18 +373,36 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
 
       <EditAnonimDialogDialog department={id} open={open} lead={edit} setOpen={setOpen} />
 
-      <Dialog onClose={closeCreateLid} open={openLid !== null}>
+      <Dialog
+        onClose={closeCreateLid}
+        open={openLid !== null}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            width: '100%',
+            minHeight: 400,
+            overflow: 'visible',
+          },
+        }}
+      >
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant='h6' component='span'>
+          <Typography variant="h6" component="span">
             {t('Yangi Lid')}
           </Typography>
 
-          <IconButton aria-label='close' onClick={closeCreateLid}>
+          <IconButton aria-label="close" onClick={closeCreateLid}>
             <Close />
           </IconButton>
         </DialogTitle>
 
-        <DialogContent sx={{ minWidth: '320px' }}>
+        <DialogContent
+          sx={{
+            overflowY: 'visible',
+            px: 3,
+            pb: 3,
+          }}
+        >
           <CreateAnonimUserForm defaultId={String(defaultId)} source={source} />
         </DialogContent>
       </Dialog>

@@ -15,7 +15,7 @@ export default function CreateCompany() {
 
   async function handleSubmit(values: any) {
     try {
-      await api.post(`/owner/create/user/`, values)
+      await api.post(`owner/create/user/`, values)
       Router.push('/c-panel')
     } catch (err: any) {
       showResponseError(err?.response?.data, setError)

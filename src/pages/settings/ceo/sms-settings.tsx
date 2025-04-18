@@ -16,6 +16,8 @@ const SmsSettings = () => {
     | 'name'
     | 'branch'
     | 'paytype'
+    | 'create_payment'
+    | 'exam'
     | 'start-time'
     | 'end-time'
     | 'birthdate'
@@ -46,10 +48,18 @@ const SmsSettings = () => {
         key === 'on_attend' ||
         key === 'attend_text' ||
         key === 'debt_text' ||
-        key === 'for_debtor'
+        key === 'for_debtor' ||
+        key === 'for_exam' ||
+        key === 'exam_text' ||
+        key === 'for_payment' ||
+        key === 'create_payment_text'
       ) {
         if (key === 'on_birthday') {
           setLoading('birthdate')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
           formData.append('birthday_text', companyInfo?.auto_sms?.birthday_text)
           formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
           formData.append('absent_text', companyInfo?.auto_sms?.absent_text)
@@ -63,6 +73,10 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'birthday_text') {
           setLoading('birthdate')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
           formData.append('on_birthday', companyInfo?.auto_sms?.on_birthday)
           formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
           formData.append('absent_text', companyInfo?.auto_sms?.absent_text)
@@ -76,6 +90,10 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'payment_warning') {
           setLoading('payment')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
           formData.append('payment_text', companyInfo?.auto_sms?.payment_text)
           formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
           formData.append('absent_text', companyInfo?.auto_sms?.absent_text)
@@ -89,6 +107,42 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'payment_text') {
           setLoading('payment')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
+          formData.append('payment_warning', true)
+          formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo?.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo?.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo?.auto_sms?.birthday_text)
+          formData.append('on_score', companyInfo?.auto_sms?.on_score)
+          formData.append('score_text', companyInfo?.auto_sms?.score_text)
+          formData.append('on_attend', companyInfo?.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo?.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo?.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
+        } else if (key === 'for_exam') {
+          setLoading('exam')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('payment_warning', true)
+          formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo?.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo?.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo?.auto_sms?.birthday_text)
+          formData.append('on_score', companyInfo?.auto_sms?.on_score)
+          formData.append('score_text', companyInfo?.auto_sms?.score_text)
+          formData.append('on_attend', companyInfo?.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo?.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo?.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
+        } else if (key === 'exam_text') {
+          setLoading('exam')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
           formData.append('payment_warning', true)
           formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
           formData.append('absent_text', companyInfo?.auto_sms?.absent_text)
@@ -102,6 +156,10 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'on_score') {
           setLoading('score')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
           formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
           formData.append('payment_text', companyInfo?.auto_sms?.payment_text)
           formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
@@ -115,6 +173,42 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'score_text') {
           setLoading('score')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
+          formData.append('on_score', companyInfo?.auto_sms?.on_score)
+          formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo?.auto_sms?.payment_text)
+          formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo?.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo?.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo?.auto_sms?.birthday_text)
+          formData.append('on_attend', companyInfo?.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo?.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo?.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
+        } else if (key === 'for_payment') {
+          setLoading('create_payment')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
+          formData.append('on_score', companyInfo?.auto_sms?.on_score)
+          formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo?.auto_sms?.payment_text)
+          formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo?.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo?.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo?.auto_sms?.birthday_text)
+          formData.append('on_attend', companyInfo?.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo?.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo?.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
+        } else if (key === 'create_payment_text') {
+          setLoading('create_payment')
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
           formData.append('on_score', companyInfo?.auto_sms?.on_score)
           formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
           formData.append('payment_text', companyInfo?.auto_sms?.payment_text)
@@ -128,8 +222,11 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'on_attend') {
           setLoading('attend')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
           // formData.append('on_attend', !companyInfo?.auto_sms?.on_attend)
-
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
           formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
           formData.append('payment_text', companyInfo?.auto_sms?.payment_text)
           formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
@@ -144,6 +241,10 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'attend_text') {
           setLoading('attend')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
           formData.append('on_attend', companyInfo?.auto_sms?.on_attend)
           formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
           formData.append('payment_text', companyInfo?.auto_sms?.payment_text)
@@ -156,6 +257,10 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else if (key === 'for_debtor') {
           setLoading('debtor')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
           formData.append('for_debtor', !companyInfo?.auto_sms?.for_debtor)
 
           formData.append('debt_text', companyInfo?.auto_sms?.attend_text)
@@ -172,6 +277,10 @@ const SmsSettings = () => {
           formData.append('on_attend', companyInfo?.auto_sms?.on_attend)
         } else if (key === 'debt_text') {
           setLoading('debtor')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
           formData.append('for_debtor', companyInfo?.auto_sms?.for_debtor)
           formData.append('on_attend', companyInfo?.auto_sms?.on_attend)
           formData.append('attend_text', companyInfo?.auto_sms?.attend_text)
@@ -188,6 +297,10 @@ const SmsSettings = () => {
             'absent_text',
             'Assalomu Alaykum, siz kecha dars qoldirdingiz iltimos sababini bildirishni unurtmang'
           )
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
           formData.append('on_birthday', companyInfo?.auto_sms?.on_birthday)
           formData.append('birthday_text', companyInfo?.auto_sms?.birthday_text)
           formData.append('payment_warning', companyInfo?.auto_sms?.payment_warning)
@@ -200,6 +313,10 @@ const SmsSettings = () => {
           formData.append('debt_text', companyInfo?.auto_sms?.debt_text)
         } else {
           setLoading('absend')
+          formData.append('create_payment_text', companyInfo?.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo?.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo?.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo?.auto_sms?.for_exam)
           formData.append('on_absent', companyInfo?.auto_sms?.on_absent)
           formData.append('on_birthday', companyInfo?.auto_sms?.on_birthday)
           formData.append('birthday_text', companyInfo?.auto_sms?.birthday_text)
@@ -245,11 +362,34 @@ const SmsSettings = () => {
         updateSettings={updateSettings}
         defaultValue={companyInfo?.auto_sms?.birthday_text}
       />
+      <SmsCard
+        companyName={companyInfo.training_center_name}
+        title='Imtihon natijasini sms yuborish'
+        loading={loading === 'exam'}
+        onSwitch='for_exam'
+        name='exam_text'
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_exam)}
+        placeholders={PLACEHOLDERS.exam}
+        updateSettings={updateSettings}
+        defaultValue={companyInfo?.auto_sms?.exam_text}
+      />
 
       <SmsCard
         companyName={companyInfo.training_center_name}
-        title="Darsga kelmaganlarga sms yuborish"
-        alert="Kelmagan o'quvchiga sms xabarnoma ertasi kuni yuboriladi"
+        title="To'lov qilgandan so'ng sms yuborish"
+        loading={loading === 'create_payment'}
+        onSwitch='for_payment'
+        name='create_payment_text'
+        onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_payment)}
+        placeholders={PLACEHOLDERS.paid}
+        updateSettings={updateSettings}
+        defaultValue={companyInfo?.auto_sms?.create_payment_text}
+      />
+
+      <SmsCard
+        companyName={companyInfo.training_center_name}
+        title='Darsga kelmaganlarga sms yuborish'
+        alert="Darsga kelmagan o‘quvchilarga yo‘qlama yakunlangach SMS xabarnoma yuboriladi."
         loading={loading === 'absend'}
         onSwitch='on_absent'
         name='absent_text'
@@ -261,8 +401,8 @@ const SmsSettings = () => {
 
       <SmsCard
         companyName={companyInfo.training_center_name}
-        title="Darsga kelganlarga sms yuborish"
-        alert="Kelgan o'quvchiga ertasi kuni sms xabarnoma yuboriladi"
+        title='Darsga kelganlarga sms yuborish'
+        alert="Kelgan o‘quvchiga dars tugagach SMS xabarnoma yuboriladi."
         loading={loading === 'attend'}
         onSwitch='on_attend'
         name='attend_text'
@@ -286,7 +426,7 @@ const SmsSettings = () => {
       />
 
       <SmsCard
-        title="Qarzdorlarni ogohlantirish"
+        title='Qarzdorlarni ogohlantirish'
         alert="O'quvchi qarzdor bo'lgan kuni 1 marta ogohlantirish boradi"
         loading={loading === 'debtor'}
         onSwitch='for_debtor'
@@ -300,15 +440,15 @@ const SmsSettings = () => {
 
       <SmsCard
         title="O'quvchi baholarini yuborish"
-        alert="Kelmagan o'quvchiga ertasi kuni sms xabarnoma yuboriladi"
+        alert="Baholar qo‘yilgach, SMS xabarnoma yuboriladi."
         loading={loading === 'debtor'}
         onSwitch='on_score'
         companyName={companyInfo.training_center_name}
-        name='debt_text'
+        name='score_text'
         onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_score)}
-        placeholders={PLACEHOLDERS.deptStudents}
+        placeholders={PLACEHOLDERS.gradeStudents}
         updateSettings={updateSettings}
-        defaultValue={companyInfo?.auto_sms?.debt_text}
+        defaultValue={companyInfo?.auto_sms?.score_text}
       />
     </Box>
   )

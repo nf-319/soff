@@ -55,12 +55,20 @@ const DATE = {
   placeholder: "Xabar matniga sanani qo'shish uchun",
 }
 
+const EXAM = {
+  label: 'Imtixon nomi',
+  value: '${exam}',
+  color: 'primary',
+  displayValue: '@IMTIXON_NOMI',
+  placeholder: "Xabar matniga imtixon nomini qo'shish uchun",
+}
+
 const AMOUNT = {
-  label: 'Miqdor',
+  label: 'Summa',
   value: '${amount}',
   color: 'warning',
-  displayValue: '@MIQDOR',
-  placeholder: "Xabar matniga miqdorni qo'shish uchun",
+  displayValue: '@SUMMA',
+  placeholder: "Xabar matniga summani qo'shish uchun",
 }
 
 const DEPT_AMOUNT = {
@@ -70,13 +78,29 @@ const DEPT_AMOUNT = {
   displayValue: '@QARZDORLIK_SUMMASI',
   placeholder: "Xabar matniga qarzdorlik summasini qo'shish uchun",
 }
+const PAID_DATE = {
+  label: "To'lov sanasi",
+  value: '${payment_date}',
+  color: 'primary',
+  displayValue: "@TO'LOV_SANASI",
+  placeholder: "Xabar matniga to'lov sanasi qo'shish uchun",
+}
+const PAID_TYPE = {
+  label: "To'lov turi",
+  value: '${payment_type}',
+  color: 'warning',
+  displayValue: "@TO'LOV_SANASI",
+  placeholder: "Xabar matniga to'lov turini qo'shish uchun",
+}
 
 export const PLACEHOLDERS: any = {
   birthdate: [FIRST_NAME],
   notComeLesson: [FIRST_NAME],
   comeLesson: [FIRST_NAME],
+  exam: [FIRST_NAME, GROUP, SCORE, EXAM],
   whosePayment: [FIRST_NAME, WHOSE_PAYMENT_DATE, DEPT_AMOUNT],
   deptStudents: [FIRST_NAME, WHOSE_PAYMENT_DATE, DEPT_AMOUNT],
-  gradeStudents: [FIRST_NAME, GROUP, SCORE],
+  gradeStudents: [FIRST_NAME, GROUP, SCORE, PAID_DATE],
+  paid: [AMOUNT, PAID_DATE, PAID_TYPE]
 }
 

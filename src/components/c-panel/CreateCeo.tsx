@@ -17,7 +17,7 @@ export default function CreateCeo({ slug }: any) {
   async function handleSubmit(values: any) {
     setLoading(true)
     try {
-      await api.post(`/owner/user/`, { ...values, client_id: slug })
+      await api.post(`owner/user/`, { ...values, client_id: slug })
       Router.push('/c-panel')
     } catch (err: any) {
       showResponseError(err?.response?.data, setError)

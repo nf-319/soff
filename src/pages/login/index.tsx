@@ -100,8 +100,6 @@ const LoginPage = () => {
       const userRoles = response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase())
       dispatch(setRoles(userRoles))
 
-      console.table(response)
-
       if (
         !window.location.hostname.split('.').includes('c-panel') &&
         !window.location.hostname.split('.').includes('localhost')
