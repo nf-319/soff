@@ -28,7 +28,7 @@ type ICustomUseMutationOptions<D, E, P> = Partial<UseMutationOptions<D, E, P>>
 
 export const getRequest = (url: string, config?: AxiosRequestConfig) =>
     api.get(url, config).then((res) => res.data);
-  
+
 
 export const postRequest = <T>(
     url: string,
@@ -36,7 +36,7 @@ export const postRequest = <T>(
     config: AxiosRequestConfig = {},
 ) =>
     api
-        .post(`/${url}`, payload, {
+        .post(url, payload, {
             headers: {
                 "Content-Type": "application/json",
             },
@@ -47,17 +47,17 @@ export const putRequest = <T>(
     url: string,
     payload: T,
     config?: AxiosRequestConfig,
-) => api.put(`/${url}`, payload, config).then((res) => res.data)
+) => api.put(url, payload, config).then((res) => res.data)
 
 export const patchRequest = <T>(
     url: string,
     payload: T,
     config?: AxiosRequestConfig,
-) => api.patch(`/${url}`, payload, config).then((res) => res.data)
+) => api.patch(url, payload, config).then((res) => res.data)
 
 
 export const deleteRequest = (url: string, config?: AxiosRequestConfig) =>
-  api.delete(`/${url}`, config).then(res => res.data)
+  api.delete(url, config).then(res => res.data)
 
 // --------------------------------------------------------------------------------
 

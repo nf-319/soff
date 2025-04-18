@@ -31,7 +31,7 @@ export function StudentsPaymentsModal({
   const [branches, setBranches] = useState([])
 
   async function getBranches() {
-    api.get(`/owner/tenant/branches/${id}/`).then(res => {
+    api.get(`owner/tenant/branches/${id}/`).then(res => {
       setBranches(res.data)
     })
   }

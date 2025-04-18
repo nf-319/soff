@@ -280,18 +280,22 @@ export const GroupsFilter = ({ isMobile }: GroupsFilterProps) => {
               <MenuItem value={'monday,tuesday,wednesday,thursday,friday,saturday,sunday'}>{t('Har kuni')}</MenuItem>
             </Select>
           </FormControl>
-            <Excel tooltip="Ko‘rinib turgan jadvalni Excel fayliga yuklab oling." url='/common/groups/export/' queryString={queryString} />
-          <Tooltip title={t("Online darsni boshlash uchun bosing.")}>
-          <LoadingButton
-            loading={onlineLessonLoading}
-            color='success'
-            variant='outlined'
-            onClick={() => {
-              handleGetMeetLink()
-            }}
-          >
-            <IconifyIcon icon='mdi:laptop' />
-          </LoadingButton>
+          <Excel
+            tooltip='Ko‘rinib turgan jadvalni Excel fayliga yuklab oling.'
+            url='common/groups/export/'
+            queryString={queryString}
+          />
+          <Tooltip title={t('Online darsni boshlash uchun bosing.')}>
+            <LoadingButton
+              loading={onlineLessonLoading}
+              color='success'
+              variant='outlined'
+              onClick={() => {
+                handleGetMeetLink()
+              }}
+            >
+              <IconifyIcon icon='mdi:laptop' />
+            </LoadingButton>
           </Tooltip>
         </Box>
       </Box>

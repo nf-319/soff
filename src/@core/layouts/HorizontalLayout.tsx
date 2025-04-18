@@ -19,9 +19,6 @@ import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
-import { Alert, Container } from 'react-bootstrap'
-import { Bell, MoveRight, X, XCircle } from 'lucide-react'
-import { Button } from '@mui/material'
 import AppBarWarning from 'src/components/AppBarWarning'
 
 const HorizontalLayoutWrapper = styled(Box)({
@@ -83,11 +80,12 @@ const HorizontalLayout = (props: LayoutProps) => {
   const { user } = useContext(AuthContext)
   const [showWarning, setShowWarning] = useState(false)
   const userData = localStorage.getItem('userData')
+  const subdomin = location.hostname.split(".")[0]
 
   const formattedUserData = JSON.parse(userData as string)
 
   useEffect(() => {
-    if (formattedUserData.payment_days >= 0) {
+    if (subdomin !== "c-panel" && formattedUserData.payment_days >= 0) {
       setShowWarning(true)
     } else {
       setShowWarning(false)

@@ -77,7 +77,6 @@ export default function CreateForm({}: Props) {
   const [name, setName] = useState<any>(null)
   const [successText, setSuccessText] = useState<string | null>(null)
   const [departments, setDepartments] = useState<any[]>([])
-  const [selectedDepartment, setSelectedDepartment] = useState<any>(null)
   const [sourceData, setSourceData] = useState<any>([])
   const [addSource, setAddSource] = useState<boolean>(false)
   const [department, setDepartment] = useState<any>(null)

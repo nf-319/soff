@@ -37,7 +37,7 @@ const UserView = () => {
       toast.error('Sahifaga kirish huquqingiz yoq!')
     }
 
-    (async function () {
+    ;(async function () {
       const queryString = new URLSearchParams(queryParams).toString()
       dispatch(setGettingAttendance(true))
       dispatch(setGettingGroupDetails(true))
@@ -72,7 +72,7 @@ const UserView = () => {
   return (
     <Box display='flex' flexDirection='column' gap={4}>
       <Box mb={isMobile ? 3 : 0} display={isMobile ? 'grid' : 'flex'} justifyContent='end' gap={isMobile ? 3 : 5}>
-        <ExcelGrades width={isMobile ? '100%' : 'auto'} url={`/common/ratings/export/${router.query.id}`} />
+        <ExcelGrades width={isMobile ? '100%' : 'auto'} url={`common/ratings/export/${router.query.id}`} />
 
         <VideoHeader item={videoUrls.group} />
       </Box>

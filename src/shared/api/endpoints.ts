@@ -4,5 +4,4 @@ export const enum Endpoints {
   OwnerListClient = 'owner/list/client/',
   Notifications = 'common/notifications/',
   NotificationRead = 'common/notification-read/{id}/',
-
 }
