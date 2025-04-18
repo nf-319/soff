@@ -18,7 +18,7 @@ import InfoIcon from '@mui/icons-material/Info'
 type Props = {
   loading: boolean
   updateSettings: (key: string, value: any) => Promise<void>
-  defaultValue?: string
+  defaultValue?: string | null
   placeholders: PlaceholdersButtonsAreaTypes[]
   title: string
   companyName: string
@@ -40,7 +40,7 @@ export const SmsCard: FC<Props> = ({
   title,
   placeholders
 }) => {
-  const [value, setValue] = useState(defaultValue)
+  const [value, setValue] = useState(defaultValue || '')
   const [editable, setEditable] = useState(false)
 
   const handleSave = async () => {
@@ -53,7 +53,7 @@ export const SmsCard: FC<Props> = ({
   }
 
   const handleCancel = () => {
-    setValue(defaultValue)
+    setValue(defaultValue || '')
     setEditable(false)
   }
 
@@ -127,7 +127,7 @@ export const SmsCard: FC<Props> = ({
               handleChange={handleSave}
               setEditable={setEditable}
               placeholders={placeholders}
-              defaultValue={defaultValue}
+              defaultValue={defaultValue || ''}
               onChange={setValue}
             />
           ) : (
