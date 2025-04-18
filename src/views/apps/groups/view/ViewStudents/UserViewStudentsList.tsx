@@ -386,31 +386,37 @@ export default function UserViewStudentsList() {
     onSubmit: async values => {
       setLoading(true)
       try {
-        await api.patch(`common/group-student-update/status/${updateStatusModal?.id}/`, { status: values.status })
-        toast.success("O'quvchi malumotlari o'zgartirildi", { position: 'top-center' })
-        setLoading(false)
-        dispatch(setUpdateStatusModal(null))
-        const queryString = new URLSearchParams({ ...studentsQueryParams }).toString()
-        const queryStringAttendance = new URLSearchParams(queryParams).toString()
-        dispatch(setGettingAttendance(true))
-        await dispatch(getStudents({ id: query.id, queryString: queryString }))
+        await api
+          .patch(`common/group-student-update/status/${updateStatusModal?.id}/`, { status: values.status })
+          .then(async () => {
+            toast.success("O'quvchi malumotlari o'zgartirildi", { position: 'top-center' })
+            setLoading(false)
+            dispatch(setUpdateStatusModal(null))
+            const queryString = new URLSearchParams({ ...studentsQueryParams }).toString()
+            const queryStringAttendance = new URLSearchParams(queryParams).toString()
+            dispatch(setGettingAttendance(true))
+            await dispatch(getStudents({ id: query.id, queryString: queryString }))
 
-        if (query.month && query?.id) {
-          await dispatch(
-            getAttendance({
-              date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query.month)}`,
-              group: query?.id,
-              queryString: queryStringAttendance
-            })
-          )
-          await dispatch(
-            getDays({
-              date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query.month)}`,
-              group: query?.id
-            })
-          )
-        }
-        dispatch(setGettingAttendance(false))
+            if (query.month && query?.id) {
+              await dispatch(
+                getAttendance({
+                  date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query.month)}`,
+                  group: query?.id,
+                  queryString: queryStringAttendance
+                })
+              )
+              await dispatch(
+                getDays({
+                  date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query.month)}`,
+                  group: query?.id
+                })
+              )
+            }
+            dispatch(setGettingAttendance(false))
+          }).catch((error) => {
+            console.log(error)
+          toast.error(error?.response?.data?.detail)
+        })
       } catch (err: any) {
         formik.setErrors(err?.response?.data)
         console.log(err?.response?.data)

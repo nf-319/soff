@@ -53,7 +53,6 @@ export const FormUpdateModal: FC<Props> = ({ open, onClose, formData, onSuccess 
   const [departments, setDepartments] = useState<any[]>([])
   const [sources, setSources] = useState<any[]>([])
   const [error, setError] = useState<any>({})
-  const [selectedDepartment, setSelectedDepartment] = useState<any>(null)
 
   const {
     handleSubmit,
@@ -81,10 +80,9 @@ export const FormUpdateModal: FC<Props> = ({ open, onClose, formData, onSuccess 
   useEffect(() => {
     if (formData && open) {
       setValue('title', formData.title || '')
-      setValue('department', formData.department_id || '')
-      setValue('source', formData.source_id || '')
+      setValue('department', formData.department || '')
+      setValue('source', formData.source || '')
       setValue('success_text', formData.success_text || '')
-      setSelectedDepartment(formData.department_parent_id || null)
     }
   }, [formData, open, setValue])
 
@@ -118,7 +116,7 @@ export const FormUpdateModal: FC<Props> = ({ open, onClose, formData, onSuccess 
         return
       }
 
-      await api.patch(`leads/application-form/update/${formId}/`, data)
+      await api.patch(`leads/forms/${formId}/`, data)
       toast.success('Forma muvaffaqiyatli yangilandi')
 
       if (onSuccess) {
@@ -136,25 +134,25 @@ export const FormUpdateModal: FC<Props> = ({ open, onClose, formData, onSuccess 
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography fontSize="18px">{t('Formani o\'zgartirish')}</Typography>
+    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+      <DialogTitle sx={{ display: 'flex', padding: 4, paddingButtom: 1, alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography fontSize='18px'>{t("Formani o'zgartirish")}</Typography>
         <IconButton onClick={onClose}>
           <IconifyIcon icon={'ic:baseline-close'} />
         </IconButton>
       </DialogTitle>
 
-      <Box padding={3}>
+      <Box padding={4} paddingTop={0}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <FormControl fullWidth margin="normal" error={!!errors.title}>
+          <FormControl fullWidth margin='normal' error={!!errors.title}>
             <Controller
-              name="title"
+              name='title'
               control={control}
               render={({ field }) => (
                 <TextField
                   {...field}
                   label={t('Forma nomi')}
-                  size="small"
+                  size='small'
                   error={!!errors.title || error?.title?.error}
                   helperText={errors.title?.message || error?.title?.message}
                 />
@@ -162,72 +160,52 @@ export const FormUpdateModal: FC<Props> = ({ open, onClose, formData, onSuccess 
             />
           </FormControl>
 
-          <FormControl fullWidth margin="normal" error={!!errors.department}>
-            <InputLabel id="department-parent-label" size="small">{t("Bo'lim")}</InputLabel>
+          <FormControl fullWidth margin='normal' error={!!errors.department}>
+            <InputLabel id='department-parent-label' size='small'>
+              {t("Bo'lim")}
+            </InputLabel>
 
-            <Select
-              labelId="department-parent-label"
-              label={t("Bo'lim")}
-              size="small"
-              value={selectedDepartment || ''}
-              onChange={(e) => setSelectedDepartment(e.target.value)}
-              error={!!errors.department || error?.departmentParent?.error}
-            >
-              {departments.map((dept) => (
-                <MenuItem key={dept.id} value={dept.id}>
-                  {dept.name}
-                </MenuItem>
-              ))}
-            </Select>
+            <Controller
+              name='department'
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  labelId='department-parent-label'
+                  label={t("Bo'lim")}
+                  size='small'
+                  error={!!errors.department || error?.departmentParent?.error}
+                >
+                  {departments.map(dept => (
+                    <MenuItem key={dept.id} value={dept.id}>
+                      {dept.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
 
             <FormHelperText error={!!errors.department || error?.departmentParent?.error}>
               {error?.departmentParent?.message}
             </FormHelperText>
           </FormControl>
 
-          {selectedDepartment && (
-            <FormControl fullWidth margin="normal" error={!!errors.department}>
-              <InputLabel id="department-label" size="small">{t("Quyi bo'lim")}</InputLabel>
-              <Controller
-                name="department"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    labelId="department-label"
-                    label={t("Quyi bo'lim")}
-                    size="small"
-                    error={!!errors.department || error?.department?.error}
-                  >
-                    {departments
-                      .find(dept => dept.id === selectedDepartment)?.children?.map((child: any) => (
-                        <MenuItem key={child.id} value={child.id}>
-                          {child.name}
-                        </MenuItem>
-                      )) || []}
-                  </Select>
-                )}
-              />
-              <FormHelperText>
-                {errors.department?.message || error?.department?.message}
-              </FormHelperText>
-            </FormControl>
-          )}
-
-          <FormControl fullWidth margin="normal" error={!!errors.source}>
-            <InputLabel id="source-label" size="small">{t('Manba')}</InputLabel>
+          <FormControl fullWidth margin='normal' error={!!errors.source}>
+            <InputLabel id='source-label' size='small'>
+              {t('Manba')}
+            </InputLabel>
             <Controller
-              name="source"
+              name='source'
               control={control}
               render={({ field }) => (
                 <Select
                   {...field}
-                  labelId="source-label"
+                  labelId='source-label'
                   label={t('Manba')}
-                  size="small"
+                  size='small'
                   error={!!errors.source || error?.source?.error}
                 >
-                  {sources.map((source) => (
+                  {sources.map(source => (
                     <MenuItem key={source.id} value={source.id}>
                       {source.name}
                     </MenuItem>
@@ -235,20 +213,18 @@ export const FormUpdateModal: FC<Props> = ({ open, onClose, formData, onSuccess 
                 </Select>
               )}
             />
-            <FormHelperText>
-              {errors.source?.message || error?.source?.message}
-            </FormHelperText>
+            <FormHelperText>{errors.source?.message || error?.source?.message}</FormHelperText>
           </FormControl>
 
-          <FormControl fullWidth margin="normal">
+          <FormControl fullWidth margin='normal'>
             <Controller
-              name="success_text"
+              name='success_text'
               control={control}
               render={({ field }) => (
                 <TextField
                   {...field}
                   label={t('Yakuniy text')}
-                  size="small"
+                  size='small'
                   rows={2}
                   error={!!errors.success_text || error?.success_text?.error}
                   helperText={errors.success_text?.message || error?.success_text?.message}
@@ -258,18 +234,10 @@ export const FormUpdateModal: FC<Props> = ({ open, onClose, formData, onSuccess 
           </FormControl>
 
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-            <Button
-              variant="outlined"
-              onClick={onClose}
-              disabled={isLoading}
-            >
+            <Button variant='outlined' onClick={onClose} disabled={isLoading}>
               {t('Bekor qilish')}
             </Button>
-            <LoadingButton
-              type="submit"
-              variant="contained"
-              loading={isLoading}
-            >
+            <LoadingButton type='submit' variant='contained' loading={isLoading}>
               {t('Saqlash')}
             </LoadingButton>
           </Box>
