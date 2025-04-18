@@ -99,7 +99,7 @@ const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed
     >
       {children}
 
-      <QRCodeScanner />
+      {user?.currentRole !== "student" && <QRCodeScanner />}
     </Layout>
   )
 }

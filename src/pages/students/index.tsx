@@ -16,6 +16,7 @@ import {
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import DataTable from '../../components/table'
 import { useTranslation } from 'react-i18next'
+import { DatePicker } from '@/components/DatePicker'
 import { useRouter } from 'next/router'
 import StudentsFilter from 'src/views/apps/students/StudentsFilter'
 import CreateStudentModal from 'src/views/apps/students/CreateStudentModal'
@@ -211,8 +212,6 @@ export default function StudentsPage() {
         toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
         return
       }
-
-      // await dispatch(fetchStudentsList({ ...queryParams }))
     }
 
     void initialize()
@@ -222,6 +221,9 @@ export default function StudentsPage() {
       dispatch(updateStudentParams({ limit: '10', offset: '0', course: '', teacher: '', group: '' }))
     }
   }, [])
+
+  const [monthAndYears, setMonthAndYears] = useState<Date | null>(null)
+
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
@@ -243,12 +245,6 @@ export default function StudentsPage() {
           )}
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          {/* <>
-            <input type='file' ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
-            <Button onClick={handleClick} variant='outlined' size='small'>
-              {t("O'quvchilarni import qilish")}
-            </Button>
-          </> */}
           <Button
             onClick={() => dispatch(setOpenEdit('create'))}
             variant='contained'
