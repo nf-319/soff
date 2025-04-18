@@ -221,7 +221,7 @@ const CardStatistics = () => {
   const confirmDeleteCategory = async () => {
     setLoading(true)
     try {
-      await api.patch(`/finance/budget-category/update/${deleteCategory}/`, { is_active: false })
+      await api.patch(`finance/budget-category/update/${deleteCategory}/`, { is_active: false })
       setDeleteCategory(null)
       dispatch(getExpenseCategories(''))
       dispatch(getIncomeCategories(''))

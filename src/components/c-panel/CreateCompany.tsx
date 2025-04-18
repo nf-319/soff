@@ -54,7 +54,7 @@ export default function CreateCompany() {
         file,
       }
 
-      await api.post(`/owner/create/client/`, formattedValues, {
+      await api.post(`owner/create/client/`, formattedValues, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

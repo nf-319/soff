@@ -34,14 +34,14 @@ export function AddStudentModal({
   const dispatch = useAppDispatch()
   const { query } = useRouter()
   async function getBranches() {
-    api.get(`/owner/tenant/branches/${id}/`).then(res => {
+    api.get(`owner/tenant/branches/${id}/`).then(res => {
       setBranches(res.data)
     })
   }
 
   useEffect(() => {
     if (openModal) {
-      getBranches()
+      void getBranches()
     }
   }, [openModal])
 
@@ -68,7 +68,7 @@ export function AddStudentModal({
     formData.append('file', values.file)
 
     try {
-      await api.post(`/owner/tenant/students-import/${id}`, formData)
+      await api.post(`owner/tenant/students-import/${id}`, formData)
       setOpenModal(false)
       toast.success('Fayl muvaffaqiyatli yuklandi')
       dispatch(fetchCompanyDetails(Number(query?.slug)))

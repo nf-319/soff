@@ -26,7 +26,7 @@ export const createTariff = createAsyncThunk(
   'createTariff',
   async (values: Partial<TariffType>, { rejectWithValue }) => {
     try {
-      const response = await api.post('/owner/tariff/create/', values)
+      const response = await api.post('owner/tariff/create/', values)
       return response.data
     } catch (err: any) {
       if (err.response) {
@@ -40,7 +40,7 @@ export const createSMSTariff = createAsyncThunk(
   'createSMSTariff',
   async (values: Partial<SMSTariff>, { rejectWithValue }) => {
     try {
-      const response = await api.post('/owner/sms-tariff/create/', values)
+      const response = await api.post('owner/sms-tariff/create/', values)
       return response.data
     } catch (err: any) {
       if (err.response) {
@@ -54,7 +54,7 @@ export const createClientPayment = createAsyncThunk(
   'createClientPayment',
   async (values: Partial<any>, { rejectWithValue }) => {
     try {
-      const response = await api.post('/owner/order/create/', values)
+      const response = await api.post('owner/order/create/', values)
       return response.data
     } catch (err: any) {
       if (err.response) {
@@ -68,7 +68,7 @@ export const updateSMSTariff = createAsyncThunk(
   'updateSMSTariff',
   async (values: Partial<SMSTariff>, { rejectWithValue }) => {
     try {
-      const response = await api.patch(`/owner/sms-tariff/update/${values.id}/`, values)
+      const response = await api.patch(`owner/sms-tariff/update/${values.id}/`, values)
       return response.data
     } catch (err: any) {
       if (err.response) {
@@ -82,7 +82,7 @@ export const updateTariff = createAsyncThunk(
   'updateTariff',
   async (values: Partial<TariffType>, { rejectWithValue }) => {
     try {
-      const response = await api.patch(`/owner/tariff/update/${values.id}/`, values)
+      const response = await api.patch(`owner/tariff/update/${values.id}/`, values)
       return response.data
     } catch (err: any) {
       if (err.response) {
@@ -96,7 +96,7 @@ export const updatePaymentModal = createAsyncThunk(
   'updatePaymentModal',
   async ({ id, formData }: { id: number | undefined } & Partial<any>, { rejectWithValue }) => {
     try {
-      const response = await api.patch(`/owner/order/update/${id}/`, formData)
+      const response = await api.patch(`owner/order/update/${id}/`, formData)
       return response.data
     } catch (err: any) {
       if (err.response) {
@@ -110,7 +110,7 @@ export const deleteCRMPayment = createAsyncThunk(
   'deleteCRMPayment',
   async (id: number | string, { rejectWithValue }) => {
     try {
-      const response = await api.delete(`/owner/order/delete/${id}/`)
+      const response = await api.delete(`owner/order/delete/${id}/`)
       return response.data
     } catch (err: any) {
       if (err.response) {
@@ -125,7 +125,7 @@ export const deleteCRM = createAsyncThunk(
   'deleteCRM',
   async (id: number | string, { rejectWithValue }) => {
     try {
-      const response = await api.delete(`/owner/client/${id}/`)
+      const response = await api.delete(`owner/client/${id}/`)
       return response.data
     } catch (err: any) {
       if (err.response) {
