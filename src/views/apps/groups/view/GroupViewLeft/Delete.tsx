@@ -35,7 +35,6 @@ export default function Delete() {
   const { query, push } = useRouter()
   const [resetBalance, setResetBalance] = useState(true)
   const queryClient = useQueryClient()
-  console.log(router.pathname)
 
   const handleCheckboxChange = (event: any) => {
     setResetBalance(event.target.checked)

@@ -30,14 +30,18 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import { setOnlineLessonLoading } from 'src/store/apps/groupDetails'
 import { fetchGroups, updateParams } from 'src/store/apps/groups'
 import { TacherItemType } from 'src/types/apps/mentorsTypes'
+import { useGet } from '@/hooks/useApi'
+import ceoConfigs from '@/configs/ceo'
 
 type GroupsFilterProps = {
   isMobile: boolean
 }
 
 export const GroupsFilter = ({ isMobile }: GroupsFilterProps) => {
-  const { queryParams, courses, teachersData } = useAppSelector(state => state.groups)
+  const { queryParams } = useAppSelector(state => state.groups)
   const { onlineLessonLoading } = useAppSelector(state => state.groupDetails)
+  const { data: teachersData } = useGet(`${ceoConfigs.employee_checklist}?role=teacher`)
+  const { data: courses } = useGet('common/course/checklist/')
 
   const dispatch = useAppDispatch()
   const [search, setSearch] = useState<string>('')

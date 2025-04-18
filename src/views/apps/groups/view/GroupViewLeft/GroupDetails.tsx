@@ -1,20 +1,22 @@
 'use client'
 
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 import { AuthContext } from 'src/context/AuthContext'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { getSMSTemp, handleEditClickOpen, setOnlineLessonLoading } from 'src/store/apps/groupDetails'
-import EditGroupModal from '../../EditGroupModal'
 import { getDashboardLessons, getGroupsDetails, handleOpenEdit } from 'src/store/apps/groups'
 import api from 'src/@core/utils/api'
 import GroupDetailsWrapper from './GroupDetailsWrapper'
+import { GroupCreateEditDrawer } from '@/components/GroupDrawerModal'
 
 export default function GroupDetails() {
   const { groupData, isGettingGroupDetails, onlineLessonLoading } = useAppSelector(state => state.groupDetails)
   const dispatch = useAppDispatch()
+      const [openEditModal, setOpenEditModal] = useState<'create'|'edit'|null>(null)
+
   const { user } = useContext(AuthContext)
   const router = useRouter()
 
@@ -24,7 +26,7 @@ export default function GroupDetails() {
   }
 
   const handleEdit = async (id: any) => {
-    dispatch(handleOpenEdit(true))
+    setOpenEditModal('edit')
     const filtered = { ...groupData }
     const queryString = new URLSearchParams({
       day_of_week: filtered?.day_of_week?.toString(),
@@ -53,6 +55,7 @@ export default function GroupDetails() {
   return (
     <>
       <GroupDetailsWrapper
+        setOpen={setOpenEditModal}
         groupData={groupData}
         isGettingGroupDetails={isGettingGroupDetails}
         onlineLessonLoading={onlineLessonLoading}
@@ -62,7 +65,7 @@ export default function GroupDetails() {
         handleEditClickOpen={(type: any) => dispatch(handleEditClickOpen(type))}
         handleGetMeetLink={handleGetMeetLink}
       />
-      <EditGroupModal />
+      <GroupCreateEditDrawer open={openEditModal} setOpen={setOpenEditModal}/>
     </>
   )
 }

@@ -1,83 +1,190 @@
+//@ts-nocheck
 import { Autocomplete, Box, Drawer, FormHelperText, IconButton, InputLabel, TextField, Typography } from '@mui/material'
-import IconifyIcon from '../../../components/icon'
+import IconifyIcon from '../icon'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import LoadingButton from '@mui/lab/LoadingButton'
 import {
   getDashboardLessons,
+  getMetaData,
   handleOpenAddModal,
+  handleOpenEdit,
   resetFormParams,
-  updateFormParams
+  setRoomsData,
+  setTeacherData,
+  updateFormParams,
+  updateGroup,
+  updateParams
 } from 'src/store/apps/groups'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { useTranslation } from 'react-i18next'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import Calendar from './Calendar'
+import Calendar from '../../views/apps/groups/Calendar'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
-import Router from 'next/router'
+import Router, { useRouter } from 'next/router'
 import api from 'src/@core/utils/api'
-import { usePost } from 'src/hooks/useApi'
+import { useGet, usePost } from 'src/hooks/useApi'
 import ceoConfigs from 'src/configs/ceo'
 import { useQueryClient } from '@tanstack/react-query'
+import {
+  getAttendance,
+  getDays,
+  getGroupById,
+  setGettingAttendance,
+  setGettingGroupDetails
+} from '@/store/apps/groupDetails'
+import { getMontNumber } from '@/@core/utils/gwt-month-name'
 
-export default function AddGroupModal() {
-  const { isOpenAddGroup, teachersData, roomsData, courses, formParams, initialValues } = useAppSelector(
+type Props = {
+  open: 'create' | 'edit' | null
+  setOpen: (status: any) => void
+}
+
+export function GroupCreateEditDrawer({ open, setOpen }: Props) {
+  const { isOpenAddGroup, groupData, queryParams, isOpenEdit, formParams, initialValues } = useAppSelector(
     state => state.groups
   )
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
   const [customWeekdays, setCustomWeekDays] = useState<string[]>([])
   const { mutate, isPending } = usePost()
+  const [loading, setLoading] = useState(false)
   const queryClient = useQueryClient()
-
+  const { query } = useRouter()
+  const { data: roomsData } = useGet('common/room-check-list/', { options: { enabled: !!open } })
+  const { data: teachersData } = useGet(`${ceoConfigs.employee_checklist}?role=teacher`, {
+    options: { enabled: !!open }
+  })
+  const { data: courses } = useGet('common/course/checklist/', { options: { enabled: !!open } })
   const validationSchema = Yup.object({
     name: Yup.string().required(t('Guruh nomini kiriting') || 'Guruh nomini kiriting'),
     course: Yup.string().required(t('Kursni tanlang') || 'Kursni tanlang'),
     teacher: Yup.string().required(t("O'qituvchini tanlang") || "O'qituvchini tanlang"),
     room: Yup.string().required(t('Xonani tanlang') || 'Xonani tanlang'),
+
     start_date: Yup.string().required(t('Boshlanish sanasini tanlang') || 'Boshlanish sanasini tanlang'),
-    // end_date: Yup.string().required(t('Tugash sanasini tanlang') || 'Tugash sanasini tanlang'),
     start_at: Yup.string().required(t('Boshlanish vaqtini tanlang') || 'Boshlanish vaqtini tanlang'),
     day_of_week: Yup.string().required(t('Dars kunlarini tanlang') || 'Dars kunlarini tanlang'),
     end_at: Yup.string().required(t('Tugash vaqtini tanlang') || 'Tugash vaqtini tanlang')
   })
+  const updateValidationSchema = Yup.object({
+    name: Yup.string().required(t('Guruh nomini kiriting')),
+    course: Yup.string().required(t('Kursni tanlang')),
+    teacher: Yup.string().required(t("O'qituvchini tanlang")),
+    room: Yup.string().required(t('Xonani tanlang')),
+    start_date: Yup.string().required(t('Boshlanish sanasini tanlang')),
+    end_date: Yup.string().required(t('Tugash sanasini tanlang')),
 
-  const formik = useFormik({
-    initialValues,
-    validationSchema,
-    onSubmit: async values => {
-      dispatch(disablePage(true));
-      let obj = { ...values };
-      if (!values.day_of_week || values.day_of_week === '0') {
-        obj = { ...obj, day_of_week: customWeekdays };
-      } else {
-        // @ts-ignore
-        obj = { ...obj, day_of_week: values.day_of_week.split(',').map((day: any) => day.trim()) };
-      }
+    start_at: Yup.string().required(t('Boshlanish vaqtini tanlang')),
+    day_of_week: Yup.string().required(t('Dars kunlarini tanlang')),
+    end_at: Yup.string().required(t('Tugash vaqtini tanlang'))
+  })
 
-
-      mutate(
-        ceoConfigs.groups_create,
-        obj,
-        {
-          onSuccess: () => {
-            handleClose();
-            toast.success(t('Guruh muvaffaqiyatli yaratildi') || 'Guruh muvaffaqiyatli yaratildi');
-            queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] });
-          },
-          onError: err => {
-            console.error('API xatosi:', err.response?.data);
-            formik.setErrors(err.response?.data || { general: 'Server xatosi' });
+  const createFormik = () =>
+    useFormik({
+      initialValues,
+      validationSchema,
+      onSubmit: async values => {
+        dispatch(disablePage(true))
+        let obj = { ...values }
+        if (!values.day_of_week || values.day_of_week === '0') {
+          obj = { ...obj, day_of_week: customWeekdays }
+        } else {
+          obj = {
+            ...obj,
+            day_of_week: values.day_of_week.split(',').map(day => day.trim())
           }
         }
-      );
-      dispatch(disablePage(false));
-    }
-  });
+
+        mutate(ceoConfigs.groups_create, obj, {
+          onSuccess: () => {
+            handleClose()
+            toast.success(t('Guruh muvaffaqiyatli yaratildi') || 'Guruh muvaffaqiyatli yaratildi')
+            queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
+          },
+          onError: err => {
+            console.error('API xatosi:', err.response?.data)
+            formik.setErrors(err.response?.data || { general: 'Server xatosi' })
+          }
+        })
+        dispatch(disablePage(false))
+      }
+    })
+
+  const updateFormik = () =>
+    useFormik({
+      initialValues,
+      validationSchema: updateValidationSchema,
+      onSubmit: async values => {
+        setLoading(true)
+        dispatch(disablePage(true))
+        let obj = { ...values }
+
+        if (!values.day_of_week || values.day_of_week === '0') {
+          obj = { ...obj, day_of_week: customWeekdays }
+        } else {
+          obj = {
+            ...obj,
+            day_of_week: values.day_of_week.split(',').map(day => day.trim())
+          }
+        }
+
+        if (queryParams?.is_recovery) {
+          obj.status = 'active'
+        }
+
+        const response = await dispatch(
+          updateGroup({
+            id: groupData?.id,
+            values: obj
+          })
+        )
+
+        if (response.meta.requestStatus === 'rejected') {
+          formik.setErrors(response.payload)
+          toast.error(response.payload.msg)
+        } else {
+          dispatch(updateParams({ is_recovery: false }))
+          toast.success(t("O'zgrishlar muvafaqqiyati saqlandi"))
+          handleClose()
+          const queryString = new URLSearchParams(queryParams).toString()
+
+          if (query?.id) {
+            dispatch(setGettingAttendance(true))
+            dispatch(setGettingGroupDetails(true))
+            await Promise.all([
+              dispatch(
+                getDays({
+                  date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query.month)}`,
+                  group: query.id
+                })
+              ),
+              dispatch(getGroupById(query.id)),
+              dispatch(
+                getAttendance({
+                  date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query.month)}`,
+                  group: query.id,
+                  queryString: queryString
+                })
+              )
+            ])
+            dispatch(setGettingAttendance(false))
+            dispatch(setGettingGroupDetails(false))
+          } else {
+            void queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
+          }
+          formik.resetForm()
+        }
+
+        setLoading(false)
+        dispatch(disablePage(false))
+      }
+    })
+  const formik = open == 'edit' ? updateFormik() : createFormik()
 
   const handleChangeField = async (
     name: string,
@@ -117,14 +224,48 @@ export default function AddGroupModal() {
   }
 
   const handleClose = () => {
-    dispatch(handleOpenAddModal(false))
+    setOpen(null)
     formik.resetForm()
     dispatch(resetFormParams())
     setCustomWeekDays([])
   }
 
+  useEffect(() => {
+    if (groupData) {
+      for (const [key, value] of Object.entries(groupData)) {
+        if (key === 'course_data') {
+          formik.setFieldValue('course', value?.id)
+        }
+        if (key == 'teacher_data') {
+          formik.setFieldValue('teacher', value?.id)
+          dispatch(updateFormParams({ teacher: value?.id }))
+        }
+        if (key == 'room_data') {
+          formik.setFieldValue('room', value?.id)
+          dispatch(updateFormParams({ room: value?.id }))
+        }
+        if (key === 'day_of_week') {
+          const dayMapping = {
+            'tuesday,thursday,saturday': 'tuesday,thursday,saturday',
+            'monday,wednesday,friday': 'monday,wednesday,friday',
+            'tuesday,thursday,saturday,monday,wednesday,friday': 'tuesday,thursday,saturday,monday,wednesday,friday'
+          }
+          const joinedValue = value.join(',')
+          if (dayMapping[joinedValue]) {
+            formik.setFieldValue(key, dayMapping[joinedValue])
+            dispatch(updateFormParams({ day_of_week: dayMapping[joinedValue] }))
+          } else {
+            formik.setFieldValue(key, 0)
+            setCustomWeekDays(value)
+            dispatch(updateFormParams({ day_of_week: value.toString() }))
+          }
+        } else formik.setFieldValue(key, value)
+      }
+    }
+  }, [groupData])
+
   return (
-    <Drawer open={isOpenAddGroup} hideBackdrop anchor='right' variant='temporary' sx={{ width: '100%' }}>
+    <Drawer open={open} hideBackdrop anchor='right' variant='temporary' sx={{ width: '100%' }}>
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', width: '100vw' }}>
         <Calendar />
         <Box
@@ -135,28 +276,30 @@ export default function AddGroupModal() {
           }}
         >
           <Box
-            className='customizer-header'
+            className='customizer-header '
             sx={{
+              top: 2,
+              display: 'flex',
+              flexDirection: 'column',
               position: 'relative',
-              p: theme => theme.spacing(3.5, 5),
+              padding: 3,
               borderBottom: theme => `1px solid ${theme.palette.divider}`
             }}
           >
-            <Typography variant='h6' sx={{ fontWeight: 600 }}>
-              {t("Guruh qo'shish")}
-            </Typography>
-            <IconButton
-              onClick={handleClose}
+            <Box
               sx={{
-                right: 20,
-                top: '50%',
-                position: 'absolute',
-                color: 'text.secondary',
-                transform: 'translateY(-50%)'
+                display: 'flex',
+                justifyContent: 'end',
+                color: 'text.secondary'
               }}
             >
-              <IconifyIcon icon='mdi:close' fontSize={20} />
-            </IconButton>
+              <IconButton onClick={handleClose}>
+                <IconifyIcon icon='mdi:close' fontSize={20} />
+              </IconButton>
+            </Box>
+            <Typography variant='h6' sx={{ fontWeight: 600 }}>
+              {open == 'create' ? t("Guruh qo'shish") : t("Guruh ma'lumotlarini tahrirlash")}
+            </Typography>
           </Box>
           <Box width={'100%'}>
             <form
@@ -342,27 +485,28 @@ export default function AddGroupModal() {
                 </FormHelperText>
               </FormControl>
 
-              {/*<FormControl sx={{ width: '100%' }}>*/}
-              {/*  <TextField*/}
-              {/*    size='small'*/}
-              {/*    type='date'*/}
-              {/*    label={t('Tugash sanasi')}*/}
-              {/*    name='end_date'*/}
-              {/*    onChange={formik.handleChange}*/}
-              {/*    onBlur={formik.handleBlur}*/}
-              {/*    value={formik.values.end_date}*/}
-              {/*    error={!!formik.errors.start_date && !!formik.touched.end_date}*/}
-              {/*    InputLabelProps={{ shrink: true }}*/}
-              {/*  />*/}
-              {/*  <FormHelperText error={!!formik.errors.start_date && !!formik.touched.start_date}>*/}
-              {/*    {!!formik.errors.start_date && !!formik.touched.start_date && formik.errors.start_date}*/}
-              {/*  </FormHelperText>*/}
-              {/*</FormControl>*/}
+              {isOpenEdit && (
+                <FormControl sx={{ width: '100%' }}>
+                  <TextField
+                    size='small'
+                    type='date'
+                    label={t('Tugash sanasi')}
+                    name='end_date'
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.end_date}
+                    error={!!formik.errors.end_date && formik.touched.end_date}
+                  />
+                  <FormHelperText error={!!formik.errors.end_date && formik.touched.end_date}>
+                    {!!formik.errors.end_date && formik.touched.end_date && formik.errors.end_date}
+                  </FormHelperText>
+                </FormControl>
+              )}
 
               <FormControl sx={{ width: '100%' }}>
                 <TextField
                   size='small'
-                  type="time"
+                  type='time'
                   label={t('Boshlanish vaqti')}
                   name='start_at'
                   onChange={formik.handleChange}
@@ -394,7 +538,7 @@ export default function AddGroupModal() {
                 </FormHelperText>
               </FormControl>
 
-              <LoadingButton loading={isPending} variant='contained' type='submit' fullWidth>
+              <LoadingButton loading={isPending || loading} variant='contained' type='submit' fullWidth>
                 {t('Saqlash')}
               </LoadingButton>
             </form>

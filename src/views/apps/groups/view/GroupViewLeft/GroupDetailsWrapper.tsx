@@ -49,6 +49,7 @@ interface GroupDetailsProps {
   isGettingGroupDetails: boolean
   onlineLessonLoading: boolean
   user: any
+  setOpen:(status:'create'|'edit'|null)=>void,
   handleEdit: (id: any) => void
   handleOpenSendSMSModal: () => void
   handleEditClickOpen: (type: string) => void
@@ -61,6 +62,7 @@ export default function GroupDetails({
   onlineLessonLoading,
   user,
   handleEdit,
+  setOpen,
   handleOpenSendSMSModal,
   handleEditClickOpen,
   handleGetMeetLink
