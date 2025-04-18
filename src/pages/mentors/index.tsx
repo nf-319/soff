@@ -105,6 +105,12 @@ export default function GroupsPage() {
     },
     {
       xs: 1.7,
+      title: 'Dars haqi',
+      dataIndex: 'lesson_amount',
+      render: per => `${per} so'm`
+    },
+    {
+      xs: 1.7,
       title: t('birth_date'),
       dataIndex: 'birth_date'
     },
@@ -205,7 +211,6 @@ export default function GroupsPage() {
             variant='outlined'
             color='warning'
             fullWidth={isMobile}
-            size='small'
             startIcon={<IconifyIcon icon='material-symbols-light:sms-outline' />}
           >
             <Tooltip title={t('Ro‘yxatdagi o‘qituvchilarga SMS yuborish.')}>
@@ -215,7 +220,6 @@ export default function GroupsPage() {
           <Button
             onClick={() => dispatch(setOpenEdit('create'))}
             variant='contained'
-            size='small'
             fullWidth={isMobile}
             startIcon={<IconifyIcon icon='ic:baseline-plus' />}
           >

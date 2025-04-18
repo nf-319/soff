@@ -60,9 +60,10 @@ const VerticalLayout = (props: LayoutProps) => {
   const userData = localStorage.getItem('userData')
   const formattedUserData = JSON.parse(userData as string)
   const toggleNavVisibility = () => setNavVisible(!navVisible)
+  const subdomain = location.hash.split('.')[0]
 
   useEffect(() => {
-    if (formattedUserData.payment_days >= 0) {
+    if (subdomain !== 'c-panel' && formattedUserData.payment_days >= 0) {
       setShowWarning(true)
     } else {
       setShowWarning(false)

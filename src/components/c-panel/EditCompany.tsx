@@ -61,7 +61,7 @@ const EditCompany = () => {
 
       setLoading(true)
       try {
-        await api.patch(`/owner/client/${details?.id}/`, values)
+        await api.patch(`owner/client/${details?.id}/`, values)
         void Router.push('/c-panel')
         toast.success("O'zgartirildi")
       } catch (err: any) {

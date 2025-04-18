@@ -1,21 +1,16 @@
-name: CI and Deploy to Test/Production Servers
+name: CI and Deploy to Test Server with Zero Downtime
 
 on:
   push:
     branches:
       - test
-#      - main
 
 jobs:
-  build-and-deploy-test:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/test'
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -23,330 +18,69 @@ jobs:
           node-version: '20.10.0'
           cache: 'npm'
 
-      - name: Verify static assets before upload
-        run: |
-          echo "Checking public directory structure:"
-          ls -la public/
-          echo "Checking localization files:"
-          ls -la public/locales/
-          for lang in uz en ru; do
-            if [ -f "public/locales/$lang.json" ]; then
-              echo "Found public/locales/$lang.json"
-            else
-              echo "WARNING: public/locales/$lang.json not found"
-            fi
-          done
-          if [ -d "public/images" ]; then
-            echo "Images directory exists:"
-            ls -la public/images/
-          else
-            echo "WARNING: public/images directory not found"
-          fi
-          # Kamida uz.json va en.json mavjudligini tekshirish
-          if [ ! -f "public/locales/uz.json" ] || [ ! -f "public/locales/en.json" ]; then
-            echo "ERROR: Required localization files (uz.json or en.json) missing"
-            exit 1
-          fi
-
       - name: Install dependencies
         run: npm ci
 
-      - name: Build application locally
+      - name: Build application
         run: npm run build
 
-      - name: Verify build output
+      - name: Prepare deployment package
         run: |
-          echo "Checking build output:"
-          ls -la .next/
-          echo "Checking static assets after build:"
-          ls -la .next/static/
-          echo "Checking public directory after build:"
-          ls -la public/
-          ls -la public/locales/
+          mkdir -p deploy_package
+          cp -R .next deploy_package/
+          cp -R public deploy_package/
+          cp package.json deploy_package/
+          cp ecosystem.config.js deploy_package/
 
-      - name: Upload repository to server
+      - name: Deploy to test server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.TEST_SERVER_IP }}
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
-          source: "."
-          target: "/tmp/repo-temp"
+          source: "deploy_package/*"
+          target: "/tmp/deploy_package"
           rm: true
-          strip_components: 0
 
-      - name: Deploy to test server
+      - name: Execute deployment script
         uses: appleboy/ssh-action@v0.1.2
         with:
           host: ${{ secrets.TEST_SERVER_IP }}
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
+            #!/bin/bash
+
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 20.10.0
 
-            APP_NAME="${{ secrets.REPO_NAME }}"
             BASE_DIR="frontend/test-subdomain-soffcrm-uz-3132"
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
             DEPLOY_DIR="${BASE_DIR}/releases/${TIMESTAMP}"
-            BLUE_LINK="${BASE_DIR}/blue"
-            GREEN_LINK="${BASE_DIR}/green"
             CURRENT_LINK="${BASE_DIR}/current"
 
-            # Create deployment directory structure
             mkdir -p ${BASE_DIR}/releases
-            mkdir -p ${DEPLOY_DIR}
+            mkdir -p ${BASE_DIR}
 
-            # Copy uploaded repository to deployment directory
-            echo "Copying repository to deployment directory..."
-            cp -R /tmp/repo-temp/* ${DEPLOY_DIR}/
-            rm -rf /tmp/repo-temp
+            mv /tmp/deploy_package/* ${DEPLOY_DIR}
 
-            # Navigate to deployment directory
             cd ${DEPLOY_DIR}
 
-            # Create env file
-            echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
-
-            # Debug: Check repository structure
-            echo "Repository structure:"
-            ls -la
-            echo "Public directory:"
-            ls -la public/
-            echo "Locales directory:"
-            ls -la public/locales/
-            echo "Images directory:"
-            if [ -d "public/images" ]; then
-              ls -la public/images/
-            else
-              echo "WARNING: public/images not found"
+            if [ ! -f "package-lock.json" ]; then
+            npm install
             fi
 
-            # Verify localization files
-            echo "Verifying localization files..."
-            for lang in uz en ru; do
-              if [ -f "public/locales/$lang.json" ]; then
-                echo "Found public/locales/$lang.json"
-              else
-                echo "WARNING: public/locales/$lang.json not found"
-              fi
-            done
-            if [ ! -f "public/locales/uz.json" ] || [ ! -f "public/locales/en.json" ]; then
-              echo "ERROR: Required localization files (uz.json or en.json) missing"
-              exit 1
-            fi
+            npm ci --production --legacy-peer-deps
 
-            # Install production dependencies
-            echo "Installing production dependencies..."
-            npm ci --prefer-offline --no-audit --production --legacy-peer-deps
-
-            # Determine target environment (blue/green)
-            if [ -L "${CURRENT_LINK}" ] && [ -e "${CURRENT_LINK}" ]; then
-              CURRENT_ENV=$(basename $(readlink -f ${CURRENT_LINK}))
-              if [[ "${CURRENT_ENV}" == "blue" ]]; then
-                TARGET_ENV="${GREEN_LINK}"
-                TARGET_NAME="green"
-              else
-                TARGET_ENV="${BLUE_LINK}"
-                TARGET_NAME="blue"
-              fi
-            else
-              TARGET_ENV="${BLUE_LINK}"
-              TARGET_NAME="blue"
-            fi
-
-            echo "Targeting ${TARGET_NAME} environment for new deployment"
-            ln -sfn ${DEPLOY_DIR} ${TARGET_ENV}
-
-            # Update PM2 name in ecosystem config
             PM2_NAME="test-subdomain-soffcrm-uz-3132"
-            sed -i "s/name: \"${APP_NAME}-test\"/name: \"${PM2_NAME}\"/" ecosystem.config.js
+            pm2 startOrReload ecosystem.config.js --only ${PM2_NAME} --update-env
 
-            # Start or reload PM2 process
-            if pm2 show ${PM2_NAME} > /dev/null 2>&1; then
-              echo "Reloading ${PM2_NAME} with new deployment..."
-              pm2 reload ecosystem.config.js --only ${PM2_NAME} --update-env
-            else
-              echo "Starting new PM2 process: ${PM2_NAME}"
-              pm2 start ecosystem.config.js --only ${PM2_NAME}
-            fi
+            ln -sfn ${DEPLOY_DIR} ${CURRENT_LINK}
 
-            # Wait for app to initialize
-            echo "Waiting for service initialization (5 seconds)..."
-            sleep 5
-
-            # Switch traffic to new environment
-            echo "Switching traffic to ${TARGET_NAME} environment"
-            ln -sfn ${TARGET_ENV} ${CURRENT_LINK}
-            pm2 save
-
-            # Clean up old releases (keep only 5 most recent)
-            echo "Cleaning up old releases..."
-            cd ${BASE_DIR}/releases
-            ls -t | tail -n +6 | xargs -r rm -rf
-
-            echo "Deployment completed successfully!"
-            echo "Current environment: ${TARGET_NAME}"
-
-  build-and-deploy-production:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.10.0'
-          cache: 'npm'
-
-      - name: Verify static assets before upload
-        run: |
-          echo "Checking public directory structure:"
-          ls -la public/
-          echo "Checking localization files:"
-          ls -la public/locales/
-          for lang in uz en ru; do
-            if [ -f "public/locales/$lang.json" ]; then
-              echo "Found public/locales/$lang.json"
-            else
-              echo "WARNING: public/locales/$lang.json not found"
-            fi
-          done
-          if [ -d "public/images" ]; then
-            echo "Images directory exists:"
-            ls -la public/images/
-          else
-            echo "WARNING: public/images directory not found"
-          fi
-          if [ ! -f "public/locales/uz.json" ] || [ ! -f "public/locales/en.json" ]; then
-            echo "ERROR: Required localization files (uz.json or en.json) missing"
-            exit 1
-          fi
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build application locally
-        run: npm run build
-
-      - name: Verify build output
-        run: |
-          echo "Checking build output:"
-          ls -la .next/
-          echo "Checking static assets after build:"
-          ls -la .next/static/
-          echo "Checking public directory after build:"
-          ls -la public/
-          ls -la public/locales/
-
-      - name: Upload repository to server
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.PROD_SERVER_IP }}
-          username: crmroot
-          password: ${{ secrets.PROD_SERVER_PASSWORD }}
-          source: "."
-          target: "/tmp/repo-temp"
-          rm: true
-          strip_components: 0
-
-      - name: Deploy to production server
-        uses: appleboy/ssh-action@v0.1.2
-        with:
-          host: ${{ secrets.PROD_SERVER_IP }}
-          username: crmroot
-          password: ${{ secrets.PROD_SERVER_PASSWORD }}
-          script: |
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm use 20.10.0
-
-            APP_NAME="${{ secrets.REPO_NAME }}"
-            BASE_DIR="frontend/prod-subdomain-soffcrm-uz-3132"
-            TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-            DEPLOY_DIR="${BASE_DIR}/releases/${TIMESTAMP}"
-            BLUE_LINK="${BASE_DIR}/blue"
-            GREEN_LINK="${BASE_DIR}/green"
-            CURRENT_LINK="${BASE_DIR}/current"
-
-            mkdir -p ${BASE_DIR}/releases
-            mkdir -p ${DEPLOY_DIR}
-
-            echo "Copying repository to deployment directory..."
-            cp -R /tmp/repo-temp/* ${DEPLOY_DIR}/
-            rm -rf /tmp/repo-temp
-
-            cd ${DEPLOY_DIR}
-            echo "${{ secrets.PROD_ENV_CONTENT }}" > .env
-
-            echo "Repository structure:"
-            ls -la
-            echo "Public directory:"
-            ls -la public/
-            echo "Locales directory:"
-            ls -la public/locales/
-            echo "Images directory:"
-            if [ -d "public/images" ]; then
-              ls -la public/images/
-            else
-              echo "WARNING: public/images not found"
-            fi
-
-            echo "Verifying localization files..."
-            for lang in uz en ru; do
-              if [ -f "public/locales/$lang.json" ]; then
-                echo "Found public/locales/$lang.json"
-              else
-                echo "WARNING: public/locales/$lang.json not found"
-              fi
-            done
-            if [ ! -f "public/locales/uz.json" ] || [ ! -f "public/locales/en.json" ]; then
-              echo "ERROR: Required localization files (uz.json or en.json) missing"
-              exit 1
-            fi
-
-            echo "Installing production dependencies..."
-            npm ci --prefer-offline --no-audit --production --legacy-peer-deps
-
-            if [ -L "${CURRENT_LINK}" ] && [ -e "${CURRENT_LINK}" ]; then
-              CURRENT_ENV=$(basename $(readlink -f ${CURRENT_LINK}))
-              if [[ "${CURRENT_ENV}" == "blue" ]]; then
-                TARGET_ENV="${GREEN_LINK}"
-                TARGET_NAME="green"
-              else
-                TARGET_ENV="${BLUE_LINK}"
-                TARGET_NAME="blue"
-              fi
-            else
-              TARGET_ENV="${BLUE_LINK}"
-              TARGET_NAME="blue"
-            fi
-
-            ln -sfn ${DEPLOY_DIR} ${TARGET_ENV}
-
-            PM2_NAME="prod-subdomain-soffcrm-uz-3132"
-            sed -i "s/name: \"${APP_NAME}-test\"/name: \"${PM2_NAME}\"/" ecosystem.config.js
-
-            if pm2 show ${PM2_NAME} > /dev/null 2>&1; then
-              echo "Reloading ${PM2_NAME}..."
-              pm2 reload ecosystem.config.js --only ${PM2_NAME} --update-env
-            else
-              echo "Starting ${PM2_NAME}..."
-              pm2 start ecosystem.config.js --only ${PM2_NAME}
-            fi
-
-            sleep 5
-            ln -sfn ${TARGET_ENV} ${CURRENT_LINK}
             pm2 save
 
             cd ${BASE_DIR}/releases
             ls -t | tail -n +6 | xargs -r rm -rf
 
-            echo "Deployment completed successfully!"
-            echo "Current environment: ${TARGET_NAME}"
+            echo "Deployment completed successfully with zero downtime!"

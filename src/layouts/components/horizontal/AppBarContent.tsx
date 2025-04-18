@@ -92,7 +92,7 @@ const AppBarContent = (props: Props) => {
         user?.role.includes('ceo') ||
         user?.role.includes('casher') ||
         user?.role.includes('watcher')) &&
-        !window.location.hostname.split('.').includes('c-panel') && (
+        !window.location.hostname.split('.').includes('c-panel') && user?.currentRole !== "teacher" && (
           <>
             <Autocomplete
               open={open}
@@ -107,7 +107,7 @@ const AppBarContent = (props: Props) => {
               options={employees || []}
               fullWidth
               size='small'
-              loadingText={'Yuklanmoqda..'}
+              loadingText='Yuklanmoqda..'
               loading={searchLoading}
               noOptionsText={search === '' ? "O'quvchi yoki O'qituvchi Qidirish" : "Malumot yo'q"}
               getOptionLabel={(option: any) => option?.first_name || ''}
@@ -142,6 +142,7 @@ const AppBarContent = (props: Props) => {
                 <TextField {...params} placeholder='Qidirish...' onChange={e => setSearch(e.target.value)} />
               )}
             />
+
             <Tooltip title='Davomat' arrow>
               <span
                 style={{

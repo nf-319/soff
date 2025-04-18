@@ -35,6 +35,7 @@ import { useNotificationsNotRead } from '@hooks/useNotification'
 import { toast } from 'sonner'
 import Image from 'next/image'
 import { useAppSelector } from '@/store'
+import Link from 'next/link'
 
 type Props = {
   settings: Settings
@@ -111,9 +112,9 @@ const NotificationDropdown = (props: Props) => {
     }
   }
 
-  const showToastNotification = (title: string, body: string) => {
+  const showToastNotification = (title: string, body: string, id: number) => {
     toast(
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+      <Link href={`/notifications?id=${id}`} style={{ display: 'flex', gap: 10, alignItems: 'center', textDecoration: "none" }}>
         <Image
           src={companyInfo?.logo || '/images/default-logo.jpg'}
           alt='User'
@@ -121,8 +122,9 @@ const NotificationDropdown = (props: Props) => {
           height={24}
           style={{ borderRadius: '4px' }}
         />
+
         <div>
-          <strong style={{ fontWeight: 600 }}>{title}</strong>
+          <strong style={{ fontWeight: 600, color: "#000" }}>{title}</strong>
           <div
             style={{
               display: '-webkit-box',
@@ -138,7 +140,7 @@ const NotificationDropdown = (props: Props) => {
             {body.replace(/<[^>]*>?/gm, '')}
           </div>
         </div>
-      </div>,
+      </Link>,
       {
         duration: 3000,
         position: 'top-right',
@@ -184,9 +186,10 @@ const NotificationDropdown = (props: Props) => {
         if (notification.id && !shownNotificationsRef.current.has(notification.id)) {
           const title = notification.title || 'Yangi xabarnoma'
           const body = notification.body || ''
+          const id = notification.id
 
           showBrowserNotification(title, body)
-          showToastNotification(title, body)
+          showToastNotification(title, body, id)
 
           if (notification.id) {
             shownNotificationsRef.current.add(notification.id)

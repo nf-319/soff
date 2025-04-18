@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Autocomplete,
   Box,
   Button,
-  debounce,
   FormControl,
   InputAdornment,
   InputLabel,
@@ -16,7 +15,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import IconifyIcon from '../../../components/icon'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { fetchStudentsList, updateStudentParams } from 'src/store/apps/students'
+import { updateStudentParams } from 'src/store/apps/students'
 import useCourses from 'src/hooks/useCourses'
 import useDebounce from 'src/hooks/useDebounce'
 import { Toggle } from 'rsuite'
@@ -288,19 +287,22 @@ const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
 
         {queryParams.is_debtor && (
           <DatePicker
+            cleanable
             size='lg'
-            label={`${queryParams.debt_date ? queryParams.debt_date : 'Yil va Oy'}`}
+            label={queryParams.debt_date ? queryParams.debt_date : 'Yil va Oy'}
             value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
             format='MMM/yyyy'
             placeholder='Select month and year'
             onChange={value => {
               if (!value) {
-                handleFilter('debt_date', '')
+                void handleFilter('debt_date', '')
               } else {
-                handleFilter('debt_date', format(value, 'yyyy-MM-dd'))
+                void handleFilter('debt_date', format(value, 'MM-yyyy'))
               }
             }}
-            style={{ width: '100%' }}
+            style={{ width: 180 }}
+            // @ts-ignore
+            disabledDate={(date) => date.getTime() > Date.now()}
           />
         )}
 
@@ -514,19 +516,22 @@ const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
           <DatePicker
             cleanable
             size='lg'
-            label={`${queryParams.debt_date ? queryParams.debt_date : 'Yil va Oy'}`}
+            label={queryParams.debt_date ? queryParams.debt_date : 'Yil va Oy'}
             value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
             format='MMM/yyyy'
             placeholder='Select month and year'
             onChange={value => {
               if (!value) {
-                handleFilter('debt_date', '')
+                void handleFilter('debt_date', '')
               } else {
-                handleFilter('debt_date', format(value, 'yyyy-MM-dd'))
+                void handleFilter('debt_date', format(value, 'MM-yyyy'))
               }
             }}
             style={{ width: 180 }}
+            // @ts-ignore
+            disabledDate={(date) => date?.getTime() > Date.now()}
           />
+
         )}
 
         <div onClick={() => setKey('group')} style={{ width: '100%' }}>
@@ -581,7 +586,7 @@ const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
           queryString={queryString}
         />
         <Button
-          onClick={() => (getSMSTemps(), handleEditClickOpen('sms'))}
+          onClick={() => { getSMSTemps(); handleEditClickOpen('sms') }}
           variant='outlined'
           color='warning'
           fullWidth

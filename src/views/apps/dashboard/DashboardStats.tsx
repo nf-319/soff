@@ -61,12 +61,9 @@ const DashboardStats = () => {
     active_groups: 'Faol guruhlar soni.',
     active_students: "Ayni vaqtda faol o'quvchilar soni",
     active_debts_count: `Umumiy qarzdor o'quvchilar soni : ${stats?.debtor_users} ta, arxivdagi o'quvchilar soni : ${stats?.active_debts_count} ta (1 ta o'quvchi 2 va undan ortiq guruhda o'qishi mumkin)`,
-    active_debts_amount: `Umumiy o'quvchilar qarzdorligi : ${formatCurrency(stats?.debtors_amount) + " so'm"}
-    ${
-      stats?.archive_debts_amount < 0 &&
-      `Arxivdagi o'quvchilar qarzdorligi : ${formatCurrency(stats.archive_debts_amount) + " so'm"}`
-    }
-    `,
+    active_debts_amount: `Umumiy o'quvchilar qarzdorligi : ${formatCurrency(stats?.debtors_amount) + " so'm,"}
+      Arxivdagi o'quvchilar qarzdorligi : ${formatCurrency(stats?.archive_debts_amount) + " so'm"}`
+    ,
     leads_count: "Hozirda faol bo'lgan va ishlov berilishi kerak bo'lgan lidlar ro'yxati.",
     not_activated_students: "Sinov darsiga kelib ketgan o'quvchilar soni",
     payment_approaching: "To'lov qilishiga 7 kundan kam qolgan o'quvchilar soni",
@@ -108,7 +105,7 @@ const DashboardStats = () => {
           {statsData
             .filter(el => stats?.[el.key] !== undefined)
             .map((item, index) => (
-              <Tooltip key={`${item.key}-${index}`} arrow title={t(tooltip[item.key] || '')} enterDelay={2000}>
+              <Tooltip key={`${item.key}-${index}`} arrow title={t(tooltip[item.key] || '')} enterDelay={200}>
                 <Box
                   sx={{
                     cursor: 'pointer',
