@@ -582,7 +582,7 @@ const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
         <ExcelStudents
           tooltip='Ko‘rinib turgan jadvalni Excel faylga yuklab olish.'
           size='medium'
-          url='/student/offset-list/'
+          url='student/offset-list/'
           queryString={queryString}
         />
         <Button
