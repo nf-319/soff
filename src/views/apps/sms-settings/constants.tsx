@@ -89,7 +89,7 @@ const PAID_TYPE = {
   label: "To'lov turi",
   value: '${payment_type}',
   color: 'warning',
-  displayValue: "@TO'LOV_SANASI",
+  displayValue: "@TO'LOV_TURI",
   placeholder: "Xabar matniga to'lov turini qo'shish uchun",
 }
 
@@ -101,6 +101,6 @@ export const PLACEHOLDERS: any = {
   whosePayment: [FIRST_NAME, WHOSE_PAYMENT_DATE, DEPT_AMOUNT],
   deptStudents: [FIRST_NAME, WHOSE_PAYMENT_DATE, DEPT_AMOUNT],
   gradeStudents: [FIRST_NAME, GROUP, SCORE, PAID_DATE],
-  paid: [AMOUNT, PAID_DATE, PAID_TYPE]
+  paid: [FIRST_NAME, AMOUNT, PAID_DATE, PAID_TYPE]
 }
 
