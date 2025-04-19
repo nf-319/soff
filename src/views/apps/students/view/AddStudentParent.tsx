@@ -56,7 +56,7 @@ const AddStudentParent = ({ open, setOpen }: IAddParentProps) => {
 
         try {
             setLoading(true);
-            const response = await api.post('/student/parent/create/', { first_name:values.first_name,phone:values.phone, student: studentData?.id });
+            const response = await api.post('student/parent/create/', { first_name:values.first_name,phone:values.phone, student: studentData?.id });
             if (response.status === 201) {
                 toast.success(t("Muvaffaqiyatli saqlandi"));
                 studentData?.id && dispatch(fetchStudentDetail(studentData.id));

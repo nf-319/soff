@@ -143,7 +143,7 @@ const ProfileTable = () => {
   const [pageSize, setPageSize] = useState<number>(7)
 
   useEffect(() => {
-    axios.get('/pages/profile-table', { params: { q: value } }).then(response => {
+    axios.get('pages/profile-table', { params: { q: value } }).then(response => {
       setData(response.data)
     })
   }, [value])
