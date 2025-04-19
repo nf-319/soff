@@ -268,7 +268,7 @@ export default function StudentsPage() {
           >
             {t('Filterlash')}
           </Button>
-          <ExcelStudents size='small' url='/student/offset-list/' queryString={queryString} />
+          <ExcelStudents size='small' url='student/offset-list/' queryString={queryString} />
         </Box>
       )}
 
