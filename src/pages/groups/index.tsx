@@ -20,7 +20,6 @@ import { useTranslation } from 'react-i18next'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import {
-  fetchGroups,
   getDashboardLessons,
   getMetaData,
   handleOpenAddModal,
@@ -50,6 +49,7 @@ import DataTable from '../../components/table'
 import { useGet, usePatch } from 'src/hooks/useApi'
 import { useQueryClient } from '@tanstack/react-query'
 import Delete from '@/views/apps/groups/view/GroupViewLeft/Delete'
+import { Filter } from '@/widgets/Filter'
 
 const IconifyIcon = dynamic(() => import('../../components/icon'))
 const RowOptions = dynamic(() => import('src/views/apps/groups/RowOptions'))
@@ -340,6 +340,8 @@ export default function GroupsPage() {
           <Excel size='small' url='common/groups/export/' queryString={queryString} />
         </>
       )}
+
+      <Filter showTeacherFilter />
 
       {!isMobile && <GroupsFilter isMobile={isMobile} />}
 
