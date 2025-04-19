@@ -17,7 +17,7 @@ export const useGetTeachers = (params: any) =>
   useQuery<ApiResponse<EmployeeChecklistType[]>>({
     queryKey: ['teachers', params],
     queryFn: () => getTeachers(params),
-    enabled: !!params,
+    enabled: false,
   })
 
 const getChecklist = async (params: any) => {

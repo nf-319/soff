@@ -1,18 +1,10 @@
 'use client'
 
-import Box from '@mui/material/Box'
-import {
-  Autocomplete,
-  FormControl,
-  InputAdornment,
-  InputLabel,
-  OutlinedInput,
-  TextField,
-  CircularProgress
-} from '@mui/material'
-import { Search } from 'lucide-react'
-import { useState, useEffect, useRef, ChangeEvent } from 'react'
+import { useState, useEffect, useCallback, useMemo, ChangeEvent } from 'react'
 import { useRouter } from 'next/router'
+import { Box, FormControl, InputLabel, OutlinedInput, InputAdornment, TextField, CircularProgress, Typography } from '@mui/material'
+import Autocomplete from '@mui/material/Autocomplete'
+import { Search } from 'lucide-react'
 import { useGetTeachers } from './api/api'
 import type { EmployeeChecklistType } from './types'
 import useDebounce from '@hooks/useDebounce'
@@ -23,39 +15,61 @@ interface FilterProps {
 
 export const Filter = ({ showTeacherFilter = true }: FilterProps) => {
   const router = useRouter()
+  const [searchValue, setSearchValue] = useState<string>(() => String(router.query.search ?? ''))
+  const [selectedTeacher, setSelectedTeacher] = useState<EmployeeChecklistType | null>(null)
+  const [teachers, setTeachers] = useState<EmployeeChecklistType[]>([])
+  const [isTeacherListOpen, setIsTeacherListOpen] = useState(false)
 
-  const initialSearchRef = useRef(String(router.query.search ?? ''))
-  const [searchValue, setSearchValue] = useState<string>(initialSearchRef.current)
   const debouncedSearch = useDebounce(searchValue, 400)
 
-  const [selectedTeacher, setSelectedTeacher] = useState<EmployeeChecklistType | null>(null)
-
-  const { data: teachers, isLoading: isLoadingTeachers } = useGetTeachers(
-    showTeacherFilter ? { role: 'teacher' } : null
+  const { isLoading: isLoadingTeachers, refetch: refetchTeacher } = useGetTeachers(
+    showTeacherFilter && isTeacherListOpen ? { role: 'teacher' } : null,
   )
 
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value)
-  }
+  const fetchTeachers = useCallback(async () => {
+    try {
+      const response = await refetchTeacher()
+      setTeachers(response.data?.results || [])
+    } catch (error) {
+      console.error('O‘qituvchilarni yuklashda xato:', error)
+      setTeachers([])
+    }
+  }, [refetchTeacher])
 
-  const handleTeacherChange = (_: any, value: EmployeeChecklistType | null) => {
+  const handleTeacherListOpen = useCallback(() => {
+    setIsTeacherListOpen(true)
+    if (!teachers.length) {
+      void fetchTeachers()
+    }
+  }, [fetchTeachers, teachers.length])
+
+  const handleTeacherListClose = useCallback(() => {
+    setIsTeacherListOpen(false)
+  }, [])
+
+  const handleSearchChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value)
+  }, [])
+
+  const handleTeacherChange = useCallback((_: any, value: EmployeeChecklistType | null) => {
     setSelectedTeacher(value)
-  }
+  }, [])
 
   useEffect(() => {
     const currentParams = router.query
     const newParams: Record<string, string> = {}
 
     if (debouncedSearch) newParams.search = debouncedSearch
-    if (selectedTeacher?.id) newParams.teacherId = String(selectedTeacher.id)
+    if (selectedTeacher?.id) newParams.teacher = String(selectedTeacher.id)
 
-    const isSameQuery =
+    if (
       currentParams.search === newParams.search &&
-      currentParams.teacherId === newParams.teacherId
+      currentParams.teacherId === newParams.teacher
+    ) {
+      return
+    }
 
-    if (isSameQuery) return
-
-    void router.push(
+    router.push(
       {
         pathname: router.pathname,
         query: newParams,
@@ -63,25 +77,27 @@ export const Filter = ({ showTeacherFilter = true }: FilterProps) => {
       undefined,
       { shallow: true }
     )
-  }, [debouncedSearch, selectedTeacher])
+  }, [debouncedSearch, selectedTeacher, router])
+
+  const noOptionsText = useMemo(() => {
+    if (isLoadingTeachers) return <CircularProgress size={20} />
+    if (!teachers.length) return <Typography>Ma’lumot topilmadi</Typography>
+    return <Typography>O‘qituvchilar mavjud emas</Typography>
+  }, [isLoadingTeachers, teachers.length])
 
   return (
-    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
       <FormControl sx={{ width: '100%', maxWidth: 260 }}>
-        <InputLabel size='small' id='search-input'>
-          Qidirish
-        </InputLabel>
-
+        <InputLabel size="small">Qidirish</InputLabel>
         <OutlinedInput
           endAdornment={
-            <InputAdornment position='end'>
+            <InputAdornment position="end">
               <Search size={18} />
             </InputAdornment>
           }
-          label='Qidirish'
-          id='search-input'
-          placeholder='Qidirish...'
-          size='small'
+          label="Qidirish"
+          placeholder="Qidirish..."
+          size="small"
           value={searchValue}
           onChange={handleSearchChange}
         />
@@ -90,20 +106,24 @@ export const Filter = ({ showTeacherFilter = true }: FilterProps) => {
       {showTeacherFilter && (
         <FormControl sx={{ width: '100%', maxWidth: 260 }}>
           <Autocomplete
-            size='small'
+            size="small"
             disablePortal
-            options={teachers?.results ?? []}
+            open={isTeacherListOpen}
+            onOpen={handleTeacherListOpen}
+            onClose={handleTeacherListClose}
+            options={teachers}
             getOptionLabel={(option) => option.first_name}
             loading={isLoadingTeachers}
+            noOptionsText={noOptionsText}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="O'qituvchi"
+                label="O‘qituvchi"
                 InputProps={{
                   ...params.InputProps,
                   endAdornment: (
                     <>
-                      {isLoadingTeachers ? <CircularProgress color="inherit" size={20} /> : null}
+                      {isLoadingTeachers && <CircularProgress color="inherit" size={20} />}
                       {params.InputProps.endAdornment}
                     </>
                   ),
