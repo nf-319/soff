@@ -22,7 +22,7 @@ export const fetchAmoCrmPipelines = createAsyncThunk(
   'appChat/fetchAmoCrmPipelines',
   async (queryParams: Record<string, any>, { rejectWithValue }) => {
     try {
-      const response = await api.get('/amocrm/pipelines/', {
+      const response = await api.get('amocrm/pipelines/', {
         params: queryParams
       })
       return response.data

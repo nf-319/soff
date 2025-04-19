@@ -9,7 +9,7 @@ import { CalendarFiltersType, AddEventType, EventType } from 'src/types/apps/cal
 
 // ** Fetch Events
 export const fetchEvents = createAsyncThunk('appCalendar/fetchEvents', async (calendars: CalendarFiltersType[]) => {
-  const response = await axios.get('/apps/calendar/events', {
+  const response = await axios.get('apps/calendar/events', {
     params: {
       calendars
     }
@@ -20,7 +20,7 @@ export const fetchEvents = createAsyncThunk('appCalendar/fetchEvents', async (ca
 
 // ** Add Event
 export const addEvent = createAsyncThunk('appCalendar/addEvent', async (event: AddEventType, { dispatch }) => {
-  const response = await axios.post('/apps/calendar/add-event', {
+  const response = await axios.post('apps/calendar/add-event', {
     data: {
       event
     }
@@ -32,7 +32,7 @@ export const addEvent = createAsyncThunk('appCalendar/addEvent', async (event: A
 
 // ** Update Event
 export const updateEvent = createAsyncThunk('appCalendar/updateEvent', async (event: EventType, { dispatch }) => {
-  const response = await axios.post('/apps/calendar/update-event', {
+  const response = await axios.post('apps/calendar/update-event', {
     data: {
       event
     }
@@ -44,7 +44,7 @@ export const updateEvent = createAsyncThunk('appCalendar/updateEvent', async (ev
 
 // ** Delete Event
 export const deleteEvent = createAsyncThunk('appCalendar/deleteEvent', async (id: number | string, { dispatch }) => {
-  const response = await axios.delete('/apps/calendar/remove-event', {
+  const response = await axios.delete('apps/calendar/remove-event', {
     params: { id }
   })
   await dispatch(fetchEvents(['Juft kunlar', 'Toq kunlar', 'Boshqa']))

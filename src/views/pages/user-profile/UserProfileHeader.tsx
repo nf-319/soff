@@ -34,7 +34,7 @@ const UserProfileHeader = () => {
   const [data, setData] = useState<ProfileHeaderType | null>(null)
 
   useEffect(() => {
-    axios.get('/pages/profile-header').then(response => {
+    axios.get('pages/profile-header').then(response => {
       setData(response.data)
     })
   }, [])
