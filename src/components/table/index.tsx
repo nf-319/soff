@@ -95,18 +95,38 @@ const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidt
                 boxShadow: 'rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px',
                 borderRadius: '8px',
                 display: 'flex',
+                border: '1px solid #dddddd',
                 alignItems: 'center',
                 gap: 1,
                 backgroundColor: colors ? colors[0] : '',
                 color: colors ? colors[1] : '',
                 width: '100%',
                 maxWidth: maxWidth || null,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
               }}
             >
               {columns.map((el: any, i) => (
-                <Box key={i} sx={{ textAlign: 'start', flex: el.xs, pb: '5px' }}>
-                  <Box sx={{ fontSize: 12, fontWeight: 500 }}>
+                <Box
+                  key={i}
+                  sx={{
+                    textAlign: 'start',
+                    flex: el.xs,
+                    pb: '5px',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <Box
+                    sx={{
+                      fontSize: 12,
+                      fontWeight: 500,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                  >
                     {el.render
                       ? el.render(el.dataIndex === 'index' ? index + 1 : item[`${el.dataIndex}`])
                       : el.renderItem
