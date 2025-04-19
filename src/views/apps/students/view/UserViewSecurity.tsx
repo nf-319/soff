@@ -9,27 +9,21 @@ import {
   DialogContent,
   DialogTitle,
   Fade,
-  FormControl,
-  FormHelperText,
-  InputLabel,
   Menu,
   MenuItem,
   Select,
-  Tooltip,
   Typography
 } from '@mui/material'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { EmptyContent } from '../../../../components/empty-content'
+import { EmptyContent } from '@components/empty-content'
 import IconifyIcon from '../../../../components/icon'
-import DataTable from '../../../../components/table'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import getMontName from 'src/@core/utils/gwt-month-name'
 import usePayment from 'src/hooks/usePayment'
-import { customTableProps } from 'src/pages/groups'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchStudentDetail, fetchStudentGroups, fetchStudentPayment } from 'src/store/apps/students'
 import StudentPaymentEditForm from './StudentPaymentEdit'
@@ -42,30 +36,6 @@ import EditStudent from '../../groups/view/ViewStudents/EditStudent'
 import toast from 'react-hot-toast'
 import api from 'src/@core/utils/api'
 import ExportDetailStudent from '../../groups/view/ViewStudents/ExportDetailStudent'
-import DebtorsDataTable from 'src/components/table/debtorsTable'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { uzbekLocaleText } from '../../StudentsPoints/constants'
-
-export async function downloadImage(filename: string, url: string) {
-  await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-    }
-  })
-    .then(response => response.blob())
-    .then(blob => {
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'fileName'
-      a.style.position = 'fixed'
-      a.target = '_blank'
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-    })
-    .catch(console.error)
-}
 
 const UserViewSecurity = () => {
   const { t } = useTranslation()
@@ -74,11 +44,9 @@ const UserViewSecurity = () => {
   const [edit, setEdit] = useState<any>(null)
   const [deleteId, setDelete] = useState<any>(null)
   const [loading, setLoading] = useState<any>(null)
-  const [amount, setAmount] = useState<any>('')
   const dispatch = useAppDispatch()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const { user } = useContext(AuthContext)
-  const { payments, isLoading } = useAppSelector(state => state.students)
   const [modalRef, setModalRef] = useState<'sms' | 'note' | 'export' | null>(null)
   const [openLeft, setOpenLeft] = useState<boolean>(false)
   const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
@@ -87,24 +55,20 @@ const UserViewSecurity = () => {
   const [group_data, setGroupData] = useState<any>()
   const { deletePayment } = usePayment()
   const school_type = localStorage.getItem('school_type')
-  const { getBranches, branches } = useBranches()
+  const { getBranches } = useBranches()
   const [changeStatusLoader, setChangeStatusLoader] = useState(false)
+
   const handleEditClickOpen = (value: ModalTypes) => {
     if (value === 'payment') {
-      getBranches()
+      void getBranches()
     }
     setOpenEdit(value)
   }
-  console.log(payments)
-
   const open = Boolean(anchorEl)
-  const handleClick = (event: React.MouseEvent<HTMLElement>, groupData: any) => {
+
+  const handleClick = (event: MouseEvent<HTMLElement>, groupData: any) => {
     setAnchorEl(event.currentTarget)
     setGroupData(groupData)
-  }
-  const handleEdit = (id: any) => {
-    setAmount(payments.find((el: any) => el.id === id)?.amount)
-    setEdit(payments.find((el: any) => el.id === id))
   }
 
   const handleClose = (value: 'none' | 'left' | 'payment' | 'notes' | 'sms' | 'export') => {
@@ -113,240 +77,11 @@ const UserViewSecurity = () => {
     if (value === 'notes') setModalRef('note')
     else if (value === 'sms') setModalRef('sms')
     else if (value === 'export') setModalRef('export')
-    else if (value === 'payment') push(`/students/view/security/?student=${query.id}`)
+    else if (value === 'payment') void push(`/students/view/security/?student=${query.id}`)
     else if (value === 'left') {
       setOpenLeft(true)
     }
   }
-
-  const handleDownload = async (id: number | string) => {
-    setLoading(true)
-    const subdomain = location.hostname.split('.')
-    try {
-      const response = await fetch(
-        `${
-          process.env.NODE_ENV === 'development'
-            ? process.env.NEXT_PUBLIC_TEST_BASE_URL
-            : subdomain.length < 3
-            ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-            : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }common/generate-check/${id}/`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        }
-      )
-      setLoading(false)
-      const data = await response.blob()
-      const blobUrl = URL.createObjectURL(data)
-
-      const downloadLink = document.createElement('a')
-      downloadLink.href = blobUrl
-      downloadLink.download = `check-${id}.pdf`
-      document.body.appendChild(downloadLink)
-      downloadLink.click()
-      document.body.removeChild(downloadLink)
-    } catch (error) {
-      setLoading(false)
-      console.error('Download error:', error)
-    }
-  }
-
-  const handlePrint = async (id: number | string) => {
-    const subdomain = location.hostname.split('.')
-    try {
-      const response = await fetch(
-        `${
-          process.env.NODE_ENV === 'development'
-            ? process.env.NEXT_PUBLIC_TEST_BASE_URL
-            : subdomain.length < 3
-            ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-            : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }common/generate-check/${id}/`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        }
-      )
-      const data = await response.blob()
-      const blobUrl = URL.createObjectURL(data)
-      const printFrame: HTMLIFrameElement | null = document.getElementById('printFrame') as HTMLIFrameElement
-      if (printFrame) {
-        printFrame.src = blobUrl
-        printFrame.onload = function () {
-          if (printFrame.contentWindow) {
-            printFrame.contentWindow?.print()
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Print error:', error)
-    }
-  }
-
-  async function getReceipt(id: any) {
-    setLoading(id)
-    try {
-      await handlePrint(id)
-    } catch (err) {
-      console.log(err)
-    }
-    setLoading(null)
-  }
-  const columns: GridColDef[] = [
-    {
-      headerName: t('ID'),
-      field: 'id'
-    },
-    {
-      headerName: t('Sana'),
-      field: 'payment_date',
-      renderCell: params => (
-        <Tooltip title={params.value || ''}>
-          <span>{params.value}</span>
-        </Tooltip>
-      )
-    },
-    {
-      headerName: t('Turi'),
-      field: 'condition',
-      renderCell: params => (
-        <Tooltip title={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}>
-          <Chip
-            size='small'
-            label={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}
-            color={params.value !== 'debt' ? 'success' : Number(params.row.amount) === 0 ? 'secondary' : 'error'}
-          />
-        </Tooltip>
-      )
-    },
-    {
-      headerName: t('Summa'),
-      field: 'amount',
-      renderCell: params => (
-        <Tooltip title={`${formatCurrency(params.value)} UZS`}>
-          <span>
-            {Number(params.value) <= 0
-              ? `${formatCurrency(Number(params.value) * -1)} UZS`
-              : `${formatCurrency(params.value)} UZS`}
-          </span>
-        </Tooltip>
-      )
-    },
-    {
-      headerName: t('Guruh'),
-      field: 'group_name',
-      renderCell: params => (
-        <Tooltip title={params.value || ''}>
-          <span>{params.value}</span>
-        </Tooltip>
-      )
-    },
-    {
-      headerName: t('Izoh'),
-      field: 'description',
-      renderCell: params => (
-        <Tooltip title={params.value || ''}>
-          <span>{params.value}</span>
-        </Tooltip>
-      )
-    },
-    {
-      headerName: 'Yaratilgan vaqt',
-      field: 'created_at',
-      renderCell: params => (
-        <Tooltip title={params.value || ''}>
-          <span>{params.value}</span>
-        </Tooltip>
-      )
-    },
-    {
-      headerName: t("To'lov turi"),
-      field: 'payment_type_name'
-    },
-    {
-      headerName: t('Qabul qildi'),
-      field: 'admin'
-    },
-    {
-      headerName: t('Amallar'),
-      field: '',
-      renderCell: params => (
-        <Box sx={{ display: 'flex', gap: '5px' }}>
-          <IconifyIcon onClick={() => handleEdit(params.row.id)} icon='mdi:pencil-outline' fontSize={20} />
-          {Number(params.row.amount) > 0 && (
-            <IconifyIcon onClick={() => setDelete(params.row.id)} icon='mdi:delete-outline' fontSize={20} />
-          )}
-          {Number(params.row.amount) < 0 ? (
-            ''
-          ) : loading === params.row.id ? (
-            <IconifyIcon icon={'la:spinner'} fontSize={20} />
-          ) : isMobile ? (
-            <IconifyIcon onClick={() => handleDownload(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
-          ) : (
-            <IconifyIcon onClick={() => getReceipt(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
-          )}
-        </Box>
-      )
-    }
-  ]
-
-  // const columns: customTableProps[] = [
-  //   { xs: 0.5, title: t('ID'), dataIndex: 'id' },
-  //   { xs: 1, title: t('Sana'), dataIndex: 'payment_date' },
-  //   {
-  //     xs: 1.2, // To'lov turi aniq chiqishi kerak
-  //     title: t('Turi'),
-  //     dataIndex: 'condition',
-  //     renderItem: item => (
-  //       <Chip
-  //         size='small'
-  //         label={item?.condition !== 'debt' ? "To'landi" : 'Qarzdorlik'}
-  //         color={item?.condition !== 'debt' ? 'success' : Number(item?.amount) === 0 ? 'secondary' : 'error'}
-  //       />
-  //     )
-  //   },
-  //   {
-  //     xs: 1.2, // Summa aniq ko‘rinishi kerak
-  //     title: t('Summa'),
-  //     dataIndex: 'amount',
-  //     render: amount =>
-  //       Number(amount) <= 0 ? `${formatCurrency(Number(amount) * -1)} UZS` : `${formatCurrency(amount)} UZS`
-  //   },
-  //   { xs: 1, title: t('Guruh'), dataIndex: 'group_name' },
-  //   { xs: 2, title: t('Izoh'), dataIndex: 'description' }, // Izohga ko‘proq joy ajratildi
-  //   { xs: 1.3, title: 'Yaratilgan vaqt', dataIndex: 'created_at' },
-  //   { xs: 1, title: t("To'lov turi"), dataIndex: 'payment_type_name' },
-  //   { xs: 1, title: t('Qabul qildi'), dataIndex: 'admin' },
-  //   {
-  //     xs: 0.8, // Amallar uchun yetarli joy
-  //     title: t('Amallar'),
-  //     dataIndex: 'amount',
-  //     renderId: (id, src) => (
-  //       <Box sx={{ display: 'flex', gap: '5px' }}>
-  //         <IconifyIcon onClick={() => handleEdit(id)} icon='mdi:pencil-outline' fontSize={20} />
-  //         {Number(src) <= 0 ? (
-  //           ''
-  //         ) : (
-  //           <IconifyIcon onClick={() => setDelete(id)} icon='mdi:delete-outline' fontSize={20} />
-  //         )}
-  //         {Number(src) < 0 ? (
-  //           ''
-  //         ) : loading === id ? (
-  //           <IconifyIcon icon={'la:spinner'} fontSize={20} />
-  //         ) : isMobile ? (
-  //           <IconifyIcon onClick={() => handleDownload(id)} icon={`ph:receipt-light`} fontSize={20} />
-  //         ) : (
-  //           <IconifyIcon onClick={() => getReceipt(id)} icon={`ph:receipt-light`} fontSize={20} />
-  //         )}
-  //       </Box>
-  //     )
-  //   }
-  // ]
 
   const handleLeft = async () => {
     setLoading(true)
@@ -367,7 +102,7 @@ const UserViewSecurity = () => {
     setChangeStatusLoader(true)
     await api
       .patch(`common/group-student-update/status/${statusId}/`, { status: statusValue })
-      .then(res => {
+      .then(() => {
         dispatch(fetchStudentGroups(query?.student))
         dispatch(fetchStudentPayment(query?.student))
       })
@@ -390,7 +125,6 @@ const UserViewSecurity = () => {
     if (query?.student) {
       dispatch(fetchStudentGroups(query?.student))
     }
-    // dispatch(fetchStudentPayment(query?.student))
   }, [query?.student])
 
   return (
@@ -698,18 +432,6 @@ const UserViewSecurity = () => {
         <EmptyContent />
       )}
 
-      {/* <Typography sx={{ my: 3, fontSize: '20px' }}>{t("To'lov tarixi")}</Typography>
-      <Box style={{ height: 'auto', width: '100%', marginTop: 4 }}>
-        <DataGrid
-          autoHeight
-          selectionModel={[]}
-          hideFooterPagination
-          loading={isLoading}
-          localeText={uzbekLocaleText}
-          rows={payments ?? []}
-          columns={columns}
-        />
-      </Box> */}
       <iframe src='' id='printFrame' style={{ height: 0 }}></iframe>
 
       <StudentPaymentEditForm openEdit={edit} setOpenEdit={setEdit} />
@@ -757,8 +479,6 @@ const UserViewSecurity = () => {
         activate={activate}
         setActivate={setActivate}
       />
-      {/*<AddNote id={query.id} modalRef={modalRef} setModalRef={setModalRef} />
-      <SentSMS smsTemps={smsTemps} id={query.id} modalRef={modalRef} setModalRef={setModalRef} />*/}
       <ExportDetailStudent id={group_data?.id} modalRef={modalRef} setModalRef={setModalRef} />
       <StudentPaymentForm
         student_id={query.id}

@@ -2,7 +2,6 @@ import * as React from 'react'
 import { Formik, Form, Field, FieldProps } from 'formik'
 import * as Yup from 'yup'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Modal from '@mui/material/Modal'
 import { TextField } from '@mui/material'
@@ -41,7 +40,6 @@ export default function StudentEditProfileModal({ isModalOpen, setIsModalOpen }:
   const [loading,setLoading] = React.useState(false)
   return (
     <div>
-      {/* <Button onClick={() => setIsModalOpen(true)}>Open modal</Button> */}
       <Modal
         open={isModalOpen}
         onClose={handleClose}
@@ -59,7 +57,7 @@ export default function StudentEditProfileModal({ isModalOpen, setIsModalOpen }:
             onSubmit={async (values, { setSubmitting, resetForm, setErrors }) => {
               try {
                 setLoading(true)
-                const response = await api.post('auth/change-password/', {
+                await api.post('auth/change-password/', {
                   old_password: values.old_password,
                   password1: values.password1,
                   password2: values.password2

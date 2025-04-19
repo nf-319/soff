@@ -20,6 +20,28 @@ import StudentPaymentEditForm from './StudentPaymentEdit'
 import { LoadingButton } from '@mui/lab'
 import usePayment from 'src/hooks/usePayment'
 
+
+export const handleCheckPrint = async (id: number | string) => {
+  try {
+    const response = await api.get(`common/generate-check/${id}/`, {
+      responseType: 'blob',
+    })
+
+    const blobUrl = URL.createObjectURL(response.data)
+    const printWindow = window.open(blobUrl)
+
+    if (printWindow) {
+      printWindow.addEventListener('load', () => {
+        printWindow.print()
+      })
+    } else {
+      console.error('Popup blocked or failed to open')
+    }
+  } catch (error) {
+    console.error('Print error:', error)
+  }
+}
+
 const UserView = ({ tab, student }: any) => {
   const url = tab
 
@@ -34,6 +56,7 @@ const UserView = ({ tab, student }: any) => {
   const { isMobile } = useResponsive()
   const [loading, setLoading] = useState<any>(null)
   const { query } = useRouter()
+
   const columns: GridColDef[] = [
     {
       width: 70,
@@ -153,44 +176,10 @@ const UserView = ({ tab, student }: any) => {
     }
   ]
 
-  const handlePrint = async (id: number | string) => {
-    const subdomain = location.hostname.split('.')
-    try {
-      const response = await fetch(
-        `${
-          process.env.NODE_ENV === 'development'
-            ? process.env.NEXT_PUBLIC_TEST_BASE_URL
-            : subdomain.length < 3
-            ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-            : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }common/generate-check/${id}/`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        }
-      )
-      const data = await response.blob()
-      const blobUrl = URL.createObjectURL(data)
-      const printFrame: HTMLIFrameElement | null = document.getElementById('printFrame') as HTMLIFrameElement
-      if (printFrame) {
-        printFrame.src = blobUrl
-        printFrame.onload = function () {
-          if (printFrame.contentWindow) {
-            printFrame.contentWindow?.print()
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Print error:', error)
-    }
-  }
-
   async function getReceipt(id: any) {
     setLoading(id)
     try {
-      await handlePrint(id)
+      await handleCheckPrint(id)
     } catch (err) {
       console.log(err)
     }
@@ -199,36 +188,29 @@ const UserView = ({ tab, student }: any) => {
 
   const handleDownload = async (id: number | string) => {
     setLoading(true)
-    const subdomain = location.hostname.split('.')
+
     try {
-      const response = await fetch(
-        `${
-          process.env.NODE_ENV === 'development'
-            ? process.env.NEXT_PUBLIC_TEST_BASE_URL
-            : subdomain.length < 3
-            ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-            : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }common/generate-check/${id}/`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        }
-      )
-      setLoading(false)
-      const data = await response.blob()
-      const blobUrl = URL.createObjectURL(data)
+      const response = await api.get(`common/generate-check/${id}/`, {
+        responseType: 'blob',
+      })
+
+      const blob = new Blob([response.data], { type: 'application/pdf' }) // MIME type explicitly
+      const blobUrl = URL.createObjectURL(blob)
 
       const downloadLink = document.createElement('a')
       downloadLink.href = blobUrl
       downloadLink.download = `check-${id}.pdf`
+
       document.body.appendChild(downloadLink)
       downloadLink.click()
+
       document.body.removeChild(downloadLink)
+      URL.revokeObjectURL(blobUrl)
+
     } catch (error) {
-      setLoading(false)
       console.error('Download error:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
