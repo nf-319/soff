@@ -300,7 +300,7 @@ function Slug(props: { slug: string }) {
       <DataTable loading={loading} columns={columns} data={data} />
 
       <Dialog open={open === 'create'} onClose={() => setOpen(null)}>
-        <DialogTitle sx={{ textAlign: 'center' }}>{t('Xarajat kiritish')}</DialogTitle>
+        <DialogTitle sx={{ textAlign: 'center' }}>{t('Kirim kiritish')}</DialogTitle>
         <DialogContent sx={{ minWidth: '320px' }}>
           <CreateCostForm
             selectedYear={selectedYear}
@@ -313,7 +313,7 @@ function Slug(props: { slug: string }) {
       </Dialog>
 
       <Dialog open={open?.id} onClose={() => setOpen(null)}>
-        <DialogTitle sx={{ textAlign: 'center' }}>{t('Xarajatni tahrirlash')}</DialogTitle>
+        <DialogTitle sx={{ textAlign: 'center' }}>{t('Kirim tahrirlash')}</DialogTitle>
         <DialogContent sx={{ minWidth: '320px' }}>
           <EditCostForm
             slug={props.slug}

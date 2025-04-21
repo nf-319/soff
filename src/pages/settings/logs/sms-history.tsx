@@ -80,7 +80,7 @@ function SMSHistory() {
   const getData = async () => {
     setLoading(true)
     try {
-      const resp = await api.get('/auth/sms-history/', {
+      const resp = await api.get('auth/sms-history/', {
         params: {
           ...query,
           limit: query?.limit || 10,
@@ -107,7 +107,7 @@ function SMSHistory() {
   }
 
   useEffect(() => {
-    getData()
+    void getData()
   }, [query?.offset, query?.search, query?.limit, query?.start_date, query?.end_date])
 
   return (

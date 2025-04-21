@@ -199,21 +199,23 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
     if (!value && !defaultValue && companyName && !wasCompanyNameRemoved) return `${companyName}: `
     if (!value) return defaultValue || ''
 
-    return value.split(/(\$\{(?:group|balance|first_name|reason|score|amount|date)})/).map((part, index) => {
-      const placeholder = placeholders.find(p => p.value === part)
-      if (placeholder) {
-        return (
-          <Chip
-            key={index}
-            label={placeholder.label}
-            color={placeholder.color as ChipProps['color']}
-            size='small'
-            sx={{ mx: 0.5, verticalAlign: 'middle' }}
-          />
-        )
-      }
-      return part
-    })
+    return value
+      .split(/(\$\{(?:group|balance|first_name|reason|score|amount|date|payment_type|payment_date|exam|)})/)
+      .map((part, index) => {
+        const placeholder = placeholders.find(p => p.value === part)
+        if (placeholder) {
+          return (
+            <Chip
+              key={index}
+              label={placeholder.label}
+              color={placeholder.color as ChipProps['color']}
+              size='small'
+              sx={{ mx: 0.5, verticalAlign: 'middle' }}
+            />
+          )
+        }
+        return part
+      })
   }
 
   const handleClose = () => {

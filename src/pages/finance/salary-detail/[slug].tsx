@@ -19,7 +19,7 @@ import {
   updateSalaryFine
 } from 'src/store/apps/finance'
 import TeacherGroupsModal from 'src/views/apps/finance/TeacherGroupsModal'
-import { VscodeIconsFileTypeExcel2 } from '../../../components/excelButton/ExcelIcon'
+import { VscodeIconsFileTypeExcel2 } from '@components/excelButton/ExcelIcon'
 import { useQuery } from '@tanstack/react-query'
 
 const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) => {

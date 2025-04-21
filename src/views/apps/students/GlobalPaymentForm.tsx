@@ -29,10 +29,9 @@ import { formatPhoneNumber } from '../../../components/phone-input/format-phone-
 import { useTranslation } from 'react-i18next'
 import api from 'src/@core/utils/api'
 import useResponsive from '../../../@core/hooks/useResponsive'
+import { handleCheckPrint } from '@/views/apps/students/view/UserViewPage'
 
-type Props = {}
-
-export default function GlobalPaymentForm({}: Props) {
+export default function GlobalPaymentForm() {
   const [loading, setLoading] = useState<boolean>(false)
   const [loadingBtn, setLoadingBtn] = useState<boolean>(false)
   const [studentList, setStudentList] = useState<any[]>([])
@@ -54,40 +53,6 @@ export default function GlobalPaymentForm({}: Props) {
   }
 
   const userData: any = { ...studentData }
-
-  const handlePrint = async (id: number | string) => {
-    const subdomain = location.hostname.split('.')
-    try {
-      const response = await fetch(
-        `${
-          process.env.NODE_ENV === 'development'
-            ? process.env.NEXT_PUBLIC_TEST_BASE_URL
-            : subdomain.length < 3
-            ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-            : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }common/generate-check/${id}/`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        }
-      )
-      const data = await response.blob()
-      const blobUrl = URL.createObjectURL(data)
-      const printFrame: HTMLIFrameElement | null = document.getElementById('printFrame') as HTMLIFrameElement
-      if (printFrame) {
-        printFrame.src = blobUrl
-        printFrame.onload = function () {
-          if (printFrame.contentWindow) {
-            printFrame.contentWindow?.print()
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Print error:', error)
-    }
-  }
 
   const validationSchema = Yup.object({
     search: Yup.string().min(4, "Qidirish uchun ma'lumot yetarli emas")
@@ -135,7 +100,7 @@ export default function GlobalPaymentForm({}: Props) {
       }
       try {
         const resp = await createPayment(data)
-        await handlePrint(resp.id)
+        await handleCheckPrint(resp.id)
         setStep('print')
         setLoadingBtn(false)
         toast.success(t('Tolov amalaga oshirildi') as string, { duration: 4000 })

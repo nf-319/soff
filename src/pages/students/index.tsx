@@ -16,7 +16,6 @@ import {
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import DataTable from '../../components/table'
 import { useTranslation } from 'react-i18next'
-import { DatePicker } from '@/components/DatePicker'
 import { useRouter } from 'next/router'
 import StudentsFilter from 'src/views/apps/students/StudentsFilter'
 import CreateStudentModal from 'src/views/apps/students/CreateStudentModal'
@@ -231,7 +230,8 @@ export default function StudentsPage() {
 
   return (
     <div>
-      <VideoHeader item={videoUrls.students} />
+      {isMobile && <VideoHeader item={videoUrls.students} />}
+
       <Box
         className='students-page-header'
         sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0' }}
@@ -244,7 +244,10 @@ export default function StudentsPage() {
             <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm"} variant='outlined' color='error' />
           )}
         </Box>
+
         <Box sx={{ display: 'flex', gap: 2 }}>
+          {!isMobile && <VideoHeader item={videoUrls.students} />}
+
           <Button
             onClick={() => dispatch(setOpenEdit('create'))}
             variant='contained'
@@ -268,11 +271,11 @@ export default function StudentsPage() {
           >
             {t('Filterlash')}
           </Button>
-          <ExcelStudents size='small' url='/student/offset-list/' queryString={queryString} />
+          <ExcelStudents size='small' url='student/offset-list/' queryString={queryString} />
         </Box>
       )}
 
-      {!isMobile && <StudentsFilter students={data?.results} isMobile={isMobile} />}
+      {!isMobile && <StudentsFilter students={data?.results} />}
 
       <DataTable
         color
@@ -334,7 +337,7 @@ export default function StudentsPage() {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <StudentsFilter isMobile={isMobile} />
+          <StudentsFilter />
         </DialogContent>
         <DialogActions className='dialog-actions-dense'>
           <Button onClick={() => setOpen(false)}>{t('Davom etish')}</Button>

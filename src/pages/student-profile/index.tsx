@@ -18,8 +18,9 @@ import StudentEditProfileModal from './studentEditModal'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { Icon } from '@iconify/react'
 import { Wallet } from 'lucide-react'
+import { useGet } from '@hooks/useApi'
 
-const StyledCard = styled(Card)(({ theme }) => ({
+const StyledCard = styled(Card)(() => ({
   width: '100%',
   overflow: 'hidden'
 }))
@@ -34,19 +35,11 @@ const CardHeaderStyled = styled(CardHeader)(({ theme }) => ({
 export default function StudentProfile() {
   const { t } = useTranslation()
   const { isMobile } = useResponsive()
-  const [groups, setGroups] = useState<any[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [sms, setSms] = useState<any[]>([])
   const { user } = useContext(AuthContext)
   const { push } = useRouter()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const getGroups = async () => {
-    setIsLoading(true)
-    const resp = await api.get(`student/groups/${user?.id}`)
-    setGroups(resp.data)
-    setIsLoading(false)
-  }
+  const { data: groups, isLoading } = useGet(`student/groups/${user?.id}`)
 
   const getSmsHistory = async () => {
     const resp = await api.get(`common/student/sms/`)
@@ -55,10 +48,10 @@ export default function StudentProfile() {
 
   useEffect(() => {
     if (!user?.role.includes('student')) {
-      push('/')
+      void push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
     }
-    Promise.all([getGroups(), getSmsHistory()])
+    void getSmsHistory()
   }, [])
 
   return (
@@ -124,14 +117,6 @@ export default function StudentProfile() {
                 </Typography>
                 <Typography variant='body1'>{user?.username}</Typography>
               </Grid>
-              {/* {school && (
-            <Grid item xs={6}>
-              <Typography variant='body2' color='text.secondary'>
-                Maktab :
-              </Typography>
-              <Typography variant='body1'>{school}</Typography>
-            </Grid>
-          )} */}
             </Grid>
           </CardContent>
         </StyledCard>
@@ -170,11 +155,11 @@ export default function StudentProfile() {
                 </Box>
               ))
             : ''}
-          {groups.length ? (
+          {groups?.length ? (
             groups?.map((group: any) => (
               <Link
                 key={group.id}
-                href={`/student-profile/group/${group.id}?month=${group.start_date}&month_duration=${group.month_duration}&start_date=${group?.start_date}`}
+                href={`/student-profile/group/${group.group_id}?month=${group.start_date}&month_duration=${group.month_duration}&start_date=${group?.start_date}`}
                 style={{
                   textDecoration: 'none',
                   display: 'block',
@@ -183,27 +168,6 @@ export default function StudentProfile() {
                   minWidth: '290px'
                 }}
               >
-                {/* <Box sx={{ display: 'flex', gap: '20px', width: '100%' }}>
-                  <Card sx={{ width: '100%' }}>
-                    <CardContent sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                        <Typography sx={{ fontSize: '12px' }}>{group.name}</Typography>
-                        <Typography sx={{ fontSize: '12px' }}>{group.course_name}</Typography>
-                        <Typography sx={{ fontSize: '12px' }}>{group.teacher_name}</Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: ' flex-end', gap: '5px' }}>
-                        <Typography sx={{ fontSize: '12px' }}>
-                          {getLessonDays(group.week_days)} {group.start_at.split(':').splice(0, 2).join(':')} -{' '}
-                          {group.end_at.split(':').splice(0, 2).join(':')}
-                        </Typography>{' '}
-                        <Typography sx={{ fontSize: '12px' }}>
-                          {'Toq kunlari'} {'16:00'}
-                        </Typography>
-                        <Typography sx={{ fontSize: '12px' }}>{group.room_name}</Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Box> */}
                 <Box sx={{ width: '100%', display: 'flex', gap: '20px' }}>
                   <Card sx={{ width: isMobile ? '100%' : '400px', minHeight: 380 }}>
                     <div onClick={e => e.stopPropagation()}>
