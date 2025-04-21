@@ -19,9 +19,16 @@ export const LidsHeader = () => {
 
   const searchQuery = Array.isArray(query.search) ? query.search[0] : query.search || ''
   const isActiveQuery = Array.isArray(query.is_active) ? query.is_active[0] : query.is_active
+  const isAmoCrmQuery = Array.isArray(query.is_amocrm) ? query.is_amocrm[0] : query.is_amocrm
+
+  
+  
   const dispatch = useAppDispatch()
   const [search, setSearch] = useState<string>(searchQuery)
   const [isActive, setIsActive] = useState<boolean>(isActiveQuery !== 'false')
+  const [isAmoCrm, setIsAmoCrm] = useState<boolean>(isAmoCrmQuery !== 'true')
+  
+  console.log(isActiveQuery,isActive);
   const searchVal = useDebounce(search, 800)
 
   useEffect(() => {
@@ -32,25 +39,30 @@ export const LidsHeader = () => {
   useEffect(() => {
     const updatedQuery = { ...query }
 
-    if (searchVal && searchVal.trim().length > 0) {
-      updatedQuery.search = searchVal
+    if (searchVal?.trim()) {
+      updatedQuery.search = searchVal.trim()
     } else {
       delete updatedQuery.search
     }
 
-    if (!isActive) {
+    delete updatedQuery.is_active
+    delete updatedQuery.is_amocrm
+
+    if (isAmoCrm) {
+      updatedQuery.is_amocrm = 'true'
+    } else if (!isActive) {
       updatedQuery.is_active = 'false'
+    }
+
+    if (isAmoCrm || !isActive) {
       delete updatedQuery.id
-      params.delete('id')
-    } else {
-      delete updatedQuery.is_active
     }
 
     void push({
       pathname: '/lids',
       query: updatedQuery
     })
-  }, [searchVal, isActive])
+  }, [searchVal, isActive, isAmoCrm])
 
   return (
     <Box
@@ -84,6 +96,12 @@ export const LidsHeader = () => {
             <span>{t('Manba')}</span>
           </Tooltip>
         </Button>
+        <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Switch checked={isAmoCrm} onChange={() => setIsAmoCrm(prev => !prev)} />
+          <Tooltip title={t('Arxivdagi leadlarni ko‘rish.')} arrow>
+            <span>{t('Amocrm')}</span>
+          </Tooltip>
+        </label>
       </form>
 
       <Box
