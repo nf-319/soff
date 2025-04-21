@@ -145,7 +145,7 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
             )
           )}
         </Grid>
-       
+
 
         <Dialog
           open={openEdit === 'group'}
@@ -552,7 +552,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
                 id='demo-simple-select-outlined'
                 labelId='demo-simple-select-outlined-label'
               >
-                {sms_list.map(item => (
+                {sms_list.result.map(item => (
                   <MenuItem value={item.id}>{item.description}</MenuItem>
                 ))}
               </Select>
@@ -570,7 +570,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
                   labelId='demo-simple-select-outlined-label'
                   onChange={e => formik?.setFieldValue('message', e.target.value)}
                 >
-                  {smschild_list.map((el: any) => (
+                  {smschild_list.result.map((el: any) => (
                     <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
                       <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>
                         {el.description}

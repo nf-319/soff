@@ -155,7 +155,7 @@ const UserSmsList = () => {
                   setParentId(e.target.value)
                 }}
               >
-                {sms_list.map((el: any) => (
+                {sms_list.result.map((el: any) => (
                   <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
                     <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '12px' }}>
                       {el.description}
@@ -180,7 +180,7 @@ const UserSmsList = () => {
                     formik.setFieldValue('message', e.target.value)
                   }}
                 >
-                  {smschild_list.map((el: any) => (
+                  {smschild_list.result.map((el: any) => (
                     <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
                       <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '12px' }}>
                         {el.description}

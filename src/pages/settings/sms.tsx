@@ -17,13 +17,13 @@ import { Plus, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
-import { useAppDispatch, useAppSelector } from '../../store';
+import { useAppDispatch, useAppSelector } from '@/store';
 import {
   fetchSmsList,
   fetchSmsListQuery,
   setOpenCreateSms,
   setOpenCreateSmsCategory
-} from '../../store/apps/settings';
+} from '@/store/apps/settings';
 import api from '../../@core/utils/api';
 import VideoHeader from '../../components/video-header/video-header';
 
@@ -143,6 +143,8 @@ const RoomsPage: React.FC = () => {
       })
   }
 
+  console.log(sms_list)
+
   useEffect(() => {
     dispatch(fetchSmsList());
   }, [dispatch]);
@@ -220,10 +222,10 @@ const RoomsPage: React.FC = () => {
       <Box sx={{ mt: 3 }}>
         {is_pending ? (
           <LoadingSkeleton />
-        ) : sms_list.length === 0 ? (
+        ) : sms_list?.result?.length === 0 ? (
           <EmptyState />
         ) : (
-          sms_list.map((item: SmsCategory) => (
+          sms_list?.result?.map((item: SmsCategory) => (
             <Accordion
               key={item.id}
               expanded={parentId === item.id}
@@ -266,11 +268,11 @@ const RoomsPage: React.FC = () => {
               <AccordionDetails sx={{ p: 2 }}>
                 {item.id === parentId && is_childpending ? (
                   <LoadingSkeleton />
-                ) : smschild_list.length === 0 ? (
+                ) : smschild_list.result.length === 0 ? (
                   <EmptyState />
                 ) : (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {smschild_list.map((child: SmsTemplate) => (
+                    {smschild_list.result.map((child: SmsTemplate) => (
                       <Box
                         key={child.id}
                         sx={{

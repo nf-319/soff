@@ -63,8 +63,8 @@ const SmsTableRowOptions: React.FC<SmsTableRowOptionsProps> = ({ id, parent_id }
   const handleEdit = () => {
     handleRowOptionsClose();
     const item = parent_id
-      ? smschild_list.find(el => el.id === id)
-      : sms_list.find(el => el.id === id);
+      ? smschild_list.result.find(el => el.id === id)
+      : sms_list.result.find(el => el.id === id);
 
     if (item) {
       dispatch(setOpenEditSms(item));
