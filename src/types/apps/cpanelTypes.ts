@@ -1,8 +1,7 @@
-
 export interface QueryParams {
   page?: string
   search?: string
-  paid?:string
+  paid?: string
   payment_status_nearly?: string
   debtor?: string
 }
@@ -14,7 +13,7 @@ export type CPanelTypes = {
   isOpenClientSMSModal: boolean
   isOpenCreateSMSTariff: boolean
   isGettingSMSTariffs: boolean
-  queryParams:QueryParams,
+  queryParams: QueryParams
   isOpenClientModal: boolean
   open: string | null
   tariffs: TariffResponseType[]
@@ -66,6 +65,12 @@ export type ClientPaymentType = {
 
 export interface CompanyDetailsPageTypes {
   details: {
+    provider_data?: {
+      id: number
+      login: string
+      password: string
+      type: string
+    }
     order_data: {
       amount: string | null
       description: string
@@ -84,8 +89,8 @@ export interface CompanyDetailsPageTypes {
       students_count: number
       employees_count: number
     }
-    salary_service:string
-    domain:string
+    salary_service: string
+    domain: string
     date: string
     expiration_date: string
     name: string
