@@ -1,66 +1,74 @@
-import { Box } from '@mui/material';
-import { useEffect } from 'react';
-import useResponsive from '../../../@core/hooks/useResponsive';
-import CompanyPaymentList from './CompanyPaymentList';
-import CompanySmsHistory from './CompanySmsHistory';
-import { useAppDispatch } from '../../../store';
-import { fetchClientPayments, fetchCompanyDetails, fetchLogs, fetchSMSHistory } from '../../../store/apps/c-panel/companySlice';
-import { fetchSMSTariffs, fetchTariffs } from '../../../store/apps/c-panel';
-import Details from './Details';
-import EditDetails from './EditDetails';
-import CreatePayment from './CreatePayment';
-import ClientLogs from './ClientLogs';
-import CreateSMSPayment from './CreateSMSPayment';
+import { Box } from '@mui/material'
+import { useEffect } from 'react'
+import useResponsive from '../../../@core/hooks/useResponsive'
+import CompanyPaymentList from './CompanyPaymentList'
+import CompanySmsHistory from './CompanySmsHistory'
+import { useAppDispatch, useAppSelector } from '../../../store'
+import {
+  fetchClientPayments,
+  fetchCompanyDetails,
+  fetchLogs,
+  fetchSMSHistory
+} from '../../../store/apps/c-panel/companySlice'
+import { fetchSMSTariffs, fetchTariffs } from '../../../store/apps/c-panel'
+import Details from './Details'
+import EditDetails from './EditDetails'
+import CreatePayment from './CreatePayment'
+import ClientLogs from './ClientLogs'
+import CreateSMSPayment from './CreateSMSPayment'
+import SmsProviderDetail from './SmsProviderDetail'
 
 type Props = {
-    slug?: number | undefined
+  slug?: number | undefined
 }
 
 export default function CreateCompany({ slug }: Props) {
-    const dispatch = useAppDispatch()
-    const { isMobile } = useResponsive()
+  const dispatch = useAppDispatch()
+  const { isMobile } = useResponsive()
+  const { details } = useAppSelector(state => state.companyDetails)
 
-    async function pageLoad() {
-        if (slug) return await Promise.all([
-            dispatch(fetchCompanyDetails(slug)),
-            dispatch(fetchSMSHistory(slug)),
-            dispatch(fetchClientPayments(slug)),
-            dispatch(fetchTariffs()),
-            dispatch(fetchSMSTariffs()),
-            dispatch(fetchLogs(slug)),
-        ])
-    }
+  async function pageLoad() {
+    if (slug)
+      return await Promise.all([
+        dispatch(fetchCompanyDetails(slug)),
+        dispatch(fetchSMSHistory(slug)),
+        dispatch(fetchClientPayments(slug)),
+        dispatch(fetchTariffs()),
+        dispatch(fetchSMSTariffs()),
+        dispatch(fetchLogs(slug))
+      ])
+  }
 
-    useEffect(() => {
-        pageLoad()
-    }, [])
+  useEffect(() => {
+    pageLoad()
+  }, [])
 
+  const style = {
+    padding: '0px',
+    display: 'flex',
+    alignItems: 'start',
+    gap: '20px',
+    flexDirection: isMobile ? 'column' : 'row'
+  }
 
-    const style = {
-        padding: '0px',
-        display: 'flex',
-        alignItems: "start",
-        gap: '20px',
-        flexDirection: isMobile ? 'column' : 'row',
-    }
-
-    return (
-        <Box>
-            <Box sx={style}>
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <Details />
-                    <EditDetails />
-                </Box>
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <Box sx={{ display: "flex", gap: "20px" }}>
-                        <CompanySmsHistory />
-                        <CompanyPaymentList />
-                    </Box>
-                    <ClientLogs />
-                </Box>
-            </Box>
-            <CreatePayment />
-            <CreateSMSPayment />
+  return (
+    <Box>
+      <Box sx={style}>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Details />
+          <EditDetails />
+          {details?.provider_data && <SmsProviderDetail />}
         </Box>
-    )
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ display: 'flex', gap: '20px' }}>
+            <CompanySmsHistory />
+            <CompanyPaymentList />
+          </Box>
+          <ClientLogs />
+        </Box>
+      </Box>
+      <CreatePayment />
+      <CreateSMSPayment />
+    </Box>
+  )
 }
