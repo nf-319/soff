@@ -17,18 +17,11 @@ export const LidsHeader = () => {
   const { isMobile } = useResponsive()
   const params = new URLSearchParams(window.location.search)
 
-  const searchQuery = Array.isArray(query.search) ? query.search[0] : query.search || ''
-  const isActiveQuery = Array.isArray(query.is_active) ? query.is_active[0] : query.is_active
-  const isAmoCrmQuery = Array.isArray(query.is_amocrm) ? query.is_amocrm[0] : query.is_amocrm
-
-  
-  
   const dispatch = useAppDispatch()
-  const [search, setSearch] = useState<string>(searchQuery)
-  const [isActive, setIsActive] = useState<boolean>(isActiveQuery !== 'false')
-  const [isAmoCrm, setIsAmoCrm] = useState<boolean>(isAmoCrmQuery !== 'true')
-  
-  console.log(isActiveQuery,isActive);
+  const [search, setSearch] = useState<string>(params.get('search') ?? '')
+  const [isActive, setIsActive] = useState<boolean>(Boolean(!params.get('is_active')))
+  const [isAmoCrm, setIsAmoCrm] = useState<boolean>(!!params.get('is_amocrm'))
+
   const searchVal = useDebounce(search, 800)
 
   useEffect(() => {
@@ -45,13 +38,22 @@ export const LidsHeader = () => {
       delete updatedQuery.search
     }
 
-    delete updatedQuery.is_active
-    delete updatedQuery.is_amocrm
-
     if (isAmoCrm) {
       updatedQuery.is_amocrm = 'true'
-    } else if (!isActive) {
-      updatedQuery.is_active = 'false'
+
+      if (!isActive) {
+        updatedQuery.is_active = 'false'
+      } else {
+        delete updatedQuery.is_active
+      }
+    } else {
+      delete updatedQuery.is_amocrm
+
+      if (!isActive) {
+        updatedQuery.is_active = 'false'
+      } else {
+        delete updatedQuery.is_active
+      }
     }
 
     if (isAmoCrm || !isActive) {

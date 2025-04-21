@@ -56,7 +56,6 @@ const Lids = () => {
     params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
 
-
   useEffect(() => {
     if (!leadData || leadData.results.length === 0) return
 
@@ -86,7 +85,6 @@ const Lids = () => {
 
   const handleTabChange = (event: SelectChangeEvent<number>) => {
     if (!leadData || !leadData.results[event.target.value as number]) return
-
     const selectedDept = leadData.results[event.target.value as number]
     setSelectedTab(Number(event.target.value))
     setCurrentData(selectedDept)
