@@ -102,7 +102,7 @@ const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidt
                   backgroundColor: colors ? colors[0] : '',
                   color: colors ? colors[1] : '',
                   display: 'flex',
-                  flexDirection: 'column', // 👉 qatorni ustma-ust ko'rinishda qilish
+                  flexDirection: 'column',
                   gap: 1,
                   width: '100%',
                   maxWidth: maxWidth || null,
@@ -114,7 +114,7 @@ const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidt
                     position: 'absolute',
                     top: 8,
                     right: 8,
-                    display: { xs: 'block', md: 'none' }, // faqat telefonda
+                    display: { xs: 'block', md: 'none' }, 
                     zIndex: 2
                   }}
                 >
@@ -136,8 +136,8 @@ const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidt
                     key={i}
                     sx={{
                       display: {
-                        xs: i === columns.length - 1 ? 'none' : 'flex', // telefonlarda oxirgi ustunni yashirish
-                        md: 'flex' // katta ekranlarda hammasi ko‘rinsin
+                        xs: i === columns.length - 1 ? 'none' : 'flex', 
+                        md: 'flex'
                       },
                       gap: 1,
                       alignItems: 'center'
