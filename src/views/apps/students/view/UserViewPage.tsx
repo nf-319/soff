@@ -167,6 +167,9 @@ const UserView = ({ tab, student }: any) => {
       renderCell: params => (
         <Box sx={{ display: 'flex', gap: '5px' }}>
           <IconifyIcon onClick={() => handleEdit(params.row.id)} icon='mdi:pencil-outline' fontSize={20} />
+          {params.row.condition === 'refund' && (
+            <IconifyIcon onClick={() => setDelete(params.row.id)} icon='mdi:delete-outline' fontSize={20} />
+          )}
           {Number(params.row.amount) > 0 && (
             <IconifyIcon onClick={() => setDelete(params.row.id)} icon='mdi:delete-outline' fontSize={20} />
           )}
@@ -294,11 +297,13 @@ const UserView = ({ tab, student }: any) => {
         <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
           To'lovni o'chirishni tasdiqlang
         </DialogTitle>
+
         <DialogContent>
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-            <Button variant='contained' onClick={() => setDelete(null)}>
+            <Button variant='outlined' onClick={() => setDelete(null)}>
               {t('Bekor qilish')}
             </Button>
+
             <LoadingButton variant='contained' color='error' onClick={onHandleDelete} loading={loading}>
               {t("O'chirish")}
             </LoadingButton>
