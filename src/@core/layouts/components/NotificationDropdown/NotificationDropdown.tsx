@@ -255,7 +255,7 @@ const NotificationDropdown = (props: Props) => {
       >
         <Box
           sx={{
-            px: 4,
+            px: "10px",
             py: 2,
             display: 'flex',
             justifyContent: 'space-between',

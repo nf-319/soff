@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Box,
   Button,
@@ -20,7 +22,6 @@ import { useTranslation } from 'react-i18next'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import {
-  fetchGroups,
   getDashboardLessons,
   getMetaData,
   handleOpenAddModal,
@@ -51,6 +52,7 @@ import { useGet, usePatch } from 'src/hooks/useApi'
 import { useQueryClient } from '@tanstack/react-query'
 import Delete from '@/views/apps/groups/view/GroupViewLeft/Delete'
 import { GroupCreateEditDrawer } from '@/components/GroupDrawerModal'
+import { Plus } from 'lucide-react'
 
 const IconifyIcon = dynamic(() => import('../../components/icon'))
 const RowOptions = dynamic(() => import('src/views/apps/groups/RowOptions'))
@@ -274,12 +276,12 @@ export default function GroupsPage() {
     initializePage()
   }, [])
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
+    void queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
   }, [user?.active_branch])
 
   return (
     <div>
-      <VideoHeader item={videoUrls.groups} />
+      {isMobile && <VideoHeader item={videoUrls.groups} />}
 
       <Box
         className='groups-page-header'
@@ -288,18 +290,23 @@ export default function GroupsPage() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Typography variant='h5'>{t('Guruhlar')}</Typography>
-          {!isLoading && <Chip label={`${data?.count}`} variant='outlined' color='primary' />}
+
+          {!isLoading && (
+            <Tooltip title='Guruhlar soni'>
+              <Chip label={`${data?.count}`} variant='outlined' color='primary' />
+            </Tooltip>
+          )}
         </Box>
-        <Button
-          onClick={handleOpenModal}
-          variant='contained'
-          size='small'
-          startIcon={<IconifyIcon icon='ic:baseline-plus' />}
-        >
-          <Tooltip title={t('Yangi guruh qo‘shish.')}>
-            <span>{t("Yangi qo'shish")}</span>
-          </Tooltip>
-        </Button>
+
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          {!isMobile && <VideoHeader item={videoUrls.groups} />}
+
+          <Button onClick={handleOpenModal} variant='contained' startIcon={<Plus size={18} />}>
+            <Tooltip title={t('Yangi guruh qo‘shish.')}>
+              <span>{t("Yangi qo'shish")}</span>
+            </Tooltip>
+          </Button>
+        </Box>
       </Box>
 
       {isMobile && (
@@ -316,7 +323,7 @@ export default function GroupsPage() {
         </>
       )}
 
-      {!isMobile && <GroupsFilter isMobile={isMobile} />}
+      {!isMobile && <GroupsFilter />}
 
       <DataTable columns={columns} loading={isLoading} data={data?.results || []} rowClick={rowClick} />
 
@@ -361,7 +368,7 @@ export default function GroupsPage() {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <GroupsFilter isMobile={isMobile} />
+          <GroupsFilter />
         </DialogContent>
         <DialogActions className='dialog-actions-dense'>
           <Button onClick={() => setOpen(false)}>{t('Davom etish')}</Button>

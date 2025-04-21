@@ -12,6 +12,7 @@ import useResponsive from 'src/@core/hooks/useResponsive'
 import SubLoader from '../loaders/SubLoader'
 import { toast } from 'react-hot-toast'
 import { AuthContext } from 'src/context/AuthContext'
+import { handleCheckPrint } from '@/views/apps/students/view/UserViewPage'
 
 const Item = ({ defaultValue }: { defaultValue: true | false | null | 0 }) => {
   if (defaultValue === true || defaultValue === false || defaultValue === null) {
@@ -52,7 +53,7 @@ const StudentGroupDetail = ({ slug, month }: any) => {
   const { user } = useContext(AuthContext)
 
   const handleClick = (value: any) => {
-    push({
+    void push({
       pathname,
       query: { ...query, month: value.date, year: value.year, id: slug }
     })
@@ -77,44 +78,10 @@ const StudentGroupDetail = ({ slug, month }: any) => {
     setIsLoading(false)
   }
 
-  const handlePrint = async (id: number | string) => {
-    const subdomain = location.hostname.split('.')
-    try {
-      const response = await fetch(
-        `${
-          process.env.NODE_ENV === 'development'
-            ? process.env.NEXT_PUBLIC_TEST_BASE_URL
-            : subdomain.length < 3
-            ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-            : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }common/generate-check/${id}/`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        }
-      )
-      const data = await response.blob()
-      const blobUrl = URL.createObjectURL(data)
-      const printFrame: HTMLIFrameElement | null = document.getElementById('printFrame') as HTMLIFrameElement
-      if (printFrame) {
-        printFrame.src = blobUrl
-        printFrame.onload = function () {
-          if (printFrame.contentWindow) {
-            printFrame.contentWindow?.print()
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Print error:', error)
-    }
-  }
-
   async function getReceipt(id: any) {
     setLoading(id)
     try {
-      await handlePrint(id)
+      await handleCheckPrint(id)
       setLoading(false)
     } catch (err) {
       console.log(err)
@@ -162,14 +129,14 @@ const StudentGroupDetail = ({ slug, month }: any) => {
 
   useEffect(() => {
     if (!user?.role.includes('student')) {
-      push('/')
+      void push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
     }
     Promise.all([getDays(), getAttendence()])
   }, [month])
 
   useEffect(() => {
-    getPayments()
+    void getPayments()
   }, [])
 
   return (

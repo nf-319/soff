@@ -26,10 +26,10 @@ export default function Excel({
   const subdomain = location.hostname.split('.')
   const baseURL =
     process.env.NODE_ENV === 'development'
-      ? `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_TEST_BASE_URL}`
+      ? `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_TEST_BASE_URL}/v1/`
       : subdomain.length < 3
       ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-      : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
+      : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/`
 
   return (
     <Link

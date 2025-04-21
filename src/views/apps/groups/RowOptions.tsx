@@ -169,7 +169,6 @@ const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }
         )}
         <Excel
           url={`common/group/export/${id}`}
-          // fullWidth
           variant='text'
           sx={{ width: '100%', py: 2, px: 5, borderRadius: '0px', display: 'flex', justifyContent: 'start' }}
         />
