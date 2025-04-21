@@ -78,11 +78,19 @@ const UserView = ({ tab, student }: any) => {
       width: 130,
       field: 'condition',
       renderCell: params => (
-        <Tooltip title={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}>
+        <Tooltip title={params.value == 'debt' ? 'Qarzdorlik' : params.value == 'refund' ? 'Qaytarilgan' : "To'landi"}>
           <Chip
             size='small'
-            label={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}
-            color={params.value !== 'debt' ? 'success' : Number(params.row.amount) === 0 ? 'secondary' : 'error'}
+            label={params.value == 'debt' ? 'Qarzdorlik' : params.value == 'refund' ? 'Qaytarilgan' : "To'landi"}
+            color={
+              params.value == 'refund'
+                ? 'info'
+                : params.value !== 'debt'
+                ? 'success'
+                : Number(params.row.amount) === 0
+                ? 'secondary'
+                : 'error'
+            }
           />
         </Tooltip>
       )
