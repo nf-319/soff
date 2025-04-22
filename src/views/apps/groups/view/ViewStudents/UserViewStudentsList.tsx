@@ -77,7 +77,7 @@ export default function UserViewStudentsList() {
   const { user } = useContext(AuthContext)
   const [search, setSearch] = useState('')
   const debounce = useDebounce(search, 500)
-  const { query, push } = useRouter()
+  const { query } = useRouter()
   const [showBalance, setShowBalance] = useState(false)
 
   const columns: customTableProps[] = [
@@ -498,9 +498,6 @@ export default function UserViewStudentsList() {
                         {t(el)}
                       </MenuItem>
                     ))}
-                    {/* <MenuItem value={'new'}>Sinov darsi</MenuItem> */}
-                    {/* <MenuItem value={'archive'}>Arxiv</MenuItem> */}
-                    {/* <MenuItem value={'frozen'}>Muzlatish</MenuItem> */}
                   </Select>
                 )}
 

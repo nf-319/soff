@@ -70,8 +70,6 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
   const MyHead = () => {
     const { companyInfo } = useAppSelector(state => state.user)
 
-    console.log(companyInfo)
-
     return (
       <Head>
         <meta name='robots' content='noindex, nofollow' />

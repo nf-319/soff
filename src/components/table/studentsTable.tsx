@@ -86,7 +86,6 @@ export default function StudentsDataTable({
                 alignItems: 'center',
                 gap: 1,
                 width: '100%',
-                // maxWidth: maxWidth || null,
                 cursor: 'pointer',
                 ':hover': {
                   transition: 'all 0.3s ease',
