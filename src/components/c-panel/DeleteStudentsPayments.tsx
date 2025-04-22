@@ -53,7 +53,7 @@ export function StudentsPaymentsModal({
       branches: values.branches.join(',')
     }
     await api
-      .post(`/owner/tenant/student-payments/delete/${id}`, formattedValues)
+      .post(`owner/tenant/student-payments/delete/${id}`, formattedValues)
       .then(res => {
         console.log(res)
         setOpenModal(false)
