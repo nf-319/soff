@@ -22,6 +22,10 @@ export const AllSettings = () => {
   const [tabIndex, setTabIndex] = useState<string>(searchParams.get('tab') || 'center')
 
   useEffect(() => {
+    setTabIndex('center')
+  }, [searchParams.get('tab')])
+
+  useEffect(() => {
     if (router.isReady) {
       const tabFromURL = router.query.tab as string | undefined
 

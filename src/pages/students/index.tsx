@@ -221,8 +221,6 @@ export default function StudentsPage() {
     }
   }, [])
 
-  const [monthAndYears, setMonthAndYears] = useState<Date | null>(null)
-
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })

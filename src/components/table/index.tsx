@@ -125,9 +125,6 @@ const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidt
                     sx={{
                       fontSize: 12,
                       fontWeight: 500,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
                     }}
                   >
                     {el.render

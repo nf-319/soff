@@ -33,6 +33,7 @@ import ExcelStudents from '../../../components/excelButton/ExcelStudents';
 import ceoConfigs from 'src/configs/ceo';
 import { useRouter } from 'next/router';
 import { MessageSquareText, Search } from 'lucide-react'
+import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 type StudentsFilterProps = {
   students?: any[];
@@ -40,6 +41,7 @@ type StudentsFilterProps = {
 
 const StudentsFilter = ({ students }: StudentsFilterProps) => {
   const router = useRouter();
+  const { companyInfo } = useAppSelector(item => item.user)
   const dispatch = useAppDispatch();
   const { queryParams } = useAppSelector((state) => state.students);
   const { schools } = useAppSelector((state) => state.settings);
@@ -57,8 +59,8 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
   const studentIds = students?.map((student) => student.id);
   const [teacherId, setTeacherId] = useState<any>();
   const [groupId, setGroupId] = useState<any>();
+  const [accessModal, setAccessModal] = useState<boolean>(false);
 
-  // Refs to prevent infinite loops
   const isInitialMount = useRef(true);
   const isUpdating = useRef(false);
 
@@ -227,6 +229,16 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
       Object.entries(queryParams).filter(([_, value]) => value !== '' && value !== undefined && value !== null)
     ) as Record<string, string>
   ).toString();
+
+  const handleModalOpen = () => {
+    if(companyInfo.access) {
+      setAccessModal(false)
+      void getSMSTemps()
+      handleEditClickOpen('sms')
+    } else {
+      setAccessModal(true)
+    }
+  }
 
   return (
     <Box
@@ -422,10 +434,7 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
         </Box>
 
         <Button
-          onClick={() => {
-            void getSMSTemps()
-            handleEditClickOpen('sms')
-          }}
+          onClick={handleModalOpen}
           variant='outlined'
           color='warning'
           size='small'
@@ -439,6 +448,8 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
           </Tooltip>
         </Button>
       </Box>
+
+      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
 
       <Box sx={{ display: { xs: 'none', sm: 'block' } }} onClick={() => dispatch(fetchSmsList())}>
         <SendSMSModal

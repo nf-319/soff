@@ -11,18 +11,25 @@ import { getDashboardLessons, getGroupsDetails, handleOpenEdit } from 'src/store
 import api from 'src/@core/utils/api'
 import GroupDetailsWrapper from './GroupDetailsWrapper'
 import { GroupCreateEditDrawer } from '@/components/GroupDrawerModal'
+import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 export default function GroupDetails() {
   const { groupData, isGettingGroupDetails, onlineLessonLoading } = useAppSelector(state => state.groupDetails)
+  const { companyInfo } = useAppSelector(state => state.user)
   const dispatch = useAppDispatch()
       const [openEditModal, setOpenEditModal] = useState<'create'|'edit'|null>(null)
 
+  const [accessModal, setAccessModal] = useState<boolean>(false)
   const { user } = useContext(AuthContext)
   const router = useRouter()
 
   const handleOpenSendSMSModal = async () => {
+    if(companyInfo.access) {
     dispatch(handleEditClickOpen('send-sms'))
     await dispatch(getSMSTemp())
+    } else {
+      setAccessModal(true)
+    }
   }
 
   const handleEdit = async (id: any) => {
@@ -66,6 +73,8 @@ export default function GroupDetails() {
         handleGetMeetLink={handleGetMeetLink}
       />
       <GroupCreateEditDrawer open={openEditModal} setOpen={setOpenEditModal}/>
+      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
+      <EditGroupModal />
     </>
   )
 }

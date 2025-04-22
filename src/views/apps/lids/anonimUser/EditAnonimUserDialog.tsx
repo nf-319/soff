@@ -50,7 +50,7 @@ export const EditAnonimDialogDialog: FC<Props> = ({ department, onClose, lead, o
         <EditAnonimUserForm
           onClose={() => {
             setOpen(null)
-            queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
+            void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
           }}
           laed
           department={department}
