@@ -100,14 +100,6 @@ const LoginPage = () => {
       const userRoles = response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase())
       dispatch(setRoles(userRoles))
 
-      if (
-        !window.location.hostname.split('.').includes('c-panel') &&
-        !window.location.hostname.split('.').includes('localhost')
-      ) {
-        const resp = await api.get('common/settings/')
-        dispatch(setCompanyInfo(resp.data[0]))
-      }
-
       const isMarketable = userRoles.includes('marketolog')
       const paymentPage = response.data.payment_page
       const returnUrl = router.query.returnUrl
