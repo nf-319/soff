@@ -219,13 +219,11 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
 
               {groupDate && (
                 <FormControl sx={{ width: '100%' }}>
-                  {/* <InputLabel htmlFor='qwqwq' size='small'>{t('Qo\'shilish sanasi')}</InputLabel> */}
                   <TextField
                     type='date'
                     size='small'
                     label={t("Qo'shilish sanasi")}
                     name='start_date'
-                    // min={groupShort?.find(el => el.id === groupDate)?.start_date || ''}
                     defaultValue={today}
                     style={{ background: 'transparent', width: '100%' }}
                   />
@@ -243,7 +241,6 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
                     name='fixed_price'
                     type='number'
                     error={!!error.fixed_price}
-                    // onChange={(e: any) => setDiscount(e.target.value)}
                     fullWidth
                   />
                   <FormHelperText className='mb-2' error={true}>
@@ -282,10 +279,9 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
             </Form>
           </DialogContent>
         </Dialog>
-        {/*   Payment  */}
         <StudentPaymentForm openEdit={openEdit} setOpenEdit={setOpenEdit} />
         <StudentWithDrawForm openEdit={openEdit} setOpenEdit={setOpenEdit} />
-        {/*   Edit Student  */}
+
         <Dialog
           open={openEdit === 'edit'}
           onClose={handleEditClose}
@@ -365,7 +361,6 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
           </DialogTitle>
           <DialogContent>Delete</DialogContent>
         </Dialog>
-        {/*   New Note  */}
         <Dialog
           open={openEdit === 'notes'}
           onClose={handleEditClose}
@@ -572,7 +567,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
                 >
                   {smschild_list.result.map((el: any) => (
                     <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
-                      <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>
+                      <span style={{ maxWidth: '250px', wordBreak: 'break-word' }}>
                         {el.description}
                       </span>
                     </MenuItem>

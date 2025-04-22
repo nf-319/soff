@@ -13,10 +13,10 @@ import { AuthContext } from 'src/context/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import QRCodeScanner from '../components/qrCodeScanner'
-import api from '../@core/utils/api'
-import { setCompanyInfo } from '../store/apps/user'
-import { useDispatch } from 'react-redux'
-import AppBarWarningVertical from 'src/components/AppBarWarningVertical'
+import { useGet } from '@hooks/useApi'
+import { Endpoints } from '@hooks/endpoints'
+import { setCompanyInfo } from '@store/apps/user'
+import { useAppDispatch } from '@/store'
 
 type Props = {
   contentHeightFixed?: boolean
@@ -26,28 +26,21 @@ const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed
   const { settings, saveSettings } = useSettings()
   const { user } = useContext(AuthContext)
   const { t } = useTranslation()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
+  const { data, isLoading } = useGet(Endpoints.CompanySettingList)
 
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
   const router = useRouter()
 
+  useEffect(() => {
+    if(data && !isLoading) {
+      dispatch(setCompanyInfo(data))
+    }
+  }, [data, isLoading])
+
   if (hidden && settings.layout === 'horizontal') {
     settings.layout = 'vertical'
   }
-
-  useEffect(() => {
-    const fetchCompanyInfo = async () => {
-      try {
-        const resp = await api.get('common/settings/list/')
-        dispatch(setCompanyInfo(resp.data[0]))
-      } catch (error) {
-        console.error('Error fetching company info:', error)
-      }
-    }
-
-    void fetchCompanyInfo()
-  }, [dispatch])
-
 
   return (
     <Layout

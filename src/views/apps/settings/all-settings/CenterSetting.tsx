@@ -76,7 +76,6 @@ export default function AllSettings() {
     | 'extra_settings'
     | null
   >(null)
-  const [error, setError] = useState<any>({})
   const [errorMessage, setErrorMessage] = useState<null | string>(null)
   const { push } = useRouter()
 
@@ -85,25 +84,11 @@ export default function AllSettings() {
   const dispatch = useAppDispatch()
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const { t } = useTranslation()
-  const [settinsLoading, setSettingsLoading] = useState(false)
   const { setUser, user } = useContext(AuthContext)
-  const [tabIndex, setTabIndex] = useState(0)
-
-  async function getSettingsList() {
-    setSettingsLoading(true)
-    await api.get('common/settings/list/').then(res => {
-      dispatch(setCompanyInfo(res.data[0]))
-    })
-    setSettingsLoading(false)
-  }
 
   async function handleChangeExtraSettings(event: any) {
-    updateSettings('extra_settings', event.target.checked)
+    void updateSettings('extra_settings', event.target.checked)
   }
-
-  useEffect(() => {
-    getSettingsList()
-  }, [])
 
   const inputRef = useRef<any | null>(null)
 
@@ -171,7 +156,7 @@ export default function AllSettings() {
       await reloadProfile()
       setCreatable(null)
       setLoading(null)
-      getBranches()
+      void getBranches()
       setId(null)
     } catch (err) {
       setLoading(null)
@@ -199,15 +184,13 @@ export default function AllSettings() {
       }
       await api.patch('common/settings/update/', formData)
 
-      const getresp = await api.get('common/settings/list/')
+      const getresp = await api.get('common/settings/')
 
       dispatch(setCompanyInfo(getresp.data[0]))
       setEditable(null)
       setId(null)
     } catch (err: any) {
-      if (err?.response?.data) {
-        showResponseError(err?.response?.data, setError)
-      }
+      console.error(err)
     } finally {
       setLoading(null)
     }

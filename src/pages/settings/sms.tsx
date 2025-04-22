@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react'
 import {
   Box,
   Button,
@@ -11,7 +11,7 @@ import {
   Skeleton,
   useTheme,
   useMediaQuery,
-  Paper, Chip
+  Paper, Chip, Dialog, DialogTitle, DialogContent
 } from '@mui/material'
 import { Plus, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +34,7 @@ import EditSmsDialog from '../../views/apps/settings/ceo/EditSmsDialog';
 import UserSuspendDialog from '../../views/apps/mentors/view/UserSuspendDialog';
 import { ChipProps } from '@mui/material/Chip'
 import { PLACEHOLDERS } from '@/views/apps/sms-settings/constants'
+import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 interface SmsCategory {
   id: number;
@@ -45,7 +46,7 @@ interface SmsTemplate {
   description: string;
 }
 
-const LoadingSkeleton: React.FC = () => (
+const LoadingSkeleton: FC = () => (
   <>
     {[1, 2, 3].map((item) => (
       <Skeleton
@@ -58,6 +59,8 @@ const LoadingSkeleton: React.FC = () => (
     ))}
   </>
 );
+
+
 
 const EmptyState: React.FC = () => {
   const { t } = useTranslation();
@@ -96,6 +99,7 @@ const RoomsPage: React.FC = () => {
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false);
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
+  const [accessDeniedOpen, setAccessDeniedOpen] = useState<boolean>(false)
 
   const handleDeleteRequest = (id: number) => {
     setDeleteItemId(id);
@@ -143,8 +147,6 @@ const RoomsPage: React.FC = () => {
       })
   }
 
-  console.log(sms_list)
-
   useEffect(() => {
     dispatch(fetchSmsList());
   }, [dispatch]);
@@ -154,6 +156,12 @@ const RoomsPage: React.FC = () => {
       dispatch(fetchSmsListQuery(parentId));
     }
   }, [parentId, dispatch]);
+
+  useEffect(() => {
+    if (sms_list?.access === false) {
+      setAccessDeniedOpen(true)
+    }
+  }, [sms_list])
 
   return (
     <Paper
@@ -318,6 +326,8 @@ const RoomsPage: React.FC = () => {
         loading={deleteLoading}
         handleOk={handleDelete}
       />
+
+      <AccessDeniedModal open={accessDeniedOpen} />
     </Paper>
   );
 };
