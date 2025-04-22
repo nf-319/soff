@@ -40,11 +40,9 @@ export default function QRCodeScanner() {
       if (res.status === 200) {
         if (res.data.type == 'employee') {
           if (res.data.is_enter == true) {
-            
             toast.success(`${res.data.first_name} ish joyiga yetib keldi`, { position: 'top-right' })
           } else {
             toast.error(`${res.data.first_name} ish joyidan chiqip ketdi`, { position: 'top-right' })
-
           }
 
           return
@@ -129,6 +127,12 @@ export default function QRCodeScanner() {
         }
         return
       }
+
+      window.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+          event.preventDefault()
+        }
+      })
 
       setScannedCode(prev => prev + key)
 
