@@ -103,9 +103,6 @@ const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidt
                 width: '100%',
                 maxWidth: maxWidth || null,
                 cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
               }}
             >
               {columns.map((el: any, i) => (
@@ -122,9 +119,6 @@ const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidt
                     sx={{
                       fontSize: 12,
                       fontWeight: 500,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
                     }}
                   >
                     {el.render
