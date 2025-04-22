@@ -27,8 +27,6 @@ const Drawer = styled(MuiDrawer)<DrawerProps>(({ theme }) => ({
 type Props = {}
 
 export default function EditSmsDialog({ }: Props) {
-
-    const { t } = useTranslation()
     const dispatch = useAppDispatch()
     const { openEditSms } = useAppSelector(state => state.settings)
 

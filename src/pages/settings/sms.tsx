@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react'
 import {
   Box,
   Button,
@@ -11,19 +11,19 @@ import {
   Skeleton,
   useTheme,
   useMediaQuery,
-  Paper, Chip
+  Paper, Chip, Dialog, DialogTitle, DialogContent
 } from '@mui/material'
 import { Plus, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
-import { useAppDispatch, useAppSelector } from '../../store';
+import { useAppDispatch, useAppSelector } from '@/store';
 import {
   fetchSmsList,
   fetchSmsListQuery,
   setOpenCreateSms,
   setOpenCreateSmsCategory
-} from '../../store/apps/settings';
+} from '@/store/apps/settings';
 import api from '../../@core/utils/api';
 import VideoHeader from '../../components/video-header/video-header';
 
@@ -34,6 +34,7 @@ import EditSmsDialog from '../../views/apps/settings/ceo/EditSmsDialog';
 import UserSuspendDialog from '../../views/apps/mentors/view/UserSuspendDialog';
 import { ChipProps } from '@mui/material/Chip'
 import { PLACEHOLDERS } from '@/views/apps/sms-settings/constants'
+import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 interface SmsCategory {
   id: number;
@@ -45,7 +46,7 @@ interface SmsTemplate {
   description: string;
 }
 
-const LoadingSkeleton: React.FC = () => (
+const LoadingSkeleton: FC = () => (
   <>
     {[1, 2, 3].map((item) => (
       <Skeleton
@@ -58,6 +59,8 @@ const LoadingSkeleton: React.FC = () => (
     ))}
   </>
 );
+
+
 
 const EmptyState: React.FC = () => {
   const { t } = useTranslation();
@@ -96,6 +99,7 @@ const RoomsPage: React.FC = () => {
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false);
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
+  const [accessDeniedOpen, setAccessDeniedOpen] = useState<boolean>(false)
 
   const handleDeleteRequest = (id: number) => {
     setDeleteItemId(id);
@@ -152,6 +156,12 @@ const RoomsPage: React.FC = () => {
       dispatch(fetchSmsListQuery(parentId));
     }
   }, [parentId, dispatch]);
+
+  useEffect(() => {
+    if (sms_list?.access === false) {
+      setAccessDeniedOpen(true)
+    }
+  }, [sms_list])
 
   return (
     <Paper
@@ -220,10 +230,10 @@ const RoomsPage: React.FC = () => {
       <Box sx={{ mt: 3 }}>
         {is_pending ? (
           <LoadingSkeleton />
-        ) : sms_list.length === 0 ? (
+        ) : sms_list?.result?.length === 0 ? (
           <EmptyState />
         ) : (
-          sms_list.map((item: SmsCategory) => (
+          sms_list?.result?.map((item: SmsCategory) => (
             <Accordion
               key={item.id}
               expanded={parentId === item.id}
@@ -266,11 +276,11 @@ const RoomsPage: React.FC = () => {
               <AccordionDetails sx={{ p: 2 }}>
                 {item.id === parentId && is_childpending ? (
                   <LoadingSkeleton />
-                ) : smschild_list.length === 0 ? (
+                ) : smschild_list.result.length === 0 ? (
                   <EmptyState />
                 ) : (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {smschild_list.map((child: SmsTemplate) => (
+                    {smschild_list.result.map((child: SmsTemplate) => (
                       <Box
                         key={child.id}
                         sx={{
@@ -316,6 +326,8 @@ const RoomsPage: React.FC = () => {
         loading={deleteLoading}
         handleOk={handleDelete}
       />
+
+      <AccessDeniedModal open={accessDeniedOpen} />
     </Paper>
   );
 };

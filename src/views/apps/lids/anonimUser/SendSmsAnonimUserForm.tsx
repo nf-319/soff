@@ -123,7 +123,7 @@ export default function SendSmsAnonimUserForm({ smsTemps, user, closeModal, smsL
               formik.setFieldValue('message', e.target.value)
             }}
           >
-            {smschild_list.map((el: any) => (
+            {smschild_list.result.map((el: any) => (
               <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
                 <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>{el.description}</span>
               </MenuItem>

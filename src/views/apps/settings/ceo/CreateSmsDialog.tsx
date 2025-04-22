@@ -159,7 +159,7 @@ export default function CreateSmsDialog({}: Props) {
               id='demo-simple-select-outlined'
               labelId='demo-simple-select-outlined-label'
             >
-              {sms_list.map(item => (
+              {sms_list?.result?.map(item => (
                 <MenuItem value={item.id}>{item.description}</MenuItem>
               ))}
             </Select>

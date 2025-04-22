@@ -1,6 +1,6 @@
 'use client'
 
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
@@ -11,16 +11,23 @@ import EditGroupModal from '../../EditGroupModal'
 import { getDashboardLessons, getGroupsDetails, handleOpenEdit } from 'src/store/apps/groups'
 import api from 'src/@core/utils/api'
 import GroupDetailsWrapper from './GroupDetailsWrapper'
+import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 export default function GroupDetails() {
   const { groupData, isGettingGroupDetails, onlineLessonLoading } = useAppSelector(state => state.groupDetails)
+  const { companyInfo } = useAppSelector(state => state.user)
   const dispatch = useAppDispatch()
+  const [accessModal, setAccessModal] = useState<boolean>(false)
   const { user } = useContext(AuthContext)
   const router = useRouter()
 
   const handleOpenSendSMSModal = async () => {
+    if(companyInfo.access) {
     dispatch(handleEditClickOpen('send-sms'))
     await dispatch(getSMSTemp())
+    } else {
+      setAccessModal(true)
+    }
   }
 
   const handleEdit = async (id: any) => {
@@ -62,6 +69,7 @@ export default function GroupDetails() {
         handleEditClickOpen={(type: any) => dispatch(handleEditClickOpen(type))}
         handleGetMeetLink={handleGetMeetLink}
       />
+      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
       <EditGroupModal />
     </>
   )
