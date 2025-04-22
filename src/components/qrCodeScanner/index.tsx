@@ -5,21 +5,25 @@ import toast from 'react-hot-toast'
 import api from 'src/@core/utils/api'
 import { getEnglish } from 'src/@core/utils/getEnglish'
 import { uuidRegex } from '../qrCode-Modal'
-import { setAttendance } from '../../store/apps/groupDetails'
-import { useDispatch } from 'react-redux'
+import { getAttendance, setAttendance } from '../../store/apps/groupDetails'
 import { getMontNumber } from '../../@core/utils/gwt-month-name'
 import { useRouter } from 'next/router'
 import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material'
 import { X } from 'lucide-react'
+import { useAppDispatch, useAppSelector } from '@/store'
 
 export default function QRCodeScanner() {
+  const { queryParams } = useAppSelector(state => state.groupDetails)
+  const queryString = new URLSearchParams(queryParams).toString()
   const [scannedCode, setScannedCode] = useState<string>('')
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [open, setOpen] = useState(false)
   const [responseData, setResponseData] = useState<any>(null)
   const pathname = window.location.pathname
   const router = useRouter()
-  const dispatch = useDispatch()
+  const query = router.query
+
+  const dispatch = useAppDispatch()
 
   const handleSendQrCode = useCallback(async (code: string): Promise<void> => {
     if (!getEnglish(code)) {
@@ -58,12 +62,13 @@ export default function QRCodeScanner() {
       }
 
       if (pathname.includes('groups/view/security')) {
-        const response = await api.get(
-          `common/attendance-list/${router.query?.year || new Date().getFullYear()}-${getMontNumber(
-            router.query?.month
-          )}-01/group/${router.query?.id}/?`
+        dispatch(
+          getAttendance({
+            date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
+            group: query?.id,
+            queryString: queryString
+          })
         )
-        dispatch(setAttendance(response.data))
       }
     } catch (err: any) {
       console.log(err)

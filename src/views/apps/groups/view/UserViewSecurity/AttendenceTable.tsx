@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import type React from "react"
-import type { Dispatch } from "react"
-import { useMemo, useCallback } from "react"
+import type React from 'react'
+import type { Dispatch } from 'react'
+import { useMemo, useCallback, useState, useEffect } from 'react'
 import { Box, IconButton, Tooltip, Typography, useMediaQuery } from '@mui/material'
-import { CalendarCheck, Edit } from "lucide-react"
-import { UserViewItem } from "./UserViewItem"
-import { EmptyContent } from "src/components/empty-content"
+import { CalendarCheck, Edit } from 'lucide-react'
+import { UserViewItem } from './UserViewItem'
+import { EmptyContent } from 'src/components/empty-content'
 
 interface Student {
   id: string | number
@@ -45,23 +45,19 @@ export const AttendanceTable = ({
   setUpdateTopic,
   setTopicId,
   t,
-  query,
+  query
 }: AttendanceTableProps) => {
-  const mediaQuery = useMediaQuery("(max-width: 600px)")
+  const mediaQuery = useMediaQuery('(max-width: 600px)')
   const displayDays = useMemo(() => {
     return days?.length > 0 ? days : Array(7).fill({ date: 'placeholder' })
   }, [days])
-
-  const students = useMemo(() => {
-    return attendance?.students || []
-  }, [attendance])
 
   const tableStyles: React.CSSProperties = useMemo(
     () => ({
       borderCollapse: 'collapse',
       backgroundColor: isDark ? '#282A42' : '#fff',
       tableLayout: 'fixed',
-      width: mediaQuery ? "auto" : days?.length > 15 ? 'auto' : '100%'
+      width: mediaQuery ? 'auto' : days?.length > 15 ? 'auto' : '100%'
     }),
     [isDark]
   )
@@ -283,8 +279,8 @@ export const AttendanceTable = ({
         </thead>
 
         <tbody>
-          {students.length
-            ? students.map((student: Student, studentIndex: number) => (
+          {attendance?.students?.length
+            ? attendance?.students?.map((student: Student, studentIndex: number) => (
                 <tr
                   key={student.id || `placeholder-student-${studentIndex}`}
                   style={
@@ -342,7 +338,6 @@ export const AttendanceTable = ({
                               borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
                             } as React.CSSProperties
                           }
-
                         >
                           <UserViewItem
                             currentDate={null}
@@ -480,4 +475,3 @@ export const AttendanceTable = ({
     </Box>
   )
 }
-
