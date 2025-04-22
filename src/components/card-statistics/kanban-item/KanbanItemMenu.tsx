@@ -94,10 +94,12 @@ export const KanbanItemMenu: FC<Props> = ({
                 <IconifyIcon icon='mdi:edit' fontSize={20} />
                 {t('Tahrirlash')}
               </MenuItem>
-              <MenuItem onClick={() => setOpen('delete')} sx={{ '& svg': { mr: 2 } }}>
-                <IconifyIcon icon='mdi:delete' fontSize={20} />
-                {t("O'chirish")}
-              </MenuItem>
+              {router.query.is_active !== 'false' && (
+                <MenuItem onClick={() => setOpen('delete')} sx={{ '& svg': { mr: 2 } }}>
+                  <IconifyIcon icon='mdi:delete' fontSize={20} />
+                  {t("O'chirish")}
+                </MenuItem>
+              )}
               {router.query.is_active == 'false' && (
                 <MenuItem onClick={() => setOpen('recover')} sx={{ '& svg': { mr: 2 } }}>
                   <IconifyIcon icon='mdi:reload' fontSize={20} />
