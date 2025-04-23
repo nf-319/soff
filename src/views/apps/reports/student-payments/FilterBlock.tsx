@@ -11,7 +11,6 @@ import {
 import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { DateRangePicker } from 'rsuite'
-import ExcelStudents from '../../../../components/excelButton/ExcelStudents'
 import IconifyIcon from '../../../../components/icon'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import useDebounce from 'src/hooks/useDebounce'
@@ -19,6 +18,7 @@ import usePayment from 'src/hooks/usePayment'
 import { formatDateString } from 'src/pages/finance'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchStudentPaymentsList, GroupsPaymentType, updateParams } from 'src/store/apps/reports/studentPayments'
+import { useGet } from '@hooks/useApi'
 
 export default function FilterBlock() {
   const [search, setSearch] = useState<string>('')
@@ -28,12 +28,10 @@ export default function FilterBlock() {
   const { groups, queryParams, teachersData } = useAppSelector(state => state.studentPayments)
   const { course_list } = useAppSelector(state => state.settings)
   const [teacher, setTeacher] = useState<string | null>(null)
-
-  const queryString = new URLSearchParams({ ...queryParams }).toString()
-
   const dispatch = useAppDispatch()
   const [date, setDate] = useState<any>('')
   const searchVal = useDebounce(search, 800)
+  const { data: roles } = useGet('employee/check-list/?roles=admin,ceo&type=employee')
 
   const memoizedQueryString = useMemo(() => {
     return new URLSearchParams({ ...queryParams, search: searchVal, page: '1' }).toString()
@@ -59,39 +57,31 @@ export default function FilterBlock() {
       await dispatch(fetchStudentPaymentsList(queryString))
     } else {
       dispatch(updateParams({ start_date: ``, end_date: ``, page: '1' }))
-      // const queryString = new URLSearchParams({ ...queryParams, start_date: ``, end_date: ``, page: '1' }).toString()
-      // await dispatch(fetchStudentPaymentsList(queryString))
     }
     setDate(e)
   }
 
   const handleFilterGroup = async (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ group: e.target.value, page: '1' }))
-    // const queryString = new URLSearchParams({ ...queryParams, group: e.target.value, page: '1' }).toString()
-    // await dispatch(fetchStudentPaymentsList(queryString))
   }
 
   const handleFilterTeacher = async (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ teacher: e.target.value, page: '1' }))
-    // const queryString = new URLSearchParams({ ...queryParams, teacher: e.target.value, page: '1' }).toString()
-    // await dispatch(fetchStudentPaymentsList(queryString))
   }
 
   const handleFilterCourse = async (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ course: e.target.value, page: '1' }))
-    // const queryString = new URLSearchParams({ ...queryParams, course: e.target.value, page: '1' }).toString()
-    // await dispatch(fetchStudentPaymentsList(queryString))
   }
   const handleFilterPayment = async (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ payment_type: e.target.value, page: '1' }))
-    // const queryString = new URLSearchParams({ ...queryParams, payment_type: e.target.value, page: '1' }).toString()
-    // await dispatch(fetchStudentPaymentsList(queryString))
   }
 
   const handleFilterBonus = async (e: SelectChangeEvent<string>) => {
     dispatch(updateParams({ bonus: e.target.value, page: '1' }))
-    // const queryString = new URLSearchParams({ ...queryParams, payment_type: e.target.value, page: '1' }).toString()
-    // await dispatch(fetchStudentPaymentsList(queryString))
+  }
+
+  const handleFilterRole = async (e: SelectChangeEvent<string>) => {
+    dispatch(updateParams({ admin: e.target.value, page: '1' }))
   }
 
   const filterGroup = (group: GroupsPaymentType[]) => {
@@ -105,20 +95,19 @@ export default function FilterBlock() {
   }
 
   useLayoutEffect(() => {
-    getPaymentMethod()
+    void getPaymentMethod()
   }, [])
 
   return (
     <Box
       sx={{
         display: 'grid',
-        gridColumn: isMobile ? '1/5' : '1/5',
-        alignItems: 'center',
-        gridTemplateColumns: isMobile ? '1fr 1fr' : ' 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr',
-        gap: '10px'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+        gap: '10px',
+        width: '100%',
       }}
     >
-      <FormControl variant='outlined' size='small' fullWidth>
+      <FormControl variant='outlined' size='small'>
         <InputLabel htmlFor='outlined-adornment-password'>{t('Qidirish')}</InputLabel>
 
         <OutlinedInput
@@ -138,7 +127,7 @@ export default function FilterBlock() {
         />
       </FormControl>
 
-      <FormControl fullWidth>
+      <FormControl>
         <InputLabel size='small' id='group-filter-label'>
           {t('Guruhlar')}
         </InputLabel>
@@ -160,7 +149,7 @@ export default function FilterBlock() {
         </Select>
       </FormControl>
 
-      <FormControl fullWidth>
+      <FormControl>
         <InputLabel size='small' id='group-filter-label'>
           {t('Tolov')}
         </InputLabel>
@@ -186,7 +175,7 @@ export default function FilterBlock() {
         </Select>
       </FormControl>
 
-      <FormControl fullWidth>
+      <FormControl>
         <InputLabel size='small' id='teacher-filter-label'>
           {t("O'qituvchilar")}
         </InputLabel>
@@ -212,7 +201,7 @@ export default function FilterBlock() {
         </Select>
       </FormControl>
 
-      <FormControl fullWidth>
+      <FormControl>
         <InputLabel size='small' id='course-filter-label'>
           {t('Kurslar')}
         </InputLabel>
@@ -237,7 +226,8 @@ export default function FilterBlock() {
           ))}
         </Select>
       </FormControl>
-      <FormControl fullWidth>
+
+      <FormControl>
         <InputLabel size='small' id='group-filter-label'>
           {t('Oquvchi bonusi')}
         </InputLabel>
@@ -255,8 +245,9 @@ export default function FilterBlock() {
           <MenuItem value='1'>{t('Bonus olganlar')}</MenuItem>
         </Select>
       </FormControl>
+
       <DateRangePicker
-        style={{ minWidth: 'auto', gridColumn: isMobile ? '1/3' : '' }}
+        style={{ gridColumn: isMobile ? '1/3' : '' }}
         showOneCalendar
         placement='bottomEnd'
         locale={{
@@ -281,7 +272,28 @@ export default function FilterBlock() {
         size='lg'
         value={date}
       />
-      <ExcelStudents queryString={queryString} url='/common/student/payments/' />
+
+      <FormControl>
+        <InputLabel size='small' id='group-filter-label-roles'>
+          Qabul qilgan xodim
+        </InputLabel>
+
+        <Select
+          sx={{ bgcolor: 'white' }}
+          size='small'
+          label={t('Qabul qilgan xodim')}
+          value={queryParams.admin || ''}
+          id='group-filter-roles'
+          labelId='group-filter-label-roles'
+          onChange={handleFilterRole}
+        >
+          {roles?.length ? (
+            roles.map((item: any) => <MenuItem value={item.id}>{item.first_name}</MenuItem>)
+          ) : (
+            <MenuItem>Malumot yo'q</MenuItem>
+          )}
+        </Select>
+      </FormControl>
     </Box>
   )
 }

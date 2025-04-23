@@ -31,7 +31,7 @@ export function StudentsPaymentsModal({
   const [branches, setBranches] = useState([])
 
   async function getBranches() {
-    api.get(`/owner/tenant/branches/${id}/`).then(res => {
+    api.get(`owner/tenant/branches/${id}/`).then(res => {
       setBranches(res.data)
     })
   }
@@ -53,7 +53,7 @@ export function StudentsPaymentsModal({
       branches: values.branches.join(',')
     }
     await api
-      .post(`/owner/tenant/student-payments/delete/${id}`, formattedValues)
+      .post(`owner/tenant/student-payments/delete/${id}`, formattedValues)
       .then(res => {
         console.log(res)
         setOpenModal(false)

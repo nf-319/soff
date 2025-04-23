@@ -8,12 +8,9 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    lng: 'uz',
-    backend: {
-      loadPath: '/locales/{{lng}}.json'
-    },
-    fallbackLng: 'uz',
     debug: false,
+    lng: 'uz',
+    fallbackLng: 'uz',
     keySeparator: false,
     react: {
       useSuspense: false
@@ -21,7 +18,18 @@ i18n
     interpolation: {
       escapeValue: false,
       formatSeparator: ','
-    }
+    },
+    resources: {
+      uz: {
+        translation: require('@/locales/uz.json'),
+      },
+      en: {
+        translation: require('@/locales/en.json'),
+      },
+      ru: {
+        translation: require('@/locales/ru.json'),
+      },
+    },
   })
 
 export default i18n

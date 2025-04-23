@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Box,
   Button,
@@ -20,7 +22,6 @@ import { useTranslation } from 'react-i18next'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import {
-  fetchGroups,
   getDashboardLessons,
   getMetaData,
   handleOpenAddModal,
@@ -49,11 +50,12 @@ import { studentsUpdateParams } from 'src/store/apps/groupDetails'
 import DataTable from '../../components/table'
 import { useGet, usePatch } from 'src/hooks/useApi'
 import { useQueryClient } from '@tanstack/react-query'
+import Delete from '@/views/apps/groups/view/GroupViewLeft/Delete'
+import { GroupCreateEditDrawer } from '@/components/GroupDrawerModal'
+import { Plus } from 'lucide-react'
 
 const IconifyIcon = dynamic(() => import('../../components/icon'))
 const RowOptions = dynamic(() => import('src/views/apps/groups/RowOptions'))
-const EditGroupModal = dynamic(() => import('src/views/apps/groups/EditGroupModal'))
-const AddGroupModal = dynamic(() => import('src/views/apps/groups/AddGroupModal'))
 
 export interface customTableProps {
   xs: number
@@ -80,6 +82,7 @@ export default function GroupsPage() {
   const router = useRouter()
   const { user } = useContext(AuthContext)
   const { t } = useTranslation()
+  const [openCreateModal, setOpenCreateModal] = useState<'create' | 'edit' | null>(null)
   const [open, setOpen] = useState<boolean>(false)
   const { isMobile } = useResponsive()
   const [page, setPage] = useState<number>(queryParams.page ? Number(queryParams.page) - 1 : 0)
@@ -90,6 +93,7 @@ export default function GroupsPage() {
   const [group_id, setGroupId] = useState<number | null>(null)
   const [groupChoices, setGroupChoices] = useState([])
   const { mutate, isPending } = usePatch()
+ 
   const { data, isLoading } = useGet(ceoConfigs.groups, {
     params: queryParams as Record<string, unknown>,
     deps: ['groups-list']
@@ -185,6 +189,7 @@ export default function GroupsPage() {
       xs: 0.4,
       dataIndex: 'id',
       title: t(''),
+
       render: actions => <RowOptions groups={data?.results} id={actions} />
     }
   ]
@@ -214,17 +219,13 @@ export default function GroupsPage() {
   }
 
   const handleOpenModal = async () => {
-    dispatch(handleOpenAddModal(true))
+    setOpenCreateModal('create')
     await dispatch(getDashboardLessons(''))
   }
 
   const rowClick = (id: any) => {
     router.push(`/groups/view/security?id=${id}&month=${getMonthName(null)}`)
     dispatch(studentsUpdateParams({ status: 'active,new' }))
-  }
-
-  const pageLoad = async () => {
-    await dispatch(getMetaData())
   }
 
   const formik = useFormik({
@@ -246,28 +247,7 @@ export default function GroupsPage() {
       })
     }
   })
-  const getTeachers = async () => {
-    await api
-      .get(`${ceoConfigs.employee_checklist}?role=teacher`)
-      .then(data => {
-        dispatch(setTeacherData(data.data))
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  }
-  const getRooms = async () => {
-    await api
-      .get('common/room-check-list/')
-      .then(data => dispatch(setRoomsData(data.data)))
-      .catch(error => {
-        console.error(error)
-      })
-  }
-  useEffect(() => {
-    getTeachers()
-    getRooms()
-  }, [])
+
 
   useEffect(() => {
     const group = data?.results?.find((item: any) => item.id == group_id)
@@ -291,18 +271,17 @@ export default function GroupsPage() {
         router.push('/')
         toast.error('Sahifaga kirish huquqingiz yoq!')
       }
-      await pageLoad()
     }
 
     initializePage()
   }, [])
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
+    void queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
   }, [user?.active_branch])
 
   return (
     <div>
-      <VideoHeader item={videoUrls.groups} />
+      {isMobile && <VideoHeader item={videoUrls.groups} />}
 
       <Box
         className='groups-page-header'
@@ -311,18 +290,23 @@ export default function GroupsPage() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Typography variant='h5'>{t('Guruhlar')}</Typography>
-          {!isLoading && <Chip label={`${data?.count}`} variant='outlined' color='primary' />}
+
+          {!isLoading && (
+            <Tooltip title='Guruhlar soni'>
+              <Chip label={`${data?.count}`} variant='outlined' color='primary' />
+            </Tooltip>
+          )}
         </Box>
-        <Button
-          onClick={handleOpenModal}
-          variant='contained'
-          size='small'
-          startIcon={<IconifyIcon icon='ic:baseline-plus' />}
-        >
-          <Tooltip title={t('Yangi guruh qo‘shish.')}>
-            <span>{t("Yangi qo'shish")}</span>
-          </Tooltip>
-        </Button>
+
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          {!isMobile && <VideoHeader item={videoUrls.groups} />}
+
+          <Button onClick={handleOpenModal} variant='contained' startIcon={<Plus size={18} />}>
+            <Tooltip title={t('Yangi guruh qo‘shish.')}>
+              <span>{t("Yangi qo'shish")}</span>
+            </Tooltip>
+          </Button>
+        </Box>
       </Box>
 
       {isMobile && (
@@ -335,11 +319,11 @@ export default function GroupsPage() {
           >
             {t('Filterlash')}
           </Button>
-          <Excel size='small' url='/common/groups/export/' queryString={queryString} />
+          <Excel size='small' url='common/groups/export/' queryString={queryString} />
         </>
       )}
 
-      {!isMobile && <GroupsFilter isMobile={isMobile} />}
+      {!isMobile && <GroupsFilter />}
 
       <DataTable columns={columns} loading={isLoading} data={data?.results || []} rowClick={rowClick} />
 
@@ -347,7 +331,7 @@ export default function GroupsPage() {
         <div className='d-flex'>
           <Pagination
             page={Number(queryParams.offset) ? Number(queryParams.offset) / rowsPerPage + 1 : 1}
-            count={Math.ceil(data?.cpount / 10)}
+            count={Math.ceil(data?.count / 10)}
             variant='outlined'
             shape='rounded'
             onChange={(e: any, page) => handlePagination(String(page))}
@@ -367,8 +351,7 @@ export default function GroupsPage() {
         </div>
       )}
 
-      <AddGroupModal />
-      <EditGroupModal />
+      <GroupCreateEditDrawer open={openCreateModal} setOpen={setOpenCreateModal} />
       <GroupChangeBranchModal />
 
       <Dialog fullScreen onClose={() => setOpen(false)} aria-labelledby='full-screen-dialog-title' open={open}>
@@ -385,7 +368,7 @@ export default function GroupsPage() {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <GroupsFilter isMobile={isMobile} />
+          <GroupsFilter />
         </DialogContent>
         <DialogActions className='dialog-actions-dense'>
           <Button onClick={() => setOpen(false)}>{t('Davom etish')}</Button>
@@ -441,6 +424,7 @@ export default function GroupsPage() {
         </form>
       </Dialog>
       <OnlineLessonModal />
+      <Delete />
     </div>
   )
 }

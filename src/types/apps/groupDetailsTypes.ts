@@ -8,6 +8,7 @@ type ActionTypes = 'delete' | 'send-sms' | 'add-student' | 'notes' | 'edit' | 'o
 export interface IGroupDetailsState {
   groupData: null | any
   gradeQueryParams: any,
+  openDebtorsModal:boolean
   updateStatusModal: any,
   onlineLessonLoading:boolean,
   meet_link:string|null,

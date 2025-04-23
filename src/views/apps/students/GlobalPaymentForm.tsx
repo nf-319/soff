@@ -1,7 +1,6 @@
 import {
   Alert,
   Box,
-  Chip,
   CircularProgress,
   FormControl,
   FormHelperText,
@@ -16,23 +15,22 @@ import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
 import useDebounce from 'src/hooks/useDebounce'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { fetchStudentDetail, searchStudent, setGlobalPay, setStudentData } from 'src/store/apps/students'
+import { fetchStudentDetail, searchStudent } from 'src/store/apps/students'
 import * as Yup from 'yup'
 import IconifyIcon from '../../../components/icon'
-import { today } from '../../../components/card-statistics/kanban-item'
-import AmountInput, { formatAmount, revereAmount } from '../../../components/amount-input'
+import { today } from '@components/card-statistics/kanban-item'
+import AmountInput, { revereAmount } from '../../../components/amount-input'
 import LoadingButton from '@mui/lab/LoadingButton'
 import usePayment from 'src/hooks/usePayment'
 import toast from 'react-hot-toast'
 import { disablePage } from 'src/store/apps/page'
-import { formatPhoneNumber } from '../../../components/phone-input/format-phone-number'
+import { formatPhoneNumber } from '@components/phone-input/format-phone-number'
 import { useTranslation } from 'react-i18next'
 import api from 'src/@core/utils/api'
 import useResponsive from '../../../@core/hooks/useResponsive'
+import { handleCheckDownload, handleCheckPrint } from '@/views/apps/students/view/UserViewPage'
 
-type Props = {}
-
-export default function GlobalPaymentForm({}: Props) {
+export default function GlobalPaymentForm() {
   const [loading, setLoading] = useState<boolean>(false)
   const [loadingBtn, setLoadingBtn] = useState<boolean>(false)
   const [studentList, setStudentList] = useState<any[]>([])
@@ -40,6 +38,7 @@ export default function GlobalPaymentForm({}: Props) {
   const { t } = useTranslation()
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const [groups, setGroups] = useState([])
+  const [isCheckId, setIsCheckId] = useState<any>()
   const [groupData, setGroupData] = useState<any>(null)
   const dispatch = useAppDispatch()
   const { isMobile } = useResponsive()
@@ -54,40 +53,6 @@ export default function GlobalPaymentForm({}: Props) {
   }
 
   const userData: any = { ...studentData }
-
-  const handlePrint = async (id: number | string) => {
-    const subdomain = location.hostname.split('.')
-    try {
-      const response = await fetch(
-        `${
-          process.env.NODE_ENV === 'development'
-            ? process.env.NEXT_PUBLIC_TEST_BASE_URL
-            : subdomain.length < 3
-            ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-            : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }/common/generate-check/${id}/`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        }
-      )
-      const data = await response.blob()
-      const blobUrl = URL.createObjectURL(data)
-      const printFrame: HTMLIFrameElement | null = document.getElementById('printFrame') as HTMLIFrameElement
-      if (printFrame) {
-        printFrame.src = blobUrl
-        printFrame.onload = function () {
-          if (printFrame.contentWindow) {
-            printFrame.contentWindow?.print()
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Print error:', error)
-    }
-  }
 
   const validationSchema = Yup.object({
     search: Yup.string().min(4, "Qidirish uchun ma'lumot yetarli emas")
@@ -134,11 +99,11 @@ export default function GlobalPaymentForm({}: Props) {
         amount: revereAmount(values.amount)
       }
       try {
-        const resp = await createPayment(data)
-        await handlePrint(resp.id)
+        const res = await createPayment(data)
+        setIsCheckId(res.id)
         setStep('print')
         setLoadingBtn(false)
-        toast.success(t('Tolov amalaga oshirildi') as string, { duration: 4000 })
+        toast.success("Tolov amalaga oshirildi")
       } catch (err: any) {
         if (err?.respnse?.data) {
           payform.setErrors(err?.respnse?.data)
@@ -148,14 +113,6 @@ export default function GlobalPaymentForm({}: Props) {
       dispatch(disablePage(false))
     }
   })
-
-  function handleClose() {
-    payform.resetForm()
-    formik.resetForm()
-    dispatch(setGlobalPay(false))
-    setStudentList([])
-    dispatch(setStudentData(null))
-  }
 
   const search = useDebounce(formik.values.search, 1000)
 
@@ -172,7 +129,7 @@ export default function GlobalPaymentForm({}: Props) {
   const clickStudent = async (item: any) => {
     setStudentList([])
     setLoading(true)
-    getGroups(item.id)
+    void getGroups(item.id)
     await dispatch(fetchStudentDetail(item.id))
     await getPaymentMethod()
     setStudentList([item])
@@ -183,16 +140,16 @@ export default function GlobalPaymentForm({}: Props) {
   useEffect(() => {
     setStudentList([])
     if (!formik.errors.search && search) {
-      handleSearch()
+      void handleSearch()
     }
   }, [search])
+
   const formatNumber = (num: any) => {
     return new Intl.NumberFormat('uz-UZ').format(num)
   }
 
   return (
     <Box sx={isMobile ? { width: '100%' } : { width: '450px' }}>
-      <iframe src='' id='printFrame' style={{ display: 'none' }}></iframe>
       {step === 'search' || step === 'pay' ? (
         <form onSubmit={e => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
           {step === 'search' && (
@@ -250,50 +207,34 @@ export default function GlobalPaymentForm({}: Props) {
                 onChange={payform.handleChange}
                 onBlur={payform.handleBlur}
               >
-                {groups &&
+                {!groups?.length ? (
+                  <MenuItem
+                    sx={{
+                      userSelect: 'none',
+                      cursor: 'default',
+                      '&:hover': {
+                        backgroundColor: 'transparent'
+                      }
+                    }}
+                  >
+                    <Typography variant='subtitle1'>Guruh mavjud emas</Typography>
+                  </MenuItem>
+                ) : (
                   groups?.map((group: any) => (
                     <MenuItem
                       onClick={() => {
-                        setGroupData(group), payform.setFieldValue('debt_amount', group.last_debt)
+                        setGroupData(group)
+                        payform.setFieldValue('debt_amount', group.last_debt)
                       }}
                       key={group.id}
                       value={group.id}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                         <Typography variant='subtitle1'>{group.name}</Typography>
-                        <Box fontSize={12} sx={{ display: 'inline', margin: '0 5px' }}>
-                          {/* <Chip
-                            label={`${formatAmount(String(group.group_data?.balance))} UZS`}
-                            size='small'
-                            variant='outlined'
-                            color={
-                              group.group_data?.balance > 0
-                                ? 'success'
-                                : group.group_data?.balance < 0
-                                ? 'error'
-                                : 'success'
-                            }
-                          /> */}
-                        </Box>
-                        {/* <Box fontSize={12} sx={{ display: 'inline' }}>
-                          <Chip
-                            label={t(group.status)}
-                            size='small'
-                            variant='outlined'
-                            color={
-                              group.status === 'active'
-                                ? 'success'
-                                : group.status === 'archive'
-                                ? 'error'
-                                : group.status === 'frozen'
-                                ? 'secondary'
-                                : 'warning'
-                            }
-                          />
-                        </Box> */}
                       </Box>
                     </MenuItem>
-                  ))}
+                  ))
+                )}
               </Select>
               {!!payform.errors.group && payform.touched.group && (
                 <FormHelperText error>{payform.errors.group}</FormHelperText>
@@ -334,13 +275,6 @@ export default function GlobalPaymentForm({}: Props) {
           )}
           {companyInfo.extra_settings.allow_debt_editing_on_payment == true && groupData && (
             <FormControl fullWidth>
-              {/* <InputLabel
-                size='small'
-                id='user-view-language-label'
-                error={!!payform.errors.debt_amount && Boolean(payform.touched.debt_amount)}
-              >
-                {t("Qarzdorlik summasi")}
-              </InputLabel> */}
               <AmountInput
                 id='user-view-language'
                 size='small'
@@ -440,13 +374,19 @@ export default function GlobalPaymentForm({}: Props) {
         </form>
       ) : (
         <Box onSubmit={e => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          <Typography sx={{ fontSize: '20px', textAlign: 'center', whiteSpace: 'break-spaces' }}>
-            {t('Ilitmos chekni talab qiluvchiga berishni unutmang')}
+          <Typography variant='h6' sx={{ textAlign: 'center', color: '#757575' }}>
+            Ilitmos chekni talab qiluvchiga berishni unutmang!
           </Typography>
 
-          <LoadingButton loading={loadingBtn} sx={{ mt: '20px' }} onClick={handleClose} variant='contained'>
-            {t('Yakunlash')}
-          </LoadingButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <LoadingButton loading={loadingBtn} onClick={() => handleCheckDownload(isCheckId)}>
+              Checkni yuklash
+            </LoadingButton>
+
+            <LoadingButton loading={loadingBtn} onClick={() => handleCheckPrint(isCheckId)}>
+              Checkni chiqarish
+            </LoadingButton>
+          </Box>
         </Box>
       )}
     </Box>

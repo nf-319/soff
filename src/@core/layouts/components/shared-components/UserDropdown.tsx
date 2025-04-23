@@ -196,7 +196,7 @@ const UserDropdown = (props: Props) => {
               <Box sx={{ display: 'flex', ml: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
                 <Typography sx={{ fontWeight: 600 }}>{user?.fullName}</Typography>
                 <div>
-                  {userRoles?.map((item, index) => (
+                  {userRoles?.map((item: any, index: number) => (
                     <div key={`${index}-${item}`} onClick={() => handleRole(item)}>
                       <Typography
                         variant='body2'

@@ -60,7 +60,8 @@ export interface TeacherSalariesResponse {
 }
 
 export interface IGroupsState {
-  roomsData:any,
+  roomsData: any,
+  deleteGroupId:any,
   teachersData:TacherItemType[]|null,
   isTableLoading: boolean
   isOpenEdit: boolean
@@ -95,4 +96,5 @@ export interface GroupFormInitialValue {
   start_at: string
   day_of_week: string | string[]
   end_at: string
+  end_date?:string
 }

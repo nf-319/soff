@@ -7,10 +7,8 @@ import { useAppSelector } from 'src/store';
 import NProgress from 'nprogress';
 import { CacheProvider } from '@emotion/react';
 import type { EmotionCache } from '@emotion/cache';
-import 'src/configs/i18n';
 import { defaultACLObj } from 'src/configs/acl';
 import themeConfig from 'src/configs/themeConfig';
-import { Toaster } from 'react-hot-toast';
 import UserLayout from 'src/layouts/UserLayout';
 import AclGuard from 'src/components/auth/AclGuard';
 import ThemeComponent from 'src/@core/theme/ThemeComponent';
@@ -20,15 +18,22 @@ import WindowWrapper from 'src/components/window-wrapper';
 import Spinner from 'src/components/spinner';
 import { AuthProvider } from 'src/context/AuthContext';
 import { SettingsConsumer, SettingsProvider } from 'src/@core/context/settingsContext';
-import ReactHotToast from 'src/@core/styles/libs/react-hot-toast';
 import { createEmotionCache } from 'src/@core/utils/create-emotion-cache';
 import DisabledProvider from 'src/@core/layouts/DisabledProvider';
 import { disableCache } from '@iconify/react'
-import { Providers } from '../providers'
+import { Providers } from '@/providers'
+import dynamic from 'next/dynamic'
+
+import 'src/configs/i18n';
 
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import 'src/iconify-bundle/icons-bundle-react';
 import './globals.css';
+
+const ToastPortal = dynamic(
+  () => import('@/layouts/ToastPortal'),
+  { ssr: false }
+);
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -52,7 +57,7 @@ if (themeConfig.routingLoader) {
 disableCache('all')
 
 const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
-  if (guestGuard) return <GuestGuard fallback={<Spinner />}>{children}</GuestGuard>
+  if (guestGuard) return <GuestGuard>{children}</GuestGuard>
   if (authGuard) return <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>
   return <>{children}</>
 }
@@ -94,9 +99,8 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
                             </AclGuard>
                           </Guard>
                         </WindowWrapper>
-                        <ReactHotToast>
-                          <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
-                        </ReactHotToast>
+
+                        <ToastPortal settings={settings} />
                       </ThemeComponent>
                     )
                   }}
