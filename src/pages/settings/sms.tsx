@@ -1,335 +1,185 @@
-'use client'
+import { Box, Button, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import IconifyIcon from '../../components/icon'
+import SubLoader from 'src/views/apps/loaders/SubLoader'
+import { useAppDispatch, useAppSelector } from 'src/store'
+import { fetchSmsList, fetchSmsListQuery, setOpenCreateSms, setOpenCreateSmsCategory } from 'src/store/apps/settings'
+import Accordion from '@mui/material/Accordion'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import SmsTableRowOptions from 'src/views/apps/settings/ceo/SmsTableRowOptions'
+import CreateSmsDialog from 'src/views/apps/settings/ceo/CreateSmsDialog'
+import CreateSmsCategoryDialog from 'src/views/apps/settings/ceo/CreateSmsCategoryDialog'
+import EditSmsDialog from 'src/views/apps/settings/ceo/EditSmsDialog'
+import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
+import { useTranslation } from 'react-i18next'
+import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
+import api from 'src/@core/utils/api'
+import toast from 'react-hot-toast'
+import { GridExpandMoreIcon } from '@mui/x-data-grid'
+import useResponsive from 'src/@core/hooks/useResponsive'
 
-import React, { FC, useEffect, useState } from 'react'
-import {
-  Box,
-  Button,
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Skeleton,
-  useTheme,
-  useMediaQuery,
-  Paper, Chip, Dialog, DialogTitle, DialogContent
-} from '@mui/material'
-import { Plus, ChevronDown } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import toast from 'react-hot-toast';
-
-import { useAppDispatch, useAppSelector } from '@/store';
-import {
-  fetchSmsList,
-  fetchSmsListQuery,
-  setOpenCreateSms,
-  setOpenCreateSmsCategory
-} from '@/store/apps/settings';
-import api from '../../@core/utils/api';
-import VideoHeader from '../../components/video-header/video-header';
-
-import SmsTableRowOptions from '../../views/apps/settings/ceo/SmsTableRowOptions';
-import CreateSmsDialog from '../../views/apps/settings/ceo/CreateSmsDialog';
-import CreateSmsCategoryDialog from '../../views/apps/settings/ceo/CreateSmsCategoryDialog';
-import EditSmsDialog from '../../views/apps/settings/ceo/EditSmsDialog';
-import UserSuspendDialog from '../../views/apps/mentors/view/UserSuspendDialog';
-import { ChipProps } from '@mui/material/Chip'
-import { PLACEHOLDERS } from '@/views/apps/sms-settings/constants'
-import { AccessDeniedModal } from '@components/AccessDeniedModal'
-
-interface SmsCategory {
-  id: number;
-  description: string;
-}
-
-interface SmsTemplate {
-  id: number;
-  description: string;
-}
-
-const LoadingSkeleton: FC = () => (
-  <>
-    {[1, 2, 3].map((item) => (
-      <Skeleton
-        key={item}
-        variant="rounded"
-        width="100%"
-        height={60}
-        sx={{ mb: 2 }}
-      />
-    ))}
-  </>
-);
-
-
-
-const EmptyState: React.FC = () => {
-  const { t } = useTranslation();
-
-  return (
-    <Box
-      sx={{
-        py: 6,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 1,
-        border: '1px dashed #ddd',
-        backgroundColor: 'rgba(0, 0, 0, 0.02)'
-      }}
-    >
-      <Typography variant="body1" color="text.secondary" mb={1}>
-        {t('Ma\'lumot yo\'q')}
-      </Typography>
-      <Typography variant="caption" color="text.secondary">
-        {t('Bu kategoriya bo\'sh')}
-      </Typography>
-    </Box>
-  );
-};
-
-const RoomsPage: React.FC = () => {
-  const { sms_list, smschild_list, is_pending, is_childpending } = useAppSelector(state => state.settings);
-  const dispatch = useAppDispatch();
-  const [parentId, setParentId] = useState<number | null>(null);
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
-  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
-  const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false);
-  const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
-  const [accessDeniedOpen, setAccessDeniedOpen] = useState<boolean>(false)
-
-  const handleDeleteRequest = (id: number) => {
-    setDeleteItemId(id);
-    setSuspendDialogOpen(true);
-  };
+export default function RoomsPage() {
+  const { sms_list, smschild_list, is_pending, is_childpending } = useAppSelector(state => state.settings)
+  const dispatch = useAppDispatch()
+  const [parentId, setParentId] = useState<number | null>(null)
+  const { t } = useTranslation()
+  const { isMobile } = useResponsive()
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [suspendDialogOpen, setSuspendDialogOpen] = useState(false)
+  const [deleteItemId, setDeleteItemId] = useState<number | null>(null)
+  const setOpenAddGroup = (value: boolean) => {
+    dispatch(setOpenCreateSms(value))
+  }
 
   const handleDelete = async () => {
-    if (!deleteItemId) return;
-
-    setDeleteLoading(true);
-    try {
-      await api.delete(`common/sms-form/delete/${deleteItemId}`);
-      toast.success(t("Kategoriya o'chirildi"));
-      dispatch(fetchSmsList());
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.msg || t('Serverda xatolik yuz berdi'));
-    } finally {
-      setDeleteLoading(false);
-      setSuspendDialogOpen(false);
-    }
-  };
-
-  const toggleAccordion = (id: number) => {
-    setParentId(parentId === id ? null : id);
-  };
-
-  const renderTextWithPlaceholders = (value: string) => {
-    return value
-      .split(/(\$\{(?:group|balance|first_name|reason|score|amount|date|payment_type|payment_date|exam|)})/)
-      .map((part, index) => {
-        const placeholder = PLACEHOLDERS.birthdate.find((p: any) => p.value === part)
-        if (placeholder) {
-          return (
-            <Chip
-              key={index}
-              label={placeholder.label}
-              color={placeholder.color as ChipProps['color']}
-              size='small'
-              sx={{ mx: 0.5, verticalAlign: 'middle' }}
-            />
-          )
-        }
-        return part
+    setDeleteLoading(true)
+    await api
+      .delete(`common/sms-form/delete/${deleteItemId}`)
+      .then(res => {
+        toast.success("Kategoriya o'chirildi")
+        setSuspendDialogOpen(false)
+        dispatch(fetchSmsList())
       })
+      .catch(err => {
+        console.log(err)
+        toast.error(err.response.data.msg || 'Serverda hatolik bor')
+      })
+    setDeleteLoading(false)
   }
 
   useEffect(() => {
-    dispatch(fetchSmsList());
-  }, [dispatch]);
-
-  useEffect(() => {
     if (parentId) {
-      dispatch(fetchSmsListQuery(parentId));
+      dispatch(fetchSmsListQuery(parentId))
     }
-  }, [parentId, dispatch]);
-
-  useEffect(() => {
-    if (sms_list?.access === false) {
-      setAccessDeniedOpen(true)
-    }
-  }, [sms_list])
+  }, [parentId])
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: { xs: 2, md: 3 },
-        backgroundColor: 'background.paper',
-        borderRadius: 1
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' },
-          alignItems: { xs: 'flex-start', md: 'center' },
-          justifyContent: 'space-between',
-          mb: 3
-        }}
-      >
-        <Typography
-          variant="h5"
-          sx={{
-            mb: { xs: 2, md: 0 },
-            fontWeight: 600
-          }}
-        >
-          SMS shablonlar
-        </Typography>
-
+    <div>
+      <VideoHeader item={videoUrls.sms} />
+      {!isMobile ? (
         <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            gap: 2,
-            width: { xs: '100%', md: 'auto' }
-          }}
+          className='groups-page-header'
+          sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0' }}
+          py={2}
         >
-          <VideoHeader
-            item={{ url: '', title: t('SMS qo\'llanmasi') }}
-          />
-
-          <Button
-            onClick={() => dispatch(setOpenCreateSmsCategory(true))}
-            variant="outlined"
-            color="primary"
-            fullWidth={isSmallScreen}
-            startIcon={<Plus size={18} />}
-            sx={{ ml: { sm: 1 } }}
-          >
-            {t('SMS kategoriya')}
-          </Button>
-
-          <Button
-            onClick={() => dispatch(setOpenCreateSms(true))}
-            variant="contained"
-            color="primary"
-            fullWidth={isSmallScreen}
-            startIcon={<Plus size={18} />}
-            sx={{ ml: { sm: 1 } }}
-          >
-            {t('SMS shablon')}
-          </Button>
-        </Box>
-      </Box>
-
-      <Box sx={{ mt: 3 }}>
-        {is_pending ? (
-          <LoadingSkeleton />
-        ) : sms_list?.result?.length === 0 ? (
-          <EmptyState />
-        ) : (
-          sms_list?.result?.map((item: SmsCategory) => (
-            <Accordion
-              key={item.id}
-              expanded={parentId === item.id}
-              onChange={() => toggleAccordion(item.id)}
-              sx={{
-                mb: 2,
-                borderRadius: 1,
-                border: `1px solid ${theme.palette.divider}`,
-                overflow: 'hidden',
-                '&:before': { display: 'none' },
-                boxShadow: 'none'
-              }}
+          <Typography variant='h5'>{t('SMS shablonlar')}</Typography>
+          <Box sx={{ display: 'flex', gap: 5 }}>
+            <Button
+              onClick={() => dispatch(setOpenCreateSmsCategory(true))}
+              variant='contained'
+              size='small'
+              startIcon={<IconifyIcon icon='ic:baseline-plus' />}
             >
-              <AccordionSummary
-                expandIcon={<ChevronDown size={20} />}
-                aria-controls={`panel-${item.id}-content`}
-                id={`panel-${item.id}-header`}
-                sx={{
-                  px: 3,
-                  '&.Mui-expanded': {
-                    marginBottom: 1,
-                    borderBottom: `1px solid ${theme.palette.divider}`
-                  }
-                }}
+              {t('SMS kategoriya yaratish')}
+            </Button>
+            <Button
+              onClick={() => setOpenAddGroup(true)}
+              variant='contained'
+              size='small'
+              startIcon={<IconifyIcon icon='ic:baseline-plus' />}
+            >
+              {t('Yangi SMS kategoriya qo‘shish')}
+            </Button>
+          </Box>
+        </Box>
+      ) : (
+        <Box className='groups-page-header' sx={{ margin: '10px 0' }} py={2}>
+          <Typography variant='h5'>{t('SMS shablonlar')}</Typography>
+          <Box sx={{ gap: 5 }} py={4}>
+            <Button
+              sx={{ marginBottom: 3 }}
+              fullWidth
+              onClick={() => dispatch(setOpenCreateSmsCategory(true))}
+              variant='contained'
+              size='small'
+              startIcon={<IconifyIcon icon='ic:baseline-plus' />}
+            >
+              {t('SMS kategoriya yaratish')}
+            </Button>
+            <Button
+              fullWidth
+              onClick={() => setOpenAddGroup(true)}
+              variant='contained'
+              size='small'
+              startIcon={<IconifyIcon icon='ic:baseline-plus' />}
+            >
+              {t('Yangi SMS kategoriya qo‘shish')}
+            </Button>
+          </Box>
+        </Box>
+      )}
+
+      {is_pending ? (
+        <SubLoader />
+      ) : (
+        sms_list.map(item => (
+          <Accordion
+            key={item.id}
+            sx={{ marginY: 5, borderRadius: 2, border: 'none', position: 'unset' }}
+            expanded={parentId === item.id}
+            onChange={() => setParentId(parentId === item.id ? null : item.id)}
+          >
+            <AccordionSummary
+              expandIcon={<GridExpandMoreIcon />}
+              aria-controls='panel1-content'
+              id={`panel-${item.id}-header`}
+            >
+              <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Typography component='span'>{item.description}</Typography>
+                <div onClick={event => event.stopPropagation()}>
+                  <SmsTableRowOptions id={item.id} />
+                </div>
+              </Box>
+              {/* <Button
+                variant='contained'
+                color='error'
+                size='small'
+                onClick={(event) => { setSuspendDialogOpen(true) ,setDeleteItemId(item.id),event.stopPropagation()}}
+                sx={{ marginLeft: 'auto' }}
               >
-                <Box sx={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}>
-                  <Typography fontWeight={500}>{item.description}</Typography>
-
-                  <Box onClick={e => e.stopPropagation()}>
-                    <SmsTableRowOptions id={item.id} />
+                {t('Delete')}
+              </Button> */}
+            </AccordionSummary>
+            {item.id === parentId && is_childpending ? (
+              <SubLoader />
+            ) : smschild_list.length === 0 ? (
+              <Typography textAlign='center' sx={{ paddingBottom: 5 }}>
+                Ma'lumot yo'q
+              </Typography>
+            ) : (
+              smschild_list.map(child => (
+                <AccordionDetails key={child.id}>
+                  <Box
+                    className='bg-light'
+                    sx={{
+                      borderRadius: 2,
+                      paddingY: 2,
+                      paddingX: 4,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}
+                  >
+                    <Typography>{child.description}</Typography>
+                    <SmsTableRowOptions parent_id={item.id} id={child.id} />
                   </Box>
-                </Box>
-              </AccordionSummary>
-
-              <AccordionDetails sx={{ p: 2 }}>
-                {item.id === parentId && is_childpending ? (
-                  <LoadingSkeleton />
-                ) : smschild_list.result.length === 0 ? (
-                  <EmptyState />
-                ) : (
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {smschild_list.result.map((child: SmsTemplate) => (
-                      <Box
-                        key={child.id}
-                        sx={{
-                          p: { xs: 2, sm: 3 },
-                          borderRadius: 1,
-                          backgroundColor: theme.palette.background.default,
-                          display: 'flex',
-                          flexDirection: { xs: 'column', sm: 'row' },
-                          alignItems: { xs: 'flex-start', sm: 'center' },
-                          justifyContent: 'space-between',
-                          gap: 2
-                        }}
-                      >
-                        <Typography
-                          variant="body1"
-                          component='div'
-                          sx={{
-                            wordBreak: 'break-word',
-                            flexGrow: 1
-                          }}
-                        >
-                          {renderTextWithPlaceholders(child.description)}
-                        </Typography>
-                        <Box sx={{ ml: 'auto', flexShrink: 0 }}>
-                          <SmsTableRowOptions parent_id={item.id} id={child.id} />
-                        </Box>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-              </AccordionDetails>
-            </Accordion>
-          ))
-        )}
-      </Box>
+                </AccordionDetails>
+              ))
+            )}
+          </Accordion>
+        ))
+      )}
 
       <CreateSmsDialog />
       <CreateSmsCategoryDialog />
       <EditSmsDialog />
       <UserSuspendDialog
+        loading={deleteLoading}
         open={suspendDialogOpen}
         setOpen={setSuspendDialogOpen}
-        loading={deleteLoading}
         handleOk={handleDelete}
       />
-
-      <AccessDeniedModal open={accessDeniedOpen} />
-    </Paper>
-  );
-};
-
-export default RoomsPage;
+    </div>
+  )
+}

@@ -16,17 +16,15 @@ import useSMS from 'src/hooks/useSMS'
 import { useDelete, useGet, usePatch } from 'src/hooks/useApi'
 import ceoConfigs from 'src/configs/ceo'
 import { useQueryClient } from '@tanstack/react-query'
-import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 const RowOptions = ({ id, status }: { id: number | string; status: string }) => {
   const { t } = useTranslation()
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
-  const { companyInfo } = useAppSelector(state => state.user)
+  const { queryParams } = useAppSelector(state => state.mentors)
   const dispatch = useAppDispatch()
   const [openSms, setOpenSms] = useState<any>()
-  const [accessModal, setAccessModal] = useState<boolean>(false)
   const rowOptionsOpen = Boolean(anchorEl)
   const { smsTemps, getSMSTemps } = useSMS()
   const { mutate: editMutate, isPending: editPending } = usePatch()
@@ -85,14 +83,6 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
     await dispatch(fetchTeacherdetail(id))
   }
 
-  const handleModalsOpen = () => {
-    if(companyInfo.access) {
-      void getSMSTemps(); setOpenSms('sms')
-    } else {
-      setAccessModal(true)
-    }
-  }
-
   return (
     <>
       <IconButton size='small' onClick={handleRowOptionsClick}>
@@ -143,15 +133,13 @@ const RowOptions = ({ id, status }: { id: number | string; status: string }) => 
               <IconifyIcon icon='mdi:delete-outline' fontSize={20} />
               {t("O'chirish")}
             </MenuItem>
-            <MenuItem onClick={handleModalsOpen} sx={{ '& svg': { mr: 2 } }}>
+            <MenuItem onClick={() => (getSMSTemps(), setOpenSms('sms'))} sx={{ '& svg': { mr: 2 } }}>
               <IconifyIcon icon='mdi:sms' fontSize={20} />
               {t('SMS yuborish')}
             </MenuItem>
           </>
         )}
       </Menu>
-
-      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
       <UserSuspendDialog
         loading={isPendingDelete}
         handleOk={() => handleDeleteTeacher(id)}

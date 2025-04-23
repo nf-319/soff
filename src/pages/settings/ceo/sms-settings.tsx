@@ -1,22 +1,16 @@
 'use client'
 
 import { Box } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import api from 'src/@core/utils/api'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setCompanyInfo } from 'src/store/apps/user'
 import { SmsCard } from 'src/views/apps/sms-settings'
 import { PLACEHOLDERS } from 'src/views/apps/sms-settings/constants'
-import { AccessDeniedModal } from '@components/AccessDeniedModal'
-import { useGet } from '@hooks/useApi'
-import { Endpoints } from '@hooks/endpoints'
-import { useRouter } from 'next/router'
 
 const SmsSettings = () => {
   const dispatch = useAppDispatch()
   const { companyInfo } = useAppSelector((state: any) => state.user)
-  const router = useRouter()
-  const [accessModal, setAccessModal] = useState<boolean>(false)
 
   const [loading, setLoading] = useState<
     | 'name'
@@ -36,8 +30,6 @@ const SmsSettings = () => {
     | 'extra_settings'
     | null
   >(null)
-
-  const { data, isLoading, refetch } = useGet(Endpoints.CompanySettingList)
 
   const updateSettings = async (key: any, value: any) => {
     try {
@@ -346,9 +338,9 @@ const SmsSettings = () => {
         await api.patch('common/settings/update/', formData)
       }
 
-      const data = await refetch()
+      const getresp = await api.get('common/settings/list/')
 
-      dispatch(setCompanyInfo(data))
+      dispatch(setCompanyInfo(getresp.data[0]))
     } catch (err: any) {
       console.error(err)
     } finally {
@@ -356,16 +348,6 @@ const SmsSettings = () => {
     }
   }
 
-  useEffect(() => {
-    if(data.access === false && !isLoading) {
-      setAccessModal(true)
-    }
-  }, [data, isLoading])
-
-  const handleBack = () => {
-    setAccessModal(false)
-    void router.push('/settings/ceo/all-settings')
-  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '100%' }}>
@@ -468,8 +450,6 @@ const SmsSettings = () => {
         updateSettings={updateSettings}
         defaultValue={companyInfo?.auto_sms?.score_text}
       />
-
-      <AccessDeniedModal open={accessModal} onClose={handleBack} />
     </Box>
   )
 }

@@ -221,7 +221,6 @@ export default function StudentsPage() {
     }
   }, [])
 
-
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
   }, [user?.active_branch])

@@ -173,8 +173,8 @@ const initialState: SettingsState = {
   openSms: null,
   logins:null,
   is_childpending: false,
-  sms_list: { access: false, result: [] },
-  smschild_list: { access: false, result: [] },
+  sms_list: [],
+  smschild_list: [],
   openCreateSms: false,
   openCreateSmsCategory: false,
   openEditSms: null,
@@ -277,20 +277,22 @@ export const settingsSlice = createSlice({
       })
       .addCase(fetchSmsList.fulfilled, (state, action) => {
         state.is_pending = false
-        state.sms_list = action.payload
+        state.sms_list = action.payload.sort((a: SmsItemType, b: SmsItemType) => a.id - b.id)
       })
       .addCase(fetchSmsListQuery.pending, state => {
         state.is_childpending = true
       })
       .addCase(fetchSmsListQuery.fulfilled, (state, action) => {
         state.is_childpending = false
-        state.smschild_list = action.payload
+        state.smschild_list = action.payload.sort((a: SmsItemType, b: SmsItemType) => a.id - b.id)
       })
       .addCase(createSms.fulfilled, (state, action) => {
-        state.sms_list === action.payload
+        state.sms_list.push(action.payload)
       })
       .addCase(editSms.fulfilled, (state, action) => {
-        state.sms_list = action.payload
+        state.sms_list = [...state.sms_list.filter(el => el.id !== action.payload.id), action.payload].sort(
+          (a: SmsItemType, b: SmsItemType) => a.id - b.id
+        )
       })
       .addCase(fetchCoursesList.pending, state => {
         state.is_pending = true

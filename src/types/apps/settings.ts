@@ -1,14 +1,9 @@
 import { genderTypes } from './userTypes'
 
-export interface SMSItemResult {
+export interface SmsItemType {
   id: number
   description: string
   parent: number
-}
-
-export interface SmsItemType {
-  access: boolean
-  result: SMSItemResult[]
 }
 
 export interface RoomType {
@@ -72,11 +67,11 @@ export interface SettingsState {
   openSms: string | null
   is_pending: boolean
   is_childpending: boolean
-  smschild_list: SmsItemType
+  smschild_list: SmsItemType[]
   openCreateSmsCategory: boolean
-  sms_list: SmsItemType
+  sms_list: SmsItemType[]
   openCreateSms: boolean
-  openEditSms: null | SMSItemResult
+  openEditSms: null | SmsItemType
   openEditCourse: null | CourseItemType
   course_list: {
     count: number

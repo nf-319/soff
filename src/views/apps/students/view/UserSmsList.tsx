@@ -27,8 +27,6 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { fetchSmsList, fetchSmsListQuery } from 'src/store/apps/settings'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { AccessDeniedModal } from '@components/AccessDeniedModal'
-import { Plus } from 'lucide-react'
 
 const UserSmsList = () => {
   const [open, setOpen] = useState<boolean>(false)
@@ -38,9 +36,7 @@ const UserSmsList = () => {
   const { getSMSTemps } = useSMS()
   const [loading, setLoading] = useState(false)
   const { smschild_list, sms_list } = useAppSelector(state => state.settings)
-  const { companyInfo } = useAppSelector((state: any) => state.user)
   const [parent_id, setParentId] = useState<number | null>(null)
-  const [accessModal, setAccessModal] = useState<boolean>(false)
 
   const dispatch = useAppDispatch()
 
@@ -104,22 +100,15 @@ const UserSmsList = () => {
     formik.resetForm()
   }
 
-  console.log(companyInfo)
-  const handleModalsOpen = () => {
-    if (companyInfo.access) {
-      setOpen(true)
-    void getSMSTemps()
-    } else {
-      setAccessModal(true)
-    }
-  }
-
   return (
     <Box>
       <Box sx={{ width: '100%', display: 'flex' }}>
         <Button
-          startIcon={<Plus size={18} />}
-          onClick={handleModalsOpen}
+          startIcon={<IconifyIcon icon='ic:baseline-add' />}
+          onClick={() => {
+            setOpen(true)
+            void getSMSTemps()
+          }}
           sx={{ marginLeft: 'auto' }}
           variant='contained'
           size='small'
@@ -140,9 +129,8 @@ const UserSmsList = () => {
           <EmptyContent />
         )}
       </Box>
-      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
       <Dialog
-        open={!accessModal ? open : false}
+        open={open}
         onClose={handleClose}
         aria-labelledby='user-view-edit'
         sx={{ '& .MuiPaper-root': { width: '100%', maxWidth: 450, p: [1, 3] } }}
@@ -167,7 +155,7 @@ const UserSmsList = () => {
                   setParentId(e.target.value)
                 }}
               >
-                {sms_list.result.map((el: any) => (
+                {sms_list.map((el: any) => (
                   <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
                     <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '12px' }}>
                       {el.description}
@@ -192,7 +180,7 @@ const UserSmsList = () => {
                     formik.setFieldValue('message', e.target.value)
                   }}
                 >
-                  {smschild_list.result.map((el: any) => (
+                  {smschild_list.map((el: any) => (
                     <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
                       <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '12px' }}>
                         {el.description}

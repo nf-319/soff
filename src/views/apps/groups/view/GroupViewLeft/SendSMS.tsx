@@ -93,7 +93,7 @@ export default function SendSMS() {
                 setParentId(e.target.value)
               }}
             >
-              {sms_list.result.map((el: any) => (
+              {sms_list.map((el: any) => (
                 <MenuItem value={el.id} sx={{ wordBreak: 'break-word' }}>
                   <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>{el.description}</span>
                 </MenuItem>
@@ -116,7 +116,7 @@ export default function SendSMS() {
                   formik.setFieldValue('message', e.target.value)
                 }}
               >
-                {smschild_list.result.map((el: any) => (
+                {smschild_list.map((el: any) => (
                   <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
                     <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>
                       {el.description}

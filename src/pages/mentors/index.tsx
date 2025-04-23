@@ -24,7 +24,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
 import TeacherEditDialog from 'src/views/apps/mentors/TeacherEditDialog'
 import DataTable from '../../components/table'
-import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 export type customTableProps = {
   xs: number
@@ -41,10 +40,8 @@ export default function GroupsPage() {
   const { user } = useContext(AuthContext)
   const router = useRouter()
   const queryClient = useQueryClient()
-  const [accessModal, setAccessModal] = useState<boolean>(false)
   const { smsTemps, getSMSTemps } = useSMS()
   const { queryParams, openSms } = useAppSelector(state => state.mentors)
-  const { companyInfo } = useAppSelector(state => state.user)
 
   const { data: teachers } = useGet(`${ceoConfigs.employee_checklist}?role=teacher`)
 
@@ -163,15 +160,6 @@ export default function GroupsPage() {
     dispatch(fetchSmsList())
   }, [])
 
-  const handleModalsOpen = () => {
-    if (companyInfo.access) {
-      void getSMSTemps()
-      handleEditClickOpen('sms')
-    } else {
-      setAccessModal(true)
-    }
-  }
-
   return (
     <div>
       <VideoHeader item={videoUrls.teachers} />
@@ -216,7 +204,10 @@ export default function GroupsPage() {
           }}
         >
           <Button
-            onClick={handleModalsOpen}
+            onClick={() => {
+              void getSMSTemps()
+              handleEditClickOpen('sms')
+            }}
             variant='outlined'
             color='warning'
             fullWidth={isMobile}
@@ -263,7 +254,6 @@ export default function GroupsPage() {
         setOpenEdit={setOpenSms}
         usersData={studentIds}
       />
-      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
     </div>
   )
 }

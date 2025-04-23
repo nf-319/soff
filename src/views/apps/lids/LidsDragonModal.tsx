@@ -41,7 +41,6 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 import AddToGroupForm from './anonimUser/AddToGroupForm'
 import { fetchGroupChecklist } from 'src/store/apps/groups'
 import Link from 'next/link'
-import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 type InfoItemProps = {
   icon: React.ReactNode
@@ -89,10 +88,8 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
   const [leadDetail, setLeadDetail] = useState<any>(null)
   const { sms_list } = useAppSelector(state => state.settings)
   const { groupChecklist } = useAppSelector(state => state.groups)
-  const { companyInfo } = useAppSelector(state => state.user)
 
   const [smsModal, setSmsModalOpen] = useState(false)
-  const [accessModal, setAccessModal] = useState<boolean>(false)
   const [addGroupModal, setAddGroupModal] = useState(false)
   const [detailLoading, setDetailLoading] = useState(false)
   const { settings } = useSettings()
@@ -123,14 +120,6 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
   ) => {
     handleGetUserDetails(newValue, selectedLead?.id)
     setValue(newValue)
-  }
-
-  const handleModalsOpen = () => {
-    if(companyInfo.access) {
-      setSmsModalOpen(true)
-    } else {
-      setAccessModal(true)
-    }
   }
 
   useEffect(() => {
@@ -349,7 +338,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
                     <Box margin={4}>
                       <Button
                         variant='contained'
-                        onClick={handleModalsOpen}
+                        onClick={() => setSmsModalOpen(true)}
                         fullWidth
                         sx={{ marginTop: 2 }}
                         startIcon={<PlusIcon />}
@@ -407,7 +396,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
 
         <DialogContent sx={{ minWidth: '300px' }}>
           <SendSmsAnonimUserForm
-            smsTemps={sms_list.result}
+            smsTemps={sms_list}
             smsLoading={false}
             open={smsModal}
             user={selectedLead?.id}
@@ -431,8 +420,6 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
           />
         </DialogContent>
       </Dialog>
-
-      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
     </Dialog>
   )
 }
