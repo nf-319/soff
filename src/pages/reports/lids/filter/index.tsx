@@ -6,6 +6,7 @@ const LidsReportsFilter = () => {
   const [duration, setDuration] = useState('3')
   const [branch, setBranch] = useState('')
   const { isMobile } = useResponsive()
+
   const handleApplyFilters = () => {
     console.log('Applied filters:', { duration, branch })
   }

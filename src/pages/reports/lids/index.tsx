@@ -10,6 +10,7 @@ const LidsReports = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
       <LidsReportsFilter />
+
       <LidsReportsCard />
       <div className='row g-4'>
         <div className='col-12 col-md-6'>

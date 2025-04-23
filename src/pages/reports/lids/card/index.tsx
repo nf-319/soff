@@ -1,5 +1,5 @@
-import { Box, Button, Card, Typography } from '@mui/material'
-import { Award, ChartLine, Clock, TriangleAlert, User } from 'lucide-react'
+import { Box, Card, Typography } from '@mui/material'
+import { Award, Clock, TriangleAlert, User } from 'lucide-react'
 
 const LidsReportsCard = () => {
   return (
