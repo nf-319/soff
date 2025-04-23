@@ -28,7 +28,7 @@ import { formatPhoneNumber } from '@components/phone-input/format-phone-number'
 import { useTranslation } from 'react-i18next'
 import api from 'src/@core/utils/api'
 import useResponsive from '../../../@core/hooks/useResponsive'
-import { handleCheckDownload, handleCheckPrint } from '@/views/apps/students/view/UserViewPage'
+import { handleCheckDownload } from '@/views/apps/students/view/UserViewPage'
 
 export default function GlobalPaymentForm() {
   const [loading, setLoading] = useState<boolean>(false)
@@ -57,6 +57,35 @@ export default function GlobalPaymentForm() {
   const validationSchema = Yup.object({
     search: Yup.string().min(4, "Qidirish uchun ma'lumot yetarli emas")
   })
+
+  const handleCheckPrint = async (id: number | string) => {
+    try {
+      const response = await api.get(`common/generate-check/${id}/`, {
+        responseType: 'blob',
+      })
+
+      const blobUrl = URL.createObjectURL(response.data)
+
+      const iframe = document.createElement('iframe')
+      iframe.style.position = 'fixed'
+      iframe.style.right = '0'
+      iframe.style.bottom = '0'
+      iframe.style.width = '0'
+      iframe.style.height = '0'
+      iframe.style.border = 'none'
+      iframe.src = blobUrl
+
+      document.body.appendChild(iframe)
+
+      iframe.onload = () => {
+        iframe.contentWindow?.focus()
+        iframe.contentWindow?.print()
+      }
+    } catch (error) {
+      console.error('Check chiqarishda xatolik:', error)
+      toast.error("Check chiqarishda xatolik yuz berdi")
+    }
+  }
 
   const initialValues = {
     search: ''
