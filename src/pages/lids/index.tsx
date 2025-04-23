@@ -29,6 +29,7 @@ import { useAuth } from 'src/hooks/useAuth'
 import { LidsEditModal } from 'src/entities/lids/modals'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useTranslation } from 'react-i18next'
+import AmoCrmLeads from './amocrm'
 
 export type DepartmentsResultType = {
   id: number
@@ -40,7 +41,7 @@ const Lids = () => {
   const { queryParams } = useSelector((state: RootState) => state.leads)
   const dispatch = useAppDispatch()
   const router = useRouter()
-  const { id, is_active } = router.query
+  const { id, is_active, is_amocrm } = router.query
   const [selectedTab, setSelectedTab] = useState<number>(0)
   const [currentData, setCurrentData] = useState<DepartmentsResultType | undefined>()
   const [openDialog, setOpenDialog] = useState<'edit' | 'recover' | null>(null)
@@ -99,71 +100,77 @@ const Lids = () => {
   return (
     <div>
       <LidsHeader />
-      <Box display={isMobile ? '' : 'flex'} justifyContent='space-between' marginY={5} alignItems='center'>
-        {isLoading ? (
-          <Skeleton variant='rectangular' width={120} height={40} />
-        ) : (
-          <Select
-            sx={{ marginBottom: isMobile ? 4 : 0 }}
-            fullWidth={isMobile}
-            size='medium'
-            value={selectedTab}
-            onChange={handleTabChange}
-            displayEmpty
-          >
-            {leadData?.results.map((item, index) => (
-              <MenuItem key={item.id} value={index}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </Select>
-        )}
+      {is_amocrm ? (
+        <AmoCrmLeads />
+      ) : (
+        <>
+          <Box display={isMobile ? '' : 'flex'} justifyContent='space-between' marginY={5} alignItems='center'>
+            {isLoading ? (
+              <Skeleton variant='rectangular' width={120} height={40} />
+            ) : (
+              <Select
+                sx={{ marginBottom: isMobile ? 4 : 0 }}
+                fullWidth={isMobile}
+                size='medium'
+                value={selectedTab}
+                onChange={handleTabChange}
+                displayEmpty
+              >
+                {leadData?.results.map((item, index) => (
+                  <MenuItem key={item.id} value={index}>
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            )}
 
-        <Box display='flex' justifyContent='space-between' gap={4} alignItems='center' flexShrink={0}>
-          <Button
-            fullWidth={isMobile}
-            size='medium'
-            variant='outlined'
-            onClick={() => dispatch(setOpenItem(currentDepartmentId))}
-            startIcon={<Plus />}
-          >
-            <b>{currentData?.name}</b>
-            {t('ga yangi bo‘lim qo‘shish')}
-          </Button>
+            <Box display='flex' justifyContent='space-between' gap={4} alignItems='center' flexShrink={0}>
+              <Button
+                fullWidth={isMobile}
+                size='medium'
+                variant='outlined'
+                onClick={() => dispatch(setOpenItem(currentDepartmentId))}
+                startIcon={<Plus />}
+              >
+                <b>{currentData?.name}</b>
+                {t('ga yangi bo‘lim qo‘shish')}
+              </Button>
 
-          {queryParams.is_active && (
-            <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-              <div>
-                <Tooltip title={t("Yangi lead qo'shish")}>
-                  <IconButton
-                    onClick={() => dispatch(setOpenLid(currentDepartmentId))}
-                    sx={{ cursor: 'pointer', marginLeft: 'auto' }}
-                  >
-                    <IconifyIcon icon={'fluent:person-add-24-filled'} color='#84cc16' />
-                  </IconButton>
-                </Tooltip>
-
-                {currentData?.name?.toLowerCase() !== 'leads' && (
-                  <Fragment>
-                    <Tooltip title={t('Bo‘lim nomini tahrirlash')}>
-                      <IconButton onClick={() => setOpen('edit')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
-                        <IconifyIcon icon={'fluent:text-bullet-list-square-edit-20-filled'} color='orange' />
+              {queryParams.is_active && (
+                <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                  <div>
+                    <Tooltip title={t("Yangi lead qo'shish")}>
+                      <IconButton
+                        onClick={() => dispatch(setOpenLid(currentDepartmentId))}
+                        sx={{ cursor: 'pointer', marginLeft: 'auto' }}
+                      >
+                        <IconifyIcon icon={'fluent:person-add-24-filled'} color='#84cc16' />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title={t('Bo‘limni o‘chirish')}>
-                      <IconButton onClick={() => setOpen('delete')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
-                        <IconifyIcon icon={'icon-park-solid:delete-four'} color='red' style={{ padding: 1 }} />
-                      </IconButton>
-                    </Tooltip>
-                  </Fragment>
-                )}
-              </div>
+
+                    {currentData?.name?.toLowerCase() !== 'leads' && (
+                      <Fragment>
+                        <Tooltip title={t('Bo‘lim nomini tahrirlash')}>
+                          <IconButton onClick={() => setOpen('edit')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
+                            <IconifyIcon icon={'fluent:text-bullet-list-square-edit-20-filled'} color='orange' />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('Bo‘limni o‘chirish')}>
+                          <IconButton onClick={() => setOpen('delete')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
+                            <IconifyIcon icon={'icon-park-solid:delete-four'} color='red' style={{ padding: 1 }} />
+                          </IconButton>
+                        </Tooltip>
+                      </Fragment>
+                    )}
+                  </div>
+                </Box>
+              )}
             </Box>
-          )}
-        </Box>
-      </Box>
+          </Box>
 
-      <LeadsKanban defaultId={currentData?.id} />
+          <LeadsKanban defaultId={currentData?.id} />
+        </>
+      )}
 
       <EditDepartmentDialog id={Number(currentDepartmentId)} name={(currentData && currentData.name) || ''} />
       <CreateDepartmentDialog />

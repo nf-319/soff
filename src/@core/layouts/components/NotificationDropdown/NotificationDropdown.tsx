@@ -207,7 +207,6 @@ const NotificationDropdown = (props: Props) => {
     }
 
     const handleError = (error: any) => {
-      console.error('WebSocket error:', error)
       wsConnectedRef.current = false
     }
 

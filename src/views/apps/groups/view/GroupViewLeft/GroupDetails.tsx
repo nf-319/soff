@@ -17,16 +17,16 @@ export default function GroupDetails() {
   const { groupData, isGettingGroupDetails, onlineLessonLoading } = useAppSelector(state => state.groupDetails)
   const { companyInfo } = useAppSelector(state => state.user)
   const dispatch = useAppDispatch()
-      const [openEditModal, setOpenEditModal] = useState<'create'|'edit'|null>(null)
+  const [openEditModal, setOpenEditModal] = useState<'create' | 'edit' | null>(null)
 
   const [accessModal, setAccessModal] = useState<boolean>(false)
   const { user } = useContext(AuthContext)
   const router = useRouter()
 
   const handleOpenSendSMSModal = async () => {
-    if(companyInfo.access) {
-    dispatch(handleEditClickOpen('send-sms'))
-    await dispatch(getSMSTemp())
+    if (companyInfo.access) {
+      dispatch(handleEditClickOpen('send-sms'))
+      await dispatch(getSMSTemp())
     } else {
       setAccessModal(true)
     }
@@ -72,9 +72,8 @@ export default function GroupDetails() {
         handleEditClickOpen={(type: any) => dispatch(handleEditClickOpen(type))}
         handleGetMeetLink={handleGetMeetLink}
       />
-      <GroupCreateEditDrawer open={openEditModal} setOpen={setOpenEditModal}/>
+      <GroupCreateEditDrawer open={openEditModal} setOpen={setOpenEditModal} />
       <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
-      <EditGroupModal />
     </>
   )
 }
