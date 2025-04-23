@@ -14,7 +14,6 @@ import {
   Tooltip,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import IconifyIcon from '../../../components/icon';
 import { useAppDispatch, useAppSelector } from 'src/store';
 import { updateStudentParams } from 'src/store/apps/students';
 import useCourses from 'src/hooks/useCourses';
@@ -58,7 +57,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
   const [teacherId, setTeacherId] = useState<any>();
   const [groupId, setGroupId] = useState<any>();
 
-  // Refs to prevent infinite loops
   const isInitialMount = useRef(true);
   const isUpdating = useRef(false);
 
@@ -90,7 +88,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
 
   async function handleFilter(key: string, value: string | number | null) {
     isUpdating.current = true;
-    dispatch(updateStudentParams({ [key]: value }));
 
     if (key === 'status') {
       dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }));
@@ -100,23 +97,37 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
     } else if (key === 'amount') {
       if (value === 'is_debtor') {
         setIsActive(false);
-        dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '' }));
+        dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '', debt_date: '' }));
       } else if (value === 'not_in_debt') {
         setIsActive(false);
-        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: true }));
+        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: true, debt_date: '' }));
       } else if (value === 'last_payment') {
         setIsActive(true);
-        dispatch(updateStudentParams({ last_payment: true, is_debtor: '', not_in_debt: '' }));
+        dispatch(updateStudentParams({ last_payment: true, is_debtor: '', not_in_debt: '', debt_date: '' }));
       } else if (value === 'all') {
         setIsActive(true);
-        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '' }));
+        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '', debt_date: '' }));
       }
+    } else {
+      dispatch(updateStudentParams({ [key]: value }));
     }
   }
 
   useEffect(() => {
     if (isInitialMount.current) {
-      const { q, status, course, school, group_status, group, teacher, is_debtor, last_payment, not_in_debt, debt_date } = router.query;
+      const {
+        q,
+        status,
+        course,
+        school,
+        group_status,
+        group,
+        teacher,
+        is_debtor,
+        last_payment,
+        not_in_debt,
+        debt_date
+      } = router.query
       const newParams = {
         search: (q as string) || '',
         status: (status as string) || '',
@@ -131,8 +142,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
         debt_date: (debt_date as string) || '',
       };
 
-      console.log('Initializing queryParams:', { newParams, current: queryParams });
-
       if (JSON.stringify(newParams) !== JSON.stringify(queryParams)) {
         isUpdating.current = true;
         dispatch(updateStudentParams(newParams));
@@ -144,8 +153,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
   useEffect(() => {
     if (!isUpdating.current) {
       const { q, ...restQuery } = router.query;
-
-      console.log('Syncing search:', { debounceSearch, currentQ: q });
 
       if (debounceSearch && debounceSearch !== q) {
         void router.push(
@@ -179,8 +186,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
     const currentQuery = Object.fromEntries(
       Object.entries(router.query).filter(([_, value]) => value !== '' && value !== undefined && value !== null)
     );
-
-    console.log('Syncing URL:', { filteredParams, currentQuery });
 
     if (JSON.stringify(filteredParams) !== JSON.stringify(currentQuery)) {
       void router.push(
@@ -363,11 +368,14 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
             size='lg'
             label={queryParams.debt_date || 'Yil va Oy'}
             value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
-            format='MM-yyyy'
+            format='yyyy-MM'
             placeholder='Select month and year'
             onChange={value => handleFilter('debt_date', value ? format(value, 'MM-yyyy') : '')}
             style={{ width: 150 }}
             shouldDisableDate={date => (date ? date.getTime() > Date.now() : false)}
+            placement='bottomStart'
+            oneTap
+            appearance='default'
           />
         )}
 
