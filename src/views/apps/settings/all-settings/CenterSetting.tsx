@@ -22,12 +22,13 @@ import api from 'src/@core/utils/api'
 import { setCompanyInfo } from 'src/store/apps/user'
 import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
-import showResponseError from 'src/@core/utils/show-response-error'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { AuthContext } from 'src/context/AuthContext'
 import { toast } from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
+import { useGet } from '@hooks/useApi'
+import { Endpoints } from '@/hooks/endpoints'
 
 const VisuallyHiddenInput = styled('input')({
   clipPath: 'inset(50%)',
@@ -76,34 +77,20 @@ export default function AllSettings() {
     | 'extra_settings'
     | null
   >(null)
-  const [error, setError] = useState<any>({})
   const [errorMessage, setErrorMessage] = useState<null | string>(null)
   const { push } = useRouter()
 
   const { getPaymentMethod, paymentMethods, createPaymentMethod, updatePaymentMethod } = usePayment()
   const { getBranches, branches } = useBranches()
   const dispatch = useAppDispatch()
+  const { refetch } = useGet(Endpoints.CompanySettingList, { options: { enabled: false } })
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const { t } = useTranslation()
-  const [settinsLoading, setSettingsLoading] = useState(false)
   const { setUser, user } = useContext(AuthContext)
-  const [tabIndex, setTabIndex] = useState(0)
-
-  async function getSettingsList() {
-    setSettingsLoading(true)
-    await api.get('common/settings/list/').then(res => {
-      dispatch(setCompanyInfo(res.data[0]))
-    })
-    setSettingsLoading(false)
-  }
 
   async function handleChangeExtraSettings(event: any) {
-    updateSettings('extra_settings', event.target.checked)
+    void updateSettings('extra_settings', event.target.checked)
   }
-
-  useEffect(() => {
-    getSettingsList()
-  }, [])
 
   const inputRef = useRef<any | null>(null)
 
@@ -171,7 +158,7 @@ export default function AllSettings() {
       await reloadProfile()
       setCreatable(null)
       setLoading(null)
-      getBranches()
+      void getBranches()
       setId(null)
     } catch (err) {
       setLoading(null)
@@ -199,15 +186,13 @@ export default function AllSettings() {
       }
       await api.patch('common/settings/update/', formData)
 
-      const getresp = await api.get('common/settings/list/')
+      const getresp = await refetch()
 
-      dispatch(setCompanyInfo(getresp.data[0]))
+      dispatch(setCompanyInfo(getresp.data))
       setEditable(null)
       setId(null)
     } catch (err: any) {
-      if (err?.response?.data) {
-        showResponseError(err?.response?.data, setError)
-      }
+      console.error(err)
     } finally {
       setLoading(null)
     }

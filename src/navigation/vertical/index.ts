@@ -46,7 +46,7 @@ export const CPanelNavigation = (t: any): any => {
       path: '/c-panel/settings'
     },
     {
-      title: t('Xabarnoma'),
+      title: t('Xabarnomalar'),
       icon: 'mdi:bell-outline',
       path: '/c-panel/notifications'
     }
