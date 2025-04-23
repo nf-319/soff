@@ -29,12 +29,28 @@ import { useAuth } from 'src/hooks/useAuth'
 import { LidsEditModal } from 'src/entities/lids/modals'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useTranslation } from 'react-i18next'
-import AmoCrmLeads from './amocrm'
 
 export type DepartmentsResultType = {
   id: number
   name: string
   is_active: boolean
+}
+
+type AmoLeads = {
+  id: number
+  name: string
+  steps: AmoLeadItem[]
+}
+
+type AmoLeadItem = {
+  id: number
+  name: string
+  sort: number
+  is_editable: boolean
+  pipeline_id: number
+  color: string
+  type: number
+  account_id: number
 }
 
 const Lids = () => {
@@ -43,6 +59,9 @@ const Lids = () => {
   const router = useRouter()
   const { id, is_active, is_amocrm } = router.query
   const [selectedTab, setSelectedTab] = useState<number>(0)
+  const [selectedAmoLeadTab, setSelectedAmoLeadTab] = useState<any>(null)
+  const [selectedAmoData, setSelectedAmoData] = useState<AmoLeads | null>(null)
+
   const [currentData, setCurrentData] = useState<DepartmentsResultType | undefined>()
   const [openDialog, setOpenDialog] = useState<'edit' | 'recover' | null>(null)
   const { isMobile } = useResponsive()
@@ -56,6 +75,17 @@ const Lids = () => {
     deps: ['leads'],
     params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
+
+  const { data: amoCrmLeadData, isLoading: amoCrmLoading } = useGet<AmoLeads[]>('amocrm/pipelines/?with_steps=true', {
+    options: { enabled: !!is_amocrm }
+  })
+
+  useEffect(() => {
+    if (!amoCrmLoading && amoCrmLeadData?.length && selectedAmoLeadTab === null && is_amocrm) {
+      setSelectedAmoLeadTab(amoCrmLeadData[0]?.id)
+      setSelectedAmoData(amoCrmLeadData[0])
+    }
+  }, [amoCrmLeadData, amoCrmLoading, selectedAmoLeadTab])
 
   useEffect(() => {
     if (!leadData || leadData.results.length === 0) return
@@ -84,6 +114,12 @@ const Lids = () => {
     }
   }, [leadData, id, router.query.search])
 
+  function handleAmoTabChange(val: any) {
+    setSelectedAmoLeadTab(val.target.value)
+    const selectedData = amoCrmLeadData?.find((item: any) => item.id == val.target.value)
+    setSelectedAmoData(selectedData || null)
+  }
+
   const handleTabChange = (event: SelectChangeEvent<number>) => {
     if (!leadData || !leadData.results[event.target.value as number]) return
     const selectedDept = leadData.results[event.target.value as number]
@@ -100,76 +136,91 @@ const Lids = () => {
   return (
     <div>
       <LidsHeader />
-      {is_amocrm ? (
-        <AmoCrmLeads />
-      ) : (
-        <>
-          <Box display={isMobile ? '' : 'flex'} justifyContent='space-between' marginY={5} alignItems='center'>
-            {isLoading ? (
-              <Skeleton variant='rectangular' width={120} height={40} />
-            ) : (
-              <Select
-                sx={{ marginBottom: isMobile ? 4 : 0 }}
-                fullWidth={isMobile}
-                size='medium'
-                value={selectedTab}
-                onChange={handleTabChange}
-                displayEmpty
-              >
-                {leadData?.results.map((item, index) => (
-                  <MenuItem key={item.id} value={index}>
-                    {item.name}
-                  </MenuItem>
-                ))}
-              </Select>
+      <Box display={isMobile ? '' : 'flex'} justifyContent='space-between' marginY={5} alignItems='center'>
+        {isLoading || amoCrmLoading ? (
+          <Skeleton variant='rectangular' sx={{ borderRadius: 1 }} width={150} height={50} />
+        ) : is_amocrm ? (
+          <Select
+            placeholder={"Bo'lim"}
+            sx={{ marginBottom: isMobile ? 4 : 0 }}
+            fullWidth={isMobile}
+            size='medium'
+            value={selectedAmoLeadTab}
+            onChange={e => handleAmoTabChange(e)}
+            displayEmpty
+          >
+            {amoCrmLeadData?.map((item: any) => (
+              <MenuItem key={item.id} value={item.id}>
+                {item.name}
+              </MenuItem>
+            ))}
+          </Select>
+        ) : (
+          <Select
+            sx={{ marginBottom: isMobile ? 4 : 0 }}
+            fullWidth={isMobile}
+            size='medium'
+            value={selectedTab}
+            onChange={handleTabChange}
+            displayEmpty
+          >
+            {leadData?.results.map((item, index) => (
+              <MenuItem key={item.id} value={index}>
+                {item.name}
+              </MenuItem>
+            ))}
+          </Select>
+        )}
+
+        {!is_amocrm && (
+          <Box display='flex' justifyContent='space-between' gap={4} alignItems='center' flexShrink={0}>
+            <Button
+              fullWidth={isMobile}
+              size='medium'
+              variant='outlined'
+              onClick={() => dispatch(setOpenItem(currentDepartmentId))}
+              startIcon={<Plus />}
+            >
+              <b>{currentData?.name}</b>
+              {t('ga yangi bo‘lim qo‘shish')}
+            </Button>
+
+            {queryParams.is_active && (
+              <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                <div>
+                  <Tooltip title={t("Yangi lead qo'shish")}>
+                    <IconButton
+                      onClick={() => dispatch(setOpenLid(currentDepartmentId))}
+                      sx={{ cursor: 'pointer', marginLeft: 'auto' }}
+                    >
+                      <IconifyIcon icon={'fluent:person-add-24-filled'} color='#84cc16' />
+                    </IconButton>
+                  </Tooltip>
+
+                  {currentData?.name?.toLowerCase() !== 'leads' && (
+                    <Fragment>
+                      <Tooltip title={t('Bo‘lim nomini tahrirlash')}>
+                        <IconButton onClick={() => setOpen('edit')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
+                          <IconifyIcon icon={'fluent:text-bullet-list-square-edit-20-filled'} color='orange' />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={t('Bo‘limni o‘chirish')}>
+                        <IconButton onClick={() => setOpen('delete')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
+                          <IconifyIcon icon={'icon-park-solid:delete-four'} color='red' style={{ padding: 1 }} />
+                        </IconButton>
+                      </Tooltip>
+                    </Fragment>
+                  )}
+                </div>
+              </Box>
             )}
-
-            <Box display='flex' justifyContent='space-between' gap={4} alignItems='center' flexShrink={0}>
-              <Button
-                fullWidth={isMobile}
-                size='medium'
-                variant='outlined'
-                onClick={() => dispatch(setOpenItem(currentDepartmentId))}
-                startIcon={<Plus />}
-              >
-                <b>{currentData?.name}</b>
-                {t('ga yangi bo‘lim qo‘shish')}
-              </Button>
-
-              {queryParams.is_active && (
-                <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-                  <div>
-                    <Tooltip title={t("Yangi lead qo'shish")}>
-                      <IconButton
-                        onClick={() => dispatch(setOpenLid(currentDepartmentId))}
-                        sx={{ cursor: 'pointer', marginLeft: 'auto' }}
-                      >
-                        <IconifyIcon icon={'fluent:person-add-24-filled'} color='#84cc16' />
-                      </IconButton>
-                    </Tooltip>
-
-                    {currentData?.name?.toLowerCase() !== 'leads' && (
-                      <Fragment>
-                        <Tooltip title={t('Bo‘lim nomini tahrirlash')}>
-                          <IconButton onClick={() => setOpen('edit')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
-                            <IconifyIcon icon={'fluent:text-bullet-list-square-edit-20-filled'} color='orange' />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('Bo‘limni o‘chirish')}>
-                          <IconButton onClick={() => setOpen('delete')} sx={{ cursor: 'pointer', marginLeft: 'auto' }}>
-                            <IconifyIcon icon={'icon-park-solid:delete-four'} color='red' style={{ padding: 1 }} />
-                          </IconButton>
-                        </Tooltip>
-                      </Fragment>
-                    )}
-                  </div>
-                </Box>
-              )}
-            </Box>
           </Box>
-
-          <LeadsKanban defaultId={currentData?.id} />
-        </>
+        )}
+      </Box>
+      {is_amocrm ? (
+        <LeadsKanban selectedData={selectedAmoData} defaultId={selectedAmoData?.id} />
+      ) : (
+        <LeadsKanban defaultId={currentData?.id} />
       )}
 
       <EditDepartmentDialog id={Number(currentDepartmentId)} name={(currentData && currentData.name) || ''} />

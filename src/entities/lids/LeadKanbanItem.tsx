@@ -6,7 +6,8 @@ import { useSettings } from '../../@core/hooks/useSettings'
 import { LeadsMenu } from './Menu'
 import { MenuOpenType } from './LeadsKanban'
 import { LidsDragonModal } from '../../views/apps/lids/LidsDragonModal'
-import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
+import { useRouter } from 'next/router'
 
 type Props = {
   provided?: DraggableProvided
@@ -22,7 +23,7 @@ export const LeadKanbanItem: FC<Props> = ({ provided, snapshot, lead, onClose })
   const [currentLead, setCurrentLead] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState<MenuOpenType>(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-
+  const { query } = useRouter()
   const handleMenuOpen = (event: any, lead: any) => {
     setStudentModalOpen(true)
     setSelectedLead(lead)
@@ -65,16 +66,18 @@ export const LeadKanbanItem: FC<Props> = ({ provided, snapshot, lead, onClose })
           </div>
           {lead?.admin_name && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3 }}>
-              <AdminPanelSettingsOutlinedIcon style={{ fontSize: 13}} />
+              <AdminPanelSettingsOutlinedIcon style={{ fontSize: 13 }} />
               <Typography fontSize={11}>{lead?.admin_name}</Typography>
             </div>
           )}
         </div>
 
         <Box display='flex' alignItems='center'>
-          <IconButton onClick={event => handleMenuOpen(event, lead)}>
-            <EyeIcon />
-          </IconButton>
+          {!query.is_amocrm && (
+            <IconButton onClick={event => handleMenuOpen(event, lead)}>
+              <EyeIcon />
+            </IconButton>
+          )}
 
           <IconButton onClick={event => handleClick(event, lead)}>
             <Ellipsis

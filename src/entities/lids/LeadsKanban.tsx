@@ -24,6 +24,7 @@ import toast from 'react-hot-toast'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 import Link from 'next/link'
 import { LeadKanbanItem } from './LeadKanbanItem'
+import { AmoLeads } from '@/pages/lids/amocrm'
 
 type LeadsChild = {
   id: number
@@ -39,6 +40,7 @@ export type LeadsResult = {
 
 type Props = {
   defaultId: number | undefined
+  selectedData?: AmoLeads | null
 }
 
 export type MenuOpenType =
@@ -53,7 +55,7 @@ export type MenuOpenType =
   | 'recover'
   | null
 
-export const LeadsKanban: FC<Props> = ({ defaultId }) => {
+export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const { isMobile } = useResponsive()
   const { settings } = useSettings()
   const dispatch = useAppDispatch()
@@ -66,8 +68,29 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [deleteItem, setDeleteItem] = useState<any | null>(null)
-  const { id, search, is_active } = router.query
+  const { id, search, is_active, is_amocrm } = router.query
   const { mutate, isPending } = usePatch()
+
+  const { data: amoLeadDataChild, isLoading: amoLeadDataChildLoding } = useGet(
+    `amocrm/leads/?pipeline_id=${defaultId}`,
+    { options: { enabled: !!router.query.is_amocrm } }
+  )
+
+  const mergedSteps = selectedData?.steps.map((step: any) => {
+    const matchingLeads = amoLeadDataChild?.filter((lead: any) => lead.status_id === step.id)
+
+    const transformedLeads = matchingLeads?.map((lead: any) => ({
+      ...lead,
+      first_name: lead.name,
+      name: undefined
+    }))
+
+    return {
+      ...step,
+      leads: transformedLeads
+    }
+  })
+  console.log(mergedSteps)
 
   const apiParams = {
     is_active: is_active ?? true
@@ -88,6 +111,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
     isLoading,
     refetch
   } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
+    options: { enabled: !router.query.is_amocrm },
     params: apiParams,
     deps: ['departments-leads']
   })
@@ -235,8 +259,8 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="section-list" direction={isMobile ? 'vertical' : 'horizontal'} type="SECTION">
-        {(provided) => (
+      <Droppable droppableId='section-list' direction={isMobile ? 'vertical' : 'horizontal'} type='SECTION'>
+        {provided => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
@@ -250,8 +274,8 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
               gap: 20
             }}
           >
-            {displayData?.results?.length ? (
-              displayData.results.map((section, sectionIndex) => (
+            {displayData?.results.length || mergedSteps?.length ? (
+              (is_amocrm ? mergedSteps : displayData?.results)?.map((section, sectionIndex) => (
                 <Draggable key={section.id} draggableId={`section-${section.id}`} index={sectionIndex}>
                   {(sectionProvided, sectionSnapshot) => (
                     <div
@@ -296,7 +320,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
                               >
                                 {section.name}
 
-                                <Chip color='primary' variant='outlined' label={section.leads.length} />
+                                <Chip color='primary' variant='outlined' label={section?.leads?.length} />
                               </div>
 
                               <Box display={'flex'}>
@@ -376,22 +400,22 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
       <Dialog
         onClose={closeCreateLid}
         open={openLid !== null}
-        maxWidth="xs"
+        maxWidth='xs'
         fullWidth
         PaperProps={{
           sx: {
             width: '100%',
             minHeight: 400,
-            overflow: 'visible',
-          },
+            overflow: 'visible'
+          }
         }}
       >
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="h6" component="span">
+          <Typography variant='h6' component='span'>
             {t('Yangi Lid')}
           </Typography>
 
-          <IconButton aria-label="close" onClick={closeCreateLid}>
+          <IconButton aria-label='close' onClick={closeCreateLid}>
             <Close />
           </IconButton>
         </DialogTitle>
@@ -400,7 +424,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
           sx={{
             overflowY: 'visible',
             px: 3,
-            pb: 3,
+            pb: 3
           }}
         >
           <CreateAnonimUserForm defaultId={String(defaultId)} source={source} />
