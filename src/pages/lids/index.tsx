@@ -73,6 +73,7 @@ const Lids = () => {
     refetch
   } = useGet<LeadsType<DepartmentsResultType[]>>('leads/departments/', {
     deps: ['leads'],
+    options: { enabled: !is_amocrm },
     params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
 

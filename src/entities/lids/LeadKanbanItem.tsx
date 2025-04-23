@@ -56,8 +56,9 @@ export const LeadKanbanItem: FC<Props> = ({ provided, snapshot, lead, onClose })
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <User width={20} height={20} color='blue' />
-
-            {lead.first_name}
+            <Box display='flex' alignItems='flex-start' width='100%'>
+              <Typography sx={{ whiteSpace: 'nowrap' }}>{lead.first_name}</Typography>
+            </Box>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
