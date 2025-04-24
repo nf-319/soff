@@ -3,15 +3,10 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import { setGlobalPay } from 'src/store/apps/students'
 import GlobalPaymentForm from './GlobalPaymentForm'
 import { disablePage } from 'src/store/apps/page'
-import { useTranslation } from 'react-i18next'
-import api from 'src/@core/utils/api'
-import { useEffect, useState } from 'react'
 
-type Props = {}
-
-export default function GlobalPaymentModal({}: Props) {
-
+export default function GlobalPaymentModal() {
   const { global_pay } = useAppSelector(state => state.students)
+
   const dispatch = useAppDispatch()
 
   function closeModal() {
@@ -19,11 +14,9 @@ export default function GlobalPaymentModal({}: Props) {
     dispatch(disablePage(false))
   }
 
-  const { t } = useTranslation()
-
   return (
     <Dialog open={global_pay} onClose={closeModal}>
-      <DialogTitle sx={{ textAlign: 'center' }}>{t("O'quvchi uchun to'lov")}</DialogTitle>
+      <DialogTitle variant='h5' sx={{ textAlign: 'center' }}>O'quvchi uchun to'lov</DialogTitle>
 
       <DialogContent>
         <GlobalPaymentForm />

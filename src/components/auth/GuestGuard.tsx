@@ -1,15 +1,12 @@
-import { ReactNode, ReactElement, useEffect } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { useAuth } from 'src/hooks/useAuth'
 
 interface GuestGuardProps {
   children: ReactNode
-  fallback: ReactElement | null
 }
 
 const GuestGuard = (props: GuestGuardProps) => {
-  const { children, fallback } = props
-  const auth = useAuth()
+  const { children } = props
   const router = useRouter()
 
   if (router.pathname.split('/').includes('r')) {
@@ -25,10 +22,6 @@ const GuestGuard = (props: GuestGuardProps) => {
       void router.push('/')
     }
   }, [router.route])
-
-  if (auth.loading || (!auth.loading && auth.user !== null)) {
-    return fallback
-  }
 
   return <>{children}</>
 }

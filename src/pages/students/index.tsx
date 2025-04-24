@@ -50,7 +50,6 @@ export default function StudentsPage() {
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
-
   const { queryParams } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const querySearch = new URLSearchParams(window.location.search).get('q')
@@ -223,7 +222,7 @@ export default function StudentsPage() {
 
 
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+    void queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
   }, [user?.active_branch])
 
   return (

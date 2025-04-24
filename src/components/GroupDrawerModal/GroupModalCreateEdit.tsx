@@ -1,6 +1,5 @@
 //@ts-nocheck
 import { Autocomplete, Box, Drawer, FormHelperText, IconButton, InputLabel, TextField, Typography } from '@mui/material'
-import IconifyIcon from '../icon'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
@@ -38,6 +37,7 @@ import {
   setGettingGroupDetails
 } from '@/store/apps/groupDetails'
 import { getMontNumber } from '@/@core/utils/gwt-month-name'
+import { Plus, X } from 'lucide-react'
 
 type Props = {
   open: 'create' | 'edit' | null
@@ -294,7 +294,7 @@ export function GroupCreateEditDrawer({ open, setOpen }: Props) {
               }}
             >
               <IconButton onClick={handleClose}>
-                <IconifyIcon icon='mdi:close' fontSize={20} />
+                <X fontSize={20} />
               </IconButton>
             </Box>
             <Typography variant='h6' sx={{ fontWeight: 600 }}>
@@ -350,7 +350,7 @@ export function GroupCreateEditDrawer({ open, setOpen }: Props) {
                   ))}
                   <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router.push('/settings/office/courses')}>
                     {t('Yangi yaratish')}
-                    <IconifyIcon icon={'ion:add-sharp'} />
+                    <Plus size={20} />
                   </MenuItem>
                 </Select>
                 <FormHelperText error={!!formik.errors.course && !!formik.touched.course}>
@@ -430,7 +430,7 @@ export function GroupCreateEditDrawer({ open, setOpen }: Props) {
                   ))}
                   <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router.push('/settings/office/rooms')}>
                     {t('Yangi yaratish')}
-                    <IconifyIcon icon={'ion:add-sharp'} />
+                    <Plus size={20} />{' '}
                   </MenuItem>
                 </Select>
                 <FormHelperText error={!!formik.errors.room && !!formik.touched.room}>
@@ -461,7 +461,7 @@ export function GroupCreateEditDrawer({ open, setOpen }: Props) {
                   ))}
                   <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router.push('/mentors')}>
                     {t('Yangi yaratish')}
-                    <IconifyIcon icon={'ion:add-sharp'} />
+                    <Plus size={20} />{' '}
                   </MenuItem>
                 </Select>
                 <FormHelperText error={!!formik.errors.teacher && !!formik.touched.teacher}>

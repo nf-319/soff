@@ -42,6 +42,30 @@ export const handleCheckPrint = async (id: number | string) => {
   }
 }
 
+export const handleCheckDownload = async (id: number | string) => {
+  try {
+    const response = await api.get(`common/generate-check/${id}/`, {
+      responseType: 'blob',
+    })
+
+    const blob = new Blob([response.data], { type: 'application/pdf' })
+    const blobUrl = URL.createObjectURL(blob)
+
+    const downloadLink = document.createElement('a')
+    downloadLink.href = blobUrl
+    downloadLink.download = `check-${id}.pdf`
+
+    document.body.appendChild(downloadLink)
+    downloadLink.click()
+
+    document.body.removeChild(downloadLink)
+    URL.revokeObjectURL(blobUrl)
+
+  } catch (error) {
+    console.error('Download error:', error)
+  }
+}
+
 const UserView = ({ tab, student }: any) => {
   const url = tab
 
@@ -178,7 +202,7 @@ const UserView = ({ tab, student }: any) => {
           ) : loading === params.row.id ? (
             <IconifyIcon icon={'la:spinner'} fontSize={20} />
           ) : isMobile ? (
-            <IconifyIcon onClick={() => handleDownload(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
+            <IconifyIcon onClick={() => handleCheckDownload(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
           ) : (
             <IconifyIcon onClick={() => getReceipt(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
           )}
@@ -195,34 +219,6 @@ const UserView = ({ tab, student }: any) => {
       console.log(err)
     }
     setLoading(null)
-  }
-
-  const handleDownload = async (id: number | string) => {
-    setLoading(true)
-
-    try {
-      const response = await api.get(`common/generate-check/${id}/`, {
-        responseType: 'blob',
-      })
-
-      const blob = new Blob([response.data], { type: 'application/pdf' }) // MIME type explicitly
-      const blobUrl = URL.createObjectURL(blob)
-
-      const downloadLink = document.createElement('a')
-      downloadLink.href = blobUrl
-      downloadLink.download = `check-${id}.pdf`
-
-      document.body.appendChild(downloadLink)
-      downloadLink.click()
-
-      document.body.removeChild(downloadLink)
-      URL.revokeObjectURL(blobUrl)
-
-    } catch (error) {
-      console.error('Download error:', error)
-    } finally {
-      setLoading(false)
-    }
   }
 
   const onHandleDelete = async () => {
@@ -247,7 +243,7 @@ const UserView = ({ tab, student }: any) => {
 
   useEffect(() => {
     if (studentData?.id) {
-      getGroups()
+      void getGroups()
     }
   }, [studentData?.id])
 
@@ -255,7 +251,7 @@ const UserView = ({ tab, student }: any) => {
 
   useEffect(() => {
     if (!user?.role?.some((role: string) => ['ceo', 'admin', 'watcher', 'marketolog'].includes(role))) {
-      router.push('/')
+      void router.push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
       return
     }
