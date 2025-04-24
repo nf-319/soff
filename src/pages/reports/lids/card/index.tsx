@@ -1,278 +1,148 @@
 import { Box, Card, Typography } from '@mui/material'
-import { ArrowRightLeft, Award, Clock, TrendingDown, TrendingUp, TriangleAlert, User } from 'lucide-react'
+import {
+  ArrowRightLeft,
+  Clock,
+  TrendingDown,
+  TrendingUp,
+  TriangleAlert,
+  User,
+} from 'lucide-react'
+import { useGetReportLeads } from '@/shared/query-hooks/report-leads/reportLeads'
+
+type DashboardCard = {
+  title: string
+  count: string | number
+  icon: any
+  iconColor?: string
+  process?: string | number
+  trendDirection?: 'up' | 'down'
+  trendColor?: string
+  pillColor?: string
+}
 
 const LidsReportsCard = () => {
+  const { data } = useGetReportLeads()
+
+  const cards: DashboardCard[] = [
+    {
+      icon: User,
+      title: 'Yangi lidlar',
+      process: data?.new_leads_progress || 0,
+      count: data?.new_leads || 0,
+      trendDirection: 'up',
+      trendColor: '#fff',
+      pillColor: '#29bf12',
+    },
+    {
+      icon: ArrowRightLeft,
+      title: 'Total Conversions',
+      process: '12.5%',
+      count: 1245,
+      trendDirection: 'up',
+      trendColor: '#fff',
+      pillColor: '#29bf12',
+      iconColor: '#29bf12',
+    },
+    {
+      icon: TriangleAlert,
+      title: 'Failed Leads',
+      process: '12.5%',
+      count: 1245,
+      trendDirection: 'down',
+      trendColor: '#fff',
+      pillColor: '#ef233c',
+      iconColor: '#ef233c',
+    },
+    {
+      icon: Clock,
+      title: 'Response Time',
+      process: '12.5%',
+      count: '12 min',
+      trendDirection: 'down',
+      trendColor: '#fff',
+      pillColor: '#ef233c',
+      iconColor: '#ffc300',
+    },
+    {
+      icon: TriangleAlert,
+      title: 'Lost Leads',
+      process: '12.5%',
+      count: 1245,
+      trendDirection: 'down',
+      trendColor: '#fff',
+      pillColor: '#ef233c',
+      iconColor: '#ef233c',
+    },
+  ]
+
   return (
-    <div className='row w-full g-4'>
-      <div className='col-12  col-sm-6 col-md-3 col-lg-2'>
-        <Card
-          sx={{
-            padding: 5,
-            height: '100%',
-            transition: '0.3s',
-            border: '1px solid hsl(240, 5.9%, 90%)',
-            boxShadow: 'none',
-            '&:hover': {
-              boxShadow: 6,
-              transform: 'translateY(-4px)',
-              cursor: 'pointer'
-            }
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <div className='d-flex justify-content-between align-items-start'>
-              <User size={40} color='black' />
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  background: '#29bf12',
-                  px: 3,
-                  py: 1,
-                  borderRadius: 1
-                }}
-              >
-                <TrendingUp size={16} color='white' />
-                <Typography color='white' fontSize={13} fontWeight={500}>
-                  12.5%
-                </Typography>
-              </Box>
-            </div>
-            <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>1245</Typography>
-            <Typography sx={{ fontSize: 15 }}>New Leads</Typography>
-            <Typography
+    <Box display='flex' alignItems='center' gap={3} sx={{ width: '100%' }}>
+      {cards.map((item, index) => {
+        const Icon = item.icon
+        const TrendIcon = item.trendDirection === 'up' ? TrendingUp : TrendingDown
+
+        return (
+          <div key={index}>
+            <Card
               sx={{
-                fontSize: 15,
-                color: 'black',
-                marginTop: 2,
-                cursor: 'pointer',
-                padding: '4px 8px',
-                borderRadius: '6px',
-                transition: 'background-color 0.3s ease',
+                padding: 5,
+                height: '100%',
+                transition: '0.3s',
+                border: '1px solid hsl(240, 5.9%, 90%)',
+                boxShadow: 'none',
                 '&:hover': {
-                  backgroundColor: '#f0f0f0'
-                }
+                  boxShadow: 6,
+                  transform: 'translateY(-4px)',
+                  cursor: 'pointer',
+                },
               }}
             >
-              View Details
-            </Typography>
-          </div>
-        </Card>
-      </div>
-      <div className='col-12  col-sm-6 col-md-3 col-lg-2'>
-        <Card
-          sx={{
-            padding: 5,
-            height: '100%',
-            transition: '0.3s',
-            border: '1px solid hsl(240, 5.9%, 90%)',
-
-            boxShadow: 'none',
-            '&:hover': {
-              boxShadow: 6,
-              transform: 'translateY(-4px)',
-              cursor: 'pointer'
-            }
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <div className='d-flex justify-content-between align-items-start'>
-              <ArrowRightLeft size={40} color='#29bf12' />
-              <Box
-                sx={{
-                  background: '#29bf12',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  paddingX: 3,
-                  paddingY: 1,
-                  borderRadius: 1
-                }}
-              >
-                <TrendingUp size={16} color='white' />
-                <Typography color={'white'} fontSize={13} fontWeight={500}>
-                  12.5%
+              <Box display='flex' flexDirection='column' gap={5}>
+                <Box className='d-flex justify-content-between align-items-start'>
+                  <Icon size={40} color={item.iconColor || 'black'} />
+                  {item.process && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        background: item.pillColor || '#ccc',
+                        px: 3,
+                        py: 1,
+                        borderRadius: 1,
+                      }}
+                    >
+                      <TrendIcon size={16} color={item.trendColor} />
+                      <Typography color={item.trendColor} fontSize={13} fontWeight={500}>
+                        {item.process}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+                <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>{item.count}</Typography>
+                <Typography sx={{ fontSize: 15 }}>{item.title}</Typography>
+                <Typography
+                  sx={{
+                    fontSize: 15,
+                    color: 'black',
+                    marginTop: 2,
+                    cursor: 'pointer',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    transition: 'background-color 0.3s ease',
+                    '&:hover': {
+                      backgroundColor: '#f0f0f0',
+                    },
+                  }}
+                >
+                  View Details
                 </Typography>
               </Box>
-            </div>
-            <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>1245</Typography>
-            <Typography sx={{ fontSize: 15 }}>New Leads</Typography>
-            <Typography sx={{ fontSize: 15, color: 'black', marginTop: 2, cursor: 'pointer' }}>View Details</Typography>
+            </Card>
           </div>
-        </Card>
-      </div>
-      <div className='col-12  col-sm-6 col-md-3 col-lg-2'>
-        <Card
-          sx={{
-            padding: 5,
-            height: '100%',
-            transition: '0.3s',
-            border: '1px solid hsl(240, 5.9%, 90%)',
-
-            boxShadow: 'none',
-            '&:hover': {
-              boxShadow: 6,
-              transform: 'translateY(-4px)',
-              cursor: 'pointer'
-            }
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <div className='d-flex justify-content-between align-items-start'>
-              <TriangleAlert size={40} color='#ef233c' />
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  background: '#ef233c',
-                  paddingX: 3,
-                  paddingY: 1,
-                  borderRadius: 1
-                }}
-              >
-                <TrendingDown size={16} color='white' />
-                <Typography color={'white'} fontSize={13} fontWeight={500}>
-                  12.5%
-                </Typography>
-              </Box>
-            </div>
-            <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>1245</Typography>
-            <Typography sx={{ fontSize: 15 }}>New Leads</Typography>
-            <Typography sx={{ fontSize: 15, color: 'black', marginTop: 2, cursor: 'pointer' }}>View Details</Typography>
-          </div>
-        </Card>
-      </div>
-      <div className='col-12  col-sm-6 col-md-3 col-lg-2'>
-        <Card
-          sx={{
-            padding: 5,
-            height: '100%',
-            transition: '0.3s',
-            border: '1px solid hsl(240, 5.9%, 90%)',
-
-            boxShadow: 'none',
-            '&:hover': {
-              boxShadow: 6,
-              transform: 'translateY(-4px)',
-              cursor: 'pointer'
-            }
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <div className='d-flex justify-content-between align-items-start'>
-              <Clock size={40} color='#ffc300' />
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  background: '#ef233c',
-                  paddingX: 3,
-                  paddingY: 1,
-                  borderRadius: 1
-                }}
-              >
-                <TrendingDown size={16} color='white' />
-
-                <Typography color={'white'} fontSize={13} fontWeight={500}>
-                  12.5%
-                </Typography>
-              </Box>
-            </div>
-            <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>12 min</Typography>
-            <Typography sx={{ fontSize: 15 }}>Response Time</Typography>
-            <Typography sx={{ fontSize: 15, color: 'black', marginTop: 2, cursor: 'pointer' }}>View Details</Typography>
-          </div>
-        </Card>
-      </div>
-      <div className='col-12  col-sm-6 col-md-3 col-lg-2'>
-        <Card
-          sx={{
-            padding: 5,
-            height: '100%',
-            transition: '0.3s',
-            border: '1px solid hsl(240, 5.9%, 90%)',
-
-            boxShadow: 'none',
-            '&:hover': {
-              boxShadow: 6,
-              transform: 'translateY(-4px)',
-              cursor: 'pointer'
-            }
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <div className='d-flex justify-content-between align-items-start'>
-              <TriangleAlert size={40} color='#ef233c' />
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  background: '#ef233c',
-                  paddingX: 3,
-                  paddingY: 1,
-                  borderRadius: 1
-                }}
-              >
-                <TrendingDown size={16} color='white' />
-
-                <Typography color={'white'} fontSize={13} fontWeight={500}>
-                  12.5%
-                </Typography>
-              </Box>
-            </div>
-            <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>1245</Typography>
-            <Typography sx={{ fontSize: 15 }}>New Leads</Typography>
-            <Typography sx={{ fontSize: 15, color: 'black', marginTop: 2, cursor: 'pointer' }}>View Details</Typography>
-          </div>
-        </Card>
-      </div>
-      <div className='col-12  col-sm-6 col-md-3 col-lg-2'>
-        <Card
-          sx={{
-            padding: 5,
-            height: '100%',
-            transition: '0.3s',
-            border: '1px solid hsl(240, 5.9%, 90%)',
-
-            boxShadow: 'none',
-            '&:hover': {
-              boxShadow: 6,
-              transform: 'translateY(-4px)',
-              cursor: 'pointer'
-            }
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <div className='d-flex justify-content-between align-items-start'>
-              <Award size={40} color='#7209b7' />
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  background: '#29bf12',
-                  gap: 1,
-                  paddingX: 3,
-                  paddingY: 1,
-                  borderRadius: 1
-                }}
-              >
-                <TrendingUp size={16} color='white' />
-                <Typography color={'white'} fontSize={13} fontWeight={500}>
-                  12.5%
-                </Typography>
-              </Box>
-            </div>
-            <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>John Doe</Typography>
-            <Typography sx={{ fontSize: 15 }}>Best Sales Rep</Typography>
-            <Typography sx={{ fontSize: 15, color: 'black', marginTop: 2, cursor: 'pointer' }}>View Details</Typography>
-          </div>
-        </Card>
-      </div>
-    </div>
+        )
+      })}
+    </Box>
   )
 }
 
