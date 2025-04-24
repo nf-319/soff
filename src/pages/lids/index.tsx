@@ -56,7 +56,6 @@ const Lids = () => {
     params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
 
-
   useEffect(() => {
     if (!leadData || leadData.results.length === 0) return
 

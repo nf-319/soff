@@ -11,7 +11,7 @@ import { EmptyContent } from '../../components/empty-content'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import { useGet, usePatch } from 'src/hooks/useApi'
-import { RootState, useAppDispatch } from 'src/store'
+import { RootState, useAppDispatch, useAppSelector } from 'src/store'
 import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
 import CreateAnonimUserForm from 'src/views/apps/lids/anonimUser/CreateAnonimUserForm'
 import { LeadsType } from './model'
@@ -24,6 +24,7 @@ import toast from 'react-hot-toast'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 import Link from 'next/link'
 import { LeadKanbanItem } from './LeadKanbanItem'
+import { SendSMSModal } from '@/views/apps/students/view/UserViewLeft'
 
 type LeadsChild = {
   id: number
@@ -68,7 +69,8 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
   const [deleteItem, setDeleteItem] = useState<any | null>(null)
   const { id, search, is_active } = router.query
   const { mutate, isPending } = usePatch()
-
+  const [sectionLeads, setSectionLeads] = useState<any[]>([])
+  const [openSmsModal, setOpenSmsModal] = useState<string | null>(null)
   const apiParams = {
     is_active: is_active ?? true
   }
@@ -210,6 +212,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
       results: newResults
     })
   }
+  const leadIds = sectionLeads?.map(item => item.id)
 
   if (isLoading) {
     return (
@@ -235,8 +238,8 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="section-list" direction={isMobile ? 'vertical' : 'horizontal'} type="SECTION">
-        {(provided) => (
+      <Droppable droppableId='section-list' direction={isMobile ? 'vertical' : 'horizontal'} type='SECTION'>
+        {provided => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
@@ -303,12 +306,21 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
                                 <IconButton
                                   sx={{ cursor: 'pointer' }}
                                   onClick={() => {
+                                    setOpenSmsModal('sms'), setSectionLeads(section?.leads)
+                                  }}
+                                >
+                                  <IconifyIcon fontSize={20} icon='material-symbols:sms-rounded' color='orange' />
+                                </IconButton>
+                                <IconButton
+                                  sx={{ cursor: 'pointer' }}
+                                  onClick={() => {
                                     setOpen(true)
                                     setEdit(section)
                                   }}
                                 >
                                   <IconifyIcon icon='fluent:text-bullet-list-square-edit-20-filled' color='orange' />
                                 </IconButton>
+
                                 <IconButton
                                   sx={{ cursor: 'pointer' }}
                                   onClick={() => {
@@ -376,22 +388,22 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
       <Dialog
         onClose={closeCreateLid}
         open={openLid !== null}
-        maxWidth="xs"
+        maxWidth='xs'
         fullWidth
         PaperProps={{
           sx: {
             width: '100%',
             minHeight: 400,
-            overflow: 'visible',
-          },
+            overflow: 'visible'
+          }
         }}
       >
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="h6" component="span">
+          <Typography variant='h6' component='span'>
             {t('Yangi Lid')}
           </Typography>
 
-          <IconButton aria-label="close" onClick={closeCreateLid}>
+          <IconButton aria-label='close' onClick={closeCreateLid}>
             <Close />
           </IconButton>
         </DialogTitle>
@@ -400,7 +412,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
           sx={{
             overflowY: 'visible',
             px: 3,
-            pb: 3,
+            pb: 3
           }}
         >
           <CreateAnonimUserForm defaultId={String(defaultId)} source={source} />
@@ -430,6 +442,17 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
         open={Boolean(deleteItem)}
         setOpen={setDeleteItem}
         handleOk={handleDelete}
+      />
+      <SendSMSModal
+        for_lead={true}
+        usersData={leadIds}
+        handleEditClose={() => {
+          setOpenSmsModal(null), setSectionLeads([])
+        }}
+        openEdit={openSmsModal}
+        // smsTemps={smsTemps}
+        setOpenEdit={setOpenSmsModal}
+        // usersData={studentIds}
       />
     </DragDropContext>
   )
