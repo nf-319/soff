@@ -17,21 +17,6 @@ export const fetchClientPayments = createAsyncThunk('fetchClientPayments', async
   return response.data
 })
 
-export const createTariff = createAsyncThunk(
-  'createTariff',
-  async (values: Partial<TariffType>, { rejectWithValue }) => {
-    try {
-      const response = await api.post('/owner/tariff/create/', values)
-      return response.data
-    } catch (err: any) {
-      if (err.response) {
-        return rejectWithValue(err.response.data)
-      }
-      return rejectWithValue(err.message)
-    }
-  }
-)
-
 export const updateClient = createAsyncThunk('updateClient', async (values: Partial<any>, { rejectWithValue }) => {
   try {
     const response = await api.patch(`owner/client/${values.id}/`, values.formData)

@@ -28,7 +28,7 @@ export const getStudents = createAsyncThunk(
 )
 export const getAttendance = createAsyncThunk(
   'getAttendance/getAttendance',
-  async ({ date, group, queryString }: { date: string; group: string | string[] | undefined; queryString: string }) => {
+  async ({ date, group, queryString }: { date: string; group: string | string[] | undefined; queryString?: string }) => {
     const resp = await api.get(`common/attendance-list/${date}-01/group/${group}/?` + queryString)
     return resp.data
   }
@@ -43,7 +43,7 @@ export const getAttendanceTeacher = createAsyncThunk(
 export const getStudentsGrades = createAsyncThunk(
   'getStudentsGrades/getStudentsGrades',
   async ({ id, queryString }: { id: any; queryString?: string }) => {
-    const resp = await api.get(`common/group-student/rating/list/${id}/?${queryString}`);
+    const resp = await api.get(`common/group-student/rating/list/${id}/?${queryString}`)
     return resp.data
   }
 )
@@ -65,9 +65,10 @@ export const addStudentToGroup = createAsyncThunk('updateGroup/addStudent', asyn
     return rejectWithValue(err.message)
   }
 })
-export const deleteGroup = createAsyncThunk('delete/group', async (id: any, { rejectWithValue }) => {
+export const deleteGroup = createAsyncThunk('delete/group', async (data: any, { rejectWithValue }) => {
   try {
-    const resp = await api.delete(`/common/group/delete/${id}`)
+    const resp = await api.post(`system/group-students/bulk-delete/`, data)
+
     return resp.data
   } catch (err: any) {
     if (err.response) {
@@ -78,7 +79,7 @@ export const deleteGroup = createAsyncThunk('delete/group', async (id: any, { re
 })
 export const deleteNote = createAsyncThunk('delete/Note', async (id: any, { rejectWithValue }) => {
   try {
-    const resp = await api.delete(`/common/group-description/delete/${id}`)
+    const resp = await api.delete(`common/group-description/delete/${id}`)
     return resp.data
   } catch (err: any) {
     if (err.response) {
@@ -108,20 +109,21 @@ export const getResults = createAsyncThunk(
 const initialState: IGroupDetailsState = {
   courses: null,
   exams: null,
+  openDebtorsModal: false,
   open: null,
   groupData: null,
   smsTemps: null,
   teachers: null,
   isOpenDelete: null,
   students: null,
-  meet_link:null,
+  meet_link: null,
   attendance: null,
   grades: null,
   days: null,
-  onlineLessonLoading:false,
+  onlineLessonLoading: false,
   rooms: null,
   results: null,
-  updateStatusModal:null,
+  updateStatusModal: null,
   resultId: null,
   examStudentId: null,
   editData: null,
@@ -172,6 +174,9 @@ export const groupDetailsSlice = createSlice({
     },
     setGettingGroupDetails: (state, action) => {
       state.isGettingGroupDetails = action.payload
+    },
+    setOpenDebtorsModal: (state, action) => {
+      state.openDebtorsModal = action.payload
     },
     handleEditClickOpen: (state, action) => {
       state.openEdit = action.payload
@@ -311,6 +316,7 @@ export const {
   setOnlineLessonLoading,
   setOpenLeadModal,
   setDays,
+  setOpenDebtorsModal,
   setGettingGroupDetails
 } = groupDetailsSlice.actions
 

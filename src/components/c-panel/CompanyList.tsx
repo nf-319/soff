@@ -60,7 +60,7 @@ export default function CompanyList() {
   async function getData(queryString: string = '') {
     setLoading(true)
     try {
-      const resp = await api.get(`/owner/list/client/?` + queryString)
+      const resp = await api.get(`owner/list/client/?` + queryString)
       setData(resp.data)
     } catch (err: any) {
       toast.error(err.message || 'An error occurred while fetching data')
@@ -71,7 +71,7 @@ export default function CompanyList() {
   const suspendCompany = async (item: any, id: any) => {
     setCenterId(item.id)
     try {
-      await api.patch(`/owner/client/${item.id}/`, { is_active: id })
+      await api.patch(`owner/client/${item.id}/`, { is_active: id })
       await getData()
     } catch (err: any) {
       console.log(err?.response?.data)

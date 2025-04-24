@@ -20,6 +20,52 @@ import StudentPaymentEditForm from './StudentPaymentEdit'
 import { LoadingButton } from '@mui/lab'
 import usePayment from 'src/hooks/usePayment'
 
+
+export const handleCheckPrint = async (id: number | string) => {
+  try {
+    const response = await api.get(`common/generate-check/${id}/`, {
+      responseType: 'blob',
+    })
+
+    const blobUrl = URL.createObjectURL(response.data)
+    const printWindow = window.open(blobUrl)
+
+    if (printWindow) {
+      printWindow.addEventListener('load', () => {
+        printWindow.print()
+      })
+    } else {
+      console.error('Popup blocked or failed to open')
+    }
+  } catch (error) {
+    console.error('Print error:', error)
+  }
+}
+
+export const handleCheckDownload = async (id: number | string) => {
+  try {
+    const response = await api.get(`common/generate-check/${id}/`, {
+      responseType: 'blob',
+    })
+
+    const blob = new Blob([response.data], { type: 'application/pdf' })
+    const blobUrl = URL.createObjectURL(blob)
+
+    const downloadLink = document.createElement('a')
+    downloadLink.href = blobUrl
+    downloadLink.download = `check-${id}.pdf`
+
+    document.body.appendChild(downloadLink)
+    downloadLink.click()
+
+    document.body.removeChild(downloadLink)
+    URL.revokeObjectURL(blobUrl)
+
+  } catch (error) {
+    console.error('Download error:', error)
+  }
+}
+
 const UserView = ({ tab, student }: any) => {
   const url = tab
 
@@ -34,6 +80,7 @@ const UserView = ({ tab, student }: any) => {
   const { isMobile } = useResponsive()
   const [loading, setLoading] = useState<any>(null)
   const { query } = useRouter()
+
   const columns: GridColDef[] = [
     {
       width: 70,
@@ -55,11 +102,19 @@ const UserView = ({ tab, student }: any) => {
       width: 130,
       field: 'condition',
       renderCell: params => (
-        <Tooltip title={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}>
+        <Tooltip title={params.value == 'debt' ? 'Qarzdorlik' : params.value == 'refund' ? 'Qaytarilgan' : "To'landi"}>
           <Chip
             size='small'
-            label={params.value !== 'debt' ? "To'landi" : 'Qarzdorlik'}
-            color={params.value !== 'debt' ? 'success' : Number(params.row.amount) === 0 ? 'secondary' : 'error'}
+            label={params.value == 'debt' ? 'Qarzdorlik' : params.value == 'refund' ? 'Qaytarilgan' : "To'landi"}
+            color={
+              params.value == 'refund'
+                ? 'info'
+                : params.value !== 'debt'
+                ? 'success'
+                : Number(params.row.amount) === 0
+                ? 'secondary'
+                : 'error'
+            }
           />
         </Tooltip>
       )
@@ -136,6 +191,9 @@ const UserView = ({ tab, student }: any) => {
       renderCell: params => (
         <Box sx={{ display: 'flex', gap: '5px' }}>
           <IconifyIcon onClick={() => handleEdit(params.row.id)} icon='mdi:pencil-outline' fontSize={20} />
+          {params.row.condition === 'refund' && (
+            <IconifyIcon onClick={() => setDelete(params.row.id)} icon='mdi:delete-outline' fontSize={20} />
+          )}
           {Number(params.row.amount) > 0 && (
             <IconifyIcon onClick={() => setDelete(params.row.id)} icon='mdi:delete-outline' fontSize={20} />
           )}
@@ -144,7 +202,7 @@ const UserView = ({ tab, student }: any) => {
           ) : loading === params.row.id ? (
             <IconifyIcon icon={'la:spinner'} fontSize={20} />
           ) : isMobile ? (
-            <IconifyIcon onClick={() => handleDownload(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
+            <IconifyIcon onClick={() => handleCheckDownload(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
           ) : (
             <IconifyIcon onClick={() => getReceipt(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
           )}
@@ -153,83 +211,14 @@ const UserView = ({ tab, student }: any) => {
     }
   ]
 
-  const handlePrint = async (id: number | string) => {
-    const subdomain = location.hostname.split('.')
-    try {
-      const response = await fetch(
-        `${
-          process.env.NODE_ENV === 'development'
-            ? process.env.NEXT_PUBLIC_TEST_BASE_URL
-            : subdomain.length < 3
-            ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-            : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }/common/generate-check/${id}/`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        }
-      )
-      const data = await response.blob()
-      const blobUrl = URL.createObjectURL(data)
-      const printFrame: HTMLIFrameElement | null = document.getElementById('printFrame') as HTMLIFrameElement
-      if (printFrame) {
-        printFrame.src = blobUrl
-        printFrame.onload = function () {
-          if (printFrame.contentWindow) {
-            printFrame.contentWindow?.print()
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Print error:', error)
-    }
-  }
-
   async function getReceipt(id: any) {
     setLoading(id)
     try {
-      await handlePrint(id)
+      await handleCheckPrint(id)
     } catch (err) {
       console.log(err)
     }
     setLoading(null)
-  }
-
-  const handleDownload = async (id: number | string) => {
-    setLoading(true)
-    const subdomain = location.hostname.split('.')
-    try {
-      const response = await fetch(
-        `${
-          process.env.NODE_ENV === 'development'
-            ? process.env.NEXT_PUBLIC_TEST_BASE_URL
-            : subdomain.length < 3
-            ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-            : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}`
-        }/common/generate-check/${id}/`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        }
-      )
-      setLoading(false)
-      const data = await response.blob()
-      const blobUrl = URL.createObjectURL(data)
-
-      const downloadLink = document.createElement('a')
-      downloadLink.href = blobUrl
-      downloadLink.download = `check-${id}.pdf`
-      document.body.appendChild(downloadLink)
-      downloadLink.click()
-      document.body.removeChild(downloadLink)
-    } catch (error) {
-      setLoading(false)
-      console.error('Download error:', error)
-    }
   }
 
   const onHandleDelete = async () => {
@@ -254,7 +243,7 @@ const UserView = ({ tab, student }: any) => {
 
   useEffect(() => {
     if (studentData?.id) {
-      getGroups()
+      void getGroups()
     }
   }, [studentData?.id])
 
@@ -262,7 +251,7 @@ const UserView = ({ tab, student }: any) => {
 
   useEffect(() => {
     if (!user?.role?.some((role: string) => ['ceo', 'admin', 'watcher', 'marketolog'].includes(role))) {
-      router.push('/')
+      void router.push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
       return
     }
@@ -304,11 +293,13 @@ const UserView = ({ tab, student }: any) => {
         <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
           To'lovni o'chirishni tasdiqlang
         </DialogTitle>
+
         <DialogContent>
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-            <Button variant='contained' onClick={() => setDelete(null)}>
+            <Button variant='outlined' onClick={() => setDelete(null)}>
               {t('Bekor qilish')}
             </Button>
+
             <LoadingButton variant='contained' color='error' onClick={onHandleDelete} loading={loading}>
               {t("O'chirish")}
             </LoadingButton>

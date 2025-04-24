@@ -221,7 +221,7 @@ const CardStatistics = () => {
   const confirmDeleteCategory = async () => {
     setLoading(true)
     try {
-      await api.patch(`/finance/budget-category/update/${deleteCategory}/`, { is_active: false })
+      await api.patch(`finance/budget-category/update/${deleteCategory}/`, { is_active: false })
       setDeleteCategory(null)
       dispatch(getExpenseCategories(''))
       dispatch(getIncomeCategories(''))
@@ -353,8 +353,9 @@ const CardStatistics = () => {
                             Qarzdorlik summasi:
                             <br /> {formatNumber(all_numbers.plans?.debt_amount || 0)} so'm
                           </Typography>
-                          <Typography color={all_numbers.plans.percentage >= 65 ? 'white' : 'black'} textAlign={'end'}>
-                            {100 % -all_numbers.plans.percentage.toFixed(1) || 0}%
+
+                          <Typography color={all_numbers.plans.percentage >= 65 ? 'white' : 'black'} textAlign="end">
+                            {(100 - parseFloat(all_numbers.plans.percentage.toFixed(1))).toFixed(1)}%
                           </Typography>
                         </Box>
                       </Box>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { FormControl, FormHelperText, IconButton, InputLabel, MenuItem, Select, TextField } from '@mui/material'
@@ -16,16 +16,16 @@ import {
 } from 'src/store/apps/leads'
 import IconifyIcon from '../../../../components/icon'
 import PhoneInput from '../../../../components/phone-input'
-import { reversePhone } from '../../../../components/phone-input/format-phone-number'
+import { reversePhone } from '@components/phone-input/format-phone-number'
 import Router, { useRouter } from 'next/router'
 import api from 'src/@core/utils/api'
 import { useGet } from 'src/hooks/useApi'
-import { LeadsResult } from '../../../../entities/lids/LeadsKanban'
+import { LeadsResult } from '@/entities/lids/LeadsKanban'
 import { LeadsType } from 'src/entities/lids'
 import { useAuth } from 'src/hooks/useAuth'
 import { Ellipsis } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
-import { LeadKanbanItem } from '../../../../entities/lids/LeadKanbanItem'
+import { LeadKanbanItem } from '@/entities/lids/LeadKanbanItem'
 
 type Props = {
   source?: any
@@ -36,6 +36,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const router = useRouter()
+  const [skipLid, setSkipLid] = useState<boolean>(false)
   const queryClient = useQueryClient()
   const { user } = useAuth()
   const query = window.location?.search?.split('?slug=')[1]
@@ -48,7 +49,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
     deps: ['departments-leads']
   })
 
-  const { data: sourseData } = useGet('leads/statistic/')
+  const { data: sourceData } = useGet('leads/statistic/')
 
   const validationSchema = Yup.object({
     department: Yup.string().required("Bo'lim tanlang"),
@@ -97,10 +98,11 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
     initialValues,
     validationSchema,
     onSubmit: async values => {
-      const resp = await dispatch(createDepartmentStudent({ ...values, phone: reversePhone(values.phone) }))
+      const resp = await dispatch(createDepartmentStudent({ ...values, skip_error: skipLid, phone: reversePhone(values.phone) }))
 
       if (resp.meta.requestStatus === 'rejected') {
         formik.setErrors(resp.payload)
+        setSkipLid(true)
       } else {
         formik.resetForm()
         dispatch(setSectionId(null))
@@ -161,13 +163,14 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
       </FormControl>
 
       <FormControl fullWidth>
-        <InputLabel size='small' id='fsdgsdgsgsdfsd-label'>
+        <InputLabel size='small' id='sourse-label'>
           {t('Manba')}
         </InputLabel>
+
         <Select
           size='small'
           label={t('Manba')}
-          labelId='fsdgsdgsgsdfsd-label'
+          labelId='sourse-label'
           name='source'
           sx={{ mb: 1 }}
           onChange={(e: any) => {
@@ -178,8 +181,8 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
           onBlur={handleBlur}
           value={values.source}
         >
-          {sourseData &&
-            sourseData.result.map((lead: any) => (
+          {sourceData &&
+            sourceData.result.map((lead: any) => (
               <MenuItem key={lead.id} value={lead.id}>
                 {lead.name}
               </MenuItem>
@@ -244,7 +247,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
       </FormControl>
 
       <LoadingButton loading={loading} type='submit' variant='outlined'>
-        {t('Yaratish')}
+        {skipLid ? "Qayta yaratish" : 'Yaratish'}
       </LoadingButton>
     </form>
   )

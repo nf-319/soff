@@ -26,7 +26,7 @@ export const fetchData = createAsyncThunk('appUsers/fetchData', async (params: D
 })
 
 export const fetchNotification = createAsyncThunk('appUsers/fetchNotification', async () => {
-  const response = await api.get('/common/notifications/')
+  const response = await api.get('common/notifications/')
   return response.data
 })
 
@@ -101,7 +101,9 @@ export const appUsersSlice = createSlice({
         work_start_time: `${action.payload?.work_start_time.split(':')?.[0]}:${
           action.payload?.work_start_time.split(':')?.[1]
         }`,
-        work_end_time: `${action.payload?.work_end_time.split(':')?.[0]}:${action.payload?.work_end_time.split(':')?.[1]}`
+        work_end_time: `${action.payload?.work_end_time.split(':')?.[0]}:${
+          action.payload?.work_end_time.split(':')?.[1]
+        }`
       }
     },
     setDepartmentsState: (state, action) => {
@@ -128,6 +130,5 @@ export const appUsersSlice = createSlice({
   }
 })
 
-export const { setRoles, setCompanyInfo } =
-  appUsersSlice.actions
+export const { setRoles, setCompanyInfo } = appUsersSlice.actions
 export default appUsersSlice.reducer

@@ -57,6 +57,7 @@ interface IStudentsPaymentState {
     offset?: string
     is_payment: any
     page: string
+    admin: string
     group?: string
     start_date?: string
     end_date?: string
@@ -67,7 +68,17 @@ const initialState: IStudentsPaymentState = {
   studentsPayment: [],
   teachersData: [],
   groups: [],
-  queryParams: {bonus:'', payment_type: '', is_payment: true, page: '1', offset: '0', limit: '10', teacher: '', course: '' },
+  queryParams: {
+    bonus: '',
+    payment_type: '',
+    is_payment: true,
+    page: '1',
+    offset: '0',
+    limit: '10',
+    teacher: '',
+    course: '',
+    admin: ''
+  },
   paymentsCount: 0,
   total_payments: 0,
   total_bonus: 0,

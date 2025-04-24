@@ -1,5 +1,5 @@
-import { Box, Button, Card, Typography } from '@mui/material'
-import { ArrowRightLeft, Award, ChartLine, Clock, TrendingDown, TrendingUp, TriangleAlert, User } from 'lucide-react'
+import { Box, Card, Typography } from '@mui/material'
+import { ArrowRightLeft, Award, Clock, TrendingDown, TrendingUp, TriangleAlert, User } from 'lucide-react'
 
 const LidsReportsCard = () => {
   return (

@@ -6,7 +6,9 @@ import { useSettings } from '../../@core/hooks/useSettings'
 import { LeadsMenu } from './Menu'
 import { MenuOpenType } from './LeadsKanban'
 import { LidsDragonModal } from '../../views/apps/lids/LidsDragonModal'
-import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';type Props = {
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
+
+type Props = {
   provided?: DraggableProvided
   snapshot?: DraggableStateSnapshot
   lead: any

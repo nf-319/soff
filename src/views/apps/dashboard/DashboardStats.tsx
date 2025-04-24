@@ -1,8 +1,6 @@
 // @ts-nocheck
 'use client'
 
-import CardStatsVertical from '../../../components/card-statistics/card-stats-vertical'
-import IconifyIcon from '../../../components/icon'
 import Box from '@mui/material/Box'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import useResponsive from 'src/@core/hooks/useResponsive'
@@ -14,16 +12,18 @@ import { formatCurrency } from 'src/@core/utils/format-currency'
 import { useGet } from 'src/hooks/useApi'
 import { AuthContext } from 'src/context/AuthContext'
 import { useContext, useEffect } from 'react'
+import IconifyIcon from '@components/icon'
+import CardStatsVertical from '@components/card-statistics/card-stats-vertical'
 
 const DashboardStats = () => {
   const { statsData } = useAppSelector(state => state.dashboard)
 
   const dispatch = useAppDispatch()
-  const { isMobile, isTablet } = useResponsive()
+  const { isMobile } = useResponsive()
   const { push } = useRouter()
   const { t } = useTranslation()
   const { user } = useContext(AuthContext)
-  const { data: stats, isLoading , refetch } = useGet('common/dashboard/statistic-list/')
+  const { data: stats, isLoading, refetch } = useGet('common/dashboard/statistic-list/')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,10 +31,9 @@ const DashboardStats = () => {
     }
 
     void fetchData()
-  }, [user?.active_branch])
+  }, [user?.active_branch, refetch])
 
-
-  function click(link: string) {
+  function click(link) {
     if (link === 'debtors_amount') {
       dispatch(updateStudentParams({ is_debtor: true, last_payment: '' }))
       return push('/students')
@@ -62,13 +61,10 @@ const DashboardStats = () => {
     active_groups: 'Faol guruhlar soni.',
     active_students: "Ayni vaqtda faol o'quvchilar soni",
     active_debts_count: `Umumiy qarzdor o'quvchilar soni : ${stats?.debtor_users} ta, arxivdagi o'quvchilar soni : ${stats?.active_debts_count} ta (1 ta o'quvchi 2 va undan ortiq guruhda o'qishi mumkin)`,
-    active_debts_amount: `Umumiy o'quvchilar qarzdorligi : ${formatCurrency(stats?.debtors_amount) + " so'm"}
-    ${
-      stats?.archive_debts_amount < 0 &&
-      `Arxivdagi o'quvchilar qarzdorligi : ${formatCurrency(stats.archive_debts_amount) + " so'm"}`
-    }
-    `,
-    leads_count: "Hozirda faol bo‘lgan va ishlov berilishi kerak bo‘lgan lidlar ro‘yxati.",
+    active_debts_amount: `Umumiy o'quvchilar qarzdorligi : ${formatCurrency(stats?.debtors_amount) + " so'm,"}
+      Arxivdagi o'quvchilar qarzdorligi : ${formatCurrency(stats?.archive_debts_amount) + " so'm"}`
+    ,
+    leads_count: "Hozirda faol bo'lgan va ishlov berilishi kerak bo'lgan lidlar ro'yxati.",
     not_activated_students: "Sinov darsiga kelib ketgan o'quvchilar soni",
     payment_approaching: "To'lov qilishiga 7 kundan kam qolgan o'quvchilar soni",
     teacher_count: "O'qituvchilar soni",
@@ -79,57 +75,56 @@ const DashboardStats = () => {
     <Box
       sx={{
         display: 'grid',
-        gap: '10px',
+        gap: '12px',
         width: '100%',
-        mb: 5,
-        gridTemplateColumns: `repeat(${isMobile ? 3 : isTablet ? 4 : statsData.length}, 1fr)`
+        mb: 4,
+        gridTemplateColumns: {
+          xs: 'repeat(3, minmax(40px, 1fr))',
+          sm: 'repeat(4, minmax(80px, 1fr))',
+          md: 'repeat(auto-fill, minmax(100px, 1fr))',
+          lg: 'repeat(auto-fill, minmax(130px, 1fr))'
+        }
       }}
     >
       {isLoading &&
-        statsData.map((_, index) => (
-          <Box key={`${_.key}-${index}`} className='' sx={{ cursor: 'pointer' }} onClick={() => click(_.link)}>
+        Array.from({ length: 9 }).map((_, index) => (
+          <Box key={`skeleton-${index}`} sx={{ width: '100%', height: '100%' }}>
             <Skeleton
-              sx={{ bgcolor: 'grey.300' }}
+              sx={{ bgcolor: 'grey.200' }}
               variant='rectangular'
               width={'100%'}
-              height={'120px'}
-              style={{ borderRadius: '10px' }}
+              height={110}
+              style={{ borderRadius: '8px' }}
               animation='wave'
             />
           </Box>
         ))}
 
-      {stats && !isLoading
-        ? stats?.payment_approaching
-          ? statsData.map((item, index) => (
-              <Tooltip key={`${item.key}-${index}`} arrow title={t(tooltip[item.key])}>
-                <Box sx={{ cursor: 'pointer', width: "100%" }} onClick={() => click(item.link)}>
+      {stats && !isLoading && (
+        <>
+          {statsData
+            .filter(el => stats?.[el.key] !== undefined)
+            .map((item, index) => (
+              <Tooltip key={`${item.key}-${index}`} arrow title={t(tooltip[item.key] || '')} enterDelay={200}>
+                <Box
+                  sx={{
+                    cursor: 'pointer',
+                    width: '100%'
+                  }}
+                  onClick={() => click(item.link)}
+                >
                   <CardStatsVertical
                     data_key={item.key}
-                    title={stats?.[item.key]}
                     stats={t(item.title)}
-                    icon={<IconifyIcon fontSize={'4rem'} icon={item.icon} />}
+                    title={stats?.[item.key] || '0'}
                     color={item.color}
+                    icon={<IconifyIcon fontSize={isMobile ? '1.2rem' : '1.5rem'} icon={item.icon} />}
                   />
                 </Box>
               </Tooltip>
-            ))
-          : statsData
-              ?.filter(el => el.key !== 'payment_approaching')
-              .map((_, index) => (
-                <Tooltip key={`${_.key}-${index}`} arrow title={t(tooltip[_.key])}>
-                  <Box sx={{ cursor: 'pointer', width: "100%" }} onClick={() => click(_.link)}>
-                    <CardStatsVertical
-                      key={_.key}
-                      title={stats?.[_.key]}
-                      stats={t(_.title)}
-                      icon={<IconifyIcon fontSize={'4rem'} icon={_.icon} />}
-                      color={_.color}
-                    />
-                  </Box>
-                </Tooltip>
-              ))
-        : null}
+            ))}
+        </>
+      )}
     </Box>
   )
 }

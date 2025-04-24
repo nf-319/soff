@@ -348,6 +348,7 @@ const SmsSettings = () => {
     }
   }
 
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '100%' }}>
       <SmsCard
@@ -380,7 +381,7 @@ const SmsSettings = () => {
         onSwitch='for_payment'
         name='create_payment_text'
         onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_payment)}
-        placeholders={PLACEHOLDERS.for_payment}
+        placeholders={PLACEHOLDERS.paid}
         updateSettings={updateSettings}
         defaultValue={companyInfo?.auto_sms?.create_payment_text}
       />
@@ -443,11 +444,11 @@ const SmsSettings = () => {
         loading={loading === 'debtor'}
         onSwitch='on_score'
         companyName={companyInfo.training_center_name}
-        name='debt_text'
+        name='score_text'
         onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_score)}
-        placeholders={PLACEHOLDERS.deptStudents}
+        placeholders={PLACEHOLDERS.gradeStudents}
         updateSettings={updateSettings}
-        defaultValue={companyInfo?.auto_sms?.debt_text}
+        defaultValue={companyInfo?.auto_sms?.score_text}
       />
     </Box>
   )

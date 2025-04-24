@@ -1,14 +1,12 @@
 // ** Type import
 import { useContext } from 'react'
-import { useDispatch } from 'react-redux'
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
 import { AuthContext } from 'src/context/AuthContext'
-import { toggleAmoModal } from 'src/store/apps/page'
 
 export const TeacherNavigation = (t: any): any => {
   return [
     {
-      title: t('Guruhlar'),
+      title: 'Guruhlar',
       icon: 'mdi:home-outline',
       path: '/dashboard'
     }
@@ -57,6 +55,14 @@ export const CPanelNavigation = (t: any): any => {
 
 const Navigation = (t: any): VerticalNavItemsType => {
   const { user } = useContext(AuthContext)
+
+  const teacher = [
+    {
+      title: 'Guruhlar',
+      icon: 'mdi:home-outline',
+      path: '/dashboard'
+    }
+  ]
 
   const items = [
     {
@@ -189,13 +195,8 @@ const Navigation = (t: any): VerticalNavItemsType => {
         }
       ]
     }
-
-    // {
-    //   title: t("Video qo'llanmalar"),
-    //   icon: 'ph:video-light',
-    //   path: '/video-tutorials'
-    // }
   ]
+
   const marketologItems = [
     {
       title: t('Lidlar'),
@@ -218,12 +219,6 @@ const Navigation = (t: any): VerticalNavItemsType => {
         }
       ]
     }
-
-    // {
-    //   title: t("Video qo'llanmalar"),
-    //   icon: 'ph:video-light',
-    //   path: '/video-tutorials'
-    // }
   ]
 
   const adminItems = [
@@ -280,14 +275,6 @@ const Navigation = (t: any): VerticalNavItemsType => {
               title: 'Maktablar',
               path: '/settings/office/schools'
             }
-            // {
-            //   title: 'Arxiv',
-            //   path: '/settings/office/archive'
-            // },
-            // {
-            //   title: 'Tark etgan talabalar',
-            //   path: '/settings/office/lefted-students'
-            // }
           ]
         },
         {
@@ -329,14 +316,16 @@ const Navigation = (t: any): VerticalNavItemsType => {
   ]
   const watcherItems = items.filter(el => el.slug !== 'settings')
 
-  return user?.role.includes('ceo')
+  return user?.currentRole === 'ceo'
     ? items
-    : user?.role.includes('casher')
+    : user?.currentRole === 'casher'
     ? items.filter(el => el.path === '/finance')
-    : user?.role.includes('watcher')
+    : user?.currentRole === 'watcher'
     ? watcherItems
-    : user?.role.includes('marketolog')
+    : user?.currentRole === 'marketolog'
     ? marketologItems
+    : user?.currentRole === 'teacher'
+    ? teacher
     : adminItems
 }
 

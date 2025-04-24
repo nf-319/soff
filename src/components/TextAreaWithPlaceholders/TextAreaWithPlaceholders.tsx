@@ -42,7 +42,7 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
   const convertAPItoUIFormat = (text: string) => {
     if (!text) return ''
     let result = text
-    placeholders.forEach(p => {
+    placeholders?.forEach(p => {
       const regex = new RegExp(escapeRegExp(p.value), 'g')
       result = result.replace(regex, p.displayValue)
     })
@@ -199,21 +199,23 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
     if (!value && !defaultValue && companyName && !wasCompanyNameRemoved) return `${companyName}: `
     if (!value) return defaultValue || ''
 
-    return value.split(/(\$\{(?:group|balance|first_name|reason|score|amount|date)})/).map((part, index) => {
-      const placeholder = placeholders.find(p => p.value === part)
-      if (placeholder) {
-        return (
-          <Chip
-            key={index}
-            label={placeholder.label}
-            color={placeholder.color as ChipProps['color']}
-            size='small'
-            sx={{ mx: 0.5, verticalAlign: 'middle' }}
-          />
-        )
-      }
-      return part
-    })
+    return value
+      .split(/(\$\{(?:group|balance|first_name|reason|score|amount|date|payment_type|payment_date|exam|)})/)
+      .map((part, index) => {
+        const placeholder = placeholders.find(p => p.value === part)
+        if (placeholder) {
+          return (
+            <Chip
+              key={index}
+              label={placeholder.label}
+              color={placeholder.color as ChipProps['color']}
+              size='small'
+              sx={{ mx: 0.5, verticalAlign: 'middle' }}
+            />
+          )
+        }
+        return part
+      })
   }
 
   const handleClose = () => {
@@ -230,7 +232,7 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
         : convertAPItoUIFormat(defaultValue)
 
     setDisplayValue(resetValue)
-    onChange(convertToApiText(resetValue)) // Reset qiymatni API ga yuboramiz
+    onChange(convertToApiText(resetValue))
     setEditable(false)
   }
 
@@ -250,7 +252,7 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
 
       <Box component='div' display='flex' alignItems='center' justifyContent='space-between' marginBottom={2}>
         <Stack direction='row' spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-          {placeholders.map((placeholder, index) => (
+          {placeholders?.map((placeholder, index) => (
             <Tooltip key={`${placeholder.label}-${index}`} title={placeholder.placeholder} placement='top'>
               <Button
                 variant='contained'
