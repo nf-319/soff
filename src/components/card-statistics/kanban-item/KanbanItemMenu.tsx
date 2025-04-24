@@ -20,8 +20,7 @@ export const KanbanItemMenu: FC<Props> = ({
   setAnchorEl,
   getSMSTemps,
   getBranches,
-  setOpen: setOpenNative,
-  is_amocrm
+  setOpen: setOpenNative
 }) => {
   const { queryParams } = useAppSelector(state => state.leads)
   const { companyInfo } = useAppSelector(state => state.user)
@@ -65,7 +64,7 @@ export const KanbanItemMenu: FC<Props> = ({
     >
       {queryParams.is_active ? (
         <Box>
-          {is_amocrm ? (
+          {router.query.is_amocrm ? (
             <>
               <MenuItem onClick={() => setOpen('add-group')} sx={{ '& svg': { mr: 2 } }}>
                 <IconifyIcon icon='material-symbols:group-add' fontSize={17} />
@@ -73,7 +72,7 @@ export const KanbanItemMenu: FC<Props> = ({
               </MenuItem>
               <MenuItem onClick={() => setOpen('merge-to')} sx={{ '& svg': { mr: 2 } }}>
                 <IconifyIcon icon='subway:round-arrow-2' fontSize={17} />
-                {t("Soff crmga qo'shish")}
+                {t("Crm lidlariga qo'shish")}
               </MenuItem>
               <MenuItem onClick={() => setOpen('merge-to-amo')} sx={{ '& svg': { mr: 2 } }}>
                 <IconifyIcon icon='subway:round-arrow-2' fontSize={17} />

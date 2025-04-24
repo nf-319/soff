@@ -14,10 +14,11 @@ type Props = {
   setOpen: Dispatch<SetStateAction<MenuOpenType>>
   leadId: string
   currentId: string
+  defaultId?:any,
   onClose?: boolean
 }
 
-export const AddDepartmantModal: FC<Props> = ({ onClose, currentId, open, setOpen, leadId }) => {
+export const AddDepartmantModal: FC<Props> = ({defaultId, onClose, currentId, open, setOpen, leadId }) => {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const dispatch = useAppDispatch()
@@ -34,10 +35,10 @@ export const AddDepartmantModal: FC<Props> = ({ onClose, currentId, open, setOpe
 
       <DialogContent>
         <MergeToDepartment
+          defaultId={defaultId}
           currentId={currentId}
           setOpen={setOpen}
           open={open}
-          is_amocrm={false}
           item={{ id: leadId }}
           reRender={async () => {
             await queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })

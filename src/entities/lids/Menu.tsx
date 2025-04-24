@@ -20,6 +20,7 @@ type Props = {
   setMenuOpen: Dispatch<SetStateAction<MenuOpenType>>
   menuOpen: any
   currentId: string
+  defaultId?:any,
   currentLead: any
   onClose?: boolean
 }
@@ -31,6 +32,7 @@ export const LeadsMenu: FC<Props> = ({
   currentLead,
   currentId,
   menuOpen,
+  defaultId,
   setMenuOpen
 }) => {
   const { getSMSTemps } = useSMS()
@@ -68,7 +70,7 @@ export const LeadsMenu: FC<Props> = ({
             setOpen={setMenuOpen}
           />
 
-          <AddGroup onClose={onClose} open={menuOpen} leadId={currentLead.id} setOpen={setMenuOpen} />
+          <AddGroup defaultId={defaultId} onClose={onClose} open={menuOpen} leadId={currentLead.id} setOpen={setMenuOpen} />
 
           <LeadDeleteModal
             onClose={onClose}
@@ -88,6 +90,7 @@ export const LeadsMenu: FC<Props> = ({
           />
 
           <AddDepartmantModal
+            defaultId={defaultId}
             onClose={onClose}
             currentId={currentId}
             open={menuOpen}

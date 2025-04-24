@@ -78,7 +78,8 @@ const Lids = () => {
   })
 
   const { data: amoCrmLeadData, isLoading: amoCrmLoading } = useGet<AmoLeads[]>('amocrm/pipelines/?with_steps=true', {
-    options: { enabled: !!is_amocrm }
+    options: { enabled: !!is_amocrm },
+    deps:['amo-leads']
   })
 
   useEffect(() => {

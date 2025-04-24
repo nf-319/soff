@@ -14,9 +14,10 @@ type Props = {
   snapshot?: DraggableStateSnapshot
   lead: any
   onClose?: boolean
+  defaultId?:any,
 }
 
-export const LeadKanbanItem: FC<Props> = ({ provided, snapshot, lead, onClose }) => {
+export const LeadKanbanItem: FC<Props> = ({defaultId, provided, snapshot, lead, onClose }) => {
   const { settings } = useSettings()
   const [studentModalOpen, setStudentModalOpen] = useState<boolean>(false)
   const [selectedLead, setSelectedLead] = useState<any | null>(null)
@@ -57,7 +58,7 @@ export const LeadKanbanItem: FC<Props> = ({ provided, snapshot, lead, onClose })
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <User width={20} height={20} color='blue' />
             <Box display='flex' alignItems='flex-start' width='100%'>
-              <Typography sx={{ whiteSpace: 'nowrap' }}>{lead.first_name}</Typography>
+              <Typography sx={{ whiteSpace: 'nowrap' }}>{lead?.first_name}</Typography>
             </Box>
           </div>
 
@@ -91,6 +92,7 @@ export const LeadKanbanItem: FC<Props> = ({ provided, snapshot, lead, onClose })
       </div>
 
       <LeadsMenu
+         defaultId={defaultId}
         currentId={currentLead}
         currentLead={currentLead}
         menuOpen={menuOpen}
