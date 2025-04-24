@@ -10,7 +10,7 @@ import MarketingSources from './pie-charts/marketing-sources'
 
 const LidsReports = () => {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+    <Box sx={{paddingY:4, display: 'flex', flexDirection: 'column', gap: 5 }}>
       <LidsReportsFilter />
 
       <LidsReportsCard />

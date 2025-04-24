@@ -1,25 +1,13 @@
-import {
-  Box,
-  Button,
-  Card,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select
-} from '@mui/material'
-import { FilterIcon } from 'lucide-react'
-import { useState } from 'react'
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
+import { useContext, useEffect, useState } from 'react'
 import useResponsive from 'src/@core/hooks/useResponsive'
-import useBranches from '@hooks/useBranch'
 import { useGetBranches } from '@/shared/query-hooks'
+import { AuthContext } from '@/context/AuthContext'
 
 const LidsReportsFilter = () => {
   const [duration, setDuration] = useState('3')
-  const [branch, setBranch] = useState('')
+  const [branch, setBranch] = useState<string | number>('')
+  const { user } = useContext(AuthContext)
   const { isMobile } = useResponsive()
   const { data } = useGetBranches()
 
@@ -27,10 +15,23 @@ const LidsReportsFilter = () => {
     console.log('Applied filters:', { duration, branch })
   }
 
-
+  useEffect(() => {
+    setBranch(user?.active_branch)
+  }, [user])
 
   return (
-    <Card sx={{ padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : '',
+        alignItems: 'center',
+        gap: isMobile ? 6 : 0,
+        justifyContent: 'space-between'
+      }}
+    >
+      <Box>
+        <Typography fontSize={22}>Lidlar Hisoboti</Typography>
+      </Box>
       <Box sx={{ display: 'flex', gap: 5, flexWrap: isMobile ? 'wrap' : '' }}>
         <FormControl fullWidth>
           <InputLabel id='duration-label'>Duration</InputLabel>
@@ -58,20 +59,18 @@ const LidsReportsFilter = () => {
             onChange={e => setBranch(e.target.value)}
             label='Branch'
           >
-            <MenuItem value=''>All branches</MenuItem>
-            {data?.results.map((item) => (
+            {data?.results.map(item => (
               <MenuItem key={item.id} value={item.id}>
                 {item.name}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
+        <Button fullWidth variant='contained' color='primary' onClick={handleApplyFilters}>
+          Apply Filters
+        </Button>
       </Box>
-
-      <Button variant='contained' color='primary' onClick={handleApplyFilters}>
-        Apply Filters
-      </Button>
-    </Card>
+    </Box>
   )
 }
 
