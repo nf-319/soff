@@ -334,7 +334,7 @@ export default function StudentsPage() {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <StudentsFilter isMobile/>
+          <StudentsFilter isMobile={isMobile} />
         </DialogContent>
         <DialogActions className='dialog-actions-dense'>
           <Button onClick={() => setOpen(false)}>{t('Davom etish')}</Button>
