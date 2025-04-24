@@ -93,7 +93,7 @@ export default function GroupsPage() {
   const [group_id, setGroupId] = useState<number | null>(null)
   const [groupChoices, setGroupChoices] = useState([])
   const { mutate, isPending } = usePatch()
- 
+
   const { data, isLoading } = useGet(ceoConfigs.groups, {
     params: queryParams as Record<string, unknown>,
     deps: ['groups-list']
@@ -203,7 +203,6 @@ export default function GroupsPage() {
     }, {} as Record<string, string>)
   ).toString()
   const handleRowsPerPageChange = async (value: number) => {
-    const limit = value
     setRowsPerPage(Number(value))
     sessionStorage.setItem('rowsPerPage', `${value}`)
 
@@ -224,7 +223,7 @@ export default function GroupsPage() {
   }
 
   const rowClick = (id: any) => {
-    router.push(`/groups/view/security?id=${id}&month=${getMonthName(null)}`)
+    void router.push(`/groups/view/security?id=${id}&month=${getMonthName(null)}`)
     dispatch(studentsUpdateParams({ status: 'active,new' }))
   }
 
@@ -268,12 +267,12 @@ export default function GroupsPage() {
         !user?.role.includes('watcher') &&
         !user?.role.includes('marketolog')
       ) {
-        router.push('/')
+        void router.push('/')
         toast.error('Sahifaga kirish huquqingiz yoq!')
       }
     }
 
-    initializePage()
+    void initializePage()
   }, [])
   useEffect(() => {
     void queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
