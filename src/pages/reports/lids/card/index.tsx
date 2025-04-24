@@ -49,7 +49,7 @@ const LidsReportsCard = () => {
                 cursor: 'pointer',
                 padding: '4px 8px',
                 borderRadius: '6px',
-                transition: 'background-color 0.3s ease', // smooth hover transition
+                transition: 'background-color 0.3s ease',
                 '&:hover': {
                   backgroundColor: '#f0f0f0'
                 }

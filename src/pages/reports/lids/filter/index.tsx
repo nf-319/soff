@@ -11,10 +11,6 @@ const LidsReportsFilter = () => {
   const { isMobile } = useResponsive()
   const { data } = useGetBranches()
 
-  const handleApplyFilters = () => {
-    console.log('Applied filters:', { duration, branch })
-  }
-
   useEffect(() => {
     setBranch(user?.active_branch)
   }, [user])
@@ -30,8 +26,9 @@ const LidsReportsFilter = () => {
       }}
     >
       <Box>
-        <Typography fontSize={22}>Lidlar Hisoboti</Typography>
+        <Typography variant="h5">Lidlar Hisoboti</Typography>
       </Box>
+
       <Box sx={{ display: 'flex', gap: 5, flexWrap: isMobile ? 'wrap' : '' }}>
         <FormControl fullWidth>
           <InputLabel id='duration-label'>Duration</InputLabel>
@@ -39,6 +36,7 @@ const LidsReportsFilter = () => {
             labelId='duration-label'
             value={duration}
             size='small'
+            sx={{ width: '150px' }}
             onChange={e => setDuration(e.target.value)}
             label='Duration'
           >
@@ -56,6 +54,7 @@ const LidsReportsFilter = () => {
             size='small'
             labelId='branch-label'
             value={branch}
+            sx={{ width: '150px' }}
             onChange={e => setBranch(e.target.value)}
             label='Branch'
           >
@@ -66,9 +65,6 @@ const LidsReportsFilter = () => {
             ))}
           </Select>
         </FormControl>
-        <Button fullWidth variant='contained' color='primary' onClick={handleApplyFilters}>
-          Apply Filters
-        </Button>
       </Box>
     </Box>
   )
