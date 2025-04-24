@@ -7,7 +7,7 @@ import {
   InputAdornment,
   InputLabel,
   MenuItem,
-  OutlinedInput, Popper,
+  OutlinedInput,
   Select,
   TextField,
   Tooltip
@@ -31,17 +31,14 @@ import { fetchSchoolsList, fetchSmsList } from 'src/store/apps/settings'
 import ExcelStudents from '../../../components/excelButton/ExcelStudents'
 import ceoConfigs from 'src/configs/ceo'
 import { useRouter } from 'next/router'
-import { styled } from '@mui/material/styles'
-import useResponsive from '@/@core/hooks/useResponsive'
 
 type StudentsFilterProps = {
+  isMobile: boolean
   students?: any[]
 }
 
-const StudentsFilter = ({ students }: StudentsFilterProps) => {
+const StudentsFilter = ({ isMobile, students }: StudentsFilterProps) => {
   const router = useRouter()
-  const { companyInfo } = useAppSelector(item => item.user)
-  const { isMobile } =useResponsive()
   const dispatch = useAppDispatch()
   const { queryParams } = useAppSelector(state => state.students)
   const { schools } = useAppSelector(state => state.settings)
@@ -59,7 +56,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
   const studentIds = students?.map(student => student.id)
   const [teacherId, setTeacherId] = useState<any>()
   const [groupId, setGroupId] = useState<any>()
-  const [accessModal, setAccessModal] = useState<boolean>(false);
 
   const handleEditClickOpen = (value: ModalTypes) => {
     setOpenEdit(value)
@@ -84,39 +80,32 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
   }
 
   async function handleFilter(key: string, value: string | number | null) {
-    dispatch(updateStudentParams({ [key]: value }));
+    dispatch(updateStudentParams({ [key]: value }))
 
-    if (key === 'status') {
-      dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }));
+    if (key == 'status') {
+      dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
     }
     if (key === 'debt_date') {
-      setIsActive(false);
-      dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '', debt_date: `${value}` }));
+      setIsActive(false)
+      dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '', debt_date: `${value}` }))
     } else if (key === 'amount') {
-      dispatch(updateStudentParams({ debt_date: '' }));
       if (value === 'is_debtor') {
-        setIsActive(false);
-        dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '' }));
+        setIsActive(false)
+        dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '' }))
       } else if (value === 'not_in_debt') {
-        setIsActive(false);
-        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: true }));
-      } else if (value === 'last_payment') {
-        setIsActive(true);
-        dispatch(updateStudentParams({ last_payment: true, is_debtor: '', not_in_debt: '' }));
-      } else if (value === 'all') {
-        setIsActive(true);
-        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '' }));
+        setIsActive(false)
+        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: true }))
       }
+      if (value === 'last_payment') {
+        setIsActive(true)
+        dispatch(updateStudentParams({ last_payment: true, is_debtor: '', not_in_debt: '' }))
+      } else if (value === 'all') {
+        setIsActive(true)
+        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '' }))
+      }
+      return
     }
   }
-
-  const StyledPopper = styled(Popper)({
-    minWidth: '300px',
-  })
-
-  const TeacherPopper = styled(Popper)({
-    minWidth: '200px',
-  })
 
   useEffect(() => {
     const { q, ...restQuery } = router.query
@@ -144,11 +133,11 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
 
   useEffect(() => {
     if (key == 'course') {
-      void getCourses()
+      getCourses()
     } else if (key == 'group') {
-      void getGroups()
+      getGroups()
     } else if (key == 'teacher') {
-      void getTeachers()
+      getTeachers()
     } else if (key == 'school') {
       dispatch(fetchSchoolsList())
     }
@@ -163,17 +152,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
     label: item?.first_name,
     value: item?.id
   }))
-
-  
-  const handleModalOpen = () => {
-    if(companyInfo.access) {
-      setAccessModal(false)
-      void getSMSTemps()
-      handleEditClickOpen('sms')
-    } else {
-      setAccessModal(true)
-    }
-  }
 
   if (isMobile)
     <form id='mobile-filter-form'>
@@ -269,6 +247,7 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
               <b>{t('Barchasi')}</b>
             </MenuItem>
             <MenuItem value={'active'}>{t('active')}</MenuItem>
+            {/* <MenuItem value={'archive'}>{t('archive')}</MenuItem> */}
             <MenuItem value={'new'}>{t('test')}</MenuItem>
             <MenuItem value={'frozen'}>{t('frozen')}</MenuItem>
             <MenuItem value={'not_activated'}>{t('Sinov darsidan ketganlar')}</MenuItem>
@@ -485,6 +464,7 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
               <b>{t('Barchasi')}</b>
             </MenuItem>
             <MenuItem value={'active'}>{t('active')}</MenuItem>
+            {/* <MenuItem value={'archive'}>{t('archive')}</MenuItem> */}
             <MenuItem value={'new'}>{t('test')}</MenuItem>
             <MenuItem value={'frozen'}>{t('frozen')}</MenuItem>
             <MenuItem value={'not_activated'}>{t('Sinov darsidan ketganlar')}</MenuItem>
@@ -538,43 +518,44 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
             size='lg'
             label={queryParams.debt_date ? queryParams.debt_date : 'Yil va Oy'}
             value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
-            format='MM/yyyy'
-            oneTap
+            format='MMM/yyyy'
             placeholder='Select month and year'
             onChange={value => {
               if (!value) {
-                void handleFilter('debt_date', '');
+                void handleFilter('debt_date', '')
               } else {
-                void handleFilter('debt_date', format(value, 'MM-yyyy'));
+                void handleFilter('debt_date', format(value, 'MM-yyyy'))
               }
             }}
             style={{ width: 180 }}
-            shouldDisableDate={date => date?.getTime() > Date.now()}
+            // @ts-ignore
+            disabledDate={(date) => date?.getTime() > Date.now()}
           />
+
         )}
 
         <div onClick={() => setKey('group')} style={{ width: '100%' }}>
           <Autocomplete
             loading={!groupOptions}
+            sx={{ maxWidth: 180, width: '100%' }}
+            disablePortal
             options={groupOptions || []}
-            onChange={(_: any, v: any) => {
-              void handleFilter('group', v?.value)
-              setGroupId(v?.value)
+            onChange={(e: any, v: any) => {
+              handleFilter('group', v?.value), setGroupId(v?.value)
             }}
-            PopperComponent={StyledPopper}
             size='small'
-            renderInput={params => <TextField {...params} label='Guruh' />}
+            renderInput={params => <TextField {...params} label={t('Guruh')} />}
           />
         </div>
         <div onClick={() => setKey('teacher')} style={{ width: '100%' }}>
           <Autocomplete
             loading={!teacherOptions}
+            sx={{ maxWidth: 180, width: '100%' }}
             disablePortal
             value={teacherOptions?.find((option: any) => option.value === queryParams.teacher) || null}
             options={teacherOptions || []}
-            PopperComponent={TeacherPopper}
             onChange={(e: any, v: any) => {
-              void handleFilter('teacher', v?.value); setTeacherId(v?.value)
+              handleFilter('teacher', v?.value), setTeacherId(v?.value)
             }}
             size='small'
             renderInput={params => <TextField {...params} label={t('Ustoz')} />}
@@ -605,14 +586,14 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
           queryString={queryString}
         />
         <Button
-          onClick={handleModalOpen}
+          onClick={() => { getSMSTemps(); handleEditClickOpen('sms') }}
           variant='outlined'
           color='warning'
           fullWidth
           size='small'
           startIcon={<IconifyIcon icon='material-symbols-light:sms-outline' />}
         >
-          <Tooltip title={t('Ro‘yxatdagi o‘quvchilarga SMS yuborish.')}>
+          <Tooltip title={t("Ro‘yxatdagi o‘quvchilarga SMS yuborish.")}>
             <span>{t('Sms yuborish')}</span>
           </Tooltip>
         </Button>

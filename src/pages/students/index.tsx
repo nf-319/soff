@@ -272,7 +272,7 @@ export default function StudentsPage() {
         </Box>
       )}
 
-      {!isMobile && <StudentsFilter students={data?.results} />}
+      {!isMobile && <StudentsFilter isMobile={isMobile} students={data?.results} />}
 
       <DataTable
         color
@@ -334,7 +334,7 @@ export default function StudentsPage() {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <StudentsFilter />
+          <StudentsFilter isMobile/>
         </DialogContent>
         <DialogActions className='dialog-actions-dense'>
           <Button onClick={() => setOpen(false)}>{t('Davom etish')}</Button>
