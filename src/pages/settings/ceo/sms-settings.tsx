@@ -362,6 +362,8 @@ const SmsSettings = () => {
     }
   }, [data, isLoading])
 
+  
+
   const handleBack = () => {
     setAccessModal(false)
     void router.push('/settings/ceo/all-settings')
@@ -370,64 +372,64 @@ const SmsSettings = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '100%' }}>
       <SmsCard
-        companyName={companyInfo.training_center_name}
+        companyName={data?.training_center_name}
         title="Tug'ilgan kunda sms bilan tabriklash"
         loading={loading === 'birthdate'}
         onSwitch='on_birthday'
         name='birthday_text'
-        onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_birthday)}
+        onSwitchInfo={Boolean(data?.auto_sms?.on_birthday)}
         placeholders={PLACEHOLDERS.birthdate}
         updateSettings={updateSettings}
-        defaultValue={companyInfo?.auto_sms?.birthday_text}
+        defaultValue={data?.auto_sms?.birthday_text}
       />
       <SmsCard
-        companyName={companyInfo.training_center_name}
+        companyName={data?.training_center_name}
         title='Imtihon natijasini sms yuborish'
         loading={loading === 'exam'}
         onSwitch='for_exam'
         name='exam_text'
-        onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_exam)}
+        onSwitchInfo={Boolean(data?.auto_sms?.for_exam)}
         placeholders={PLACEHOLDERS.exam}
         updateSettings={updateSettings}
-        defaultValue={companyInfo?.auto_sms?.exam_text}
+        defaultValue={data?.auto_sms?.exam_text}
       />
 
       <SmsCard
-        companyName={companyInfo.training_center_name}
+        companyName={data?.training_center_name}
         title="To'lov qilgandan so'ng sms yuborish"
         loading={loading === 'create_payment'}
         onSwitch='for_payment'
         name='create_payment_text'
-        onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_payment)}
+        onSwitchInfo={Boolean(data?.auto_sms?.for_payment)}
         placeholders={PLACEHOLDERS.paid}
         updateSettings={updateSettings}
-        defaultValue={companyInfo?.auto_sms?.create_payment_text}
+        defaultValue={data?.auto_sms?.create_payment_text}
       />
 
       <SmsCard
-        companyName={companyInfo.training_center_name}
+        companyName={data?.training_center_name}
         title='Darsga kelmaganlarga sms yuborish'
         alert='Darsga kelmagan o‘quvchilarga yo‘qlama yakunlangach SMS xabarnoma yuboriladi.'
         loading={loading === 'absend'}
         onSwitch='on_absent'
         name='absent_text'
-        onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_absent)}
+        onSwitchInfo={Boolean(data?.auto_sms?.on_absent)}
         placeholders={PLACEHOLDERS.notComeLesson}
         updateSettings={updateSettings}
-        defaultValue={companyInfo?.auto_sms?.absent_text}
+        defaultValue={data?.auto_sms?.absent_text}
       />
 
       <SmsCard
-        companyName={companyInfo.training_center_name}
+        companyName={data?.training_center_name}
         title='Darsga kelganlarga sms yuborish'
         alert='Kelgan o‘quvchiga dars tugagach SMS xabarnoma yuboriladi.'
         loading={loading === 'attend'}
         onSwitch='on_attend'
         name='attend_text'
-        onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_attend)}
+        onSwitchInfo={Boolean(data?.auto_sms?.on_attend)}
         placeholders={PLACEHOLDERS.comeLesson}
         updateSettings={updateSettings}
-        defaultValue={companyInfo?.auto_sms?.attend_text}
+        defaultValue={data?.auto_sms?.attend_text}
       />
 
       <SmsCard
@@ -435,12 +437,12 @@ const SmsSettings = () => {
         alert="Sms xabarnoma o'quvchiga to'lovga 7 kun qolganda yuboriladi"
         loading={loading === 'payment'}
         onSwitch='payment_warning'
-        companyName={companyInfo.training_center_name}
+        companyName={data?.training_center_name}
         name='payment_text'
-        onSwitchInfo={Boolean(companyInfo?.auto_sms?.payment_warning)}
+        onSwitchInfo={Boolean(data?.auto_sms?.payment_warning)}
         placeholders={PLACEHOLDERS.whosePayment}
         updateSettings={updateSettings}
-        defaultValue={companyInfo?.auto_sms?.payment_text}
+        defaultValue={data?.auto_sms?.payment_text}
       />
 
       <SmsCard
@@ -449,11 +451,11 @@ const SmsSettings = () => {
         loading={loading === 'debtor'}
         onSwitch='for_debtor'
         name='debt_text'
-        companyName={companyInfo.training_center_name}
-        onSwitchInfo={Boolean(companyInfo?.auto_sms?.for_debtor)}
+        companyName={data?.training_center_name}
+        onSwitchInfo={Boolean(data?.auto_sms?.for_debtor)}
         placeholders={PLACEHOLDERS.deptStudents}
         updateSettings={updateSettings}
-        defaultValue={companyInfo?.auto_sms?.debt_text}
+        defaultValue={data?.auto_sms?.debt_text}
       />
 
       <SmsCard
@@ -461,12 +463,12 @@ const SmsSettings = () => {
         alert='Baholar qo‘yilgach, SMS xabarnoma yuboriladi.'
         loading={loading === 'debtor'}
         onSwitch='on_score'
-        companyName={companyInfo.training_center_name}
+        companyName={data?.training_center_name}
         name='score_text'
-        onSwitchInfo={Boolean(companyInfo?.auto_sms?.on_score)}
+        onSwitchInfo={Boolean(data?.auto_sms?.on_score)}
         placeholders={PLACEHOLDERS.gradeStudents}
         updateSettings={updateSettings}
-        defaultValue={companyInfo?.auto_sms?.score_text}
+        defaultValue={data?.auto_sms?.score_text}
       />
 
       <AccessDeniedModal open={accessModal} onClose={handleBack} />
