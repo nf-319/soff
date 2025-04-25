@@ -7,10 +7,12 @@ import SalesFunnel from './pie-charts/sales-funnel'
 import YearlyTrend from './pie-charts/yearly-trend'
 import CourseInterest from './pie-charts/course-interest'
 import MarketingSources from './pie-charts/marketing-sources'
+import { useGetLeadsSourceStatus } from '@/shared/query-hooks/report-leads/reportLeads'
 
 const LidsReports = () => {
+  const { data } = useGetLeadsSourceStatus()
   return (
-    <Box sx={{paddingY:4, display: 'flex', flexDirection: 'column', gap: 5 }}>
+    <Box sx={{ paddingY: 4, display: 'flex', flexDirection: 'column', gap: 5 }}>
       <LidsReportsFilter />
 
       <LidsReportsCard />
@@ -19,14 +21,13 @@ const LidsReports = () => {
           <SalesFunnel />
         </div>
         <div className='col-12 col-md-6'>
-          
           <YearlyTrend />
         </div>
         <div className='col-12 col-md-6'>
-          <CourseInterest />
+          <CourseInterest data={data?.courses || []} />
         </div>
         <div className='col-12 col-md-6'>
-          <MarketingSources />
+          <MarketingSources data={data?.sources || []} />
         </div>
       </div>
     </Box>

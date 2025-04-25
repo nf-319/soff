@@ -1,12 +1,5 @@
 import { Box, Card, Typography } from '@mui/material'
-import {
-  ArrowRightLeft,
-  Clock,
-  TrendingDown,
-  TrendingUp,
-  TriangleAlert,
-  User,
-} from 'lucide-react'
+import { ArrowRightLeft, Clock, TrendingDown, TrendingUp, TriangleAlert, User } from 'lucide-react'
 import { useGetReportLeads } from '@/shared/query-hooks/report-leads/reportLeads'
 
 type DashboardCard = {
@@ -31,7 +24,7 @@ const LidsReportsCard = () => {
       count: data?.new_leads || 0,
       trendDirection: 'up',
       trendColor: '#fff',
-      pillColor: '#29bf12',
+      pillColor: '#29bf12'
     },
     {
       icon: ArrowRightLeft,
@@ -41,7 +34,7 @@ const LidsReportsCard = () => {
       trendDirection: 'up',
       trendColor: '#fff',
       pillColor: '#29bf12',
-      iconColor: '#29bf12',
+      iconColor: '#29bf12'
     },
     {
       icon: TriangleAlert,
@@ -51,7 +44,7 @@ const LidsReportsCard = () => {
       trendDirection: 'down',
       trendColor: '#fff',
       pillColor: '#ef233c',
-      iconColor: '#ef233c',
+      iconColor: '#ef233c'
     },
     {
       icon: Clock,
@@ -61,7 +54,7 @@ const LidsReportsCard = () => {
       trendDirection: 'down',
       trendColor: '#fff',
       pillColor: '#ef233c',
-      iconColor: '#ffc300',
+      iconColor: '#ffc300'
     },
     {
       icon: TriangleAlert,
@@ -71,18 +64,24 @@ const LidsReportsCard = () => {
       trendDirection: 'down',
       trendColor: '#fff',
       pillColor: '#ef233c',
-      iconColor: '#ef233c',
-    },
+      iconColor: '#ef233c'
+    }
   ]
 
   return (
-    <Box display='flex' alignItems='center' gap={3} sx={{ width: '100%' }}>
+    <Box
+      display='flex'
+      alignItems='stretch'
+      justifyContent='space-between'
+      flexWrap='wrap'
+      sx={{ width: '100%', gap: 2 }}
+    >
       {cards.map((item, index) => {
         const Icon = item.icon
         const TrendIcon = item.trendDirection === 'up' ? TrendingUp : TrendingDown
 
         return (
-          <div key={index}>
+          <Box key={index} flex='1 1 calc(20% - 16px)' minWidth={200}>
             <Card
               sx={{
                 padding: 5,
@@ -93,8 +92,8 @@ const LidsReportsCard = () => {
                 '&:hover': {
                   boxShadow: 6,
                   transform: 'translateY(-4px)',
-                  cursor: 'pointer',
-                },
+                  cursor: 'pointer'
+                }
               }}
             >
               <Box display='flex' flexDirection='column' gap={5}>
@@ -109,7 +108,7 @@ const LidsReportsCard = () => {
                         background: item.pillColor || '#ccc',
                         px: 3,
                         py: 1,
-                        borderRadius: 1,
+                        borderRadius: 1
                       }}
                     >
                       <TrendIcon size={16} color={item.trendColor} />
@@ -131,15 +130,15 @@ const LidsReportsCard = () => {
                     borderRadius: '6px',
                     transition: 'background-color 0.3s ease',
                     '&:hover': {
-                      backgroundColor: '#f0f0f0',
-                    },
+                      backgroundColor: '#f0f0f0'
+                    }
                   }}
                 >
                   View Details
                 </Typography>
               </Box>
             </Card>
-          </div>
+          </Box>
         )
       })}
     </Box>

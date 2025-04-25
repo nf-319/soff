@@ -9,24 +9,30 @@ const SalesFunnel = () => {
   const isDark = settings.mode == 'dark'
   const textColor = isDark ? '#ffffff' : '#333333'
 
-  const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-
   const updatedFunnelData = [
     { id: 'All Leads', value: 1245, label: 'All Leads' },
     { id: 'Contacted', value: 850, label: 'Contacted' },
     { id: 'Demo Given', value: 520, label: 'Demo Given' },
     { id: 'Enrolled', value: 320, label: 'Enrolled' }
   ]
+
   return (
-    <Card style={{ height: 500, boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px;' }}>
-      <Typography sx={{ paddingX: 6, paddingY: 4 }} color={'black'} fontSize={20} fontWeight={700}>
+    <Card
+      sx={{
+        height: { xs: 400, sm: 500 }, 
+        width: '100%',
+        boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+      <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
         Sales Funnel
       </Typography>
-      <Box sx={{ paddingX: 5 }}>
-        <FormControl>
+      <Box sx={{ px: 5 }}>
+        <FormControl fullWidth size='small'>
           <InputLabel id='duration-label'>Duration</InputLabel>
           <Select
-            size='small'
             labelId='duration-label'
             value={duration}
             onChange={e => setDuration(e.target.value)}
@@ -39,7 +45,8 @@ const SalesFunnel = () => {
           </Select>
         </FormControl>
       </Box>
-      <div style={{ height: '100%' }}>
+
+      <Box sx={{ flexGrow: 1, width: '100%' }}>
         <ResponsiveFunnel
           data={updatedFunnelData}
           margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
@@ -76,7 +83,7 @@ const SalesFunnel = () => {
           }}
           animate={true}
         />
-      </div>
+      </Box>
     </Card>
   )
 }

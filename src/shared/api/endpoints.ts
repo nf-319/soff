@@ -5,5 +5,7 @@ export const enum Endpoints {
   Notifications = 'common/notifications/',
   NotificationRead = 'common/notification-read/{id}/',
   Branches = 'common/branches/',
-  LeadsDashboard = 'leads/dashboard/ '
+  LeadsDashboard = 'leads/dashboard/',
+  LeadsYearlyStats = 'leads/yearly-stats/',
+  LeadsSourceStats = 'leads/source-stats/'
 }

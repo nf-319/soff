@@ -12,3 +12,26 @@ export type ReportLeadsDashboardTypes = {
   top_lead_source_count: number
   top_lead_source_progress: number
 }
+
+export type ReportLeadsYearlyStats = {
+  enrolled_count: string
+  lost_count: string
+  month: string
+  new_count: string
+}
+
+export type ReportLeadsSourceStats = {
+  courses: ReportLeadsCourseType[]
+  sources: ReportLeadsSourceType[]
+}
+
+export type ReportLeadsCourseType = {
+  name: string
+  count: number
+}
+
+export type ReportLeadsSourceType = {
+  id: number
+  name: string
+  count: number
+}
