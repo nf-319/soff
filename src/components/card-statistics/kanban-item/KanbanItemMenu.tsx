@@ -78,6 +78,10 @@ export const KanbanItemMenu: FC<Props> = ({
                 <IconifyIcon icon='subway:round-arrow-2' fontSize={17} />
                 {t("Boshqa bo'limga o'tkazish")}
               </MenuItem>
+              <MenuItem onClick={() => setOpen('delete')} sx={{ '& svg': { mr: 2 } }}>
+                <IconifyIcon icon='mdi:delete' fontSize={20} />
+                {t("O'chirish")}
+              </MenuItem>
             </>
           ) : (
             <>

@@ -70,26 +70,31 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const [deleteItem, setDeleteItem] = useState<any | null>(null)
   const { id, search, is_active, is_amocrm } = router.query
   const { mutate, isPending } = usePatch()
-
+  const [mergedSteps, setMergedSteps] = useState<any[] | null>(null)
   const { data: amoLeadDataChild, isLoading: amoLeadDataChildLoding } = useGet(
     `amocrm/leads/?pipeline_id=${defaultId}`,
     { options: { enabled: !!router.query.is_amocrm } }
   )
 
-  const mergedSteps = selectedData?.steps.map((step: any) => {
-    const matchingLeads = amoLeadDataChild?.filter((lead: any) => lead.status_id === step.id)
+  useEffect(() => {
+    const mergedSteps = selectedData?.steps.map((step: any) => {
+      const matchingLeads = amoLeadDataChild?.filter((lead: any) => lead.status_id === step.id)
 
-    const transformedLeads = matchingLeads?.map((lead: any) => ({
-      ...lead,
-      first_name: lead.name,
-      name: undefined
-    }))
+      const transformedLeads = matchingLeads?.map((lead: any) => ({
+        ...lead,
+        first_name: lead.name,
+        name: undefined
+      }))
 
-    return {
-      ...step,
-      leads: transformedLeads
+      return {
+        ...step,
+        leads: transformedLeads
+      }
+    })
+    if (mergedSteps) {
+      setMergedSteps(mergedSteps)
     }
-  })
+  }, [selectedData, amoLeadDataChild])
 
   const apiParams = {
     is_active: is_active ?? true
@@ -123,6 +128,16 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
       setLocalLeadData(leadData)
     }
   }, [leadData])
+
+  // useEffect(() => {
+  //   if (mergedSteps) {
+  //     setLocalAmoLeadData(mergedSteps)
+  //   }
+  // }, [mergedSteps])
+
+  useEffect(() => {
+    setLocalAmoLeadData(null)
+  }, [selectedData])
 
   const updateLeadMutation = useMutation({
     mutationFn: (data: { leadId: number; departmentId: number }) => {
@@ -259,10 +274,10 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
       const [movedSection] = newResults.splice(source.index, 1)
       newResults.splice(destination.index, 0, movedSection)
 
-      setLocalAmoLeadData({
-        ...localAmoLeadData,
-        newResults
-      })
+      // setLocalAmoLeadData({
+      //   ...localAmoLeadData,
+      //   newResults
+      // })
 
       updateDepartmentOrderMutation.mutate({
         departmentId: movedSection.id,
@@ -307,13 +322,10 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
       })
     }
 
-    setLocalAmoLeadData({
-      ...localAmoLeadData,
-      newResults
-    })
+    setLocalAmoLeadData(newResults)
   }
 
-  if (isLoading) {
+  if (isLoading || amoLeadDataChildLoding) {
     return (
       <Box display='flex' flexDirection='column' marginBottom={10} gap={5}>
         <Box display='flex' gap={5}>
@@ -336,15 +348,17 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const displayData = localLeadData || leadData
   const amoLeadData = localAmoLeadData || mergedSteps
 
+
   return (
     <DragDropContext onDragEnd={is_amocrm ? onDragEndAmo : onDragEnd}>
-      <Droppable droppableId='section-list' direction={isMobile ? 'vertical' : 'horizontal'} type='SECTION'>
+      <Droppable  droppableId='section-list' direction={isMobile ? 'vertical' : 'horizontal'} type='SECTION'>
         {provided => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
             className='kanban'
             style={{
+              paddingBottom:20,
               display: 'flex',
               overflow: 'auto',
               flexDirection: isMobile ? 'column' : 'row',
@@ -354,103 +368,103 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
             }}
           >
             {displayData?.results.length || amoLeadData?.length ? (
-              (is_amocrm ? amoLeadData?.newResults || amoLeadData : displayData?.results)?.map(
-                (section: any, sectionIndex: any) => (
-                  <Draggable key={section.id} draggableId={`section-${section.id}`} index={sectionIndex}>
-                    {(sectionProvided, sectionSnapshot) => (
-                      <div
-                        ref={sectionProvided.innerRef}
-                        {...sectionProvided.draggableProps}
-                        style={{
-                          ...sectionProvided.draggableProps.style,
-                          opacity: sectionSnapshot.isDragging ? 0.8 : 1
-                        }}
-                      >
-                        <Droppable key={section.id} droppableId={String(section.id)} type='LEAD'>
-                          {leadsProvided => (
-                            <div
-                              {...leadsProvided.droppableProps}
-                              className='kanban__section'
-                              ref={leadsProvided.innerRef}
-                              style={{
-                                width: isMobile ? '100%' : 'auto',
-                                minWidth: 350,
-                                padding: 20,
-                                background: settings.mode == 'dark' ? '#282A42' : 'white',
-                                borderRadius: 10
-                              }}
+              (is_amocrm ? amoLeadData : displayData?.results)?.map((section: any, sectionIndex: any) => (
+                <Draggable key={section.id} draggableId={`section-${section.id}`} index={sectionIndex}>
+                  {(sectionProvided, sectionSnapshot) => (
+                    <div
+                      ref={sectionProvided.innerRef}
+                      {...sectionProvided.draggableProps}
+                      style={{
+                        ...sectionProvided.draggableProps.style,
+                        opacity: sectionSnapshot.isDragging ? 0.8 : 1
+                      }}
+                    >
+                      <Droppable key={section.id} droppableId={String(section.id)} type='LEAD'>
+                        {leadsProvided => (
+                          <div
+                            {...leadsProvided.droppableProps}
+                            className='kanban__section'
+                            ref={leadsProvided.innerRef}
+                            style={{
+                              width: isMobile ? '100%' : 'auto',
+                              minWidth: 350,
+                              padding: 20,
+                              background: settings.mode == 'dark' ? '#282A42' : 'white',
+                              borderRadius: 10
+                            }}
+                          >
+                            <Box
+                              display='flex'
+                              alignItems='center'
+                              justifyContent='space-between'
+                              {...sectionProvided.dragHandleProps}
+                              sx={{ cursor: 'grab' }}
                             >
-                              <Box
-                                display='flex'
-                                alignItems='center'
-                                justifyContent='space-between'
-                                {...sectionProvided.dragHandleProps}
-                                sx={{ cursor: 'grab' }}
-                              >
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 5,
-                                    background: settings.mode == 'dark' ? '#282A42' : 'white',
-                                    borderRadius: 10,
-                                    minWidth: 240,
-                                    fontSize: 25
-                                  }}
-                                >
-                                  {section.name}
-
-                                  <Chip color='primary' variant='outlined' label={section?.leads?.length} />
-                                </div>
-
-                                <Box display={'flex'}>
-                                  <IconButton
-                                    sx={{ cursor: 'pointer' }}
-                                    onClick={() => {
-                                      setOpen(true)
-                                      setEdit(section)
-                                    }}
-                                  >
-                                    <IconifyIcon icon='fluent:text-bullet-list-square-edit-20-filled' color='orange' />
-                                  </IconButton>
-                                  <IconButton
-                                    sx={{ cursor: 'pointer' }}
-                                    onClick={() => {
-                                      setDeleteItem(section)
-                                    }}
-                                  >
-                                    <Delete color='error' />
-                                  </IconButton>
-                                </Box>
-                              </Box>
-
                               <div
-                                style={{ marginBottom: 10, maxHeight: '50vh', paddingRight: 10, overflow: 'auto' }}
-                                className='kanban__section__content'
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 5,
+                                  background: settings.mode == 'dark' ? '#282A42' : 'white',
+                                  borderRadius: 10,
+                                  minWidth: 240,
+                                  fontSize: 25
+                                }}
                               >
-                                {section.leads && section.leads.length > 0 ? (
-                                  section.leads.map((lead: any, index: number) => (
-                                    <Draggable key={lead?.id} draggableId={String(lead?.id)} index={index}>
-                                      {(provided, snapshot) => (
-                                        <LeadKanbanItem
-                                          defaultId={defaultId}
-                                          lead={lead}
-                                          provided={provided}
-                                          snapshot={snapshot}
-                                        />
-                                      )}
-                                    </Draggable>
-                                  ))
-                                ) : (
-                                  <Box sx={{ p: 2, textAlign: 'center' }}>
-                                    <Typography variant='body2' color='text.secondary'>
-                                      Bo'sh
-                                    </Typography>
-                                  </Box>
-                                )}
-                                {leadsProvided.placeholder}
+                                {section.name}
+
+                                <Chip color='primary' variant='outlined' label={section?.leads?.length} />
                               </div>
 
+                              <Box display={'flex'}>
+                                <IconButton
+                                  sx={{ cursor: 'pointer' }}
+                                  onClick={() => {
+                                    setOpen(true)
+                                    setEdit(section)
+                                  }}
+                                >
+                                  <IconifyIcon icon='fluent:text-bullet-list-square-edit-20-filled' color='orange' />
+                                </IconButton>
+                                <IconButton
+                                  sx={{ cursor: 'pointer' }}
+                                  onClick={() => {
+                                    setDeleteItem(section)
+                                  }}
+                                >
+                                  <Delete color='error' />
+                                </IconButton>
+                              </Box>
+                            </Box>
+
+                            <div
+                              style={{ marginBottom: 10, maxHeight: '50vh', paddingRight: 10, overflow: 'auto' }}
+                              className='kanban__section__content'
+                            >
+                              {section.leads && section.leads.length > 0 ? (
+                                section.leads.map((lead: any, index: number) => (
+                                  <Draggable key={lead?.id} draggableId={String(lead?.id)} index={index}>
+                                    {(provided, snapshot) => (
+                                      <LeadKanbanItem
+                                        defaultId={defaultId}
+                                        lead={lead}
+                                        provided={provided}
+                                        snapshot={snapshot}
+                                      />
+                                    )}
+                                  </Draggable>
+                                ))
+                              ) : (
+                                <Box sx={{ p: 2, textAlign: 'center' }}>
+                                  <Typography variant='body2' color='text.secondary'>
+                                    Bo'sh
+                                  </Typography>
+                                </Box>
+                              )}
+                              {leadsProvided.placeholder}
+                            </div>
+
+                            {!is_amocrm && (
                               <Box>
                                 <Button
                                   size='medium'
@@ -465,14 +479,14 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                                   {t("Yangi lid qo'shish")}
                                 </Button>
                               </Box>
-                            </div>
-                          )}
-                        </Droppable>
-                      </div>
-                    )}
-                  </Draggable>
-                )
-              )
+                            )}
+                          </div>
+                        )}
+                      </Droppable>
+                    </div>
+                  )}
+                </Draggable>
+              ))
             ) : (
               <EmptyContent />
             )}
