@@ -2,60 +2,63 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import Box from '@mui/material/Box'
-import { FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select } from '@mui/material'
+import { Box, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select } from '@mui/material'
 import { Search } from 'lucide-react'
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
+
 import useDebounce from 'src/hooks/useDebounce'
 import { useGet } from 'src/hooks/useApi'
 import ceoConfigs from 'src/configs/ceo'
 
 export const StudentPointsFilter = () => {
   const router = useRouter()
-  const [search, setSearch] = useState<string>('')
-  const [branch, setBranch] = useState<string>('')
-  const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(null)
-  const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
-  const searchDebounce = useDebounce(search, 300)
   const { data } = useGet(ceoConfigs.barnchs)
 
-  useEffect(() => {
-    if (router.isReady) {
-      const query = router.query
-      setSearch((query.search as string) || '')
-      setBranch((query.branch as string) || '')
-      setStartDate(query.start_date ? dayjs(query.start_date as string) : null)
-      setEndDate(query.end_date ? dayjs(query.end_date as string) : null)
-    }
-  }, [router.isReady, router.query])
+  const [search, setSearch] = useState('')
+  const [branch, setBranch] = useState('')
+  const [startDate, setStartDate] = useState<Dayjs | null>(null)
+  const [endDate, setEndDate] = useState<Dayjs | null>(null)
 
-  const updateUrlParams = () => {
-    const newQuery = {
-      ...router.query,
-      ...(searchDebounce && { search: searchDebounce }),
-      ...(branch && { branch }),
-      ...(startDate && { start_date: startDate.format('YYYY-MM-DD') }),
-      ...(endDate && { end_date: endDate.format('YYYY-MM-DD') })
-    }
-
-    if (!searchDebounce) delete newQuery.search
-    if (!branch) delete newQuery.branch
-    if (!startDate) delete newQuery.start_date
-    if (!endDate) delete newQuery.end_date
-
-    void router.push({
-      pathname: router.pathname,
-      query: newQuery
-    }, undefined, { shallow: true })
-  }
+  const debouncedSearch = useDebounce(search, 300)
 
   useEffect(() => {
-    if (router.isReady) {
-      updateUrlParams()
-    }
-  }, [searchDebounce, branch, startDate, endDate])
+    if (!router.isReady) return
+
+    const { search = '', branch = '', start_date, end_date } = router.query
+
+    setSearch(search as string)
+    setBranch(branch as string)
+    setStartDate(start_date ? dayjs(start_date as string) : null)
+    setEndDate(end_date ? dayjs(end_date as string) : null)
+  }, [router.isReady])
+
+  useEffect(() => {
+    if (!router.isReady) return
+
+    const { query, pathname } = router
+
+    const queryStart = startDate?.format('YYYY-MM-DD') || ''
+    const queryEnd = endDate?.format('YYYY-MM-DD') || ''
+
+    const isChanged =
+      (query.search || '') !== debouncedSearch ||
+      (query.branch || '') !== branch ||
+      (query.start_date || '') !== queryStart ||
+      (query.end_date || '') !== queryEnd
+
+    if (!isChanged) return
+
+    const newQuery: Record<string, string> = {}
+
+    if (debouncedSearch) newQuery.search = debouncedSearch
+    if (branch) newQuery.branch = branch
+    if (startDate) newQuery.start_date = queryStart
+    if (endDate) newQuery.end_date = queryEnd
+
+    void router.replace({ pathname, query: newQuery }, undefined, { shallow: true })
+  }, [debouncedSearch, branch, startDate, endDate, router])
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -74,38 +77,40 @@ export const StudentPointsFilter = () => {
           <OutlinedInput
             value={search}
             onChange={e => setSearch(e.target.value)}
-            endAdornment={<InputAdornment position='end'><Search /></InputAdornment>}
-            label="Qidirish..."
+            endAdornment={
+              <InputAdornment position='end'>
+                <Search size={18} />
+              </InputAdornment>
+            }
+            label='Qidirish...'
           />
         </FormControl>
 
         <FormControl size='small' fullWidth>
           <InputLabel>Filial</InputLabel>
-          <Select
-            value={branch}
-            onChange={e => setBranch(e.target.value)}
-            label="Filial"
-          >
-            <MenuItem value="">Barchasi</MenuItem>
-            {data?.results?.map((branch: any) => (
-              <MenuItem key={branch.id} value={branch.id}>{branch.name}</MenuItem>
+          <Select value={branch} onChange={e => setBranch(e.target.value)} label='Filial'>
+            <MenuItem value=''>Barchasi</MenuItem>
+            {data?.results?.map((item: any) => (
+              <MenuItem key={item.id} value={item.id}>
+                {item.name}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
         <DatePicker
-          label="Boshlanish sanasi"
+          label='Boshlanish sanasi'
           value={startDate}
-          onChange={date => setStartDate(date)}
-          format="DD-MM-YYYY"
+          onChange={setStartDate}
+          format='DD-MM-YYYY'
           slotProps={{ textField: { size: 'small', fullWidth: true } }}
         />
 
         <DatePicker
-          label="Tugash sanasi"
+          label='Tugash sanasi'
           value={endDate}
-          onChange={date => setEndDate(date)}
-          format="DD-MM-YYYY"
+          onChange={setEndDate}
+          format='DD-MM-YYYY'
           slotProps={{ textField: { size: 'small', fullWidth: true } }}
         />
       </Box>
