@@ -164,225 +164,18 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
     value: item?.id
   }))
 
-  if (isMobile)
-    <form id='mobile-filter-form'>
-      <Box display={'flex'} gap={2} flexDirection={'column'} paddingTop={isMobile ? 3 : 0} rowGap={isMobile ? 4 : 0}>
-        <FormControl sx={{ width: '100%' }}>
-          <InputLabel size='small' id='search-input'>
-            {t('Qidirish')}
-          </InputLabel>
-          <OutlinedInput
-            onChange={e => setSearch(e.target.value)}
-            value={search}
-            endAdornment={
-              <InputAdornment position='end'>
-                <IconifyIcon icon={'tabler:search'} />
-              </InputAdornment>
-            }
-            label='Qidirish'
-            id='search-input'
-            placeholder='Qidirish...'
-            size='small'
-          />
-        </FormControl>
-        <FormControl fullWidth>
-          <InputLabel size='small' id='demo-simple-select-outlined-label'>
-            {t('Kurslar')}
-          </InputLabel>
-          <Select
-            onOpen={() => setKey('course')}
-            key={'course'}
-            size='small'
-            label={t('Kurslar')}
-            defaultValue={''}
-            id='demo-simple-select-outlined'
-            labelId='demo-simple-select-outlined-label'
-            onChange={(e: any) => {
-              if (e.target.value === '') {
-                handleFilter('course', null)
-              } else {
-                handleFilter('course', e.target.value)
-              }
-            }}
-          >
-            <MenuItem value={''}>
-              <b>{t('Barchasi')}</b>
-            </MenuItem>
-            {courses.map(course => (
-              <MenuItem key={course.id} value={course.id}>
-                {course.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <InputLabel size='small' id='demo-simple-select-outlined-label'>
-            {t('Maktab')}
-          </InputLabel>
-
-          <Select
-            onOpen={() => setKey('school')}
-            size='small'
-            label={t('Maktab')}
-            value={queryParams.school}
-            id='demo-simple-select-outlined'
-            labelId='demo-simple-select-outlined-label'
-            onChange={(e: any) => {
-              handleFilter('school', e.target.value)
-            }}
-          >
-            <MenuItem value={''}>
-              <b>{t('Barchasi')}</b>
-            </MenuItem>
-            {schools.map((school: any) => (
-              <MenuItem key={school.id} value={school.id}>
-                {school.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <InputLabel size='small' id='demo-simple-select-outlined-label'>
-            {t('Guruhdagi holati')}
-          </InputLabel>
-          <Select
-            onClick={() => setKey('group_status')}
-            size='small'
-            label={t('Guruhdagi holati')}
-            value={queryParams.group_status}
-            id='demo-simple-select-outlined'
-            labelId='demo-simple-select-outlined-label'
-            onChange={(e: any) => handleFilter('group_status', e.target.value)}
-          >
-            <MenuItem value=''>
-              <b>{t('Barchasi')}</b>
-            </MenuItem>
-            <MenuItem value={'active'}>{t('active')}</MenuItem>
-            <MenuItem value={'new'}>{t('test')}</MenuItem>
-            <MenuItem value={'frozen'}>{t('frozen')}</MenuItem>
-            <MenuItem value={'not_activated'}>{t('Sinov darsidan ketganlar')}</MenuItem>
-            <MenuItem value={'without_group'}>{t('Guruhsiz')}</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <InputLabel size='small' id='demo-simple-select-outlined-label'>
-            {t("To'lov holati")}
-          </InputLabel>
-          <Select
-            size='small'
-            label={t("To'lov holati")}
-            value={queryParams.is_debtor ? 'is_debtor' : Boolean(queryParams.last_payment) ? 'last_payment' : ''}
-            id='demo-simple-select-outlined'
-            labelId='demo-simple-select-outlined-label'
-            onChange={(e: any) => {
-              if (e.target.value === 'is_debtor') {
-                handleFilter('amount', 'is_debtor')
-              } else if (e.target.value === 'last_payment') {
-                handleFilter('amount', 'last_payment')
-              } else if (e.target.value === 'not_in_debt') {
-                handleFilter('amount', 'not_in_debt')
-              } else {
-                handleFilter('amount', 'all')
-              }
-            }}
-          >
-            <MenuItem value=''>
-              <b>{t('Barchasi')}</b>
-            </MenuItem>
-            <MenuItem value={'last_payment'}>{t("To'lov vaqti yaqinlashgan")}</MenuItem>
-            <MenuItem value={'is_debtor'}>{t('Qarzdor')}</MenuItem>
-            <MenuItem value={'not_in_debt'}>{t("Qarzdor bo'lmagan")}</MenuItem>
-          </Select>
-        </FormControl>
-
-        {/* <FormControl fullWidth sx={{ position: 'relative' }}>
-          <InputLabel
-            sx={{ position: 'absolute', top: -30, left: -10 }}
-            size='small'
-            id='demo-simple-select-outlined-label'
-          >
-            <p style={{ fontSize: 12 }}>{t('Oy kesimida balans')}</p>
-          </InputLabel>
-          <DatePicker
-            cleanable={true}
-            size='lg'
-            placeholder='Oy va yil'
-            format='MM/yyyy'
-            // value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
-            onChange={value => {
-              if (!value) {
-                void handleFilter('debt_date', '')
-              } else {
-                void handleFilter('debt_date', format(value, 'MM-yyyy'))
-              }
-            }}
-            style={{ width: 180 }}
-            shouldDisableDate={date => date?.getTime() > Date.now()}
-          />
-        </FormControl> */}
-
-        <div onClick={() => setKey('group')} style={{ width: '100%' }}>
-          <Autocomplete
-            loading={!groupOptions}
-            disablePortal
-            options={groupOptions || []}
-            onChange={(e: any, v: any) => handleFilter('group', v?.value)}
-            size='small'
-            renderInput={params => <TextField {...params} label={t('Guruh')} />}
-          />
-        </div>
-        <div onClick={() => setKey('group')} style={{ width: '100%' }}>
-          <Autocomplete
-            loading={!teacherOptions}
-            disablePortal
-            options={teacherOptions || []}
-            onChange={(e: any, v: any) => handleFilter('teacher', v?.value)}
-            size='small'
-            renderInput={params => <TextField {...params} label={t('Ustoz')} />}
-          />
-        </div>
-
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Toggle
-            checked={queryParams.status === 'archive'}
-            color='red'
-            checkedChildren={t('Arxiv')}
-            unCheckedChildren={t('Arxiv')}
-            onChange={e => {
-              if (e) {
-                handleFilter('status', 'archive')
-              } else {
-                handleFilter('status', 'active')
-              }
-            }}
-          />
-        </Box>
-        <Button
-          onClick={() => (getSMSTemps(), handleEditClickOpen('sms'))}
-          variant='outlined'
-          color='warning'
-          fullWidth
-          size='small'
-          startIcon={<IconifyIcon icon='material-symbols-light:sms-outline' />}
-        >
-          {t('Sms yuborish')}
-        </Button>
-      </Box>
-      <div onClick={() => dispatch(fetchSmsList())}>
-        <SendSMSModal
-          handleEditClose={handleEditClose}
-          openEdit={openEdit}
-          smsTemps={smsTemps}
-          setOpenEdit={setOpenEdit}
-          usersData={studentIds}
-        />
-      </div>
-    </form>
+  console.log(isMobile)
 
   return (
     <Box display='flex' gap={2} alignItems='center' flexWrap={'wrap'} justifyContent='space-between' width='100%'>
-      <Box display={'flex'} width='100%' gap={2} flexWrap={'nowrap'}>
-        <FormControl sx={{ width: '100%', maxWidth: 260 }}>
+      <Box
+        display={'flex'}
+        width='100%'
+        gap={2}
+        flexWrap={{ sm: 'wrap', md: 'nowrap' }}
+        flexDirection={{ xs: 'column', sm: 'row' }}
+      >
+        <FormControl fullWidth>
           <InputLabel size='small' id='search-input'>
             {t('Qidirish')}
           </InputLabel>
@@ -402,7 +195,7 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
           />
         </FormControl>
 
-        <FormControl sx={{ maxWidth: 180, width: '100%' }}>
+        <FormControl fullWidth>
           <InputLabel size='small' id='demo-simple-select-outlined-label'>
             {t('Kurslar')}
           </InputLabel>
@@ -433,7 +226,7 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
             ))}
           </Select>
         </FormControl>
-        <FormControl sx={{ maxWidth: 180, width: '100%' }}>
+        <FormControl fullWidth>
           <InputLabel size='small' id='demo-simple-select-outlined-label'>
             {t('Maktab')}
           </InputLabel>
@@ -462,7 +255,7 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
           </Select>
         </FormControl>
 
-        <FormControl sx={{ maxWidth: 180, width: '100%' }}>
+        <FormControl fullWidth>
           <InputLabel size='small' id='demo-simple-select-outlined-label'>
             {t('Guruhdagi holati')}
           </InputLabel>
@@ -486,7 +279,7 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
           </Select>
         </FormControl>
 
-        <FormControl sx={{ maxWidth: 180, width: '100%' }}>
+        <FormControl fullWidth>
           <InputLabel size='small' id='demo-simple-select-outlined-label'>
             {t("To'lov holati")}
           </InputLabel>
@@ -527,7 +320,7 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
         </FormControl>
 
         <div>
-          <FormControl fullWidth sx={{ position: 'relative' }}>
+          <FormControl sx={{ width: !isMobile ? 180 : '100%', position: 'relative', mt: isMobile ? 3 : 0 }}>
             <InputLabel
               sx={{ position: 'absolute', top: -30, left: -10 }}
               size='small'
@@ -548,7 +341,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
                   void handleFilter('debt_date', format(value, 'MM-yyyy'))
                 }
               }}
-              style={{ width: 180 }}
               shouldDisableDate={date => date?.getTime() > Date.now()}
             />
           </FormControl>
@@ -556,6 +348,8 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
 
         <div onClick={() => setKey('group')} style={{ width: '100%' }}>
           <Autocomplete
+            fullWidth
+            // sx={{ width: !isMobile ? 180 : '100%' }}
             loading={!groupOptions}
             options={groupOptions || []}
             onChange={(_: any, v: any) => {
@@ -569,6 +363,8 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
         </div>
         <div onClick={() => setKey('teacher')} style={{ width: '100%' }}>
           <Autocomplete
+            fullWidth
+            // sx={{ width: !isMobile ? 180 : '100%' }}
             loading={!teacherOptions}
             disablePortal
             value={teacherOptions?.find((option: any) => option.value === queryParams.teacher) || null}

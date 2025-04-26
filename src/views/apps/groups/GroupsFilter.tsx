@@ -13,7 +13,8 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
-  Tooltip
+  Tooltip,
+  useMediaQuery
 } from '@mui/material'
 import { useRouter } from 'next/router'
 
@@ -35,7 +36,7 @@ import { useEffect, useState } from 'react'
 export const GroupsFilter = () => {
   const router = useRouter()
   const { query } = router
-  const { isMobile } = useResponsive()
+  const isMobile = useMediaQuery('(max-width:564px)');
   const { queryParams } = useAppSelector(state => state.groups)
   const { onlineLessonLoading } = useAppSelector(state => state.groupDetails)
   const { data: teachersData } = useGetTeachers()
@@ -112,7 +113,7 @@ export const GroupsFilter = () => {
     return (
       <form id='mobile-filter-form'>
         <Box display={'flex'} gap={2} flexDirection={'column'} paddingTop={isMobile ? 3 : 0} rowGap={isMobile ? 4 : 0}>
-          <FormControl sx={{ width: '100%', maxWidth: 260 }}>
+          <FormControl sx={{ width: '100%' }}>
             <InputLabel size='small' id='search-input'>
               {t('Qidirish')}
             </InputLabel>

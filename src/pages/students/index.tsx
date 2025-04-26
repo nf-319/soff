@@ -11,7 +11,8 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  Tooltip
+  Tooltip,
+  useMediaQuery
 } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import DataTable from '../../components/table'
@@ -45,7 +46,7 @@ export type customTableProps = {
 export default function StudentsPage() {
   const { t } = useTranslation()
   const router = useRouter()
-  const { isMobile } = useResponsive()
+  const isMobile = useMediaQuery('(max-width:564px)');
   const { user } = useContext(AuthContext)
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
@@ -55,7 +56,6 @@ export default function StudentsPage() {
   const querySearch = new URLSearchParams(window.location.search).get('q')
   const { search, ...filteredParams } = queryParams
 
-    console.log(isMobile);
     
 
   const queryString = new URLSearchParams(
@@ -239,8 +239,8 @@ export default function StudentsPage() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Typography variant='h5'>{t("O'quvchilar")}</Typography>
-          {!isLoading && <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' />}
-          {!isLoading  && (
+          {!isLoading  && <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' />}
+          {!isLoading  && !isMobile && (
             <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm"} variant='outlined' color='error' />
           )}
         </Box>
