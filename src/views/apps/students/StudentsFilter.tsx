@@ -99,7 +99,7 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
       dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
     } else if (key === 'debt_date') {
       setIsActive(false)
-      dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '', debt_date: `${value}` }))
+      dispatch(updateStudentParams({  debt_date: `${value}` }))
     } else if (key === 'amount') {
       if (value === 'is_debtor') {
         setIsActive(false)

@@ -238,7 +238,7 @@ export default function StudentsPage() {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Typography variant='h5'>{t("O'quvchilar")}</Typography>
           {!isLoading && <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' />}
-          {!isLoading && queryParams.is_debtor && (
+          {!isLoading  && (
             <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm"} variant='outlined' color='error' />
           )}
         </Box>
