@@ -45,7 +45,6 @@ export const UserViewItem: FC<Props> = ({
   isDayOff = false,
   isEndOfMonth = false
 }) => {
-
   const [value, setValue] = useState<true | false | null | 0>(defaultValue)
   const [open, setOpen] = useState<boolean>(false)
   const [description, setDescription] = useState<true | false | null | 0>(0)
@@ -295,11 +294,10 @@ export const UserViewItem: FC<Props> = ({
           maxWidth='xs'
           fullWidth
           open={description === false}
-          onClose={onClose}
           PaperProps={{
             sx: {
               borderRadius: '12px',
-              padding: '8px',
+              padding: '8px'
             }
           }}
         >
@@ -325,7 +323,7 @@ export const UserViewItem: FC<Props> = ({
                       placeholder='Kelmagan sababi haqida izoh kiriting'
                       name='description'
                       fullWidth
-                      margin="normal"
+                      margin='normal'
                       variant='outlined'
                       onChange={handleChange}
                       onBlur={handleBlur}
