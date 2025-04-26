@@ -1,5 +1,5 @@
 import { Box, Card, Typography } from '@mui/material'
-import { ArrowRightLeft, Clock, TrendingDown, TrendingUp, TriangleAlert, User } from 'lucide-react'
+import { ArrowRightLeft, Clock, Megaphone, TrendingDown, TrendingUp, TriangleAlert, User } from 'lucide-react'
 import { useGetReportLeads } from '@/shared/query-hooks/report-leads/reportLeads'
 
 type DashboardCard = {
@@ -16,56 +16,56 @@ type DashboardCard = {
 const LidsReportsCard = () => {
   const { data } = useGetReportLeads()
 
+  const getProcess = (process?: number): "up" | "down" => {
+    const results = (process || 0) > 0
+    return results ? "up" : "down"
+  }
+
+  const getFillColor = (process?: number): string => {
+    const results = (process || 0) > 0
+    return results ? "#29bf12" : "#ef233c"
+  }
+
   const cards: DashboardCard[] = [
     {
       icon: User,
       title: 'Yangi lidlar',
       process: data?.new_leads_progress || 0,
       count: data?.new_leads || 0,
-      trendDirection: 'up',
+      trendDirection: getProcess(data?.new_leads_progress),
       trendColor: '#fff',
-      pillColor: '#29bf12'
+      pillColor: getFillColor(data?.new_leads_progress)
     },
     {
       icon: ArrowRightLeft,
-      title: 'Total Conversions',
-      process: '12.5%',
-      count: 1245,
-      trendDirection: 'up',
+      title: 'Jami konversiyalar',
+      process: data?.conversion_progress || 0,
+      count: data?.conversion || 0,
+      trendDirection: getProcess(data?.conversion_progress),
       trendColor: '#fff',
-      pillColor: '#29bf12',
+      pillColor: getFillColor(data?.conversion_progress),
       iconColor: '#29bf12'
     },
     {
       icon: TriangleAlert,
-      title: 'Failed Leads',
-      process: '12.5%',
-      count: 1245,
-      trendDirection: 'down',
+      title: "Yo'qotilgan lidlar",
+      process: data?.lost_leads_progress || 0,
+      count: data?.lost_leads || 0,
+      trendDirection: getProcess(data?.lost_leads_progress),
       trendColor: '#fff',
-      pillColor: '#ef233c',
+      pillColor: getFillColor(data?.lost_leads_progress),
       iconColor: '#ef233c'
     },
     {
-      icon: Clock,
-      title: 'Response Time',
-      process: '12.5%',
-      count: '12 min',
-      trendDirection: 'down',
+      icon: Megaphone,
+      title: 'Eng yaxshi marketing manbasi',
+      process: data?.top_lead_source_progress || 0,
+      count: data?.top_lead_source || 0,
+      trendDirection: getProcess(data?.top_lead_source_progress),
       trendColor: '#fff',
-      pillColor: '#ef233c',
+      pillColor: getFillColor(data?.top_lead_source_progress),
       iconColor: '#ffc300'
     },
-    {
-      icon: TriangleAlert,
-      title: 'Lost Leads',
-      process: '12.5%',
-      count: 1245,
-      trendDirection: 'down',
-      trendColor: '#fff',
-      pillColor: '#ef233c',
-      iconColor: '#ef233c'
-    }
   ]
 
   return (
@@ -120,22 +120,6 @@ const LidsReportsCard = () => {
                 </Box>
                 <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>{item.count}</Typography>
                 <Typography sx={{ fontSize: 15 }}>{item.title}</Typography>
-                <Typography
-                  sx={{
-                    fontSize: 15,
-                    color: 'black',
-                    marginTop: 2,
-                    cursor: 'pointer',
-                    padding: '4px 8px',
-                    borderRadius: '6px',
-                    transition: 'background-color 0.3s ease',
-                    '&:hover': {
-                      backgroundColor: '#f0f0f0'
-                    }
-                  }}
-                >
-                  View Details
-                </Typography>
               </Box>
             </Card>
           </Box>
