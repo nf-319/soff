@@ -36,13 +36,13 @@ export type DepartmentsResultType = {
   is_active: boolean
 }
 
-type AmoLeads = {
+export type AmoLeads = {
   id: number
   name: string
   steps: AmoLeadItem[]
 }
 
-type AmoLeadItem = {
+export type AmoLeadItem = {
   id: number
   name: string
   sort: number

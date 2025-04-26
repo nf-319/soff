@@ -73,6 +73,7 @@ export const LeadsMenu: FC<Props> = ({
           <AddGroup defaultId={defaultId} onClose={onClose} open={menuOpen} leadId={currentLead.id} setOpen={setMenuOpen} />
 
           <LeadDeleteModal
+            defaultId={defaultId}
             onClose={onClose}
             open={menuOpen}
             setOpen={setMenuOpen}

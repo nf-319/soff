@@ -17,11 +17,10 @@ import { useGet } from 'src/hooks/useApi'
 import { LeadsResult } from '../../../../entities/lids/LeadsKanban'
 import { LeadsType } from 'src/entities/lids'
 import { useAuth } from 'src/hooks/useAuth'
-import { DepartmentsResultType } from '../../../../pages/lids'
+import { AmoLeads, DepartmentsResultType } from '../../../../pages/lids'
 import { useRouter } from 'next/router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/@core/utils/api'
-import { AmoLeads } from '@/pages/lids/amocrm'
 
 type Props = {
   item: any

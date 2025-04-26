@@ -24,8 +24,7 @@ import toast from 'react-hot-toast'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 import Link from 'next/link'
 import { LeadKanbanItem } from './LeadKanbanItem'
-import { AmoLeads } from '@/pages/lids/amocrm'
-
+import { AmoLeads } from '@/pages/lids'
 type LeadsChild = {
   id: number
   first_name: string
