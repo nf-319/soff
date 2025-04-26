@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react'
 import {
   Autocomplete,
   Box,
@@ -12,113 +12,126 @@ import {
   SelectChangeEvent,
   TextField,
   Tooltip,
-} from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import IconifyIcon from '../../../components/icon';
-import { useAppDispatch, useAppSelector } from 'src/store';
-import { updateStudentParams } from 'src/store/apps/students';
-import useCourses from 'src/hooks/useCourses';
-import useDebounce from 'src/hooks/useDebounce';
-import { Toggle } from 'rsuite';
-import 'rsuite/Toggle/styles/index.css';
-import api from 'src/@core/utils/api';
-import { MetaTypes } from 'src/types/apps/groupsTypes';
-import { ModalTypes, SendSMSModal } from './view/UserViewLeft';
-import useSMS from 'src/hooks/useSMS';
-import 'rsuite/DateRangePicker/styles/index.css';
-import { DatePicker } from 'rsuite';
-import { format } from 'date-fns';
-import { fetchSchoolsList, fetchSmsList } from 'src/store/apps/settings';
-import ExcelStudents from '../../../components/excelButton/ExcelStudents';
-import ceoConfigs from 'src/configs/ceo';
-import { useRouter } from 'next/router';
+  useMediaQuery
+} from '@mui/material'
+import { useTranslation } from 'react-i18next'
+import IconifyIcon from '../../../components/icon'
+import { useAppDispatch, useAppSelector } from 'src/store'
+import { updateStudentParams } from 'src/store/apps/students'
+import useCourses from 'src/hooks/useCourses'
+import useDebounce from 'src/hooks/useDebounce'
+import { Toggle } from 'rsuite'
+import 'rsuite/Toggle/styles/index.css'
+import api from 'src/@core/utils/api'
+import { MetaTypes } from 'src/types/apps/groupsTypes'
+import { ModalTypes, SendSMSModal } from './view/UserViewLeft'
+import useSMS from 'src/hooks/useSMS'
+import 'rsuite/DateRangePicker/styles/index.css'
+import { DatePicker } from 'rsuite'
+import { format } from 'date-fns'
+import { fetchSchoolsList, fetchSmsList } from 'src/store/apps/settings'
+import ExcelStudents from '../../../components/excelButton/ExcelStudents'
+import ceoConfigs from 'src/configs/ceo'
+import { useRouter } from 'next/router'
 import { MessageSquareText, Search } from 'lucide-react'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 type StudentsFilterProps = {
-  students?: any[];
-};
+  students?: any[]
+}
 
 const StudentsFilter = ({ students }: StudentsFilterProps) => {
-  const router = useRouter();
+  const router = useRouter()
   const { companyInfo } = useAppSelector(item => item.user)
-  const dispatch = useAppDispatch();
-  const { queryParams } = useAppSelector((state) => state.students);
-  const { schools } = useAppSelector((state) => state.settings);
-  const [key, setKey] = useState<string>('');
-  const { getCourses, courses } = useCourses();
-  const [groups, setGroups] = useState<any>();
-  const [teachers, setTeachers] = useState<any>();
-  const [isActive, setIsActive] = useState<boolean>(true);
-  const { t } = useTranslation();
-  const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null);
-  const { smsTemps, getSMSTemps } = useSMS();
-  const querySearch = new URLSearchParams(window.location.search).get('q');
-  const [search, setSearch] = useState<string>(querySearch || '');
-  const debounceSearch = useDebounce(search, 300);
-  const studentIds = students?.map((student) => student.id);
-  const [teacherId, setTeacherId] = useState<any>();
-  const [groupId, setGroupId] = useState<any>();
-  const [accessModal, setAccessModal] = useState<boolean>(false);
-
-  const isInitialMount = useRef(true);
-  const isUpdating = useRef(false);
+  const dispatch = useAppDispatch()
+  const { queryParams } = useAppSelector(state => state.students)
+  const { schools } = useAppSelector(state => state.settings)
+  const [key, setKey] = useState<string>('')
+  const { getCourses, courses } = useCourses()
+  const [groups, setGroups] = useState<any>()
+  const [teachers, setTeachers] = useState<any>()
+  const [isActive, setIsActive] = useState<boolean>(true)
+  const { t } = useTranslation()
+  const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
+  const { smsTemps, getSMSTemps } = useSMS()
+  const querySearch = new URLSearchParams(window.location.search).get('q')
+  const [search, setSearch] = useState<string>(querySearch || '')
+  const debounceSearch = useDebounce(search, 300)
+  const studentIds = students?.map(student => student.id)
+  const [teacherId, setTeacherId] = useState<any>()
+  const [groupId, setGroupId] = useState<any>()
+  const [accessModal, setAccessModal] = useState<boolean>(false)
+  const isMobile = useMediaQuery('(max-width:564px)');
+  const isInitialMount = useRef(true)
+  const isUpdating = useRef(false)
 
   const handleEditClickOpen = (value: ModalTypes) => {
-    setOpenEdit(value);
-  };
+    setOpenEdit(value)
+  }
 
   const handleEditClose = () => {
-    setOpenEdit(null);
-  };
+    setOpenEdit(null)
+  }
 
   async function getGroups() {
     try {
-      const res = await api.get(`common/group-check-list/?teacher=${teacherId || ''}`);
-      setGroups(res.data);
+      const res = await api.get(`common/group-check-list/?teacher=${teacherId || ''}`)
+      setGroups(res.data)
     } catch (error) {
-      console.error('Error fetching groups:', error);
+      console.error('Error fetching groups:', error)
     }
   }
 
   async function getTeachers() {
     try {
-      const res = await api.get(`${ceoConfigs.employee_checklist}?role=teacher&group=${groupId || ''}`);
-      setTeachers(res.data);
+      const res = await api.get(`${ceoConfigs.employee_checklist}?role=teacher&group=${groupId || ''}`)
+      setTeachers(res.data)
     } catch (error) {
-      console.error('Error fetching teachers:', error);
+      console.error('Error fetching teachers:', error)
     }
   }
 
   async function handleFilter(key: string, value: string | number | null) {
-    isUpdating.current = true;
-    dispatch(updateStudentParams({ [key]: value }));
+    isUpdating.current = true
+    dispatch(updateStudentParams({ [key]: value }))
 
     if (key === 'status') {
-      dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }));
+      dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
     } else if (key === 'debt_date') {
-      setIsActive(false);
-      dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '', debt_date: `${value}` }));
+      setIsActive(false)
+      dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '', debt_date: `${value}` }))
     } else if (key === 'amount') {
       if (value === 'is_debtor') {
-        setIsActive(false);
-        dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '' }));
+        setIsActive(false)
+        dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '' }))
       } else if (value === 'not_in_debt') {
-        setIsActive(false);
-        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: true }));
+        setIsActive(false)
+        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: true }))
       } else if (value === 'last_payment') {
-        setIsActive(true);
-        dispatch(updateStudentParams({ last_payment: true, is_debtor: '', not_in_debt: '' }));
+        setIsActive(true)
+        dispatch(updateStudentParams({ last_payment: true, is_debtor: '', not_in_debt: '' }))
       } else if (value === 'all') {
-        setIsActive(true);
-        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '' }));
+        setIsActive(true)
+        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '' }))
       }
     }
   }
 
   useEffect(() => {
     if (isInitialMount.current) {
-      const { q, status, course, school, group_status, group, teacher, is_debtor, last_payment, not_in_debt, debt_date } = router.query;
+      const {
+        q,
+        status,
+        course,
+        school,
+        group_status,
+        group,
+        teacher,
+        is_debtor,
+        last_payment,
+        not_in_debt,
+        debt_date
+      } = router.query
       const newParams = {
         search: (q as string) || '',
         status: (status as string) || '',
@@ -130,108 +143,110 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
         is_debtor: (is_debtor as string) || '',
         last_payment: (last_payment as string) || '',
         not_in_debt: (not_in_debt as string) || '',
-        debt_date: (debt_date as string) || '',
-      };
+        debt_date: (debt_date as string) || ''
+      }
 
-      console.log('Initializing queryParams:', { newParams, current: queryParams });
+      console.log('Initializing queryParams:', { newParams, current: queryParams })
 
       if (JSON.stringify(newParams) !== JSON.stringify(queryParams)) {
-        isUpdating.current = true;
-        dispatch(updateStudentParams(newParams));
+        isUpdating.current = true
+        dispatch(updateStudentParams(newParams))
       }
-      isInitialMount.current = false;
+      isInitialMount.current = false
     }
-  }, [router.query, dispatch, queryParams]);
+  }, [router.query, dispatch, queryParams])
 
   useEffect(() => {
     if (!isUpdating.current) {
-      const { q, ...restQuery } = router.query;
+      const { q, ...restQuery } = router.query
 
-      console.log('Syncing search:', { debounceSearch, currentQ: q });
+      console.log('Syncing search:', { debounceSearch, currentQ: q })
 
       if (debounceSearch && debounceSearch !== q) {
         void router.push(
           {
             pathname: '/students',
-            query: { ...restQuery, q: debounceSearch },
+            query: { ...restQuery, q: debounceSearch }
           },
           undefined,
           { shallow: true }
-        );
+        )
       } else if (!debounceSearch && q) {
         void router.push(
           {
             pathname: '/students',
-            query: restQuery,
+            query: restQuery
           },
           undefined,
           { shallow: true }
-        );
+        )
       }
     }
-  }, [debounceSearch, router]);
+  }, [debounceSearch, router])
 
   useEffect(() => {
-    if (!isUpdating.current) return;
+    if (!isUpdating.current) return
 
     const filteredParams = Object.fromEntries(
       Object.entries(queryParams).filter(([_, value]) => value !== '' && value !== undefined && value !== null)
-    );
+    )
 
     const currentQuery = Object.fromEntries(
       Object.entries(router.query).filter(([_, value]) => value !== '' && value !== undefined && value !== null)
-    );
+    )
 
-    console.log('Syncing URL:', { filteredParams, currentQuery });
+    console.log('Syncing URL:', { filteredParams, currentQuery })
 
     if (JSON.stringify(filteredParams) !== JSON.stringify(currentQuery)) {
       void router.push(
         {
           pathname: router.pathname,
-          query: filteredParams,
+          query: filteredParams
         },
         undefined,
         { shallow: true }
-      );
+      )
     }
 
-    isUpdating.current = false;
-  }, [queryParams, router.pathname]);
+    isUpdating.current = false
+  }, [queryParams, router.pathname])
 
   useEffect(() => {
-    isUpdating.current = false;
-  }, []);
+    isUpdating.current = false
+  }, [])
 
   useEffect(() => {
     if (key === 'course') {
-      void getCourses();
+      void getCourses()
     } else if (key === 'group') {
-      void getGroups();
+      void getGroups()
     } else if (key === 'teacher') {
-      void getTeachers();
+      void getTeachers()
     } else if (key === 'school') {
-      dispatch(fetchSchoolsList());
+      dispatch(fetchSchoolsList())
     }
-  }, [key, getCourses, dispatch]);
+  }, [key, getCourses, dispatch])
 
-  const groupOptions = groups?.map((item: MetaTypes) => ({
-    label: item?.name,
-    value: item?.id,
-  })) || [];
+  const groupOptions =
+    groups?.map((item: MetaTypes) => ({
+      label: item?.name,
+      value: item?.id
+    })) || []
 
-  const teacherOptions = teachers?.map((item: any) => ({
-    label: item?.first_name,
-    value: item?.id,
-  })) || [];
+  const teacherOptions =
+    teachers?.map((item: any) => ({
+      label: item?.first_name,
+      value: item?.id
+    })) || []
 
   const queryString = new URLSearchParams(
     Object.fromEntries(
       Object.entries(queryParams).filter(([_, value]) => value !== '' && value !== undefined && value !== null)
     ) as Record<string, string>
-  ).toString();
+  ).toString()
 
   const handleModalOpen = () => {
-    if(companyInfo.access) {
+    if (companyInfo.access) {
       setAccessModal(false)
       void getSMSTemps()
       handleEditClickOpen('sms')
@@ -369,19 +384,32 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
           </Select>
         </FormControl>
 
-        {queryParams.is_debtor && (
-          <DatePicker
-            cleanable
-            size='lg'
-            label={queryParams.debt_date || 'Yil va Oy'}
-            value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
-            format='MM-yyyy'
-            placeholder='Select month and year'
-            onChange={value => handleFilter('debt_date', value ? format(value, 'MM-yyyy') : '')}
-            style={{ width: 150 }}
-            shouldDisableDate={date => (date ? date.getTime() > Date.now() : false)}
-          />
-        )}
+        <div>
+          <FormControl sx={{ width: !isMobile ? 180 : '100%', position: 'relative', mt: isMobile ? 3 : 0 }}>
+            <InputLabel
+              sx={{ position: 'absolute', top: -30, left: -10 }}
+              size='small'
+              id='demo-simple-select-outlined-label'
+            >
+              <p style={{ fontSize: 12 }}>{t('Oy kesimida balans')}</p>
+            </InputLabel>
+            <DatePicker
+              cleanable={true}
+              size='lg'
+              placeholder='Oy va yil'
+              format='MM/yyyy'
+              // value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
+              onChange={value => {
+                if (!value) {
+                  void handleFilter('debt_date', '')
+                } else {
+                  void handleFilter('debt_date', format(value, 'MM-yyyy'))
+                }
+              }}
+              shouldDisableDate={date => date?.getTime() > Date.now()}
+            />
+          </FormControl>
+        </div>
 
         <FormControl fullWidth onClick={() => setKey('group')}>
           <Autocomplete
@@ -440,7 +468,7 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
           size='small'
           startIcon={<MessageSquareText size={18} />}
           sx={{
-            width: '100%',
+            width: '100%'
           }}
         >
           <Tooltip title={t('Ro‘yxatdagi o‘quvchilarga SMS yuborish.')}>
@@ -462,6 +490,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
       </Box>
     </Box>
   )
-};
+}
 
-export default StudentsFilter;
+export default StudentsFilter
