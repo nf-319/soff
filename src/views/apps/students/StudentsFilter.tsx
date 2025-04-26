@@ -7,10 +7,12 @@ import {
   InputAdornment,
   InputLabel,
   MenuItem,
-  OutlinedInput, Popper,
+  OutlinedInput,
+  Popper,
   Select,
   TextField,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import IconifyIcon from '../../../components/icon'
@@ -40,7 +42,7 @@ type StudentsFilterProps = {
 
 const StudentsFilter = ({ students }: StudentsFilterProps) => {
   const router = useRouter()
-  const { isMobile } =useResponsive()
+  const { isMobile } = useResponsive()
   const dispatch = useAppDispatch()
   const { queryParams } = useAppSelector(state => state.students)
   const { schools } = useAppSelector(state => state.settings)
@@ -82,38 +84,38 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
   }
 
   async function handleFilter(key: string, value: string | number | null) {
-    dispatch(updateStudentParams({ [key]: value }));
+    dispatch(updateStudentParams({ [key]: value }))
 
     if (key === 'status') {
-      dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }));
+      dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
     }
     if (key === 'debt_date') {
-      setIsActive(false);
-      dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '', debt_date: `${value}` }));
+      setIsActive(false)
+      dispatch(updateStudentParams({ debt_date: `${value}` }))
     } else if (key === 'amount') {
-      dispatch(updateStudentParams({ debt_date: '' }));
+      dispatch(updateStudentParams({ debt_date: '' }))
       if (value === 'is_debtor') {
-        setIsActive(false);
-        dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '' }));
+        setIsActive(false)
+        dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '' }))
       } else if (value === 'not_in_debt') {
-        setIsActive(false);
-        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: true }));
+        setIsActive(false)
+        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: true }))
       } else if (value === 'last_payment') {
-        setIsActive(true);
-        dispatch(updateStudentParams({ last_payment: true, is_debtor: '', not_in_debt: '' }));
+        setIsActive(true)
+        dispatch(updateStudentParams({ last_payment: true, is_debtor: '', not_in_debt: '' }))
       } else if (value === 'all') {
-        setIsActive(true);
-        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '' }));
+        setIsActive(true)
+        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '' }))
       }
     }
   }
 
   const StyledPopper = styled(Popper)({
-    minWidth: '300px',
+    minWidth: '300px'
   })
 
   const TeacherPopper = styled(Popper)({
-    minWidth: '200px',
+    minWidth: '200px'
   })
 
   useEffect(() => {
@@ -293,14 +295,20 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
           </Select>
         </FormControl>
 
-        {queryParams.is_debtor && (
+        {/* <FormControl fullWidth sx={{ position: 'relative' }}>
+          <InputLabel
+            sx={{ position: 'absolute', top: -30, left: -10 }}
+            size='small'
+            id='demo-simple-select-outlined-label'
+          >
+            <p style={{ fontSize: 12 }}>{t('Oy kesimida balans')}</p>
+          </InputLabel>
           <DatePicker
-            cleanable
+            cleanable={true}
             size='lg'
-            label={queryParams.debt_date ? queryParams.debt_date : 'Yil va Oy'}
-            value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
-            format='MMM/yyyy'
-            placeholder='Select month and year'
+            placeholder='Oy va yil'
+            format='MM/yyyy'
+            // value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
             onChange={value => {
               if (!value) {
                 void handleFilter('debt_date', '')
@@ -309,10 +317,9 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
               }
             }}
             style={{ width: 180 }}
-            // @ts-ignore
-            disabledDate={(date) => date.getTime() > Date.now()}
+            shouldDisableDate={date => date?.getTime() > Date.now()}
           />
-        )}
+        </FormControl> */}
 
         <div onClick={() => setKey('group')} style={{ width: '100%' }}>
           <Autocomplete
@@ -519,26 +526,33 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
           </Select>
         </FormControl>
 
-        {queryParams.is_debtor && (
-          <DatePicker
-            cleanable
-            size='lg'
-            label={queryParams.debt_date ? queryParams.debt_date : 'Yil va Oy'}
-            value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
-            format='MM/yyyy'
-            oneTap
-            placeholder='Select month and year'
-            onChange={value => {
-              if (!value) {
-                void handleFilter('debt_date', '');
-              } else {
-                void handleFilter('debt_date', format(value, 'MM-yyyy'));
-              }
-            }}
-            style={{ width: 180 }}
-            shouldDisableDate={date => date?.getTime() > Date.now()}
-          />
-        )}
+        <div>
+          <FormControl fullWidth sx={{ position: 'relative' }}>
+            <InputLabel
+              sx={{ position: 'absolute', top: -30, left: -10 }}
+              size='small'
+              id='demo-simple-select-outlined-label'
+            >
+              <p style={{ fontSize: 12 }}>{t('Oy kesimida balans')}</p>
+            </InputLabel>
+            <DatePicker
+              cleanable={true}
+              size='lg'
+              placeholder='Oy va yil'
+              format='MM/yyyy'
+              // value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
+              onChange={value => {
+                if (!value) {
+                  void handleFilter('debt_date', '')
+                } else {
+                  void handleFilter('debt_date', format(value, 'MM-yyyy'))
+                }
+              }}
+              style={{ width: 180 }}
+              shouldDisableDate={date => date?.getTime() > Date.now()}
+            />
+          </FormControl>
+        </div>
 
         <div onClick={() => setKey('group')} style={{ width: '100%' }}>
           <Autocomplete
@@ -561,7 +575,8 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
             options={teacherOptions || []}
             PopperComponent={TeacherPopper}
             onChange={(e: any, v: any) => {
-              void handleFilter('teacher', v?.value); setTeacherId(v?.value)
+              void handleFilter('teacher', v?.value)
+              setTeacherId(v?.value)
             }}
             size='small'
             renderInput={params => <TextField {...params} label={t('Ustoz')} />}
