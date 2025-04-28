@@ -547,7 +547,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
                 id='demo-simple-select-outlined'
                 labelId='demo-simple-select-outlined-label'
               >
-                {sms_list.result.map(item => (
+                {sms_list?.result?.map(item => (
                   <MenuItem value={item.id}>{item.description}</MenuItem>
                 ))}
               </Select>
