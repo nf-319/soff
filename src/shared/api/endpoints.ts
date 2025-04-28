@@ -9,6 +9,9 @@ export const enum Endpoints {
   Branches = 'common/branches/',
   LeadsDashboard = 'leads/dashboard/',
   LeadsYearlyStats = 'leads/yearly-stats/',
-  LeadsSourceStats = 'leads/source-stats/'
+  LeadsSourceStats = 'leads/source-stats/',
+  ReportLeadsSellers = 'leads/sellers/',
+  ReportLeadsList = 'leads/list/',
+  ReportLeadsChart = 'leads/separate-leads-chart/'
 }
 

@@ -35,3 +35,42 @@ export type ReportLeadsSourceType = {
   name: string
   count: number
 }
+
+export type ReposrtLeadsSellers = {
+  conversion_rate: number
+  first_name: string
+  id: number
+  lost_leads: number
+  phone: string
+  worked_lead_count: number
+}
+
+export type ReportsLeadsListType = {
+  count: number
+  next: string
+  previous: any
+  results: ReportsLeadsListItemType[]
+}
+
+export type ReportsLeadsListItemType = {
+  admin: string
+  course: any
+  first_name: string
+  id: number
+  phone: string
+  source: string
+  status: string
+  temperature: any
+}
+
+export type ReportsLeadsChartType = {
+  count: number
+  next: string
+  previous: any
+  results: ReportsLeadsChartItemType[]
+}
+
+export type ReportsLeadsChartItemType = {
+  count: string
+  month: string
+}

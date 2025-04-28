@@ -1,9 +1,12 @@
-import { Box, Card, Typography } from '@mui/material'
+import { Box, Card, Dialog, DialogContent, DialogTitle, Typography } from '@mui/material'
 import { ArrowRightLeft, Clock, Megaphone, TrendingDown, TrendingUp, TriangleAlert, User } from 'lucide-react'
 import { useGetReportLeads } from '@/shared/query-hooks/report-leads/reportLeads'
+import { useState } from 'react'
+import LeadsDashboardCardModal from '@/components/leads-detail-chart'
 
 type DashboardCard = {
   title: string
+  id?: string
   count: string | number
   icon: any
   iconColor?: string
@@ -15,19 +18,27 @@ type DashboardCard = {
 
 const LidsReportsCard = () => {
   const { data } = useGetReportLeads()
-
-  const getProcess = (process?: number): "up" | "down" => {
+  const [modalContent, setModalContent] = useState<string|null>(null)
+  const getProcess = (process?: number): 'up' | 'down' => {
     const results = (process || 0) > 0
-    return results ? "up" : "down"
+    return results ? 'up' : 'down'
   }
 
   const getFillColor = (process?: number): string => {
     const results = (process || 0) > 0
-    return results ? "#29bf12" : "#ef233c"
+    return results ? '#29bf12' : '#ef233c'
+  }
+
+  const handleOpenModal = (content?: string) => {
+    if (content) {
+      setModalContent(content)
+
+    }
   }
 
   const cards: DashboardCard[] = [
     {
+      id: 'new',
       icon: User,
       title: 'Yangi lidlar',
       process: data?.new_leads_progress || 0,
@@ -47,6 +58,7 @@ const LidsReportsCard = () => {
       iconColor: '#29bf12'
     },
     {
+      id: 'rejected',
       icon: TriangleAlert,
       title: "Yo'qotilgan lidlar",
       process: data?.lost_leads_progress || 0,
@@ -60,20 +72,31 @@ const LidsReportsCard = () => {
       icon: Megaphone,
       title: 'Eng yaxshi marketing manbasi',
       process: data?.top_lead_source_progress || 0,
-      count: data?.top_lead_source || 0,
+      count: `${data?.top_lead_source} : ${data?.top_lead_source_count}` || 0,
       trendDirection: getProcess(data?.top_lead_source_progress),
       trendColor: '#fff',
       pillColor: getFillColor(data?.top_lead_source_progress),
       iconColor: '#ffc300'
     },
+
+    {
+      icon: User,
+      title: `Eng yaxshi sotuvchi ${data?.best_seller}`,
+      process: data?.best_seller_progress || 0,
+      count: data?.best_seller_leads_count || 0,
+      trendColor: '#fff',
+      trendDirection: getProcess(data?.best_seller_leads_count),
+      pillColor: getFillColor(data?.best_seller_progress),
+      iconColor: '#ffc300'
+    }
   ]
+
 
   return (
     <Box
       display='flex'
-      alignItems='stretch'
+      flexDirection={{ md: 'row', xs: 'column' }}
       justifyContent='space-between'
-      flexWrap='wrap'
       sx={{ width: '100%', gap: 2 }}
     >
       {cards.map((item, index) => {
@@ -81,7 +104,7 @@ const LidsReportsCard = () => {
         const TrendIcon = item.trendDirection === 'up' ? TrendingUp : TrendingDown
 
         return (
-          <Box key={index} flex='1 1 calc(20% - 16px)' minWidth={200}>
+          <Box key={index} flex='1 1 calc(20% - 16px)' minWidth={150}>
             <Card
               sx={{
                 padding: 5,
@@ -96,10 +119,10 @@ const LidsReportsCard = () => {
                 }
               }}
             >
-              <Box display='flex' flexDirection='column' gap={5}>
+              <Box display='flex' flexDirection='column'  gap={5}>
                 <Box className='d-flex justify-content-between align-items-start'>
                   <Icon size={40} color={item.iconColor || 'black'} />
-                  {item.process && (
+                  {item.process !== null && (
                     <Box
                       sx={{
                         display: 'flex',
@@ -119,12 +142,40 @@ const LidsReportsCard = () => {
                   )}
                 </Box>
                 <Typography sx={{ fontWeight: 700, fontSize: 22, color: 'black' }}>{item.count}</Typography>
-                <Typography sx={{ fontSize: 15 }}>{item.title}</Typography>
+                <Typography
+                  sx={{
+                    fontSize: 15,
+                    cursor: 'pointer',
+                    transition: '0.3s',
+                    p: 1,
+                    borderRadius: 1
+                  }}
+                >
+                  {item.title}
+                </Typography>{' '}
+                <div onClick={() => handleOpenModal(String(item?.id))}>
+                  <Typography
+                    sx={{
+                      color: 'black',
+                      fontSize: 15,
+                      cursor: 'pointer',
+                      transition: '0.3s',
+                      p: 1,
+                      borderRadius: 1,
+                      '&:hover': {
+                        backgroundColor: '#f0f0f0'
+                      }
+                    }}
+                  >
+                    Detailni ko'rish
+                  </Typography>{' '}
+                </div>
               </Box>
             </Card>
           </Box>
         )
       })}
+      <LeadsDashboardCardModal setOpen={setModalContent} id={modalContent} />
     </Box>
   )
 }

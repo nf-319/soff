@@ -16,7 +16,6 @@ import { EmptyContent } from '@/components/empty-content'
 const MarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {
   const { settings } = useSettings()
 
-  console.log(data)
   const marketingSourcesData = data.map(item => ({
     source: item.name,
     conversionRate: item.count

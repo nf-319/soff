@@ -5,5 +5,8 @@ export const enum QueryKeys {
   ReportLeadsYearlStats = 'leads-yearly-stats',
   ReportLeadsSourceStats = 'leads-source-stats',
   ChecklistTeacher = 'check-list_teacher',
-  ChecklistCourse = 'check-list_course'
+  ChecklistCourse = 'check-list_course',
+  ReportsLeadsSellers = 'leads-sellers',
+  ReportLeadsList = 'leads-list',
+  ReportLeadsChart = 'leads-card-chart'
 }
