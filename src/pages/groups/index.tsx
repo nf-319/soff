@@ -51,11 +51,12 @@ import DataTable from '../../components/table'
 import { useGet, usePatch } from 'src/hooks/useApi'
 import { useQueryClient } from '@tanstack/react-query'
 import Delete from '@/views/apps/groups/view/GroupViewLeft/Delete'
-import { GroupCreateEditDrawer } from '@/components/GroupDrawerModal'
 import { Plus } from 'lucide-react'
 
 const IconifyIcon = dynamic(() => import('../../components/icon'))
 const RowOptions = dynamic(() => import('src/views/apps/groups/RowOptions'))
+const EditGroupModal = dynamic(() => import('src/views/apps/groups/EditGroupModal'))
+const AddGroupModal = dynamic(() => import('src/views/apps/groups/AddGroupModal'))
 
 export interface customTableProps {
   xs: number
@@ -82,7 +83,6 @@ export default function GroupsPage() {
   const router = useRouter()
   const { user } = useContext(AuthContext)
   const { t } = useTranslation()
-  const [openCreateModal, setOpenCreateModal] = useState<'create' | 'edit' | null>(null)
   const [open, setOpen] = useState<boolean>(false)
   const { isMobile } = useResponsive()
   const [page, setPage] = useState<number>(queryParams.page ? Number(queryParams.page) - 1 : 0)
@@ -93,7 +93,6 @@ export default function GroupsPage() {
   const [group_id, setGroupId] = useState<number | null>(null)
   const [groupChoices, setGroupChoices] = useState([])
   const { mutate, isPending } = usePatch()
-
   const { data, isLoading } = useGet(ceoConfigs.groups, {
     params: queryParams as Record<string, unknown>,
     deps: ['groups-list']
@@ -203,6 +202,7 @@ export default function GroupsPage() {
     }, {} as Record<string, string>)
   ).toString()
   const handleRowsPerPageChange = async (value: number) => {
+    const limit = value
     setRowsPerPage(Number(value))
     sessionStorage.setItem('rowsPerPage', `${value}`)
 
@@ -218,13 +218,17 @@ export default function GroupsPage() {
   }
 
   const handleOpenModal = async () => {
-    setOpenCreateModal('create')
+    dispatch(handleOpenAddModal(true))
     await dispatch(getDashboardLessons(''))
   }
 
   const rowClick = (id: any) => {
-    void router.push(`/groups/view/security?id=${id}&month=${getMonthName(null)}`)
+    router.push(`/groups/view/security?id=${id}&month=${getMonthName(null)}`)
     dispatch(studentsUpdateParams({ status: 'active,new' }))
+  }
+
+  const pageLoad = async () => {
+    await dispatch(getMetaData())
   }
 
   const formik = useFormik({
@@ -246,7 +250,28 @@ export default function GroupsPage() {
       })
     }
   })
-
+  const getTeachers = async () => {
+    await api
+      .get(`${ceoConfigs.employee_checklist}?role=teacher`)
+      .then(data => {
+        dispatch(setTeacherData(data.data))
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
+  const getRooms = async () => {
+    await api
+      .get('common/room-check-list/')
+      .then(data => dispatch(setRoomsData(data.data)))
+      .catch(error => {
+        console.error(error)
+      })
+  }
+  useEffect(() => {
+    getTeachers()
+    getRooms()
+  }, [])
 
   useEffect(() => {
     const group = data?.results?.find((item: any) => item.id == group_id)
@@ -267,12 +292,13 @@ export default function GroupsPage() {
         !user?.role.includes('watcher') &&
         !user?.role.includes('marketolog')
       ) {
-        void router.push('/')
+        router.push('/')
         toast.error('Sahifaga kirish huquqingiz yoq!')
       }
+      await pageLoad()
     }
 
-    void initializePage()
+    initializePage()
   }, [])
   useEffect(() => {
     void queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
@@ -350,7 +376,8 @@ export default function GroupsPage() {
         </div>
       )}
 
-      <GroupCreateEditDrawer open={openCreateModal} setOpen={setOpenCreateModal} />
+      <AddGroupModal />
+      <EditGroupModal />
       <GroupChangeBranchModal />
 
       <Dialog fullScreen onClose={() => setOpen(false)} aria-labelledby='full-screen-dialog-title' open={open}>

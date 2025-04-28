@@ -50,6 +50,7 @@ export default function StudentsPage() {
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
+
   const { queryParams } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const querySearch = new URLSearchParams(window.location.search).get('q')
@@ -222,7 +223,7 @@ export default function StudentsPage() {
 
 
   useEffect(() => {
-    void queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
   }, [user?.active_branch])
 
   return (
@@ -237,7 +238,7 @@ export default function StudentsPage() {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Typography variant='h5'>{t("O'quvchilar")}</Typography>
           {!isLoading && <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' />}
-          {!isLoading && queryParams.is_debtor && (
+          {!isLoading  && (
             <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm"} variant='outlined' color='error' />
           )}
         </Box>
