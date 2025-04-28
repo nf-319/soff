@@ -3,7 +3,7 @@ import {
   Box,
   FormControl,
   InputLabel,
-  MenuItem,
+  MenuItem, Popper,
   Select,
   SelectChangeEvent,
   TextField
@@ -22,6 +22,9 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker'
 import { format, parseISO } from 'date-fns'
 import ceoConfigs from 'src/configs/ceo'
+import { useGet } from '@hooks/useApi'
+import { Endpoints } from '@api/endpoints'
+import styled from '@emotion/styled'
 type AttandanceFiltersProps = {
   isMobile: boolean
 }
@@ -36,6 +39,8 @@ export const AttandanceFilters = ({ isMobile }: AttandanceFiltersProps) => {
   const { branches, getBranches } = useBranches()
   const now = new Date()
   const currentYear = new Date().getFullYear()
+
+  const { data: groupData } = useGet(Endpoints.ChecklistGroup)
 
   const years = Array.from({ length: currentYear - 2021 + 1 }, (_, index) => 2021 + index)
 
@@ -74,8 +79,8 @@ export const AttandanceFilters = ({ isMobile }: AttandanceFiltersProps) => {
   }
 
   useEffect(() => {
-    getTeachers()
-    getBranches()
+    void getTeachers()
+    void getBranches()
   }, [])
 
   const handleChangeBranch = async (e: SelectChangeEvent<string>) => {
@@ -90,6 +95,16 @@ export const AttandanceFilters = ({ isMobile }: AttandanceFiltersProps) => {
 
   const handleChangeTeacher = async (value: string) => {
     dispatch(updateQueryParam({ teacher: value }))
+
+    const updatedQueryParams = store.getState().attendance.queryParams
+
+    const queryString = new URLSearchParams({ ...updatedQueryParams }).toString()
+
+    await dispatch(fetchAttendances(queryString))
+  }
+
+  const handleChangeGroup = async (value: number) => {
+    dispatch(updateQueryParam({ group: Number(value) }))
 
     const updatedQueryParams = store.getState().attendance.queryParams
 
@@ -132,6 +147,10 @@ export const AttandanceFilters = ({ isMobile }: AttandanceFiltersProps) => {
     await dispatch(fetchAttendances(queryString))
   }
 
+  const StyledPopper = styled(Popper)({
+    minWidth: '300px'
+  })
+
   const handleChangeDateMonth = async (e: SelectChangeEvent<string>) => {
     setSelectedDate(null)
     const year = queryParams.date_year ? queryParams.date_year.split('-')[0] : queryParams.date_year || currentYear
@@ -173,6 +192,13 @@ export const AttandanceFilters = ({ isMobile }: AttandanceFiltersProps) => {
       label: item?.first_name,
       value: item?.id
     })) || []
+
+  const groupOptions =
+    groupData?.map((item: any) => ({
+      label: item?.name,
+      value: item?.id
+    })) || []
+
 
   if (isMobile) {
     return (
@@ -359,7 +385,7 @@ export const AttandanceFilters = ({ isMobile }: AttandanceFiltersProps) => {
                 }}
                 value={selectedDate}
                 onChange={newValue => {
-                  handleChangeDate(newValue)
+                  void handleChangeDate(newValue)
                 }}
               />
             </LocalizationProvider>
@@ -448,12 +474,23 @@ export const AttandanceFilters = ({ isMobile }: AttandanceFiltersProps) => {
 
           <FormControl sx={{ width: '100%' }}>
             <Autocomplete
-              onChange={(e: any, v) => handleChangeTeacher(String(v?.value))}
+              onChange={(e: any, v: any) => handleChangeTeacher(String(v?.value))}
               size='small'
               placeholder={"O'qituvchi"}
               disablePortal
               options={options}
               renderInput={params => <TextField {...params} label={t("O'qituvchi")} />}
+            />
+          </FormControl>
+          <FormControl sx={{ width: '100%' }}>
+            <Autocomplete
+              onChange={(e: any, v: any) => handleChangeGroup(Number(v?.value))}
+              size='small'
+              placeholder="Guhuhlar"
+              disablePortal
+              options={groupOptions}
+              PopperComponent={StyledPopper}
+              renderInput={params => <TextField {...params} label="Guruhlar" />}
             />
           </FormControl>
         </Box>

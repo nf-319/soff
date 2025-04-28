@@ -28,7 +28,7 @@ const initialState: AttendanceInitialType = {
     teacher: '',
     ...getCurrentDate(),
     date: '',
-    status: 'active'
+    status: 'active',
   },
   isLoading: false,
   error: ''
@@ -48,7 +48,7 @@ export const attendanceSlice = createSlice({
         teacher: '',
         date: '',
         ...getCurrentDate(),
-        status: 'active'
+        status: 'active',
       }
     }
   },

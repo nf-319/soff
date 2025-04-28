@@ -28,6 +28,7 @@ export default function Attandences() {
   const dispatch = useAppDispatch()
   const { attandance, isLoading, queryParams } = useAppSelector(state => state.attendance)
   const router = useRouter()
+
   const columns: customTableProps[] = [
     {
       xs: 0.3,
@@ -83,9 +84,7 @@ export default function Attandences() {
       )
     }
   ]
-  const rowClick = (id: any) => {
-    router.push(`/groups/view/security?id=${id}&month=${getMonthName(null)}`)
-  }
+
   useEffect(() => {
     const queryString = new URLSearchParams({ ...queryParams }).toString()
     dispatch(fetchAttendances(queryString))
@@ -93,18 +92,24 @@ export default function Attandences() {
 
   return (
     <div>
-      <VideoHeader item={videoUrls.groups} />
+
       <Box
         className='groups-page-header'
         py={2}
+        display='flex'
+        flexDirection={{ xs: 'column', md: 'row' }}
+        gap={3}
+        justifyContent={{ xs: 'center', md: 'space-between' }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px',mb:3 }}>
-          <Typography variant='h5'>{t('Davomatlar')}</Typography>
+          <Typography variant='h5'>Davomatlar</Typography>
         </Box>
+
+        <VideoHeader item={videoUrls.groups} />
+
         {isMobile && (
           <>
             <Button
-              size='small'
               sx={{ marginLeft: 'auto', width: '100%', marginBottom: 2 }}
               variant='outlined'
               onClick={() => setOpen(true)}
