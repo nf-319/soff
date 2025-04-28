@@ -3,5 +3,7 @@ export const enum QueryKeys {
   Branches = 'branches',
   ReportLead = 'report-lead',
   ReportLeadsYearlStats = 'leads-yearly-stats',
-  ReportLeadsSourceStats = 'leads-source-stats'
+  ReportLeadsSourceStats = 'leads-source-stats',
+  ChecklistTeacher = 'check-list_teacher',
+  ChecklistCourse = 'check-list_course'
 }

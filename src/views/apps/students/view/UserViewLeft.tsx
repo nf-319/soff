@@ -17,7 +17,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import { useTranslation } from 'react-i18next'
 import IconifyIcon from 'src/components/icon'
-import {  Checkbox, FormHelperText, Skeleton } from '@mui/material'
+import { Checkbox, FormHelperText, Skeleton } from '@mui/material'
 import Form from 'src/components/form'
 import UserViewStudentsList from './UserViewStudentsList'
 import useStudent, { StudentTypes } from 'src/hooks/useStudents'
@@ -36,7 +36,7 @@ import * as Yup from 'yup'
 import StudentParentList from './StudentParentList'
 import StudentWithDrawForm from './StudentWithdrawForm'
 import toast from 'react-hot-toast'
-import { fetchSmsListQuery } from 'src/store/apps/settings'
+import { fetchSmsList, fetchSmsListQuery } from 'src/store/apps/settings'
 import StudentCard from './card'
 import Link from 'next/link'
 import { Box } from '@mui/system'
@@ -145,7 +145,6 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
             )
           )}
         </Grid>
-       
 
         <Dialog
           open={openEdit === 'group'}
@@ -422,11 +421,19 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
 
 export default UserViewLeft
 
-export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData, teacherData, usersData }: any) => {
+export const SendSMSModal = ({
+  for_lead,
+  handleEditClose,
+  openEdit,
+  setOpenEdit,
+  userData,
+  teacherData,
+  usersData
+}: any) => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
-  const [isErrorText, setIsErrorText] = useState<null | string>(null)
+  const [isErrorText, setIsErrorText] = useState<null | any>(null)
   const [isActive, setIsActive] = useState(false)
   const { sms_list, smschild_list } = useAppSelector(state => state.settings)
   const [parent_id, setParentId] = useState<number | null>(null)
@@ -452,6 +459,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
     setLoading(true)
     const data = {
       ...value,
+      for_lead: for_lead || false,
       users: userData ? [userData.id] : usersData,
       is_partly: isActive
     }
@@ -466,7 +474,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
       await dispatch(userData?.id)
     } catch (err: any) {
       if (err.response.status) {
-        setIsErrorText(err.response.data.message)
+        setIsErrorText(err.response.data)
         setLoading(false)
       } else {
         console.log(err)
@@ -478,6 +486,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
   const handleSendMessages = () => {
     setIsSuccess(false)
     setOpenEdit(null)
+    handleEditClose()
     toast.success('Smslar yuborildi')
     setParentId(null)
   }
@@ -487,6 +496,11 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
       dispatch(fetchSmsListQuery(parent_id))
     }
   }, [parent_id])
+  useEffect(() => {
+    if (openEdit === 'sms') {
+      dispatch(fetchSmsList())
+    }
+  }, [])
   return (
     <Dialog
       open={openEdit === 'sms'}
@@ -572,9 +586,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
                 >
                   {smschild_list.map((el: any) => (
                     <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
-                      <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>
-                        {el.description}
-                      </span>
+                      <span style={{ maxWidth: '250px', wordBreak: 'break-word' }}>{el.description}</span>
                     </MenuItem>
                   ))}
                 </Select>
@@ -599,15 +611,19 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
                 {formik.errors.message}
               </FormHelperText>
             </FormControl>
-            <p style={{ color: 'red', padding: 3 }}>{isErrorText}</p>
             {isErrorText && (
-              <div className='d-flex align-items-start'>
+              <p style={{ color: 'red', padding: 3 }}>
+                {isErrorText?.message} {`(Sms limit : ${isErrorText?.allowed_sms_count})`}
+              </p>
+            )}
+            {isErrorText && (
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Checkbox
                   checked={isActive}
                   onChange={handleChangeActive}
                   inputProps={{ 'aria-label': 'controlled' }}
                 />
-                <p>Sms limit yetganicha habar yuborilsin (10) ta</p>
+                <p style={{ fontSize: '14px' }}>Sms limit yetganicha habar yuborilsin</p>
               </div>
             )}
             <DialogActions sx={{ justifyContent: 'center' }}>

@@ -1,8 +1,8 @@
 import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
 import { useContext, useEffect, useState } from 'react'
 import useResponsive from 'src/@core/hooks/useResponsive'
-import { useGetBranches } from '@/shared/query-hooks'
 import { AuthContext } from '@/context/AuthContext'
+import { useGetBranches } from '@/shared/query-hooks/branches/branches'
 
 const LidsReportsFilter = () => {
   const [duration, setDuration] = useState('3')

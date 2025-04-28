@@ -11,7 +11,8 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  Tooltip
+  Tooltip,
+  useMediaQuery
 } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import DataTable from '../../components/table'
@@ -45,16 +46,18 @@ export type customTableProps = {
 export default function StudentsPage() {
   const { t } = useTranslation()
   const router = useRouter()
-  const { isMobile } = useResponsive()
+  const isMobile = useMediaQuery('(max-width:564px)');
   const { user } = useContext(AuthContext)
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
-
   const { queryParams } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const querySearch = new URLSearchParams(window.location.search).get('q')
   const { search, ...filteredParams } = queryParams
+
+    
+
   const queryString = new URLSearchParams(
     Object.fromEntries(
       Object.entries({ ...filteredParams, ...(querySearch ? { search: querySearch } : { search: '' }) })
@@ -222,7 +225,7 @@ export default function StudentsPage() {
   }, [])
 
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+    void queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
   }, [user?.active_branch])
 
   return (
@@ -236,8 +239,8 @@ export default function StudentsPage() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Typography variant='h5'>{t("O'quvchilar")}</Typography>
-          {!isLoading && <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' />}
-          {!isLoading && queryParams.is_debtor && (
+          {!isLoading  && <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' />}
+          {!isLoading  && !isMobile && (
             <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm"} variant='outlined' color='error' />
           )}
         </Box>
