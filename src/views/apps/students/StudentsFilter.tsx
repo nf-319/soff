@@ -164,8 +164,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
     value: item?.id
   }))
 
-  console.log(isMobile)
-
   return (
     <Box display='flex' gap={2} alignItems='center' flexWrap={'wrap'} justifyContent='space-between' width='100%'>
       <Box
@@ -333,7 +331,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
               size='lg'
               placeholder='Oy va yil'
               format='MM/yyyy'
-              // value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
               onChange={value => {
                 if (!value) {
                   void handleFilter('debt_date', '')
@@ -349,7 +346,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
         <div onClick={() => setKey('group')} style={{ width: '100%' }}>
           <Autocomplete
             fullWidth
-            // sx={{ width: !isMobile ? 180 : '100%' }}
             loading={!groupOptions}
             options={groupOptions || []}
             onChange={(_: any, v: any) => {
@@ -364,7 +360,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
         <div onClick={() => setKey('teacher')} style={{ width: '100%' }}>
           <Autocomplete
             fullWidth
-            // sx={{ width: !isMobile ? 180 : '100%' }}
             loading={!teacherOptions}
             disablePortal
             value={teacherOptions?.find((option: any) => option.value === queryParams.teacher) || null}
