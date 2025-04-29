@@ -7,10 +7,10 @@ import toast from 'react-hot-toast'
 import { AuthContext } from 'src/context/AuthContext'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { getSMSTemp, handleEditClickOpen, setOnlineLessonLoading } from 'src/store/apps/groupDetails'
+import EditGroupModal from '../../EditGroupModal'
 import { getDashboardLessons, getGroupsDetails, handleOpenEdit } from 'src/store/apps/groups'
 import api from 'src/@core/utils/api'
 import GroupDetailsWrapper from './GroupDetailsWrapper'
-import { GroupCreateEditDrawer } from '@/components/GroupDrawerModal'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 export default function GroupDetails() {
@@ -33,7 +33,7 @@ export default function GroupDetails() {
   }
 
   const handleEdit = async (id: any) => {
-    setOpenEditModal('edit')
+    dispatch(handleOpenEdit(true))
     const filtered = { ...groupData }
     const queryString = new URLSearchParams({
       day_of_week: filtered?.day_of_week?.toString(),
@@ -62,7 +62,6 @@ export default function GroupDetails() {
   return (
     <>
       <GroupDetailsWrapper
-        setOpen={setOpenEditModal}
         groupData={groupData}
         isGettingGroupDetails={isGettingGroupDetails}
         onlineLessonLoading={onlineLessonLoading}
@@ -72,8 +71,8 @@ export default function GroupDetails() {
         handleEditClickOpen={(type: any) => dispatch(handleEditClickOpen(type))}
         handleGetMeetLink={handleGetMeetLink}
       />
-      <GroupCreateEditDrawer open={openEditModal} setOpen={setOpenEditModal} />
       <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
+      <EditGroupModal />
     </>
   )
 }

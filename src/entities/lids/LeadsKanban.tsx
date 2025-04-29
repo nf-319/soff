@@ -11,7 +11,7 @@ import { EmptyContent } from '../../components/empty-content'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import { useGet, usePatch } from 'src/hooks/useApi'
-import { RootState, useAppDispatch } from 'src/store'
+import { RootState, useAppDispatch, useAppSelector } from 'src/store'
 import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
 import CreateAnonimUserForm from 'src/views/apps/lids/anonimUser/CreateAnonimUserForm'
 import { LeadsType } from './model'
@@ -24,7 +24,10 @@ import toast from 'react-hot-toast'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 import Link from 'next/link'
 import { LeadKanbanItem } from './LeadKanbanItem'
+import { SendSMSModal } from '@/views/apps/students/view/UserViewLeft'
 import { AmoLeads } from '@/pages/lids'
+import { AccessDeniedModal } from '@components/AccessDeniedModal'
+
 type LeadsChild = {
   id: number
   first_name: string
@@ -39,7 +42,7 @@ export type LeadsResult = {
 
 type Props = {
   defaultId: number | undefined
-  selectedData?: AmoLeads | null
+  selectedData?: any
 }
 
 export type MenuOpenType =
@@ -69,6 +72,13 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const [deleteItem, setDeleteItem] = useState<any | null>(null)
   const { id, search, is_active, is_amocrm } = router.query
   const { mutate, isPending } = usePatch()
+  const [sectionLeads, setSectionLeads] = useState<any[]>([])
+  const [accessModal, setAccessModal] = useState<boolean>(false)
+  const [openSmsModal, setOpenSmsModal] = useState<string | null>(null)
+
+  const { companyInfo } = useAppSelector(item => item.user)
+
+
   const [mergedSteps, setMergedSteps] = useState<any[] | null>(null)
   const { data: amoLeadDataChild, isLoading: amoLeadDataChildLoding } = useGet(
     `amocrm/leads/?pipeline_id=${defaultId}`,
@@ -127,12 +137,6 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
       setLocalLeadData(leadData)
     }
   }, [leadData])
-
-  // useEffect(() => {
-  //   if (mergedSteps) {
-  //     setLocalAmoLeadData(mergedSteps)
-  //   }
-  // }, [mergedSteps])
 
   useEffect(() => {
     setLocalAmoLeadData(null)
@@ -263,6 +267,8 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
       results: newResults
     })
   }
+  const leadIds = sectionLeads?.map(item => item.id)
+
   const onDragEndAmo = async (result: any) => {
     if (!result.destination || !mergedSteps) return
 
@@ -272,11 +278,6 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
       const newResults = Array.from(mergedSteps)
       const [movedSection] = newResults.splice(source.index, 1)
       newResults.splice(destination.index, 0, movedSection)
-
-      // setLocalAmoLeadData({
-      //   ...localAmoLeadData,
-      //   newResults
-      // })
 
       updateDepartmentOrderMutation.mutate({
         departmentId: movedSection.id,
@@ -346,6 +347,16 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
 
   const displayData = localLeadData || leadData
   const amoLeadData = localAmoLeadData || mergedSteps
+
+  const handleAccessModal = (section: any) => {
+    if (companyInfo?.access){
+      setOpenSmsModal('sms');
+      setSectionLeads(section?.leads)
+    } else {
+      setAccessModal(true)
+    }
+  }
+
 
   return (
     <DragDropContext onDragEnd={is_amocrm ? onDragEndAmo : onDragEnd}>
@@ -417,6 +428,12 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                               <Box display={'flex'}>
                                 <IconButton
                                   sx={{ cursor: 'pointer' }}
+                                  onClick={() => handleAccessModal(section)}
+                                >
+                                  <IconifyIcon fontSize={20} icon='material-symbols:sms-rounded' color='orange' />
+                                </IconButton>
+                                <IconButton
+                                  sx={{ cursor: 'pointer' }}
                                   onClick={() => {
                                     setOpen(true)
                                     setEdit(section)
@@ -424,6 +441,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                                 >
                                   <IconifyIcon icon='fluent:text-bullet-list-square-edit-20-filled' color='orange' />
                                 </IconButton>
+
                                 <IconButton
                                   sx={{ cursor: 'pointer' }}
                                   onClick={() => {
@@ -553,6 +571,20 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
         setOpen={setDeleteItem}
         handleOk={handleDelete}
       />
+      <SendSMSModal
+        for_lead={true}
+        usersData={leadIds}
+        handleEditClose={() => {
+          setOpenSmsModal(null);
+          setSectionLeads([])
+        }}
+        openEdit={openSmsModal}
+        // smsTemps={smsTemps}
+        setOpenEdit={setOpenSmsModal}
+        // usersData={studentIds}
+      />
+
+      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
     </DragDropContext>
   )
 }

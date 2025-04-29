@@ -90,6 +90,7 @@ const EmptyState: React.FC = () => {
 
 const RoomsPage: React.FC = () => {
   const { sms_list, smschild_list, is_pending, is_childpending } = useAppSelector(state => state.settings);
+  const { companyInfo } = useAppSelector(state => state.user);
   const dispatch = useAppDispatch();
   const [parentId, setParentId] = useState<number | null>(null);
   const { t } = useTranslation();
@@ -158,10 +159,10 @@ const RoomsPage: React.FC = () => {
   }, [parentId, dispatch]);
 
   useEffect(() => {
-    if (sms_list?.access === false) {
+    if (!companyInfo?.access) {
       setAccessDeniedOpen(true)
     }
-  }, [sms_list])
+  }, [companyInfo])
 
   return (
     <Paper
@@ -276,11 +277,11 @@ const RoomsPage: React.FC = () => {
               <AccordionDetails sx={{ p: 2 }}>
                 {item.id === parentId && is_childpending ? (
                   <LoadingSkeleton />
-                ) : smschild_list.result.length === 0 ? (
+                ) : smschild_list?.result?.length === 0 ? (
                   <EmptyState />
                 ) : (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {smschild_list.result.map((child: SmsTemplate) => (
+                    {smschild_list?.result?.map((child: SmsTemplate) => (
                       <Box
                         key={child.id}
                         sx={{

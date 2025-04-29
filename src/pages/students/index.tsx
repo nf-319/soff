@@ -12,6 +12,7 @@ import {
   DialogTitle,
   IconButton,
   Tooltip
+  Tooltip
 } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import DataTable from '../../components/table'
@@ -22,7 +23,7 @@ import CreateStudentModal from 'src/views/apps/students/CreateStudentModal'
 import EditStudentModal from 'src/views/apps/students/EditStudentModal'
 import StudentRowOptions from 'src/views/apps/students/StudentRowOptions'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { setStudentId, updateStudentParams } from 'src/store/apps/students'
+import students, { setStudentId, updateStudentParams } from 'src/store/apps/students'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { setOpenEdit } from 'src/store/apps/students'
 import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
@@ -34,6 +35,13 @@ import ExcelStudents from '../../components/excelButton/ExcelStudents'
 import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
 import { useGet } from 'src/hooks/useApi'
 import { useQueryClient } from '@tanstack/react-query'
+import { AccessDeniedModal } from '@components/AccessDeniedModal'
+import { fetchSmsList } from '@store/apps/settings'
+import { ModalTypes, SendSMSModal } from '@/views/apps/students/view/UserViewLeft'
+import { MessageSquareText } from 'lucide-react'
+import useSMS from '@hooks/useSMS'
+import Divider from '@mui/material/Divider'
+import { Toggle } from 'rsuite'
 
 export type customTableProps = {
   xs: number
@@ -46,10 +54,12 @@ export default function StudentsPage() {
   const { t } = useTranslation()
   const router = useRouter()
   const { isMobile } = useResponsive()
+  const { isMobile } = useResponsive()
   const { user } = useContext(AuthContext)
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
+
   const { queryParams } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const querySearch = new URLSearchParams(window.location.search).get('q')
@@ -220,19 +230,46 @@ export default function StudentsPage() {
     }
   }, [])
 
+  const handleEditClickOpen = (value: ModalTypes) => {
+    setOpenEdit(value)
+  }
+
+  const handleEditClose = () => {
+    setOpenEdit(null)
+  }
+
+  // const exelQueryString = new URLSearchParams(
+  //   Object.fromEntries(
+  //     Object.entries(queryParams).filter(([_, value]) => value !== '' && value !== undefined && value !== null)
+  //   ) as Record<string, string>
+  // ).toString()
+
+  const handleModalOpen = () => {
+    if (companyInfo.access) {
+      setAccessModal(false)
+      void getSMSTemps()
+      handleEditClickOpen('sms')
+    } else {
+      setAccessModal(true)
+    }
+  }
+
+  const handleSwitch = (value: 'archive' | 'active') => {
+      dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
+  }
+
 
   useEffect(() => {
-    void queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
   }, [user?.active_branch])
 
   return (
-    <div>
+    <Box display="flex" flexDirection="column" gap={3}>
       {isMobile && <VideoHeader item={videoUrls.students} />}
 
       <Box
         className='students-page-header'
-        sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0' }}
-        py={2}
+        sx={{ display: 'flex', justifyContent: 'space-between' }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Typography variant='h5'>{t("O'quvchilar")}</Typography>
@@ -251,7 +288,7 @@ export default function StudentsPage() {
             size='small'
             startIcon={<IconifyIcon icon='ic:baseline-plus' />}
           >
-            <Tooltip title={t("Yangi o‘quvchi qo‘shish.")}>
+            <Tooltip title={t('Yangi o‘quvchi qo‘shish.')}>
               <span>{t("Yangi qo'shish")}</span>
             </Tooltip>
           </Button>
@@ -262,7 +299,7 @@ export default function StudentsPage() {
         <Box>
           <Button
             size='small'
-            sx={{ marginLeft: 'auto', width: '100%', marginBottom: 2 }}
+            sx={{ marginLeft: 'auto', width: '100%' }}
             variant='outlined'
             onClick={() => setOpen(true)}
           >
@@ -272,7 +309,41 @@ export default function StudentsPage() {
         </Box>
       )}
 
-      {!isMobile && <StudentsFilter isMobile={isMobile} students={data?.results} />}
+      <Divider />
+
+      <Box display='flex' alignItems='center' justifyContent='end' gap={3}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Toggle
+            checked={queryParams.status === 'archive'}
+            color='red'
+            checkedChildren={t('Arxiv')}
+            unCheckedChildren={t('Arxiv')}
+            onChange={e => handleSwitch(e ? 'archive' : 'active')}
+          />
+        </Box>
+
+        <Box>
+          <ExcelStudents
+            size='medium'
+            tooltip={t('Ko‘rinib turgan jadvalni Excel faylga yuklab olish.')}
+            url='student/offset-list/'
+            queryString={queryString}
+          />
+        </Box>
+
+        <Button
+          onClick={handleModalOpen}
+          variant='outlined'
+          color='warning'
+          startIcon={<MessageSquareText size={18} />}
+        >
+          <Tooltip title={t('Ro‘yxatdagi o‘quvchilarga SMS yuborish.')}>
+            <span>{t('Sms yuborish')}</span>
+          </Tooltip>
+        </Button>
+      </Box>
+
+      {!isMobile && <StudentsFilter />}
 
       <DataTable
         color
@@ -334,12 +405,24 @@ export default function StudentsPage() {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <StudentsFilter isMobile={isMobile} />
+          <StudentsFilter />
         </DialogContent>
         <DialogActions className='dialog-actions-dense'>
           <Button onClick={() => setOpen(false)}>{t('Davom etish')}</Button>
         </DialogActions>
       </Dialog>
-    </div>
+
+      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
+
+      <Box sx={{ display: { xs: 'none', sm: 'block' } }} onClick={() => dispatch(fetchSmsList())}>
+        <SendSMSModal
+          handleEditClose={handleEditClose}
+          openEdit={openModalEdit}
+          smsTemps={smsTemps}
+          setOpenEdit={setOpenModalEdit}
+          usersData={data?.results?.map((item: any) => item.id)}
+        />
+      </Box>
+    </Box>
   )
 }

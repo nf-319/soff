@@ -58,7 +58,9 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && [401, 403].includes(error.response.status)) {
       if (typeof window !== 'undefined') {
-        localStorage.clear()
+        localStorage.removeItem(authConfig.storageTokenKeyName)
+        localStorage.removeItem('settings')
+
         void Router.push('/login')
       }
       return Promise.reject({ message: error.response?.data || 'Authentication error' })

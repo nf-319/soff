@@ -2,7 +2,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import api from 'src/@core/utils/api'
 import ceoConfigs from 'src/configs/ceo'
-import { RoomType, SettingsState, SmsItemType } from 'src/types/apps/settings'
+import { RoomType, SettingsState } from 'src/types/apps/settings'
 
 export const fetchSmsListQuery = createAsyncThunk('settings/fetchSmsListQuery', async (queryString?: number) => {
   return (await api.get(`common/sms-form/list/?parent_id=${queryString || ''}`)).data

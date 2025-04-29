@@ -3,12 +3,12 @@ import { useRouter } from 'next/router'
 import { ReactNode, useEffect } from 'react'
 import SubLoader from '../../views/apps/loaders/SubLoader'
 import { EmptyContent } from '../empty-content'
-import { fetchDepartmentList } from '@store/apps/leads'
-import { useAppDispatch } from '@/store'
+import { fetchDepartmentList } from '../../store/apps/leads'
+import { useAppDispatch } from '../../store'
 
 export interface customTableDataProps {
   xs: number
-  title: ReactNode
+  title: string | React.ReactNode
   dataIndex?: string | ReactNode
   renderItem?: (source: any) => any | undefined
   render?: (source: string) => any | undefined
@@ -31,6 +31,7 @@ export default function StudentsDataTable({
   loading = false,
   data,
   minWidth,
+  maxWidth,
   rowClick,
   color,
   text_color,
