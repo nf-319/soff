@@ -36,11 +36,12 @@ import * as Yup from 'yup'
 import StudentParentList from './StudentParentList'
 import StudentWithDrawForm from './StudentWithdrawForm'
 import toast from 'react-hot-toast'
-import { fetchSmsListQuery } from 'src/store/apps/settings'
+import { fetchSmsList, fetchSmsListQuery } from 'src/store/apps/settings'
 import StudentCard from './card'
 import Link from 'next/link'
 import { Box } from '@mui/system'
 import { MailCheck } from 'lucide-react'
+import { useGet } from '@hooks/useApi'
 
 export type ModalTypes = 'group' | 'withdraw' | 'payment' | 'sms' | 'delete' | 'edit' | 'notes' | 'parent'
 
@@ -424,6 +425,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
   const [isErrorText, setIsErrorText] = useState<null | string>(null)
   const [isActive, setIsActive] = useState(false)
   const { sms_list, smschild_list } = useAppSelector(state => state.settings)
+  const { companyInfo } = useAppSelector(state => state.user)
   const [parent_id, setParentId] = useState<number | null>(null)
   const [isSuccess, setIsSuccess] = useState<boolean>(false)
 
@@ -464,7 +466,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
         setIsErrorText(err.response.data.message)
         setLoading(false)
       } else {
-        console.log(err)
+        console.error(err)
         setLoading(false)
       }
     }
@@ -478,10 +480,16 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
   }
 
   useEffect(() => {
+    if(openEdit === 'sms')
+      dispatch(fetchSmsList())
+  }, [openEdit])
+
+  useEffect(() => {
     if (parent_id) {
       dispatch(fetchSmsListQuery(parent_id))
     }
   }, [parent_id])
+
   return (
     <Dialog
       open={openEdit === 'sms'}
@@ -565,7 +573,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
                   labelId='demo-simple-select-outlined-label'
                   onChange={e => formik?.setFieldValue('message', e.target.value)}
                 >
-                  {smschild_list.result.map((el: any) => (
+                  {smschild_list?.result?.map((el: any) => (
                     <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
                       <span style={{ maxWidth: '250px', wordBreak: 'break-word' }}>
                         {el.description}
