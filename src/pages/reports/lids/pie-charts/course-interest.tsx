@@ -26,7 +26,7 @@ const CourseInterest = ({ data }: { data: ReportLeadsCourseType[] }) => {
       }}
     >
       <Typography sx={{ px: 6, pt: 4, pb: 2 }} color={'black'} fontSize={20} fontWeight={700}>
-        Course Interest
+        Kurslar
       </Typography>
       {!courseInterestData.length ? (
         <EmptyContent />

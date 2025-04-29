@@ -4,10 +4,12 @@ import { Box, CircularProgress, Dialog, DialogContent, DialogTitle, IconButton, 
 import { ResponsiveLine } from '@nivo/line'
 import { X } from 'lucide-react'
 import { EmptyContent } from '../empty-content'
+import { useTranslation } from 'react-i18next'
 
 const LeadsDashboardCardModal = ({ id, setOpen }: { id: string | null; setOpen: (status: any) => void }) => {
   const { data, isLoading } = useGetReportLeadsChart({ status: String(id) })
   const { settings } = useSettings()
+  const { t } = useTranslation()
   const isDark = settings.mode == 'dark'
   const textColor = settings.mode == 'dark' ? '#ffffff' : '#333333'
   const gridColor = settings.mode == 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
@@ -15,7 +17,7 @@ const LeadsDashboardCardModal = ({ id, setOpen }: { id: string | null; setOpen: 
 
   const formattedData = [
     {
-      id: id || 'status',
+      id: t(String(id)) || 'status',
       data:
         data?.results.map(item => ({
           x: monthNames[parseInt(item.month, 10) - 1],
@@ -26,8 +28,8 @@ const LeadsDashboardCardModal = ({ id, setOpen }: { id: string | null; setOpen: 
 
   return (
     <Dialog fullWidth open={id == 'new' || id == 'rejected'} onClose={() => setOpen(null)}>
-      <DialogTitle sx={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-        <Typography> {id == 'new' ?  'Yangi lidlar':"Yo'qotilgan lidlar"}</Typography>
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography> {id == 'new' ? 'Yangi lidlar' : "Yo'qotilgan lidlar"}</Typography>
         <IconButton
           edge='end'
           color='inherit'
@@ -47,7 +49,7 @@ const LeadsDashboardCardModal = ({ id, setOpen }: { id: string | null; setOpen: 
           </Box>
         ) : formattedData[0].data.length === 0 ? (
           <Box display='flex' alignItems='center' justifyContent='center' height='100%'>
-            <EmptyContent/>
+            <EmptyContent />
           </Box>
         ) : (
           <Box style={{ height: '400px', width: '100%' }}>

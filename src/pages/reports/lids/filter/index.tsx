@@ -26,24 +26,23 @@ const LidsReportsFilter = () => {
       }}
     >
       <Box>
-        <Typography variant="h5">Lidlar Hisoboti</Typography>
+        <Typography variant='h5'>Lidlar Hisoboti</Typography>
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 5, flexWrap: isMobile ? 'wrap' : '' }}>
+      <Box sx={{ display: 'flex', gap: 5, flexDirection: isMobile ? 'column' : 'row' }}>
         <FormControl fullWidth>
-          <InputLabel id='duration-label'>Duration</InputLabel>
+          <InputLabel id='duration-label'>Oy</InputLabel>
           <Select
             labelId='duration-label'
             value={duration}
             size='small'
-            sx={{ width: '150px' }}
             onChange={e => setDuration(e.target.value)}
-            label='Duration'
+            label='Oy'
           >
-            <MenuItem value='3'>3 month</MenuItem>
-            <MenuItem value='4'>4 month</MenuItem>
-            <MenuItem value='5'>5 month</MenuItem>
-            <MenuItem value='6'>6 month</MenuItem>
+            <MenuItem value='3'>3 oy</MenuItem>
+            <MenuItem value='4'>4 oy</MenuItem>
+            <MenuItem value='5'>5 oy</MenuItem>
+            <MenuItem value='6'>6 oy</MenuItem>
           </Select>
         </FormControl>
 
@@ -54,7 +53,6 @@ const LidsReportsFilter = () => {
             size='small'
             labelId='branch-label'
             value={branch}
-            sx={{ width: '150px' }}
             onChange={e => setBranch(e.target.value)}
             label='Branch'
           >

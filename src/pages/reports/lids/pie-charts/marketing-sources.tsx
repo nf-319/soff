@@ -27,7 +27,7 @@ const MarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {
   return (
     <Card sx={{ height: 400 }}>
       <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
-        Marketing Source
+        Marketing manbasi
       </Typography>
       {!marketingSourcesData.length ? (
         <EmptyContent />
