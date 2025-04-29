@@ -1,3 +1,4 @@
+import { count } from 'console';
 export type ReportLeadsDashboardTypes = {
   best_seller: string
   best_seller_leads_count: number
@@ -73,4 +74,10 @@ export type ReportsLeadsChartType = {
 export type ReportsLeadsChartItemType = {
   count: string
   month: string
+}
+
+
+export type SellersDetailCourseType = {
+  name: string,
+  count:number
 }

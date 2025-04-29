@@ -11,7 +11,7 @@ const CourseInterest = ({ data }: { data: ReportLeadsCourseType[] }) => {
 
   const courseInterestData = data.map(item => ({
     id: item.name,
-    labe: item.name,
+    label: item.name,
     value: item.count
   }))
 

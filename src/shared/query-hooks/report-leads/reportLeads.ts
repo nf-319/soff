@@ -8,7 +8,8 @@ import {
   ReportLeadsYearlyStats,
   ReportsLeadsChartType,
   ReportsLeadsListType,
-  ReposrtLeadsSellers
+  ReposrtLeadsSellers,
+  SellersDetailCourseType
 } from '@/types/report'
 
 const getReportLeads = async () => {
@@ -106,4 +107,20 @@ export const useGetReportLeadsChart = (params?: { status: string }) =>
     queryKey: [QueryKeys.ReportLeadsChart, params],
     queryFn: () => getReportLeadsChart(params),
     enabled: !!params?.status
+  })
+
+const getLeadsSellerDetail = async (admin_id?: string) => {
+  try {
+    const response = await api.get<SellersDetailCourseType[]>(`leads/course-distribution/${admin_id}/`)
+    return response.data
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export const useGetLeadsSellerDetail = (params?: { id: string }) =>
+  useQuery({
+    queryKey: [QueryKeys.ReportsLeadsSellers, params],
+    queryFn: () => getLeadsSellerDetail(params?.id),
+    enabled: !!params?.id
   })
