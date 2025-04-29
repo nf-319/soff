@@ -485,7 +485,7 @@ export function GroupCreateEditDrawer({ open, setOpen }: Props) {
                 </FormHelperText>
               </FormControl>
 
-              {isOpenEdit && (
+              {open == 'edit' && (
                 <FormControl sx={{ width: '100%' }}>
                   <TextField
                     size='small'
