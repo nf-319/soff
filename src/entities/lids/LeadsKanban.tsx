@@ -347,17 +347,16 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const displayData = localLeadData || leadData
   const amoLeadData = localAmoLeadData || mergedSteps
 
-
   return (
     <DragDropContext onDragEnd={is_amocrm ? onDragEndAmo : onDragEnd}>
-      <Droppable  droppableId='section-list' direction={isMobile ? 'vertical' : 'horizontal'} type='SECTION'>
+      <Droppable droppableId='section-list' direction={isMobile ? 'vertical' : 'horizontal'} type='SECTION'>
         {provided => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
             className='kanban'
             style={{
-              paddingBottom:20,
+              paddingBottom: 20,
               display: 'flex',
               overflow: 'auto',
               flexDirection: isMobile ? 'column' : 'row',
@@ -366,7 +365,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
               gap: 20
             }}
           >
-            {displayData?.results.length || amoLeadData?.length ? (
+            {(!is_amocrm && displayData?.results.length) || (is_amocrm && amoLeadData?.length) ? (
               (is_amocrm ? amoLeadData : displayData?.results)?.map((section: any, sectionIndex: any) => (
                 <Draggable key={section.id} draggableId={`section-${section.id}`} index={sectionIndex}>
                   {(sectionProvided, sectionSnapshot) => (

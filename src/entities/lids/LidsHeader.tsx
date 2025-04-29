@@ -10,13 +10,14 @@ import useResponsive from 'src/@core/hooks/useResponsive'
 import useDebounce from 'src/hooks/useDebounce'
 import { useAppDispatch } from 'src/store'
 import { setOpen } from 'src/store/apps/leads'
+import { useGet } from '@/hooks/useApi'
 
 export const LidsHeader = () => {
   const { push, query } = useRouter()
   const { t } = useTranslation()
   const { isMobile } = useResponsive()
   const params = new URLSearchParams(window.location.search)
-
+  const { data: amoCrmdata } = useGet('amocrm/data/')
   const dispatch = useAppDispatch()
   const [search, setSearch] = useState<string>(params.get('search') ?? '')
   const [isActive, setIsActive] = useState<boolean>(Boolean(!params.get('is_active')))
@@ -98,12 +99,14 @@ export const LidsHeader = () => {
             <span>{t('Manba')}</span>
           </Tooltip>
         </Button>
-        <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Switch checked={isAmoCrm} onChange={() => setIsAmoCrm(prev => !prev)} />
-          <Tooltip title={t('Arxivdagi leadlarni ko‘rish.')} arrow>
-            <span>{t('Amocrm')}</span>
-          </Tooltip>
-        </label>
+        {amoCrmdata && (
+          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Switch checked={isAmoCrm} onChange={() => setIsAmoCrm(prev => !prev)} />
+            <Tooltip title={t('Arxivdagi leadlarni ko‘rish.')} arrow>
+              <span>{t('Amocrm')}</span>
+            </Tooltip>
+          </label>
+        )}
       </form>
 
       <Box
