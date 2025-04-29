@@ -12,7 +12,6 @@ import {
   DialogTitle,
   IconButton,
   Tooltip
-  Tooltip
 } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import DataTable from '../../components/table'
@@ -54,12 +53,14 @@ export default function StudentsPage() {
   const { t } = useTranslation()
   const router = useRouter()
   const { isMobile } = useResponsive()
-  const { isMobile } = useResponsive()
+  const {getSMSTemps,smsTemps} = useSMS()
   const { user } = useContext(AuthContext)
+  const [openModalEdit, setOpenModalEdit] = useState<any>()
+  const { companyInfo } = useAppSelector((state: any) => state.user)
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
-
+  const [accessModal,setAccessModal] = useState(false)
   const { queryParams } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const querySearch = new URLSearchParams(window.location.search).get('q')
