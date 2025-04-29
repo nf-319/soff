@@ -9,6 +9,7 @@ import { today } from 'src/components/card-statistics/kanban-item'
 import api from 'src/@core/utils/api'
 import toast, { Toaster } from 'react-hot-toast'
 import { setDragonLoading, setLeadItems } from 'src/store/apps/leads'
+import { useRouter } from 'next/router'
 
 type Props = {
   item: any
@@ -16,16 +17,16 @@ type Props = {
   groups: any[]
   setLoading?: any
   loading?: any
-  is_amocrm?: boolean
   open?: boolean
   setOpenParent?: (status: boolean) => void
   setOpen?: (status: boolean) => void
 }
 
-export default function AddToGroupForm({ setOpenParent, setOpen, is_amocrm, item, reRender, groups }: Props) {
+export default function AddToGroupForm({ setOpenParent, setOpen, item, reRender, groups }: Props) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const dispatch = useAppDispatch()
+  const router = useRouter()
 
   const validationSchema = Yup.object({
     group: Yup.string().required('Guruhni tanlang'),
@@ -61,10 +62,13 @@ export default function AddToGroupForm({ setOpenParent, setOpen, is_amocrm, item
     onSubmit: async values => {
       setLoading(true)
       try {
-        const resp = await api.post(is_amocrm ? 'amocrm/group-student-create/' : `leads/lead-to-student/`, {
-          lead: item.id,
-          ...values
-        })
+        const resp = await api.post(
+          router.query.is_amocrm ? 'amocrm/group-student-create/' : `leads/lead-to-student/`,
+          {
+            lead: item.id,
+            ...values
+          }
+        )
         toast.success(`${resp.data?.msg || "Guruhga qo'shildi"}`)
         setLoading(false)
         if (setOpen) {

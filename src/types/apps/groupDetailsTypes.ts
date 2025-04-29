@@ -1,7 +1,7 @@
 import { StudentDetailType } from 'src/types/apps/studentsTypes'
 import { BranchTypes } from 'src/hooks/useRooms'
 import { TeacherType } from 'src/hooks/useTeachers'
-import { SmsItemType } from './settings'
+import { SMSItemResult } from './settings'
 
 type ActionTypes = 'delete' | 'send-sms' | 'add-student' | 'notes' | 'edit' | 'online-lesson'
 
@@ -41,7 +41,7 @@ export interface IGroupDetailsState {
   studentsQueryParams: {
     status: 'active,new' | 'archive'
   }
-  smsTemps: SmsItemType[] | null
+  smsTemps: SMSItemResult[] | null
   month_list: {
     month: string
     date: string

@@ -50,6 +50,7 @@ import AddNote from './view/ViewStudents/AddNote'
 import SentSMS from './view/ViewStudents/SentSMS'
 import ExportStudent from './view/ViewStudents/ExportStudent'
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
+import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 type Props = {
   id: number
@@ -62,9 +63,11 @@ export default function GroupDetailRowOptions({ id }: Props) {
   const { push, query } = useRouter()
   const { students, studentsQueryParams, queryParams, openLeadModal } =
     useAppSelector(state => state.groupDetails)
+  const { companyInfo } = useAppSelector(state => state.user)
   const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const { t } = useTranslation()
+  const [accessModal, setAccessModal] = useState<boolean>(false)
   const [modalRef, setModalRef] = useState<'sms' | 'note' | 'export' | null>(null)
   const [openLeft, setOpenLeft] = useState<boolean>(false)
   const { smsTemps, getSMSTemps } = useSMS()
@@ -85,7 +88,7 @@ export default function GroupDetailRowOptions({ id }: Props) {
     if (value === 'notes') setModalRef('note')
     else if (value === 'sms') setModalRef('sms')
     else if (value === 'export') setModalRef('export')
-    else if (value === 'payment') push(`/students/view/security/?student=${id}`)
+    else if (value === 'payment') void push(`/students/view/security/?student=${id}`)
     else if (value === 'left') {
       setOpenLeft(true)
     }
@@ -135,6 +138,15 @@ export default function GroupDetailRowOptions({ id }: Props) {
       .catch(error => console.error(error))
   }
 
+  const handleModalsOpen = () => {
+    if(companyInfo.access) {
+      handleClose('sms');
+      void getSMSTemps()
+    } else {
+      setAccessModal(true)
+    }
+  }
+
   return (
     <>
       <IconButton size='small' onClick={handleRowOptionsClick}>
@@ -180,7 +192,7 @@ export default function GroupDetailRowOptions({ id }: Props) {
         </MenuItem>
         <MenuItem
           sx={{ display: 'flex', alignItems: 'center', gap: '7px' }}
-          onClick={() => (handleClose('sms'), getSMSTemps())}
+          onClick={handleModalsOpen}
         >
           <Icon fontSize={'20px'} icon={'ic:baseline-message'} />
           {t('Xabar (sms)')} +
@@ -238,6 +250,7 @@ export default function GroupDetailRowOptions({ id }: Props) {
       <AddNote id={student?.student?.id} modalRef={modalRef} setModalRef={setModalRef} />
       <SentSMS smsTemps={smsTemps} id={student?.student?.id} modalRef={modalRef} setModalRef={setModalRef} />
       <ExportStudent id={student?.id} modalRef={modalRef} setModalRef={setModalRef} />
+      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
     </>
   )
 }

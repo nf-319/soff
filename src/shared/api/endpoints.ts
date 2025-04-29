@@ -8,4 +8,3 @@ export const enum Endpoints {
   ChecklistCourses = 'common/course/checklist/',
   NotificationRead = 'common/notification-read/{id}/',
 }
-

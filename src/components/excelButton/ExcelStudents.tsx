@@ -3,7 +3,6 @@ import { VscodeIconsFileTypeExcel2 } from './ExcelIcon'
 import api from '../../@core/utils/api'
 import { LoadingButton } from '@mui/lab'
 import { useState } from 'react'
-import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 
 interface ExcelProps {
@@ -52,6 +51,7 @@ export default function ExcelStudents({
       startIcon={!loading && <VscodeIconsFileTypeExcel2 />}
       {...args}
       variant={variant}
+      size={size}
       color={color}
       fullWidth
     >

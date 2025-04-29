@@ -58,6 +58,7 @@ export const appUsersSlice = createSlice({
       extra_settings: {
         allow_debt_editing_on_payment: false
       },
+      access: true,
       training_center_name: 'SOFF CRM',
       logo: '/images/default-logo.jpg',
       work_start_time: '00:00',
@@ -96,15 +97,7 @@ export const appUsersSlice = createSlice({
       state.total = action.payload
     },
     setCompanyInfo: (state, action) => {
-      state.companyInfo = {
-        ...action.payload,
-        work_start_time: `${action.payload?.work_start_time.split(':')?.[0]}:${
-          action.payload?.work_start_time.split(':')?.[1]
-        }`,
-        work_end_time: `${action.payload?.work_end_time.split(':')?.[0]}:${
-          action.payload?.work_end_time.split(':')?.[1]
-        }`
-      }
+      state.companyInfo = action.payload
     },
     setDepartmentsState: (state, action) => {
       state.departmentsState = action.payload

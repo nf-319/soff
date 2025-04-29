@@ -127,16 +127,16 @@ const DataTable: FC<DataTableProps> = ({ columns, loading = false, data, minWidt
                     {el.render
                       ? el.render(el.dataIndex === 'index' ? index + 1 : item[`${el.dataIndex}`])
                       : el.renderItem
-                      ? el.renderItem(item)
-                      : el.renderSource
-                      ? el.renderSource(item[`${el.dataIndex}`], item)
-                      : el.renderId
-                      ? el.renderId(item.id, item[`${el.dataIndex}`])
-                      : el.dataIndex === 'index'
-                      ? `${
-                          query.page && Number(query.page) > 1 ? (Number(query?.page) - 1) * 10 + index + 1 : 1 + index
-                        }.`
-                      : item[`${el.dataIndex}`]}
+                        ? el.renderItem(item)
+                        : el.renderSource
+                          ? el.renderSource(item[`${el.dataIndex}`], item)
+                          : el.renderId
+                            ? el.renderId(item.id, item[`${el.dataIndex}`])
+                            : el.dataIndex === 'index'
+                              ? `${
+                                query.page && Number(query.page) > 1 ? (Number(query?.page) - 1) * 10 + index + 1 : 1 + index
+                              }.`
+                              : item[`${el.dataIndex}`]}
                   </Box>
                 </Box>
               ))}
