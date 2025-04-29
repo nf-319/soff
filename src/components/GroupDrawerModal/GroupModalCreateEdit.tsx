@@ -146,7 +146,7 @@ export function GroupCreateEditDrawer({ open, setOpen }: Props) {
 
         if (response.meta.requestStatus === 'rejected') {
           formik.setErrors(response.payload)
-          toast.error(response.payload.msg)
+          toast.error(response.payload.msg || response.payload.end_date)
         } else {
           dispatch(updateParams({ is_recovery: false }))
           toast.success(t("O'zgrishlar muvafaqqiyati saqlandi"))
@@ -496,6 +496,9 @@ export function GroupCreateEditDrawer({ open, setOpen }: Props) {
                     onBlur={formik.handleBlur}
                     value={formik.values.end_date}
                     error={!!formik.errors.end_date && formik.touched.end_date}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
                   />
                   <FormHelperText error={!!formik.errors.end_date && formik.touched.end_date}>
                     {!!formik.errors.end_date && formik.touched.end_date && formik.errors.end_date}
