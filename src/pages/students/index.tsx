@@ -53,20 +53,18 @@ export default function StudentsPage() {
   const { t } = useTranslation()
   const router = useRouter()
   const { isMobile } = useResponsive()
+  const {getSMSTemps,smsTemps} = useSMS()
   const { user } = useContext(AuthContext)
+  const [openModalEdit, setOpenModalEdit] = useState<any>()
+  const { companyInfo } = useAppSelector((state: any) => state.user)
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
-
+  const [accessModal,setAccessModal] = useState(false)
   const { queryParams } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const querySearch = new URLSearchParams(window.location.search).get('q')
   const { search, ...filteredParams } = queryParams
-  const [openModalEdit, setOpenModalEdit] = useState<ModalTypes | null>(null)
-  const { smsTemps, getSMSTemps } = useSMS()
-  const [accessModal, setAccessModal] = useState<boolean>(false)
-  const { companyInfo } = useAppSelector(item => item.user)
-
   const queryString = new URLSearchParams(
     Object.fromEntries(
       Object.entries({ ...filteredParams, ...(querySearch ? { search: querySearch } : { search: '' }) })
@@ -276,9 +274,9 @@ export default function StudentsPage() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Typography variant='h5'>{t("O'quvchilar")}</Typography>
-          {!isLoading && <Chip label={`O'quvchilar soni: ${data?.count || 0} ta`} variant='outlined' color='primary' />}
-          {!isLoading && (
-            <Chip label={`Qazdorlik: ${formatCurrency(data?.total_debts) || 0}` + " so'm"} variant='outlined' color='error' />
+          {!isLoading && <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' />}
+          {!isLoading && queryParams.is_debtor && (
+            <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm"} variant='outlined' color='error' />
           )}
         </Box>
 

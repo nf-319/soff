@@ -334,7 +334,6 @@ const StudentsFilter = () => {
 
         <FormControl fullWidth onClick={() => setKey('group')}>
           <Autocomplete
-            fullWidth
             loading={!groupOptions}
             disablePortal
             options={groupOptions}

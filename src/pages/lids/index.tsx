@@ -29,6 +29,7 @@ import { useAuth } from 'src/hooks/useAuth'
 import { LidsEditModal } from 'src/entities/lids/modals'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 
 export type DepartmentsResultType = {
   id: number
@@ -77,10 +78,22 @@ const Lids = () => {
     params: { branch: user?.active_branch, is_active: is_active || true, parent: null }
   })
 
-  const { data: amoCrmLeadData, isLoading: amoCrmLoading } = useGet<AmoLeads[]>('amocrm/pipelines/?with_steps=true', {
+  const {
+    data: amoCrmLeadData,
+    isLoading: amoCrmLoading,
+    error: amoCrmError
+  } = useGet<AmoLeads[]>('amocrm/pipelines/?with_steps=true', {
     options: { enabled: !!is_amocrm },
-    deps:['amo-leads']
+    deps: ['amo-leads']
   })
+
+  console.log(amoCrmError)
+
+  useEffect(() => {
+    if (amoCrmError?.response?.data) {
+      toast.error(amoCrmError.response.data.msg)
+    }
+  }, [amoCrmError])
 
   useEffect(() => {
     if (!amoCrmLoading && amoCrmLeadData?.length && selectedAmoLeadTab === null && is_amocrm) {
@@ -142,21 +155,23 @@ const Lids = () => {
         {isLoading || amoCrmLoading ? (
           <Skeleton variant='rectangular' sx={{ borderRadius: 1 }} width={150} height={50} />
         ) : is_amocrm ? (
-          <Select
-            placeholder={"Bo'lim"}
-            sx={{ marginBottom: isMobile ? 4 : 0 }}
-            fullWidth={isMobile}
-            size='medium'
-            value={selectedAmoLeadTab}
-            onChange={e => handleAmoTabChange(e)}
-            displayEmpty
-          >
-            {amoCrmLeadData?.map((item: any) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </Select>
+          amoCrmLeadData?.length && (
+            <Select
+              placeholder={"Bo'lim"}
+              sx={{ marginBottom: isMobile ? 4 : 0 }}
+              fullWidth={isMobile}
+              size='medium'
+              value={selectedAmoLeadTab}
+              onChange={e => handleAmoTabChange(e)}
+              displayEmpty
+            >
+              {amoCrmLeadData?.map((item: any) => (
+                <MenuItem key={item.id} value={item.id}>
+                  {item.name}
+                </MenuItem>
+              ))}
+            </Select>
+          )
         ) : (
           <Select
             sx={{ marginBottom: isMobile ? 4 : 0 }}
