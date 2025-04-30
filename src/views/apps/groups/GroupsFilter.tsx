@@ -30,6 +30,7 @@ import { useGetChecklistCourses } from '@/shared/query-hooks'
 import { LaptopMinimal, Search } from 'lucide-react'
 import useDebounce from '@hooks/useDebounce'
 import { useEffect, useState } from 'react'
+import useResponsive from '@/@core/hooks/useResponsive'
 
 export const GroupsFilter = () => {
   const router = useRouter()
