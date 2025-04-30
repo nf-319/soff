@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux'
 import { EmptyContent } from '../../components/empty-content'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'
-import { useGet, usePatch } from 'src/hooks/useApi'
+import { useGet, usePatch, usePost } from 'src/hooks/useApi'
 import { RootState, useAppDispatch } from 'src/store'
 import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
 import CreateAnonimUserForm from 'src/views/apps/lids/anonimUser/CreateAnonimUserForm'
@@ -68,7 +68,22 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
   const [deleteItem, setDeleteItem] = useState<any | null>(null)
   const { id, search, is_active } = router.query
   const { mutate, isPending } = usePatch()
+  const { mutate: updateDepartmentMutation } = usePost()
 
+  const handleSubmit = (data: any) => {
+    updateDepartmentMutation(
+      'leads/departments/bulk-ordering/',
+      { departments: data },
+      {
+        onSuccess: response => {
+          console.log('Success:', response)
+        },
+        onError: error => {
+          console.error('Error:', error)
+        }
+      }
+    )
+  }
   const apiParams = {
     is_active: is_active ?? true
   }
@@ -156,7 +171,14 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
       const newResults = Array.from(localLeadData.results)
       const [movedSection] = newResults.splice(source.index, 1)
       newResults.splice(destination.index, 0, movedSection)
-
+      console.log(newResults)
+      const newResultsOrdered = newResults.map((item, index) => ({
+        obj_id: item?.id,
+        order: index
+      }))
+      if (newResultsOrdered) {
+        handleSubmit(newResultsOrdered)
+      }
       setLocalLeadData({
         ...localLeadData,
         results: newResults
@@ -235,8 +257,8 @@ export const LeadsKanban: FC<Props> = ({ defaultId }) => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="section-list" direction={isMobile ? 'vertical' : 'horizontal'} type="SECTION">
-        {(provided) => (
+      <Droppable droppableId='section-list' direction={isMobile ? 'vertical' : 'horizontal'} type='SECTION'>
+        {provided => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
