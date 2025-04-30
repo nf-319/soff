@@ -29,7 +29,7 @@ const LidsReportsFilter = () => {
         <Typography variant='h5'>Lidlar Hisoboti</Typography>
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 5, flexDirection: isMobile ? 'column' : 'row' }}>
+      {/* <Box sx={{ display: 'flex', gap: 5, flexDirection: isMobile ? 'column' : 'row' }}>
         <FormControl fullWidth>
           <InputLabel id='duration-label'>Oy</InputLabel>
           <Select
@@ -63,7 +63,7 @@ const LidsReportsFilter = () => {
             ))}
           </Select>
         </FormControl>
-      </Box>
+      </Box> */}
     </Box>
   )
 }

@@ -2,24 +2,35 @@ import { Box, Card, FormControl, InputLabel, MenuItem, Select, Typography } from
 import { useState } from 'react'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import { ResponsiveFunnel } from '@nivo/funnel'
+import { useGet } from '@/hooks/useApi'
+import { EmptyContent } from '@/components/empty-content'
 
 const SalesFunnel = () => {
   const [duration, setDuration] = useState('3')
   const { settings } = useSettings()
   const isDark = settings.mode == 'dark'
   const textColor = isDark ? '#ffffff' : '#333333'
+  const { data } = useGet('leads/sales-funnel/')
 
-  const updatedFunnelData = [
-    { id: 'All Leads', value: 1245, label: 'All Leads' },
-    { id: 'Contacted', value: 850, label: 'Contacted' },
-    { id: 'Demo Given', value: 520, label: 'Demo Given' },
-    { id: 'Enrolled', value: 320, label: 'Enrolled' }
-  ]
+  const labelMap: { [key: string]: string } = {
+    all_leads: 'All Leads',
+    connected_leads: 'Contacted',
+    test_period: 'Demo Given',
+    enrolled_leads: 'Enrolled'
+  }
+
+  const updatedFunnelData = data
+    ? Object.entries(data).map(([key, value]) => ({
+        id: labelMap[key],
+        value: Number(value),
+        label: labelMap[key]
+      }))
+    : []
 
   return (
     <Card
       sx={{
-        height: { xs: 400, sm: 500 }, 
+        height: { xs: 400, sm: 500 },
         width: '100%',
         boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
         display: 'flex',
@@ -29,7 +40,7 @@ const SalesFunnel = () => {
       <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
         Sales Funnel
       </Typography>
-      <Box sx={{ px: 5 }}>
+      {/* <Box sx={{ px: 5 }}>
         <FormControl fullWidth size='small'>
           <InputLabel id='duration-label'>Duration</InputLabel>
           <Select
@@ -44,46 +55,49 @@ const SalesFunnel = () => {
             <MenuItem value={'6'}>6 month</MenuItem>
           </Select>
         </FormControl>
-      </Box>
-
-      <Box sx={{ flexGrow: 1, width: '100%' }}>
-        <ResponsiveFunnel
-          data={updatedFunnelData}
-          margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-          valueFormat='>-.0f'
-          colors={{ scheme: 'blues' }}
-          borderWidth={20}
-          labelColor={textColor}
-          beforeSeparatorLength={100}
-          beforeSeparatorOffset={20}
-          afterSeparatorLength={100}
-          afterSeparatorOffset={20}
-          currentPartSizeExtension={10}
-          currentBorderWidth={40}
-          motionConfig='gentle'
-          shapeBlending={0.6}
-          enableLabel={true}
-          theme={{
-            labels: {
-              text: {
-                fontSize: 14,
-                fontWeight: 'bold',
-                fill: textColor
+      </Box> */}
+      {!updatedFunnelData?.length ? (
+        <EmptyContent />
+      ) : (
+        <Box sx={{ flexGrow: 1, width: '100%' }}>
+          <ResponsiveFunnel
+            data={updatedFunnelData}
+            margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+            valueFormat='>-.0f'
+            colors={{ scheme: 'blues' }}
+            borderWidth={20}
+            labelColor={textColor}
+            beforeSeparatorLength={100}
+            beforeSeparatorOffset={20}
+            afterSeparatorLength={100}
+            afterSeparatorOffset={20}
+            currentPartSizeExtension={10}
+            currentBorderWidth={40}
+            motionConfig='gentle'
+            shapeBlending={0.6}
+            enableLabel={true}
+            theme={{
+              labels: {
+                text: {
+                  fontSize: 14,
+                  fontWeight: 'bold',
+                  fill: textColor
+                }
+              },
+              tooltip: {
+                container: {
+                  background: isDark ? '#1e1e1e' : '#ffffff',
+                  color: textColor,
+                  fontSize: 12,
+                  borderRadius: 4,
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                }
               }
-            },
-            tooltip: {
-              container: {
-                background: isDark ? '#1e1e1e' : '#ffffff',
-                color: textColor,
-                fontSize: 12,
-                borderRadius: 4,
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-              }
-            }
-          }}
-          animate={true}
-        />
-      </Box>
+            }}
+            animate={true}
+          />
+        </Box>
+      )}
     </Card>
   )
 }

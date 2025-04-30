@@ -18,16 +18,18 @@ const LeadsDashboardCardModal = ({ id, setOpen }: { id: string | null; setOpen: 
   const formattedData = [
     {
       id: t(String(id)) || 'status',
-      data:
-        data?.results.map(item => ({
-          x: monthNames[parseInt(item.month, 10) - 1],
-          y: parseInt(item.count, 10)
-        })) || []
+      data: monthNames.map((month, index) => {
+        const found = data?.results.find(item => parseInt(item.month, 10) === index + 1)
+        return {
+          x: month,
+          y: found ? parseInt(found.count, 10) : 0
+        }
+      })
     }
   ]
 
   return (
-    <Dialog fullWidth open={id == 'new' || id == 'rejected'} onClose={() => setOpen(null)}>
+    <Dialog fullWidth maxWidth='md' open={id == 'new' || id == 'rejected'} onClose={() => setOpen(null)}>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography> {id == 'new' ? 'Yangi lidlar' : "Yo'qotilgan lidlar"}</Typography>
         <IconButton

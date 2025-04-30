@@ -13,39 +13,47 @@ const YearlyTrend = () => {
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
   const { isMobile } = useResponsive()
 
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const monthNames = [
+    'Yanvar',
+    'Fevral',
+    'Mart',
+    'Aprel',
+    'May',
+    'Iyun',
+    'Iyul',
+    'Avgust',
+    'Sentabr',
+    'Oktabr',
+    'Noyabr',
+    'Dekabr'
+  ]
+
+  const fillMissingMonths = (dataArray:any[] , valueKey: string) => {
+    const monthMap = new Map(dataArray?.map(item => [parseInt(item.month, 10), parseInt(item[valueKey], 10)]))
+
+    return monthNames.map((name, index) => ({
+      x: name,
+      y: monthMap.get(index + 1) ?? 0
+    }))
+  }
 
   const yearlyTrendData = [
     {
       id: 'Yangi lidlar',
       color: 'hsl(240, 70%, 50%)',
-      data: data?.map(item => ({
-        x: monthNames[parseInt(item.month, 10) - 1],
-        y: parseInt(item.new_count, 10)
-      }))
+      data: fillMissingMonths(data ?? [], 'new_count')
     },
     {
       id: 'Roʻyxatdan oʻtgan',
       color: 'hsl(120, 70%, 50%)',
-      data: data?.map(item => ({
-        x: monthNames[parseInt(item.month, 10) - 1],
-        y: parseInt(item.enrolled_count, 10)
-      }))
+      data: fillMissingMonths(data ?? [], 'enrolled_count')
     },
     {
       id: "Yo'qotilgan Lidlar",
       color: 'hsl(0, 70%, 50%)',
-      data: data?.map(item => ({
-        x: monthNames[parseInt(item.month, 10) - 1],
-        y: parseInt(item.lost_count, 10)
-      }))
+      data: fillMissingMonths(data ?? [], 'lost_count')
     }
   ]
-
-  const normalizedData = yearlyTrendData?.map(series => ({
-    ...series,
-    data: series.data ?? []
-  }))
 
   return (
     <Card
@@ -58,11 +66,11 @@ const YearlyTrend = () => {
       <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
         Yillik yetakchi trendi
       </Typography>
-      {!normalizedData.length ? (
+      {!yearlyTrendData.length ? (
         <EmptyContent />
       ) : (
         <ResponsiveLine
-          data={normalizedData}
+          data={yearlyTrendData}
           margin={{ top: 20, right: isMobile ? 50 : 140, bottom: isMobile ? 110 : 90, left: 60 }}
           xScale={{ type: 'point' }}
           yScale={{

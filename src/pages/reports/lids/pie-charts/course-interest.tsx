@@ -9,8 +9,8 @@ const CourseInterest = ({ data }: { data: ReportLeadsCourseType[] }) => {
   const isDark = settings.mode == 'dark'
   const textColor = isDark ? '#ffffff' : '#333333'
 
-  const courseInterestData = data.map(item => ({
-    id: item.name,
+  const courseInterestData = data.map((item, index) => ({
+    id: `${item.name}_${item.id}`, // unique qilish uchun index qo‘shiladi
     label: item.name,
     value: item.count
   }))
@@ -34,7 +34,7 @@ const CourseInterest = ({ data }: { data: ReportLeadsCourseType[] }) => {
         <Box sx={{ flexGrow: 1, width: '100%' }}>
           <ResponsivePie
             data={courseInterestData}
-            margin={{ top: 20, right: 20, bottom: 60, left: 20 }}
+            margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
             innerRadius={0.5}
             padAngle={0.7}
             cornerRadius={3}
@@ -53,26 +53,46 @@ const CourseInterest = ({ data }: { data: ReportLeadsCourseType[] }) => {
               from: 'color',
               modifiers: [['darker', 2]]
             }}
+            defs={[
+              {
+                id: 'dots',
+                type: 'patternDots',
+                background: 'inherit',
+                color: 'rgba(255, 255, 255, 0.3)',
+                size: 4,
+                padding: 1,
+                stagger: true
+              },
+              {
+                id: 'lines',
+                type: 'patternLines',
+                background: 'inherit',
+                color: 'rgba(255, 255, 255, 0.3)',
+                rotation: -45,
+                lineWidth: 6,
+                spacing: 10
+              }
+            ]}
             legends={[
               {
                 anchor: 'bottom',
                 direction: 'row',
                 justify: false,
                 translateX: 0,
-                translateY: 40,
+                translateY: 56,
                 itemsSpacing: 0,
-                itemWidth: 80,
+                itemWidth: 100,
                 itemHeight: 18,
                 itemTextColor: textColor,
                 itemDirection: 'left-to-right',
                 itemOpacity: 1,
-                symbolSize: 14,
+                symbolSize: 18,
                 symbolShape: 'circle',
                 effects: [
                   {
                     on: 'hover',
                     style: {
-                      itemTextColor: '#3f51b5'
+                      itemTextColor: isDark ? '#3f51b5' : '#3f51b5'
                     }
                   }
                 ]

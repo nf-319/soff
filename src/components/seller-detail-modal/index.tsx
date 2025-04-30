@@ -27,20 +27,21 @@ const SellerDetailModal = ({
 }: {
   sellerId: number | null
   setSellerId: (status: any) => void
-  selectedSeller: ReposrtLeadsSellers | null
+  selectedSeller: any | null
 }) => {
-  const { data: sellerDetailCourse, isLoading: corseLoading } = useGetLeadsSellerDetail({ id: String(sellerId) })
-  const { data, isLoading } = useGet(`leads/seller-conversion/${sellerId}/`, { options: { enabled: !!sellerId } })
+  const { data: sellerData, isLoading } = useGet(`leads/sellers/${sellerId}/`, { options: { enabled: !!sellerId } })
   const { settings } = useSettings()
   const isDark = settings.mode == 'dark'
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-  const { isMobile } = useResponsive()
   const textColor = isDark ? '#ffffff' : '#333333'
-  const courseInterestData = sellerDetailCourse?.map(item => ({
+
+  const courseInterestData = sellerData?.course_distribution?.map((item: any) => ({
     id: item.name,
     label: item.name,
     value: item.count
   }))
+
+  console.log(sellerData)
 
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -48,14 +49,24 @@ const SellerDetailModal = ({
     {
       id: 'Lidlar',
       color: 'hsl(240, 70%, 50%)',
-      data: data?.map((item: any) => ({
-        x: monthNames[parseInt(item.month, 10) - 1],
-        y: parseInt(item.conversion_rate, 10)
-      }))
+      data: monthNames.map((monthName, index) => {
+        const found = sellerData?.conversion_graph?.find((item: any) => parseInt(item.month, 10) === index + 1)
+
+        return {
+          x: monthName,
+          y: found ? parseInt(found.conversion_rate, 10) : 0
+        }
+      })
     }
   ]
 
-  const normalizedData = yearlyTrendData?.map(series => ({
+  type Series = {
+    id: string
+    color: string
+    data: any[]
+  }
+
+  const normalizedData: Series[] | undefined = yearlyTrendData?.map(series => ({
     ...series,
     data: series.data ?? []
   }))
@@ -96,12 +107,12 @@ const SellerDetailModal = ({
               flexDirection: 'column'
             }}
           >
-            <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
+            <Typography color={'black'} fontSize={20} fontWeight={700}>
               Yillik lidlar foizi
             </Typography>
             {isLoading ? (
               <Skeleton height={350} sx={{ px: 3 }} />
-            ) : !normalizedData.length ? (
+            ) : normalizedData?.[0]?.data?.length < 1 ? (
               <EmptyContent />
             ) : (
               <ResponsiveLine
@@ -212,15 +223,15 @@ const SellerDetailModal = ({
             <Typography sx={{ pb: 2 }} color={'black'} fontSize={20} fontWeight={700}>
               Kurslar
             </Typography>
-            {corseLoading ? (
+            {isLoading ? (
               <Skeleton height={350} sx={{ px: 3 }} />
             ) : !courseInterestData?.length ? (
               <EmptyContent />
             ) : (
-              <Box sx={{ flexGrow: 1, width: '100%' }}>
+              <Box sx={{height:300, flexGrow: 1, width: '100%' }}>
                 <ResponsivePie
                   data={courseInterestData}
-                  margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
+                  margin={{ top: 20, right: 80, bottom: 80, left: 80 }}
                   innerRadius={0.5}
                   padAngle={0.7}
                   cornerRadius={3}
@@ -229,7 +240,8 @@ const SellerDetailModal = ({
                   borderColor={{
                     from: 'color',
                     modifiers: [['darker', 0.2]]
-                  }}
+                      }}
+                    
                   arcLinkLabelsSkipAngle={10}
                   arcLinkLabelsTextColor={textColor}
                   arcLinkLabelsThickness={2}
@@ -245,10 +257,10 @@ const SellerDetailModal = ({
                       direction: 'row',
                       justify: false,
                       translateX: 0,
-                      translateY: 40,
-                      itemsSpacing: 0,
-                      itemWidth: 80,
-                      itemHeight: 18,
+                      translateY: 66, // pastga tushiradi
+                      itemsSpacing: 16, // elementlar orasini kengaytiradi
+                      itemWidth: 120, // har bir itemga keng joy beradi
+                      itemHeight: 20,
                       itemTextColor: textColor,
                       itemDirection: 'left-to-right',
                       itemOpacity: 1,
@@ -281,49 +293,37 @@ const SellerDetailModal = ({
           <Card>
             <Grid sx={{ paddingX: 5, paddingY: 5 }} container spacing={5}>
               <Grid item xs={12} sm={6} md={6}>
-                <Card className='shadow-sm border-0' style={{ backgroundColor: '#f9f9f9' }}>
+                <Card  style={{backgroundColor: '#f9f9f9',boxShadow:'none',border:'1px solid lightgray' }}>
                   <CardContent>
                     <Typography variant='subtitle2' color='textSecondary'>
                       Konversatsiya raytingi
                     </Typography>
                     <Typography variant='h5' className='fw-bold mt-2'>
-                      {selectedSeller?.conversion_rate}
+                      {sellerData?.average_conversion}%
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={6}>
-                <Card className='shadow-sm border-0' style={{ backgroundColor: '#f9f9f9' }}>
+                <Card  style={{ backgroundColor: '#f9f9f9' ,boxShadow:'none',border:'1px solid lightgray' }}>
                   <CardContent>
                     <Typography variant='subtitle2' color='textSecondary'>
                       Lidlar soni
                     </Typography>
                     <Typography variant='h5' className='fw-bold mt-2'>
-                      {selectedSeller?.worked_lead_count}
+                      {sellerData?.total_worked_leads}
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} sm={6} md={6}>
-                <Card className='shadow-sm border-0' style={{ backgroundColor: '#f9f9f9' }}>
-                  <CardContent>
-                    <Typography variant='subtitle2' color='textSecondary'>
-                      Ishlagan vaqti
-                    </Typography>
-                    <Typography variant='h5' className='fw-bold mt-2'>
-                      {selectedSeller?.conversion_rate}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={6}>
-                <Card className='shadow-sm border-0' style={{ backgroundColor: '#f9f9f9' }}>
+              <Grid item xs={12} sm={12} md={12}>
+                <Card  style={{ backgroundColor: '#f9f9f9' ,boxShadow:'none',border:'1px solid lightgray' }}>
                   <CardContent>
                     <Typography variant='subtitle2' color='textSecondary'>
                       Yo'qotilgan lidlar
                     </Typography>
                     <Typography variant='h5' className='fw-bold mt-2'>
-                      {selectedSeller?.lost_leads}%
+                      {sellerData?.lost_leads}
                     </Typography>
                   </CardContent>
                 </Card>

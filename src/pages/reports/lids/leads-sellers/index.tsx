@@ -69,7 +69,7 @@ const LeadsSellers = () => {
   return (
     <Box>
       <Typography variant='h5'>Sotuvchilar list</Typography>
-      <DataTable columns={columns} loading={isLoading} data={data || []} />
+      <DataTable columns={columns} loading={isLoading} data={data || []} rowClick={(item:number) => setSellerId(item)} />
       <SellerDetailModal selectedSeller={selectedSeller} sellerId={sellerId} setSellerId={setSellerId} />
     </Box>
   )
