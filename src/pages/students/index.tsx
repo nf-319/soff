@@ -34,6 +34,7 @@ import ExcelStudents from '../../components/excelButton/ExcelStudents'
 import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
 import { useGet } from 'src/hooks/useApi'
 import { useQueryClient } from '@tanstack/react-query'
+import useSMS from '@/hooks/useSMS'
 
 export type customTableProps = {
   xs: number
@@ -46,11 +47,14 @@ export default function StudentsPage() {
   const { t } = useTranslation()
   const router = useRouter()
   const { isMobile } = useResponsive()
+  const {getSMSTemps,smsTemps} = useSMS()
   const { user } = useContext(AuthContext)
+  const [openModalEdit, setOpenModalEdit] = useState<any>()
+  const { companyInfo } = useAppSelector((state: any) => state.user)
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
-
+  const [accessModal,setAccessModal] = useState(false)
   const { queryParams } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const querySearch = new URLSearchParams(window.location.search).get('q')
@@ -238,7 +242,7 @@ export default function StudentsPage() {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Typography variant='h5'>{t("O'quvchilar")}</Typography>
           {!isLoading && <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' />}
-          {!isLoading  && (
+          {!isLoading && queryParams.is_debtor && (
             <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm"} variant='outlined' color='error' />
           )}
         </Box>

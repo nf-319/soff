@@ -13,8 +13,7 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
-  Tooltip,
-  useMediaQuery
+  Tooltip
 } from '@mui/material'
 import { useRouter } from 'next/router'
 
@@ -31,11 +30,12 @@ import { useGetChecklistCourses } from '@/shared/query-hooks'
 import { LaptopMinimal, Search } from 'lucide-react'
 import useDebounce from '@hooks/useDebounce'
 import { useEffect, useState } from 'react'
+import useResponsive from '@/@core/hooks/useResponsive'
 
 export const GroupsFilter = () => {
   const router = useRouter()
   const { query } = router
-  const isMobile = useMediaQuery('(max-width:564px)');
+  const { isMobile } = useResponsive()
   const { queryParams } = useAppSelector(state => state.groups)
   const { onlineLessonLoading } = useAppSelector(state => state.groupDetails)
   const { data: teachersData } = useGetTeachers()
@@ -112,7 +112,7 @@ export const GroupsFilter = () => {
     return (
       <form id='mobile-filter-form'>
         <Box display={'flex'} gap={2} flexDirection={'column'} paddingTop={isMobile ? 3 : 0} rowGap={isMobile ? 4 : 0}>
-          <FormControl sx={{ width: '100%' }}>
+          <FormControl sx={{ width: '100%', maxWidth: 260 }}>
             <InputLabel size='small' id='search-input'>
               {t('Qidirish')}
             </InputLabel>
