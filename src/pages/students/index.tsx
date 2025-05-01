@@ -47,14 +47,14 @@ export default function StudentsPage() {
   const { t } = useTranslation()
   const router = useRouter()
   const { isMobile } = useResponsive()
-  const {getSMSTemps,smsTemps} = useSMS()
+  const { getSMSTemps, smsTemps } = useSMS()
   const { user } = useContext(AuthContext)
   const [openModalEdit, setOpenModalEdit] = useState<any>()
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
-  const [accessModal,setAccessModal] = useState(false)
+  const [accessModal, setAccessModal] = useState(false)
   const { queryParams } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const querySearch = new URLSearchParams(window.location.search).get('q')
@@ -225,7 +225,6 @@ export default function StudentsPage() {
     }
   }, [])
 
-
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
   }, [user?.active_branch])
@@ -256,7 +255,7 @@ export default function StudentsPage() {
             size='small'
             startIcon={<IconifyIcon icon='ic:baseline-plus' />}
           >
-            <Tooltip title={t("Yangi o‘quvchi qo‘shish.")}>
+            <Tooltip title={t('Yangi o‘quvchi qo‘shish.')}>
               <span>{t("Yangi qo'shish")}</span>
             </Tooltip>
           </Button>
