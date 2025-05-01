@@ -384,7 +384,7 @@ const CardStatistics = () => {
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', minWidth: '300px', justifyContent: 'space-between' }}>
           <Typography>{t("Kirimlar bo'limini yaratish")}</Typography>
 
-          <Close o  nClick={() => setOpen(null)} />
+          <Close onClick={() => setOpen(null)} />
         </DialogTitle>
 
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
