@@ -8,8 +8,7 @@ import { Box, Skeleton, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useAppSelector } from 'src/store'
 import useResponsive from 'src/@core/hooks/useResponsive'
-import { useState } from 'react'
-import { EmptyContent } from '../../../../components/empty-content'
+import { EmptyContent } from '@components/empty-content'
 
 const CardWidgetsWeeklyOverview = () => {
   const { isMobile } = useResponsive()
