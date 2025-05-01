@@ -130,7 +130,6 @@ const UserViewSecurity = () => {
 
   const archivedGroups = studentGroups?.filter((item: any) => item.status == 'archive')
   const unArchivedGroups = studentGroups?.filter((item: any) => item.status !== 'archive')
-  console.log(archivedGroups, unArchivedGroups)
 
   return (
     <Box className='demo-space-y'>
