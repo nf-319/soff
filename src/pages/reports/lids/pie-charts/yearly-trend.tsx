@@ -7,7 +7,7 @@ import { EmptyContent } from '@/components/empty-content'
 
 const YearlyTrend = () => {
   const { settings } = useSettings()
-  const { data, isLoading } = useGetLeadsYearlyStatus()
+  const { data } = useGetLeadsYearlyStatus()
   const isDark = settings.mode == 'dark'
   const textColor = isDark ? '#ffffff' : '#333333'
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
@@ -28,10 +28,18 @@ const YearlyTrend = () => {
     'Dekabr'
   ]
 
+  // Get current month (0-11)
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth() // 0-11
+
+  // Filter months to only show current and past months of this year
+  const availableMonths = monthNames.slice(0, currentMonth + 1)
+
   const fillMissingMonths = (dataArray:any[] , valueKey: string) => {
     const monthMap = new Map(dataArray?.map(item => [parseInt(item.month, 10), parseInt(item[valueKey], 10)]))
 
-    return monthNames.map((name, index) => ({
+    // Only fill data for months up to current month
+    return availableMonths.map((name, index) => ({
       x: name,
       y: monthMap.get(index + 1) ?? 0
     }))
@@ -66,7 +74,7 @@ const YearlyTrend = () => {
       <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
         Yillik yetakchi trendi
       </Typography>
-      {!yearlyTrendData.length ? (
+      {!yearlyTrendData[0].data.length ? (
         <EmptyContent />
       ) : (
         <ResponsiveLine
@@ -75,7 +83,7 @@ const YearlyTrend = () => {
           xScale={{ type: 'point' }}
           yScale={{
             type: 'linear',
-            min: 'auto',
+            min: 0,
             max: 'auto',
             stacked: false,
             reverse: false

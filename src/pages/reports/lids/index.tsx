@@ -19,20 +19,28 @@ const LidsReports = () => {
       <LidsReportsCard />
       <div className='row g-4'>
         <div className='col-12 col-md-6'>
-          <SalesFunnel />
+          <Box sx={{ height: { xs: 450, sm: 500 } }}>
+            <SalesFunnel />
+          </Box>
         </div>
         <div className='col-12 col-md-6'>
-          <YearlyTrend />
+          <Box sx={{ height: { xs: 450, sm: 500 } }}>
+            <YearlyTrend />
+          </Box>
         </div>
         <div className='col-12 col-md-6'>
-          <CourseInterest data={data?.courses || []} />
+          <Box sx={{ height: { xs: 450, sm: 500 } }}>
+            <CourseInterest data={data?.courses || []} />
+          </Box>
         </div>
         <div className='col-12 col-md-6'>
-          <MarketingSources data={data?.sources || []} />
+          <Box sx={{ height: { xs: 450, sm: 500 } }}>
+            <MarketingSources data={data?.sources || []} />
+          </Box>
         </div>
       </div>
       <LeadsSellers />
-      <LeadsList/>
+      <LeadsList />
     </Box>
   )
 }

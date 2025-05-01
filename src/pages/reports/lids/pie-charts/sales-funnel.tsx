@@ -6,7 +6,6 @@ import { useGet } from '@/hooks/useApi'
 import { EmptyContent } from '@/components/empty-content'
 
 const SalesFunnel = () => {
-  const [duration, setDuration] = useState('3')
   const { settings } = useSettings()
   const isDark = settings.mode == 'dark'
   const textColor = isDark ? '#ffffff' : '#333333'
@@ -38,24 +37,8 @@ const SalesFunnel = () => {
       }}
     >
       <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
-        Sales Funnel
+        Savdo voronkasi
       </Typography>
-      {/* <Box sx={{ px: 5 }}>
-        <FormControl fullWidth size='small'>
-          <InputLabel id='duration-label'>Duration</InputLabel>
-          <Select
-            labelId='duration-label'
-            value={duration}
-            onChange={e => setDuration(e.target.value)}
-            label='Duration'
-          >
-            <MenuItem value={'3'}>3 month</MenuItem>
-            <MenuItem value={'4'}>4 month</MenuItem>
-            <MenuItem value={'5'}>5 month</MenuItem>
-            <MenuItem value={'6'}>6 month</MenuItem>
-          </Select>
-        </FormControl>
-      </Box> */}
       {!updatedFunnelData?.length ? (
         <EmptyContent />
       ) : (
