@@ -112,7 +112,7 @@ const LoginPage = () => {
       const paymentPage = response.data.payment_page
       const returnUrl = router.query.returnUrl
       const redirectURL = isMarketable
-        ? '/lids'
+        ? '/lid-statements'
         : paymentPage
         ? '/crm-payments'
         : returnUrl && returnUrl !== '/'

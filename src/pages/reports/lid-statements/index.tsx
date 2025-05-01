@@ -7,12 +7,21 @@ import SalesFunnel from './pie-charts/sales-funnel'
 import YearlyTrend from './pie-charts/yearly-trend'
 import CourseInterest from './pie-charts/course-interest'
 import MarketingSources from './pie-charts/marketing-sources'
-import { useGetLeadsSourceStatus } from '@/shared/query-hooks/report-leads/reportLeads'
 import LeadsSellers from './leads-sellers'
 import LeadsList from './leads-list'
+import { useRouter } from 'next/router'
+import { useGet } from '@hooks/useApi'
+import { Endpoints } from '@api/endpoints'
 
 const LidsReports = () => {
-  const { data } = useGetLeadsSourceStatus()
+  const router = useRouter()
+  const { branch } = router.query
+  console.log(branch)
+  const { data } = useGet(Endpoints.LeadsSourceStats, {
+    params: { branch: String(branch) },
+    options: { enabled: !!branch }
+  })
+
   return (
     <Box sx={{ paddingY: 4, display: 'flex', flexDirection: 'column', gap: 8 }}>
       <LidsReportsFilter />

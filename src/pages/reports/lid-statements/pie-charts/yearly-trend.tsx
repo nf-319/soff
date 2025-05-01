@@ -2,43 +2,31 @@ import { Card, Typography } from '@mui/material'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import { ResponsiveLine } from '@nivo/line'
 import useResponsive from '@/@core/hooks/useResponsive'
-import { useGetLeadsYearlyStatus } from '@/shared/query-hooks/report-leads/reportLeads'
 import { EmptyContent } from '@/components/empty-content'
+import { uzbekMonths } from '@/shared/constans'
+import { useRouter } from 'next/router'
+import { useGet } from '@hooks/useApi'
+import { Endpoints } from '@api/endpoints'
+import { ReportLeadsYearlyStats } from '@/types/report'
 
 const YearlyTrend = () => {
   const { settings } = useSettings()
-  const { data } = useGetLeadsYearlyStatus()
+  const router = useRouter()
+  const { branch } = router.query
+  const { data } = useGet<ReportLeadsYearlyStats[]>(Endpoints.LeadsYearlyStats, { params: { branch: String(branch) }, options: { enabled: !!branch } })
   const isDark = settings.mode == 'dark'
   const textColor = isDark ? '#ffffff' : '#333333'
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
   const { isMobile } = useResponsive()
 
-  const monthNames = [
-    'Yanvar',
-    'Fevral',
-    'Mart',
-    'Aprel',
-    'May',
-    'Iyun',
-    'Iyul',
-    'Avgust',
-    'Sentabr',
-    'Oktabr',
-    'Noyabr',
-    'Dekabr'
-  ]
-
-  // Get current month (0-11)
   const currentDate = new Date()
-  const currentMonth = currentDate.getMonth() // 0-11
+  const currentMonth = currentDate.getMonth()
 
-  // Filter months to only show current and past months of this year
-  const availableMonths = monthNames.slice(0, currentMonth + 1)
+  const availableMonths = uzbekMonths.slice(0, currentMonth + 1)
 
   const fillMissingMonths = (dataArray:any[] , valueKey: string) => {
     const monthMap = new Map(dataArray?.map(item => [parseInt(item.month, 10), parseInt(item[valueKey], 10)]))
 
-    // Only fill data for months up to current month
     return availableMonths.map((name, index) => ({
       x: name,
       y: monthMap.get(index + 1) ?? 0
@@ -74,6 +62,7 @@ const YearlyTrend = () => {
       <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
         Yillik yetakchi trendi
       </Typography>
+
       {!yearlyTrendData[0].data.length ? (
         <EmptyContent />
       ) : (

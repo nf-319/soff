@@ -12,50 +12,24 @@ import {
   SellersDetailCourseType
 } from '@/types/report'
 
-const getReportLeads = async () => {
+const getReportLeads = async (branch?: string) => {
   try {
-    const response = await api.get<ReportLeadsDashboardTypes>(Endpoints.LeadsDashboard)
+    const params = branch ? { branch } : {}
+    const response = await api.get<ReportLeadsDashboardTypes>(Endpoints.LeadsDashboard, { params })
     return response.data
   } catch (error) {
     console.error(error)
+    throw error;
   }
 }
 
-export const useGetReportLeads = () =>
+export const useGetReportLeads = (branch?: string) =>
   useQuery({
-    queryKey: [QueryKeys.ReportLead],
-    queryFn: getReportLeads
+    queryKey: [QueryKeys.ReportLead, branch],
+    queryFn: () => getReportLeads(branch),
+    enabled: true,
   })
 
-const getLeadsYearlyStats = async () => {
-  try {
-    const response = await api.get<ReportLeadsYearlyStats[]>(Endpoints.LeadsYearlyStats)
-    return response.data
-  } catch (error) {
-    console.error(error)
-  }
-}
-
-export const useGetLeadsYearlyStatus = () =>
-  useQuery({
-    queryKey: [QueryKeys.ReportLeadsYearlStats],
-    queryFn: getLeadsYearlyStats
-  })
-
-const getLeadsSourceStats = async () => {
-  try {
-    const response = await api.get<ReportLeadsSourceStats>(Endpoints.LeadsSourceStats)
-    return response.data
-  } catch (error) {
-    console.error(error)
-  }
-}
-
-export const useGetLeadsSourceStatus = () =>
-  useQuery({
-    queryKey: [QueryKeys.ReportLeadsSourceStats],
-    queryFn: getLeadsSourceStats
-  })
 
 const getLeadsSellers = async () => {
   try {
@@ -90,7 +64,7 @@ export const useGetReportLeadsList = (params?: { page?: number; limit?: number }
     queryFn: () => getReportLeadsList(params)
   })
 
-const getReportLeadsChart = async (params?: { status: string }) => {
+const getReportLeadsChart = async (params?: any) => {
   try {
     const response = await api.get<ReportsLeadsChartType>(Endpoints.ReportLeadsChart, {
       params
@@ -102,11 +76,11 @@ const getReportLeadsChart = async (params?: { status: string }) => {
   }
 }
 
-export const useGetReportLeadsChart = (params?: { status: string }) =>
+export const useGetReportLeadsChart = (params?: any) =>
   useQuery({
     queryKey: [QueryKeys.ReportLeadsChart, params],
     queryFn: () => getReportLeadsChart(params),
-    enabled: !!params?.status
+    enabled: !!params
   })
 
 const getLeadsSellerDetail = async (admin_id?: string) => {

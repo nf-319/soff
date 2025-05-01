@@ -16,7 +16,7 @@ const LegendItem = styled(Box)(({ theme }) => ({
   whiteSpace: 'nowrap',
 }))
 
-const CourseInterest = ({ data }: { data: ReportLeadsCourseType[] }) => {
+const CourseInterest = ({ data, isCard = false }: { data: ReportLeadsCourseType[], isCard?: boolean }) => {
   const { settings } = useSettings()
   const isDark = settings.mode === 'dark'
 
@@ -40,9 +40,10 @@ const CourseInterest = ({ data }: { data: ReportLeadsCourseType[] }) => {
   return (
     <Card
       sx={{
-        height: '100%',
+        height: isCard ? 300 : '100%',
         width: '100%',
-        boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
+        boxShadow: isCard ? 'none' : 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
+        border: isCard ? '1px solid lightgray' : 'none',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -50,6 +51,7 @@ const CourseInterest = ({ data }: { data: ReportLeadsCourseType[] }) => {
       <Typography sx={{ px: 6, pt: 4, pb: 2 }} color={'black'} fontSize={20} fontWeight={700}>
         Kurslar
       </Typography>
+
       {!courseInterestData.length ? (
         <EmptyContent />
       ) : (
@@ -110,15 +112,14 @@ const CourseInterest = ({ data }: { data: ReportLeadsCourseType[] }) => {
               }}
             />
           </Box>
-          {/* Custom Legend */}
           <Box sx={{ px: 6, pb: 4 }}>
-            <Grid container spacing={1}> {/* Tighter spacing for many items */}
+            <Grid container spacing={1}>
               {courseInterestData.map((item) => (
                 <Grid item xs={6} key={item.id}>
                   <LegendItem>
                     <Box
                       sx={{
-                        width: 12, // Smaller circle for many items
+                        width: 12,
                         height: 12,
                         borderRadius: '50%',
                         backgroundColor: item.color,

@@ -10,7 +10,7 @@ const statsData: StatsDataType[] = [
     title: 'Faol Lidlar',
     color: 'success',
     key: 'leads_count',
-    link: '/lids'
+    link: '/lid-statements'
   },
   {
     icon: 'la:layer-group',
@@ -80,7 +80,7 @@ export const fetchLessons = createAsyncThunk('dashboard/fetchLessons', async ({q
     day_of_week: queryWeeks?.toString() || '',
     interval: interval?.toString() || ''
   }).toString()
-  
+
 
   const response = await api.get(`common/dashboard/?` + queryString)
   return response.data

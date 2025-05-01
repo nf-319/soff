@@ -1,6 +1,12 @@
+type LeadDashboardSellerType = {
+  id: number
+  first_name: string
+  phone: string
+}
+
 export type ReportLeadsDashboardTypes = {
-  best_seller: string
-  best_seller_id:number,
+  best_seller: LeadDashboardSellerType
+  best_seller_id: number
   best_seller_leads_count: number
   best_seller_progress: number
   conversion: number

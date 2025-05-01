@@ -4,15 +4,19 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 import { ResponsiveFunnel } from '@nivo/funnel'
 import { useGet } from '@/hooks/useApi'
 import { EmptyContent } from '@/components/empty-content'
+import { useRouter } from 'next/router'
 
 const SalesFunnel = () => {
   const { settings } = useSettings()
+  const router = useRouter()
+  const { branch } = router.query
   const isDark = settings.mode == 'dark'
   const textColor = isDark ? '#ffffff' : '#333333'
-  const { data } = useGet('leads/sales-funnel/')
+  const { data } = useGet('leads/sales-funnel/', { params: { branch: String(branch) }, options: { enabled: !!branch } })
 
   const labelMap: { [key: string]: string } = {
     all_leads: 'All Leads',
+
     connected_leads: 'Contacted',
     test_period: 'Demo Given',
     enrolled_leads: 'Enrolled'

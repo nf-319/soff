@@ -125,7 +125,7 @@ const Navigation = (t: any): HorizontalNavItemsType => {
         },
         {
           title: 'Lidlar Hisoboti',
-          path: '/reports/lids'
+          path: '/reports/lid-statements'
         },
         {
           title: t('Davomatlar'),
@@ -243,7 +243,7 @@ const Navigation = (t: any): HorizontalNavItemsType => {
         },
         {
           title: 'Lidlar Hisoboti',
-          path: '/reports/lids'
+          path: '/reports/lid-statements'
         },
         {
           title: t('Davomatlar'),

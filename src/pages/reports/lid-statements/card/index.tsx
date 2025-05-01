@@ -7,6 +7,7 @@ import ReportLeadsSourceModal from '@/components/leads-detail-chart/source-modal
 import SellerDetailModal from '@/components/seller-detail-modal'
 import useResponsive from '@/@core/hooks/useResponsive'
 import { TrendCard } from '@components/TrendCard'
+import { useRouter } from 'next/router'
 
 type DashboardCard = {
   title: string
@@ -21,7 +22,10 @@ type DashboardCard = {
 }
 
 const LidsReportsCard = () => {
-  const { data, isLoading } = useGetReportLeads()
+  const router = useRouter()
+  const { branch } = router.query
+  const branchParam = branch && branch !== "undefined" ? String(branch) : undefined
+  const { data, isLoading } = useGetReportLeads(branchParam)
   const [modalContent, setModalContent] = useState<string | null>(null)
   const [sourceModal, setSourceModal] = useState<boolean>(false)
   const [selectedSeller, setSelectedSeller] = useState<any>(null)
@@ -41,7 +45,7 @@ const LidsReportsCard = () => {
   const handleOpenModal = (content?: string | number) => {
     if (typeof content == 'number') {
       setSellerId(content)
-      setSelectedSeller({ first_name: data?.best_seller })
+      setSelectedSeller(data?.best_seller)
     }
     if (content == 'source') {
       setSourceModal(true)
@@ -97,9 +101,9 @@ const LidsReportsCard = () => {
       iconColor: '#ffc300'
     },
     {
-      id: data?.best_seller_id,
+      id: data?.best_seller.id,
       icon: User,
-      title: `Eng yaxshi sotuvchi ${data?.best_seller}`,
+      title: `Eng yaxshi sotuvchi ${data?.best_seller.first_name}`,
       process: data?.best_seller_progress || 0,
       count: data?.best_seller_leads_count || 0,
       trendColor: '#fff',

@@ -3,6 +3,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 import { ResponsiveBar } from '@nivo/bar'
 import { ReportLeadsSourceType } from '@/types/report'
 import { EmptyContent } from '@/components/empty-content'
+import { truncateLabel } from '@/shared/utils'
 
 const MarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {
   const { settings } = useSettings()
@@ -15,10 +16,6 @@ const MarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {
   const isDark = settings.mode === 'dark'
   const textColor = isDark ? '#ffffff' : '#333333'
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-
-  const truncateLabel = (label: string, maxLength: number = 15) => {
-    return label.length > maxLength ? `${label.slice(0, maxLength - 3)}...` : label
-  }
 
   return (
     <Card

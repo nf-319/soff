@@ -47,7 +47,7 @@ export const LidsHeader = () => {
     }
 
     void push({
-      pathname: '/lids',
+      pathname: '/lid-statements',
       query: updatedQuery
     })
   }, [searchVal, isActive])

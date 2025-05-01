@@ -18,7 +18,7 @@ import { UserIcon, X } from 'lucide-react'
 import { EmptyContent } from '../empty-content'
 import { useGet } from '@/hooks/useApi'
 import { ResponsiveLine } from '@nivo/line'
-import useResponsive from '@/@core/hooks/useResponsive'
+import { uzbekMonths } from '@/shared/constans'
 
 const SellerDetailModal = ({
   sellerId,
@@ -41,15 +41,14 @@ const SellerDetailModal = ({
     value: item.count
   }))
 
-  console.log(sellerData)
-
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth()
 
   const yearlyTrendData = [
     {
       id: 'Lidlar',
       color: 'hsl(240, 70%, 50%)',
-      data: monthNames.map((monthName, index) => {
+      data: uzbekMonths.slice(0, currentMonth + 1).map((monthName, index) => {
         const found = sellerData?.conversion_graph?.find((item: any) => parseInt(item.month, 10) === index + 1)
 
         return {
@@ -74,7 +73,9 @@ const SellerDetailModal = ({
   return (
     <Dialog maxWidth='md' fullWidth onClose={() => setSellerId(null)} open={!!sellerId}>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant='h5'>Sotuvchi detaili</Typography>
+        <Typography variant='h5' fontWeight={700}>
+          Eng yaxshi sotuvchi
+        </Typography>
         <IconButton onClick={() => setSellerId(null)}>
           <X />
         </IconButton>
@@ -86,7 +87,8 @@ const SellerDetailModal = ({
               width: '50px',
               height: '50px',
               borderRadius: '50%',
-              backgroundColor: '#e5e7eb',
+              color: 'white',
+              backgroundColor: '#666CFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
@@ -94,7 +96,14 @@ const SellerDetailModal = ({
           >
             <UserIcon />
           </div>
-          <Typography>{selectedSeller?.first_name}</Typography>
+          <Box display='flex' flexDirection='column' alignItems='start'>
+            <Typography variant='body1' sx={{ fontWeight: '600' }}>
+              {selectedSeller?.first_name}
+            </Typography>
+            <Typography variant='subtitle1' sx={{ fontSize: '12px' }}>
+              {selectedSeller?.phone}
+            </Typography>
+          </Box>
         </Box>
         <Box mt={5} display={'flex'} flexDirection={{ xs: 'column', md: 'row' }} gap={4}>
           <Card
@@ -117,7 +126,7 @@ const SellerDetailModal = ({
             ) : (
               <ResponsiveLine
                 data={normalizedData}
-                margin={{ top: 20, right: 20, bottom: 50, left: 30 }}
+                margin={{ top: 20, right: 20, bottom: 30, left: 30 }}
                 xScale={{ type: 'point' }}
                 yScale={{
                   type: 'linear',
@@ -134,7 +143,6 @@ const SellerDetailModal = ({
                   tickSize: 5,
                   tickPadding: 5,
                   tickRotation: 0,
-                  legend: 'Oylar',
                   legendOffset: 36,
                   legendPosition: 'middle'
                 }}
@@ -228,7 +236,7 @@ const SellerDetailModal = ({
             ) : !courseInterestData?.length ? (
               <EmptyContent />
             ) : (
-              <Box sx={{height:300, flexGrow: 1, width: '100%' }}>
+              <Box sx={{ height: 300, flexGrow: 1, width: '100%' }}>
                 <ResponsivePie
                   data={courseInterestData}
                   margin={{ top: 20, right: 80, bottom: 80, left: 80 }}
@@ -240,8 +248,7 @@ const SellerDetailModal = ({
                   borderColor={{
                     from: 'color',
                     modifiers: [['darker', 0.2]]
-                      }}
-                    
+                  }}
                   arcLinkLabelsSkipAngle={10}
                   arcLinkLabelsTextColor={textColor}
                   arcLinkLabelsThickness={2}
@@ -257,9 +264,9 @@ const SellerDetailModal = ({
                       direction: 'row',
                       justify: false,
                       translateX: 0,
-                      translateY: 66, // pastga tushiradi
-                      itemsSpacing: 16, // elementlar orasini kengaytiradi
-                      itemWidth: 120, // har bir itemga keng joy beradi
+                      translateY: 66,
+                      itemsSpacing: 16,
+                      itemWidth: 120,
                       itemHeight: 20,
                       itemTextColor: textColor,
                       itemDirection: 'left-to-right',
@@ -293,7 +300,7 @@ const SellerDetailModal = ({
           <Card>
             <Grid sx={{ paddingX: 5, paddingY: 5 }} container spacing={5}>
               <Grid item xs={12} sm={6} md={6}>
-                <Card  style={{backgroundColor: '#f9f9f9',boxShadow:'none',border:'1px solid lightgray' }}>
+                <Card style={{ backgroundColor: '#f9f9f9', boxShadow: 'none', border: '1px solid lightgray' }}>
                   <CardContent>
                     <Typography variant='subtitle2' color='textSecondary'>
                       Konversatsiya raytingi
@@ -305,7 +312,7 @@ const SellerDetailModal = ({
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={6}>
-                <Card  style={{ backgroundColor: '#f9f9f9' ,boxShadow:'none',border:'1px solid lightgray' }}>
+                <Card style={{ backgroundColor: '#f9f9f9', boxShadow: 'none', border: '1px solid lightgray' }}>
                   <CardContent>
                     <Typography variant='subtitle2' color='textSecondary'>
                       Lidlar soni
@@ -317,7 +324,7 @@ const SellerDetailModal = ({
                 </Card>
               </Grid>
               <Grid item xs={12} sm={12} md={12}>
-                <Card  style={{ backgroundColor: '#f9f9f9' ,boxShadow:'none',border:'1px solid lightgray' }}>
+                <Card style={{ backgroundColor: '#f9f9f9', boxShadow: 'none', border: '1px solid lightgray' }}>
                   <CardContent>
                     <Typography variant='subtitle2' color='textSecondary'>
                       Yo'qotilgan lidlar

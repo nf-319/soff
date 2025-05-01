@@ -6,23 +6,24 @@ import { useSettings } from '@/@core/hooks/useSettings'
 import { ResponsivePie } from '@nivo/pie'
 import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import CourseInterest from '@/pages/reports/lid-statements/pie-charts/course-interest'
+import { truncateLabel } from '@/shared/utils'
+import { useRouter } from 'next/router'
 
 const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (status: boolean) => void }) => {
-  const { data } = useGet('leads/source-stats/all/', { options: { enabled: open } })
+  const router = useRouter()
+  const { branch } = router.query
+
+  const { data } = useGet('leads/source-stats/all/', { params: { branch: String(branch) }, options: { enabled: open } })
   const { settings } = useSettings()
   const isDark = settings.mode == 'dark'
   const { t } = useTranslation()
   const textColor = isDark ? '#ffffff' : '#333333'
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+
   const marketingSourcesData = data?.sources.map((item: any) => ({
     source: item.name,
     conversionRate: item.conversion_rate
-  }))
-
-  const courseInterestData = data?.courses?.map((item: any, index: any) => ({
-    id: `${item.name}_${item.id}`,
-    label: item.name,
-    value: item.count
   }))
 
   return (
@@ -36,7 +37,11 @@ const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (st
         </DialogTitle>
         <DialogContent>
           <Box flexDirection={{ xs: 'column', md: 'row' }} sx={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <Card sx={{ border: '1px solid lightgray ', boxShadow: 'none', padding: 6, width: '100%', height: 300 }}>
+            <Card sx={{ border: '1px solid lightgray ', boxShadow: 'none', width: '100%', height: 300 }}>
+              <Typography sx={{ px: 6, pt: 4, pb: 2 }} color={'black'} fontSize={20} fontWeight={700}>
+                Manba
+              </Typography>
+
               {!marketingSourcesData?.length ? (
                 <EmptyContent />
               ) : (
@@ -44,7 +49,7 @@ const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (st
                   data={marketingSourcesData}
                   keys={['conversionRate']}
                   indexBy='source'
-                  margin={{ top: 30, right: 30, bottom: 70, left: 30 }} // bottom marginni oshirdik
+                  margin={{ top: 30, right: 40, bottom: 120, left: 30 }}
                   padding={0.3}
                   valueScale={{ type: 'linear' }}
                   indexScale={{ type: 'band', round: true }}
@@ -58,10 +63,10 @@ const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (st
                   axisBottom={{
                     tickSize: 5,
                     tickPadding: 5,
-                    tickRotation: -30, // burish bilan bir-biridan ajratamiz
-                    legend: t('Manba'),
+                    tickRotation: 30,
                     legendPosition: 'middle',
-                    legendOffset: 50
+                    legendOffset: 50,
+                    format: (value) => truncateLabel(value),
                   }}
                   axisLeft={{
                     tickSize: 5,
@@ -145,67 +150,7 @@ const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (st
                 />
               )}
             </Card>
-            <Card sx={{ border: '1px solid lightgray ', boxShadow: 'none', padding: 4, width: '100%', height: 300 }}>
-              {!courseInterestData?.length ? (
-                <EmptyContent />
-              ) : (
-                <ResponsivePie
-                  data={courseInterestData}
-                  margin={{ top: 40, right: 40, bottom: 120, left: 40 }}
-                  innerRadius={0.5}
-                  padAngle={0.7}
-                  cornerRadius={3}
-                  activeOuterRadiusOffset={8}
-                  borderWidth={1}
-                  borderColor={{
-                    from: 'color',
-                    modifiers: [['darker', 0.2]]
-                  }}
-                  arcLinkLabelsSkipAngle={10}
-                  arcLinkLabelsTextColor={textColor}
-                  arcLinkLabelsThickness={2}
-                  arcLinkLabelsColor={{ from: 'color' }}
-                  arcLabelsSkipAngle={10}
-                  arcLabelsTextColor={{
-                    from: 'color',
-                    modifiers: [['darker', 2]]
-                  }}
-                  legends={[
-                    {
-                      anchor: 'bottom',
-                      direction: 'row',
-                      justify: false,
-                      translateX: 0,
-                      translateY: 100, // pastga tushurish
-                      itemsSpacing: 10, // itemlar orasiga masofa
-                      itemWidth: 120, // yozuvlar uzun bo‘lsa kenglik oshirish
-                      itemHeight: 20,
-                      itemTextColor: textColor,
-                      itemDirection: 'left-to-right',
-                      itemOpacity: 1,
-                      symbolSize: 14,
-                      symbolShape: 'circle',
-                      effects: [
-                        {
-                          on: 'hover',
-                          style: {
-                            itemTextColor: '#3f51b5'
-                          }
-                        }
-                      ]
-                    }
-                  ]}
-                  theme={{
-                    tooltip: {
-                      container: {
-                        background: isDark ? '#1e1e1e' : '#ffffff',
-                        color: textColor
-                      }
-                    }
-                  }}
-                />
-              )}
-            </Card>
+            <CourseInterest isCard data={data?.courses || []} />
           </Box>
           <Card sx={{ p: 4, mt: 4 }}>
             <Typography variant='h5' pb={3}>

@@ -5,37 +5,56 @@ import { ResponsiveLine } from '@nivo/line'
 import { X } from 'lucide-react'
 import { EmptyContent } from '../empty-content'
 import { useTranslation } from 'react-i18next'
+import { useRouter } from 'next/router'
+import { uzbekMonths } from '@/shared/constans'
 
 const LeadsDashboardCardModal = ({ id, setOpen }: { id: string | null; setOpen: (status: any) => void }) => {
-  const { data, isLoading } = useGetReportLeadsChart({ status: String(id) })
+  const router = useRouter()
+  const { branch } = router.query
+  const branchParam = branch && branch !== "undefined" ? String(branch) : undefined
+  const { data, isLoading } = useGetReportLeadsChart({ status: String(id), branch: branchParam })
   const { settings } = useSettings()
   const { t } = useTranslation()
-  const isDark = settings.mode == 'dark'
-  const textColor = settings.mode == 'dark' ? '#ffffff' : '#333333'
-  const gridColor = settings.mode == 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const isDark = settings.mode === 'dark'
+  const textColor = isDark ? '#ffffff' : '#333333'
+  const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
 
-  const formattedData = [
-    {
-      id: t(String(id)) || 'status',
-      data: monthNames.map((month, index) => {
-        const found = data?.results.find(item => parseInt(item.month, 10) === index + 1)
-        return {
-          x: month,
-          y: found ? parseInt(found.count, 10) : 0
-        }
-      })
-    }
-  ]
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth() + 1
+
+  const formatChartData = () => {
+    if (!data?.results) return []
+
+    const monthData = Array.from({ length: currentMonth }, (_, i) => {
+      const month = i + 1
+      const found = data.results.find(item => parseInt(item.month, 10) === month)
+      return {
+        x: uzbekMonths[i],
+        y: found ? parseInt(found.count, 10) : 0
+      }
+    })
+
+    return [
+      {
+        id: t(String(id)) || 'status',
+        data: monthData
+      }
+    ]
+  }
+
+  const formattedData = formatChartData()
+
+  const isDataEmpty = !formattedData.length || formattedData[0].data.length === 0 ||
+    formattedData[0].data.every(item => item.y === 0)
 
   return (
-    <Dialog fullWidth maxWidth='md' open={id == 'new' || id == 'rejected'} onClose={() => setOpen(null)}>
+    <Dialog fullWidth maxWidth='md' open={id === 'new' || id === 'rejected'} onClose={() => setOpen(null)}>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography> {id == 'new' ? 'Yangi lidlar' : "Yo'qotilgan lidlar"}</Typography>
+        <Typography>{id === 'new' ? 'Yangi lidlar' : "Yo'qotilgan lidlar"}</Typography>
         <IconButton
           edge='end'
           color='inherit'
-          onClick={() => setOpen(null)} // Close the modal when clicked
+          onClick={() => setOpen(null)}
           aria-label='close'
           sx={{
             color: textColor
@@ -43,33 +62,32 @@ const LeadsDashboardCardModal = ({ id, setOpen }: { id: string | null; setOpen: 
         >
           <X />
         </IconButton>
-      </DialogTitle>{' '}
+      </DialogTitle>
       <DialogContent>
         {isLoading ? (
           <Box display='flex' alignItems='center' justifyContent='center' height='100%'>
             <CircularProgress />
           </Box>
-        ) : formattedData[0].data.length === 0 ? (
+        ) : isDataEmpty ? (
           <Box display='flex' alignItems='center' justifyContent='center' height='100%'>
             <EmptyContent />
           </Box>
         ) : (
           <Box style={{ height: '400px', width: '100%' }}>
-            {' '}
-            {/* Set fixed height here */}
             <ResponsiveLine
               data={formattedData}
               margin={{ top: 20, right: 40, bottom: 50, left: 60 }}
               xScale={{ type: 'point' }}
               yScale={{
                 type: 'linear',
-                min: 'auto',
+                min: 0,
                 max: 'auto',
                 stacked: false,
-                reverse: false
+                reverse: false,
+                clamp: true
               }}
               yFormat=' >-.0f'
-              curve='cardinal'
+              curve='monotoneX'
               axisTop={null}
               axisRight={null}
               axisBottom={{
@@ -89,7 +107,6 @@ const LeadsDashboardCardModal = ({ id, setOpen }: { id: string | null; setOpen: 
                 legendPosition: 'middle'
               }}
               enableGridX={false}
-              colors={{ scheme: 'category10' }}
               lineWidth={3}
               pointSize={10}
               pointColor={{ theme: 'background' }}
@@ -100,6 +117,9 @@ const LeadsDashboardCardModal = ({ id, setOpen }: { id: string | null; setOpen: 
               crosshairType='cross'
               useMesh={true}
               motionConfig='stiff'
+              enableArea={false}
+              areaBaselineValue={0}
+              colors={{ scheme: 'category10' }}
               theme={{
                 axis: {
                   domain: {
