@@ -19,7 +19,6 @@ type Props = {
   shortDescription?: string
   severity?: AlertProps['severity']
   onChange: (value: string) => void
-  label?: string
 }
 
 export const TextAreaWithPlaceholders: FC<Props> = ({
@@ -35,8 +34,7 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
   companyName,
   placeholders,
   defaultValue,
-  onChange,
-  label
+  onChange
 }) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
   const [wasCompanyNameRemoved, setWasCompanyNameRemoved] = useState(false)
@@ -270,7 +268,7 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
           ))}
         </Stack>
 
-        <Box sx={{ display: 'flex', gap: 1 }} className='text-area-with-placeholders-editable'>
+        <Box sx={{ display: 'flex', gap: 1 }}>
           {editable && (
             <Button variant='outlined' color='secondary' onClick={handleClose}>
               Bekor qilish
@@ -289,7 +287,6 @@ export const TextAreaWithPlaceholders: FC<Props> = ({
             inputRef={textAreaRef}
             multiline
             rows={4}
-            label={label}
             fullWidth
             variant='outlined'
             value={displayValue}

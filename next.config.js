@@ -1,7 +1,15 @@
 const path = require('path');
+const withTM = require('next-transpile-modules')([
+  '@nivo/core',
+  '@nivo/funnel',
+  '@nivo/bar',
+  '@nivo/line',
+  '@nivo/pie',
+  'd3-interpolate',
+]);
 
 /** @type {import('next').NextConfig} */
-module.exports = {
+module.exports = withTM({
   trailingSlash: false,
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
@@ -19,4 +27,4 @@ module.exports = {
       { protocol: 'http', hostname: '*' },
     ],
   },
-};
+});

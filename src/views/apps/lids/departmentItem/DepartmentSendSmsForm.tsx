@@ -57,7 +57,7 @@ export default function DepartmentSendSmsForm({ smsTemps, loading, setLoading, u
           dispatch(fetchSmsListQuery(parent_id))
         }
       }, [parent_id])
-
+    
   useEffect(() => {
     return () => {
       formik.resetForm()
@@ -106,7 +106,7 @@ export default function DepartmentSendSmsForm({ smsTemps, loading, setLoading, u
               formik.setFieldValue('message', e.target.value)
             }}
           >
-            {smschild_list.result.map((el: any) => (
+            {smschild_list.map((el: any) => (
               <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
                 <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>{el.description}</span>
               </MenuItem>

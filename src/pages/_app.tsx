@@ -70,16 +70,11 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
   const MyHead = () => {
     const { companyInfo } = useAppSelector(state => state.user)
 
-    return (
-      <Head>
-        <meta name='robots' content='noindex, nofollow' />
-        <title>
-          {`${companyInfo?.training_center_name || 'Soffcrm'} - Taʼlim tizimini nazorat qilish platformasi`}
-        </title>
-
-        <link rel='shortcut icon' href={companyInfo.logo} />
-      </Head>
-    )
+    return <Head>
+      <meta name="robots" content="noindex, nofollow" />
+      <title>{`${companyInfo.training_center_name} - Taʼlim tizimini nazorat qilish platformasi`}</title>
+      <link rel='shortcut icon' href={companyInfo.logo} />
+    </Head>
   }
 
   return (

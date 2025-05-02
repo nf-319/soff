@@ -57,7 +57,6 @@ import toast from 'react-hot-toast'
 import { useQueryClient } from '@tanstack/react-query'
 import UserSuspendDialog from '../../mentors/view/UserSuspendDialog'
 import { useFormik } from 'formik'
-import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 interface StudentCardProps {
   photo?: string
@@ -93,7 +92,6 @@ export default function StudentCard({
   balance,
   school
 }: StudentCardProps): ReactElement {
-  const { companyInfo } = useAppSelector((state: any) => state.user)
   const { getBranches, branches } = useBranches()
   const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
@@ -116,7 +114,6 @@ export default function StudentCard({
   const [deleteDetailModal, setDeleteDetailModal] = useState<string | number | null>(null)
   const [editItem, setEditItem] = useState<{ key: string; value: string; id: number } | null>(null)
   const queryClient = useQueryClient()
-  const [accessModal, setAccessModal] = useState<boolean>(false)
   const { mutate: editMutate, isPending: editPending } = usePatch()
   const { data: studentDetails, isLoading: studentDetailLoading } = useGet(`student/extradata/list/${userData.id}/`, {
     deps: ['student-data']
@@ -286,16 +283,6 @@ export default function StudentCard({
       getBranches()
     }
     setOpenEdit(value)
-  }
-
-  const handleSMSOpen = async () => {
-    if(companyInfo.access) {
-      setAccessModal(false)
-      await dispatch(fetchSmsList())
-      handleEditClickOpen('sms')
-    } else {
-      setAccessModal(true)
-    }
   }
 
   return (
@@ -489,10 +476,9 @@ export default function StudentCard({
           </Button>
         </Box>
         <Box display='flex' gap={2} justifyContent='center' width='100%'>
-          <Button onClick={handleSMSOpen} variant='outlined' fullWidth>
+          <Button onClick={() => (dispatch(fetchSmsList()), handleEditClickOpen('sms'))} variant='outlined' fullWidth>
             <MessageSquare size={15} />
           </Button>
-
           <Button variant='outlined' onClick={() => handleEditClickOpen('edit')} fullWidth>
             <Edit size={15} />
           </Button>
@@ -828,7 +814,6 @@ export default function StudentCard({
           </form>
         </DialogContent>
       </Dialog>
-      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
       <UserSuspendDialog
         open={Boolean(deleteDetailModal)}
         setOpen={setDeleteDetailModal}

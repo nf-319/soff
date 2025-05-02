@@ -1,0 +1,1 @@
+export { truncateLabel } from './trucateLabel'

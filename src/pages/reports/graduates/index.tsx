@@ -28,13 +28,11 @@ export default function GraduatesPage() {
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [groups, setGroups] = useState<any[]>([])
   const [selectedGroup, setSelectedGroup] = useState<string>('all')
 
   const dispatch = useAppDispatch()
   const { groupChecklist } = useAppSelector(state => state.groups)
 
-  // Bitiruvchilarni yuklash
   async function getGraduates() {
     setLoading(true)
 
@@ -54,7 +52,7 @@ export default function GraduatesPage() {
   }
 
   useEffect(() => {
-    getGraduates()
+    void getGraduates()
   }, [page, selectedGroup])
 
   useEffect(() => {

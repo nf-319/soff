@@ -6,12 +6,14 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  TextField,
   Typography,
   styled
 } from '@mui/material'
 import { useFormik } from 'formik'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import IconifyIcon from '../../../../components/icon'
 import * as Yup from 'yup'
 import MuiDrawer, { DrawerProps } from '@mui/material/Drawer'
 import { createSms, fetchSmsList, fetchSmsListQuery, setOpenCreateSms } from 'src/store/apps/settings'
@@ -19,9 +21,6 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
-import { X } from 'lucide-react'
-import { PLACEHOLDERS } from '@/views/apps/sms-settings/constants'
-import { TextAreaWithPlaceholders } from '@/components'
 
 const Drawer = styled(MuiDrawer)<DrawerProps>(({ theme }) => ({
   width: 400,
@@ -42,7 +41,6 @@ type Props = {}
 export default function CreateSmsDialog({}: Props) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState<boolean>(false)
-  const [editable, setEditable] = useState<boolean>(true)
   const dispatch = useAppDispatch()
   const { openCreateSms, sms_list } = useAppSelector(state => state.settings)
 
@@ -87,14 +85,6 @@ export default function CreateSmsDialog({}: Props) {
     dispatch(fetchSmsList())
   }, [])
 
-  const handleTextAreaChange = (value: string) => {
-    formik.setFieldValue('description', value)
-  }
-
-  const handleTextAreaSave = async () => {
-    return Promise.resolve()
-  }
-
   const { errors, values, handleSubmit, handleChange, handleBlur, touched } = formik
 
   return (
@@ -110,7 +100,6 @@ export default function CreateSmsDialog({}: Props) {
         <Typography variant='h6' sx={{ fontWeight: 600 }}>
           {t("SMS shablon qo'shish")}
         </Typography>
-
         <IconButton
           onClick={() => {
             setOpenAddGroup(false)
@@ -124,11 +113,15 @@ export default function CreateSmsDialog({}: Props) {
             transform: 'translateY(-50%)'
           }}
         >
-          <X size={22} />
+          <IconifyIcon icon='mdi:close' fontSize={20} />
         </IconButton>
       </Box>
       <p style={{ fontSize: 12 }} className='mb-3 mt-2 px-3'>
-          Xabar matniga talaba ismini qo'shish uchun dynamic tugmadan foydalaning.
+        <p>
+          Xabar matniga talaba ismini qo'shish uchun{' '}
+          <span style={{ backgroundColor: '#E0F7FA', color: 'blue', fontWeight: 'bold' }}>{'${first_name}'}</span> kalit
+          so'zi qoldiring.
+        </p>
       </p>
       <form
         onSubmit={handleSubmit}
@@ -138,58 +131,47 @@ export default function CreateSmsDialog({}: Props) {
           width: '100%',
           display: 'flex',
           flexDirection: 'column',
-          height: '100%',
           gap: '15px',
           marginTop: '5px'
         }}
       >
-        <Box display='grid' gap={3}>
-          <FormControl sx={{ width: '100%' }}>
-            <InputLabel size='small' id='demo-simple-select-outlined-label'>
-              {t('Kategoriya')}
-            </InputLabel>
-            <Select
-              size='small'
-              label={t('Kategoriya')}
-              name='parent'
-              error={!!errors.parent && touched.parent}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              value={values.parent}
-              id='demo-simple-select-outlined'
-              labelId='demo-simple-select-outlined-label'
-            >
-              {sms_list?.result?.map(item => (
-                <MenuItem value={item.id}>{item.description}</MenuItem>
-              ))}
-            </Select>
-            {!!errors.parent && touched.parent && <FormHelperText error>{errors.parent}</FormHelperText>}
-          </FormControl>
-          <FormControl fullWidth>
-            <Box
-              sx={{
-                '& .text-area-with-placeholders-editable': {
-                  display: 'none !important'
-                }
-              }}
-            >
-              <TextAreaWithPlaceholders
-                value={values.description}
-                editable={true}
-                loading={loading}
-                label='SMS matni'
-                handleChange={handleTextAreaSave}
-                setEditable={setEditable}
-                placeholders={PLACEHOLDERS.birthdate}
-                defaultValue={values.description}
-                onChange={handleTextAreaChange}
-              />
-            </Box>
-            {!!errors.description && touched.description && <FormHelperText error>{errors.description}</FormHelperText>}
-          </FormControl>
-        </Box>
-
-        <LoadingButton loading={loading} type='submit' variant='contained' sx={{ mt: 'auto' }} fullWidth>
+        <FormControl sx={{ width: '100%' }}>
+          <InputLabel size='small' id='demo-simple-select-outlined-label'>
+            {t('Kategoriya')}
+          </InputLabel>
+          <Select
+            size='small'
+            label={t('Kategoriya')}
+            name='parent'
+            error={!!errors.parent && touched.parent}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            value={values.parent}
+            id='demo-simple-select-outlined'
+            labelId='demo-simple-select-outlined-label'
+          >
+            {sms_list.map(item => (
+              <MenuItem value={item.id}>{item.description}</MenuItem>
+            ))}
+          </Select>
+          {!!errors.parent && touched.parent && <FormHelperText error>{errors.parent}</FormHelperText>}
+        </FormControl>
+        <FormControl fullWidth>
+          <TextField
+            multiline
+            rows={10}
+            label={t('SMS Matni')}
+            size='small'
+            name='description'
+            error={!!errors.description && touched.description}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            value={values.description}
+          />
+          {!!errors.description && touched.description && <FormHelperText error>{errors.description}</FormHelperText>}
+        </FormControl>
+        <LoadingButton loading={loading} type='submit' variant='contained' fullWidth>
+          {' '}
           {t('Saqlash')}
         </LoadingButton>
       </form>

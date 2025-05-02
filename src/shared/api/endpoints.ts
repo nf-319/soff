@@ -6,4 +6,12 @@ export const enum Endpoints {
   ChecklistTeacher = 'employee/check-list/?role=teacher',
   ChecklistCourses = 'common/course/checklist/',
   NotificationRead = 'common/notification-read/{id}/',
+  Branches = 'common/branches/',
+  LeadsDashboard = 'leads/dashboard/',
+  LeadsYearlyStats = 'leads/yearly-stats/',
+  LeadsSourceStats = 'leads/source-stats/',
+  ReportLeadsSellers = 'leads/sellers/',
+  ReportLeadsList = 'leads/list/',
+  ReportLeadsChart = 'leads/separate-leads-chart/',
+  ReportLeadsSellerDetail = 'leads/course-distribution/'
 }

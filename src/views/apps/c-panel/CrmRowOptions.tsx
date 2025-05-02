@@ -11,17 +11,14 @@ import { deleteCRM, deleteCRMPayment, fetchCRMPayments, handleEditClientPayment 
 import Router from 'next/router'
 import { StudentsPaymentsModal } from '../../../components/c-panel/DeleteStudentsPayments'
 import { AddStudentModal } from '../../../components/c-panel/AddStudentModal'
-import { MessageCirclePlus, Plus } from 'lucide-react'
-import SmsPaketModal from '@/components/c-panel/AddSms'
 
 const CrmRowOptions = ({ id }: { id: number | string }) => {
   const { t } = useTranslation()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
-  const [openStudentPaymentsModal, setOpenStudentsPaymentsModal] = useState(false)
-  const [openStudentAddModal, setOpenStudentAddModal] = useState(false)
-  const [openSmsPaketModal, setOpenSmsPaketModal] = useState(false)
+    const [openStudentPaymentsModal, setOpenStudentsPaymentsModal] = useState(false)
+    const [openStudentAddModal, setOpenStudentAddModal] = useState(false)
 
   const [loading, setLoaading] = useState<boolean>(false)
   const rowOptionsOpen = Boolean(anchorEl)
@@ -88,14 +85,10 @@ const CrmRowOptions = ({ id }: { id: number | string }) => {
         <MenuItem onClick={() => setOpenStudentsPaymentsModal(true)} sx={{ '& svg': { mr: 2 } }}>
           <IconifyIcon icon='mdi:cash-multiple' fontSize={20} />
           {t("O'quvchilari to'lovi")}
-        </MenuItem>
-        <MenuItem onClick={() => setOpenStudentAddModal(true)} sx={{ '& svg': { mr: 2 } }}>
-          <IconifyIcon icon='mdi:account-plus' fontSize={20} />
+              </MenuItem>
+              <MenuItem onClick={()=>setOpenStudentAddModal(true)} sx={{ '& svg': { mr: 2 } }}>
+          <IconifyIcon icon="mdi:account-plus" fontSize={20} />
           {t("O'quvchi qo'shish")}
-        </MenuItem>
-        <MenuItem onClick={() => setOpenSmsPaketModal(true)} sx={{ '& svg': { mr: 2 } }}>
-          <MessageCirclePlus size={16}/>
-          {t("Sms paket ulash")}
         </MenuItem>
       </Menu>
       <UserSuspendDialog
@@ -104,9 +97,9 @@ const CrmRowOptions = ({ id }: { id: number | string }) => {
         open={suspendDialogOpen}
         setOpen={setSuspendDialogOpen}
       />
-      <SmsPaketModal open={openSmsPaketModal} setOpen={setOpenSmsPaketModal} />
-      <StudentsPaymentsModal id={id} openModal={openStudentPaymentsModal} setOpenModal={setOpenStudentsPaymentsModal} />
-      <AddStudentModal id={id} openModal={openStudentAddModal} setOpenModal={setOpenStudentAddModal} />
+          <StudentsPaymentsModal id={id} openModal={openStudentPaymentsModal} setOpenModal={setOpenStudentsPaymentsModal} />
+          <AddStudentModal id={id} openModal={openStudentAddModal} setOpenModal={setOpenStudentAddModal} />
+
     </>
   )
 }
