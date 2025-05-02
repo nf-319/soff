@@ -54,6 +54,7 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
     bonus: '0',
     amount: '',
     description: '',
+    refund_amount: '0',
     payment_date: today
   }
 
@@ -62,11 +63,19 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
     validationSchema,
     onSubmit: async values => {
       setLoading(true)
-      const data = {
+
+      const data: any = {
         ...values,
-        student: query?.student,
-        amount: revereAmount(values.amount),
-        bonus: revereAmount(values.bonus)
+        student: query?.student
+      }
+
+      if (values.amount && Number(values.amount) > 0) {
+        data.amount = revereAmount(values.amount)
+        data.refund_amount = revereAmount(values.amount)
+      }
+
+      if (values.bonus && Number(values.bonus) > 0) {
+        data.bonus = revereAmount(values.bonus)
       }
 
       try {
@@ -113,7 +122,8 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
         payment_date: openEdit.payment_date,
         payment_type: openEdit.payment_type || '',
         description: openEdit.description,
-        group: openEdit.group
+        group: openEdit.group,
+        refund_amount: openEdit.refund_amount
       })
       setTimeout(() => {
         setOpen(true)
@@ -207,6 +217,20 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
                 />
                 {!!errors.amount && touched.amount && <FormHelperText error>{errors.amount}</FormHelperText>}
               </FormControl>
+              {Number(values.refund_amount) !== 0 && (
+                <FormControl fullWidth>
+                  <AmountInput
+                    label={t('Qaytarilgan Summa')}
+                    size='small'
+                    name='refund_amount'
+                    error={!!errors.refund_amount && touched.refund_amount}
+                    value={values.refund_amount}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {!!errors.amount && touched.amount && <FormHelperText error>{errors.amount}</FormHelperText>}
+                </FormControl>
+              )}
               {openEdit?.condition == 'payment' && (
                 <FormControl fullWidth>
                   <AmountInput
