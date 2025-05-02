@@ -33,8 +33,6 @@ import StudentPaymentForm from './StudentPaymentForm'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import StudentParentList from './StudentParentList'
-import StudentWithDrawForm from './StudentWithdrawForm'
 import toast from 'react-hot-toast'
 import { fetchSmsList, fetchSmsListQuery } from 'src/store/apps/settings'
 import StudentCard from './card'
@@ -281,7 +279,6 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
           </DialogContent>
         </Dialog>
         <StudentPaymentForm openEdit={openEdit} setOpenEdit={setOpenEdit} />
-        <StudentWithDrawForm openEdit={openEdit} setOpenEdit={setOpenEdit} />
 
         <Dialog
           open={openEdit === 'edit'}
@@ -425,7 +422,6 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
   const [isErrorText, setIsErrorText] = useState<null | string>(null)
   const [isActive, setIsActive] = useState(false)
   const { sms_list, smschild_list } = useAppSelector(state => state.settings)
-  const { companyInfo } = useAppSelector(state => state.user)
   const [parent_id, setParentId] = useState<number | null>(null)
   const [isSuccess, setIsSuccess] = useState<boolean>(false)
 
