@@ -1,7 +1,18 @@
 'use client'
 
 import { Close, Delete, PersonAddAlt } from '@mui/icons-material'
-import { Box, Button, Chip, Dialog, DialogContent, DialogTitle, IconButton, Skeleton, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Skeleton,
+  Tooltip,
+  Typography
+} from '@mui/material'
 import { useRouter } from 'next/router'
 import { useState, useEffect, FC } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
@@ -27,6 +38,7 @@ import { LeadKanbanItem } from './LeadKanbanItem'
 import { SendSMSModal } from '@/views/apps/students/view/UserViewLeft'
 import { AmoLeads } from '@/pages/lids'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
+import { MessageSquare } from 'lucide-react'
 
 type LeadsChild = {
   id: number
@@ -426,12 +438,12 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                               </div>
 
                               <Box display={'flex'}>
-                                <IconButton
-                                  sx={{ cursor: 'pointer' }}
-                                  onClick={() => handleAccessModal(section)}
-                                >
-                                  <IconifyIcon fontSize={20} icon='material-symbols:sms-rounded' color='orange' />
-                                </IconButton>
+                                <Tooltip title={`${section.name}dagi barcha lidlarga SMS yuborish`}>
+                                  <IconButton sx={{ cursor: 'pointer' }} onClick={() => handleAccessModal(section)}>
+                                    <MessageSquare size={20} fill='orange' color='orange' />
+                                  </IconButton>
+                                </Tooltip>
+
                                 <IconButton
                                   sx={{ cursor: 'pointer' }}
                                   onClick={() => {
@@ -575,7 +587,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
         for_lead={true}
         usersData={leadIds}
         handleEditClose={() => {
-          setOpenSmsModal(null);
+          setOpenSmsModal(null)
           setSectionLeads([])
         }}
         openEdit={openSmsModal}

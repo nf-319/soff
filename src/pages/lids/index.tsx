@@ -87,8 +87,6 @@ const Lids = () => {
     deps: ['amo-leads']
   })
 
-  console.log(amoCrmError)
-
   useEffect(() => {
     if (amoCrmError?.response?.data) {
       toast.error(amoCrmError.response.data.msg)

@@ -23,10 +23,6 @@ import useResponsive from 'src/@core/hooks/useResponsive'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import {
   getDashboardLessons,
-  getMetaData,
-  handleOpenAddModal,
-  setRoomsData,
-  setTeacherData,
   updateParams
 } from 'src/store/apps/groups'
 import { useRouter } from 'next/router'
@@ -165,7 +161,7 @@ export default function GroupsPage() {
               setUpdateStatusModal(true)
               setGroupId(status?.id)
             } else {
-              console.log('Archived status clicked, but no action triggered.')
+              console.info('Archived status clicked, but no action triggered.')
             }
           }}
         >

@@ -103,6 +103,8 @@ export const GroupsFilter = () => {
 
   const queryString = new URLSearchParams({ ...queryParams }).toString()
 
+  console.log(queryString)
+
   const options = teachersData?.map(item => ({
     label: item.first_name,
     value: item.id
@@ -308,11 +310,12 @@ export const GroupsFilter = () => {
               <MenuItem value={'monday,tuesday,wednesday,thursday,friday,saturday,sunday'}>{t('Har kuni')}</MenuItem>
             </Select>
           </FormControl>
-          <Excel
+          <Exwwcel
             tooltip='Ko‘rinib turgan jadvalni Excel fayliga yuklab oling.'
             url='common/groups/export/'
             queryString={queryString}
           />
+
           <Tooltip title={t('Online darsni boshlash uchun bosing.')}>
             <LoadingButton
               loading={onlineLessonLoading}

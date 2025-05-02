@@ -80,8 +80,7 @@ const Stats = () => {
     await api
       .get(`leads/statistic/`, { params: { start_date, end_date } })
       .then(resp => setSources(resp.data.result))
-      .catch(err => console.log(err))
-      .finally(() => console.log('finish'))
+      .catch(err => console.error(err))
   }
 
   const handleFilter = (value: any) => {
