@@ -54,7 +54,7 @@ if (themeConfig.routingLoader) {
 disableCache('all')
 
 const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
-  if (guestGuard) return <GuestGuard fallback={<Spinner />}>{children}</GuestGuard>
+  if (guestGuard) return <GuestGuard>{children}</GuestGuard>
   if (authGuard) return <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>
   return <>{children}</>
 }

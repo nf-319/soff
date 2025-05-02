@@ -22,10 +22,9 @@ import CreateStudentModal from 'src/views/apps/students/CreateStudentModal'
 import EditStudentModal from 'src/views/apps/students/EditStudentModal'
 import StudentRowOptions from 'src/views/apps/students/StudentRowOptions'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import students, { setStudentId, updateStudentParams } from 'src/store/apps/students'
+import { setStudentId, updateStudentParams } from 'src/store/apps/students'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { setOpenEdit } from 'src/store/apps/students'
-import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
 import { AuthContext } from 'src/context/AuthContext'
 import { toast } from 'react-hot-toast'
 import useResponsive from 'src/@core/hooks/useResponsive'
@@ -240,12 +239,6 @@ export default function StudentsPage() {
   const handleEditClose = () => {
     setOpenEdit(null)
   }
-
-  // const exelQueryString = new URLSearchParams(
-  //   Object.fromEntries(
-  //     Object.entries(queryParams).filter(([_, value]) => value !== '' && value !== undefined && value !== null)
-  //   ) as Record<string, string>
-  // ).toString()
 
   const handleModalOpen = () => {
     if (companyInfo.access) {

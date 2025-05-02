@@ -346,7 +346,6 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
             )}
           </DialogContent>
         </Dialog>
-        {/*   Delete  */}
         <Dialog
           open={openEdit === 'delete'}
           onClose={handleEditClose}
