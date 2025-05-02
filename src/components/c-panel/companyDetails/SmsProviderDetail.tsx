@@ -19,7 +19,7 @@ const SmsProviderDetail = () => {
 
   const deleteSms = async (id: string | number) => {
     setLoading(true)
-    const response = await api
+    await api
       .delete(`owner/sms-provider/delete/${id}/`)
       .then(res => {
         dispatch(fetchCompanyDetails(Number(query?.slug)))

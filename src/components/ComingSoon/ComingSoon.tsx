@@ -69,6 +69,7 @@ export const ComingSoon: FC<ComingSoonProps> = ({
           filter: 'brightness(0.7) blur(0.5px)',
           opacity: 0.75,
           width: '100%',
+          height: '100%',
           userSelect: 'none'
         }}
       >

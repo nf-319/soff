@@ -16,7 +16,7 @@ import {
 import { Bell, Clock, Info, MessageSquare, Phone, PlusIcon, User, UserIcon } from 'lucide-react'
 
 import React, { useEffect, useState } from 'react'
-import { EmptyContent } from '../../../components/empty-content'
+import { EmptyContent } from '@components/empty-content'
 import IconifyIcon from '../../../components/icon'
 import api from 'src/@core/utils/api'
 import { formatDate } from 'src/@core/utils/format'
@@ -54,7 +54,7 @@ type InfoItemProps = {
 const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value }) => {
   const { settings } = useSettings()
   return label === 'Telefon raqami' ? (
-    <Link href={`tel:${value}`} style={{ textDecoration: 'none' }}>
+    <Link href={`tel:${value}`} style={{ textDecoration:'none' }}>
       <div
         style={{ cursor: 'pointer' }}
         className={`d-flex align-items-center p-3 ${
@@ -91,7 +91,10 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
   const [leadDetail, setLeadDetail] = useState<any>(null)
   const { sms_list } = useAppSelector(state => state.settings)
   const { groupChecklist } = useAppSelector(state => state.groups)
+  const { companyInfo } = useAppSelector(state => state.user)
+
   const [smsModal, setSmsModalOpen] = useState(false)
+  const [accessModal, setAccessModal] = useState<boolean>(false)
   const [addGroupModal, setAddGroupModal] = useState(false)
   const [detailLoading, setDetailLoading] = useState(false)
   const { settings } = useSettings()
@@ -99,7 +102,6 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
   const [nodeModal, setNodeModal] = useState(false)
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
-
   const handleGetUserDetails = async (value: string, id: number) => {
     setDetailLoading(true)
     try {
@@ -119,10 +121,18 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
 
   const handleChange = async (
     event: React.SyntheticEvent,
-    newValue: 'lead-user-description' | 'anonim-user' | 'sms-history' | 'history'
+    newValue: 'lead-user-description' | 'anonim-user' | 'sms-history'
   ) => {
     handleGetUserDetails(newValue, selectedLead?.id)
     setValue(newValue)
+  }
+
+  const handleModalsOpen = () => {
+    if(companyInfo.access) {
+      setSmsModalOpen(true)
+    } else {
+      setAccessModal(true)
+    }
   }
 
   useEffect(() => {
@@ -137,7 +147,8 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
       fullWidth
       open={openModal}
       onClose={() => {
-        handleClose(false), setValue('anonim-user')
+        handleClose(false);
+        setValue('anonim-user')
       }}
     >
       <DialogTitle>
@@ -156,7 +167,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
               fontWeight: 'bold'
             }}
           >
-            {selectedLead?.first_name[0]?.toLocaleUpperCase()}
+            {selectedLead?.first_name[0].toLocaleUpperCase()}
           </div>
         </Box>
         <div className='row g-4 mt-2'>
@@ -350,7 +361,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
                     <Box margin={4}>
                       <Button
                         variant='contained'
-                        onClick={() => setSmsModalOpen(true)}
+                        onClick={handleModalsOpen}
                         fullWidth
                         sx={{ marginTop: 2 }}
                         startIcon={<PlusIcon />}
@@ -461,7 +472,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
 
         <DialogContent sx={{ minWidth: '300px' }}>
           <SendSmsAnonimUserForm
-            smsTemps={sms_list}
+            smsTemps={sms_list.result}
             smsLoading={false}
             open={smsModal}
             user={selectedLead?.id}

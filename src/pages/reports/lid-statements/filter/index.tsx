@@ -5,8 +5,8 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
-  Select,
-  Typography,
+  Select, Tooltip,
+  Typography
 } from '@mui/material'
 import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -52,42 +52,40 @@ const LidsReportsFilter = () => {
         flexDirection: isMobile ? 'column' : 'row',
         alignItems: 'center',
         gap: isMobile ? 6 : 0,
-        justifyContent: 'space-between',
+        justifyContent: 'space-between'
       }}
     >
-      <Box>
-        <Typography variant="h5">Lidlar Hisoboti</Typography>
-      </Box>
+      <Typography variant='h4'>Lidlar Hisoboti</Typography>
 
       <Box sx={{ display: 'flex', gap: 5, flexDirection: isMobile ? 'column' : 'row' }}>
-        <ComingSoon releaseDate={defaultReleaseDate} size="small">
+        <ComingSoon releaseDate={defaultReleaseDate} size='small'>
           <FormControl fullWidth>
-            <InputLabel id="duration-label">Oy</InputLabel>
+            <InputLabel id='duration-label'>Oy</InputLabel>
             <Select
-              labelId="duration-label"
+              labelId='duration-label'
               value={duration}
-              size="small"
-              onChange={(e) => setDuration(e.target.value)}
-              label="Oy"
+              size='small'
+              onChange={e => setDuration(e.target.value)}
+              label='Oy'
             >
-              <MenuItem value="3">3 oy</MenuItem>
-              <MenuItem value="4">4 oy</MenuItem>
-              <MenuItem value="5">5 oy</MenuItem>
-              <MenuItem value="6">6 oy</MenuItem>
+              <MenuItem value='3'>3 oy</MenuItem>
+              <MenuItem value='4'>4 oy</MenuItem>
+              <MenuItem value='5'>5 oy</MenuItem>
+              <MenuItem value='6'>6 oy</MenuItem>
             </Select>
           </FormControl>
         </ComingSoon>
 
         <FormControl fullWidth>
-          <InputLabel id="branch-label">Branch</InputLabel>
+          <InputLabel id='branch-label'>Branch</InputLabel>
           <Select
-            size="small"
-            labelId="branch-label"
+            size='small'
+            labelId='branch-label'
             value={branch}
-            onChange={(e) => setBranch(e.target.value)}
-            label="Branch"
+            onChange={e => setBranch(e.target.value)}
+            label='Branch'
           >
-            {data?.results.map((item) => (
+            {data?.results.map(item => (
               <MenuItem key={item.id} value={item.id}>
                 {item.name}
               </MenuItem>

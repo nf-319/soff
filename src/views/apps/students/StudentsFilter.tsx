@@ -1,8 +1,7 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Autocomplete,
   Box,
-  Button,
   FormControl,
   InputAdornment,
   InputLabel,
@@ -11,39 +10,26 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
-  Tooltip,
   useMediaQuery
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from '../../../components/icon'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { updateStudentParams } from 'src/store/apps/students'
 import useCourses from 'src/hooks/useCourses'
 import useDebounce from 'src/hooks/useDebounce'
-import { Toggle } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
 import api from 'src/@core/utils/api'
 import { MetaTypes } from 'src/types/apps/groupsTypes'
-import { ModalTypes, SendSMSModal } from './view/UserViewLeft'
-import useSMS from 'src/hooks/useSMS'
 import 'rsuite/DateRangePicker/styles/index.css'
 import { DatePicker } from 'rsuite'
 import { format } from 'date-fns'
-import { fetchSchoolsList, fetchSmsList } from 'src/store/apps/settings'
-import ExcelStudents from '../../../components/excelButton/ExcelStudents'
+import { fetchSchoolsList } from 'src/store/apps/settings'
 import ceoConfigs from 'src/configs/ceo'
 import { useRouter } from 'next/router'
-import { MessageSquareText, Search } from 'lucide-react'
-import { AccessDeniedModal } from '@components/AccessDeniedModal'
+import { Search } from 'lucide-react'
 
-type StudentsFilterProps = {
-  isMobile: boolean
-  students?: any[]
-}
-
-const StudentsFilter = ({ students }: StudentsFilterProps) => {
+const StudentsFilter = () => {
   const router = useRouter()
-  const { companyInfo } = useAppSelector(item => item.user)
   const dispatch = useAppDispatch()
   const { queryParams } = useAppSelector(state => state.students)
   const { schools } = useAppSelector(state => state.settings)
@@ -51,28 +37,16 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
   const { getCourses, courses } = useCourses()
   const [groups, setGroups] = useState<any>()
   const [teachers, setTeachers] = useState<any>()
-  const [isActive, setIsActive] = useState<boolean>(true)
   const { t } = useTranslation()
-  const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
-  const { smsTemps, getSMSTemps } = useSMS()
+
   const querySearch = new URLSearchParams(window.location.search).get('q')
   const [search, setSearch] = useState<string>(querySearch || '')
   const debounceSearch = useDebounce(search, 300)
-  const studentIds = students?.map(student => student.id)
   const [teacherId, setTeacherId] = useState<any>()
   const [groupId, setGroupId] = useState<any>()
-  const [accessModal, setAccessModal] = useState<boolean>(false)
   const isMobile = useMediaQuery('(max-width:564px)');
   const isInitialMount = useRef(true)
   const isUpdating = useRef(false)
-
-  const handleEditClickOpen = (value: ModalTypes) => {
-    setOpenEdit(value)
-  }
-
-  const handleEditClose = () => {
-    setOpenEdit(null)
-  }
 
   async function getGroups() {
     try {
@@ -96,23 +70,16 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
     isUpdating.current = true
     dispatch(updateStudentParams({ [key]: value }))
 
-    if (key === 'status') {
-      dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
-    } else if (key === 'debt_date') {
-      setIsActive(false)
+    if (key === 'debt_date') {
       dispatch(updateStudentParams({  debt_date: `${value}` }))
     } else if (key === 'amount') {
       if (value === 'is_debtor') {
-        setIsActive(false)
         dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '' }))
       } else if (value === 'not_in_debt') {
-        setIsActive(false)
         dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: true }))
       } else if (value === 'last_payment') {
-        setIsActive(true)
         dispatch(updateStudentParams({ last_payment: true, is_debtor: '', not_in_debt: '' }))
       } else if (value === 'all') {
-        setIsActive(true)
         dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '' }))
       }
     }
@@ -147,8 +114,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
         debt_date: (debt_date as string) || ''
       }
 
-      console.log('Initializing queryParams:', { newParams, current: queryParams })
-
       if (JSON.stringify(newParams) !== JSON.stringify(queryParams)) {
         isUpdating.current = true
         dispatch(updateStudentParams(newParams))
@@ -161,7 +126,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
     if (!isUpdating.current) {
       const { q, ...restQuery } = router.query
 
-      console.log('Syncing search:', { debounceSearch, currentQ: q })
 
       if (debounceSearch && debounceSearch !== q) {
         void router.push(
@@ -184,33 +148,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
       }
     }
   }, [debounceSearch, router])
-
-  useEffect(() => {
-    if (!isUpdating.current) return
-
-    const filteredParams = Object.fromEntries(
-      Object.entries(queryParams).filter(([_, value]) => value !== '' && value !== undefined && value !== null)
-    )
-
-    const currentQuery = Object.fromEntries(
-      Object.entries(router.query).filter(([_, value]) => value !== '' && value !== undefined && value !== null)
-    )
-
-    console.log('Syncing URL:', { filteredParams, currentQuery })
-
-    if (JSON.stringify(filteredParams) !== JSON.stringify(currentQuery)) {
-      void router.push(
-        {
-          pathname: router.pathname,
-          query: filteredParams
-        },
-        undefined,
-        { shallow: true }
-      )
-    }
-
-    isUpdating.current = false
-  }, [queryParams, router.pathname])
 
   useEffect(() => {
     isUpdating.current = false
@@ -239,22 +176,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
       label: item?.first_name,
       value: item?.id
     })) || []
-
-  const queryString = new URLSearchParams(
-    Object.fromEntries(
-      Object.entries(queryParams).filter(([_, value]) => value !== '' && value !== undefined && value !== null)
-    ) as Record<string, string>
-  ).toString()
-
-  const handleModalOpen = () => {
-    if (companyInfo.access) {
-      setAccessModal(false)
-      void getSMSTemps()
-      handleEditClickOpen('sms')
-    } else {
-      setAccessModal(true)
-    }
-  }
 
   return (
     <Box
@@ -369,10 +290,10 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
               queryParams.is_debtor
                 ? 'is_debtor'
                 : queryParams.not_in_debt
-                ? 'not_in_debt'
-                : queryParams.last_payment
-                ? 'last_payment'
-                : ''
+                  ? 'not_in_debt'
+                  : queryParams.last_payment
+                    ? 'last_payment'
+                    : ''
             }
             id='payment-status-select'
             labelId='payment-status-select-label'
@@ -399,7 +320,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
               size='lg'
               placeholder='Oy va yil'
               format='MM/yyyy'
-              // value={queryParams.debt_date ? new Date(queryParams.debt_date) : null}
               onChange={value => {
                 if (!value) {
                   void handleFilter('debt_date', '')
@@ -414,6 +334,7 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
 
         <FormControl fullWidth onClick={() => setKey('group')}>
           <Autocomplete
+            fullWidth
             loading={!groupOptions}
             disablePortal
             options={groupOptions}
@@ -442,53 +363,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
             renderInput={params => <TextField {...params} label={t('Ustoz')} />}
           />
         </FormControl>
-
-        {isActive && (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Toggle
-              checked={queryParams.status === 'archive'}
-              color='red'
-              checkedChildren={t('Arxiv')}
-              unCheckedChildren={t('Arxiv')}
-              onChange={e => handleFilter('status', e ? 'archive' : 'active')}
-            />
-          </Box>
-        )}
-
-        <Box>
-          <ExcelStudents
-            tooltip={t('Ko‘rinib turgan jadvalni Excel faylga yuklab olish.')}
-            url='student/offset-list/'
-            queryString={queryString}
-          />
-        </Box>
-
-        <Button
-          onClick={() => { getSMSTemps(); handleEditClickOpen('sms') }}
-          variant='outlined'
-          color='warning'
-          size='small'
-          startIcon={<MessageSquareText size={18} />}
-          sx={{
-            width: '100%'
-          }}
-        >
-          <Tooltip title={t("Ro‘yxatdagi o‘quvchilarga SMS yuborish.")}>
-            <span>{t('Sms yuborish')}</span>
-          </Tooltip>
-        </Button>
-      </Box>
-
-      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
-
-      <Box sx={{ display: { xs: 'none', sm: 'block' } }} onClick={() => dispatch(fetchSmsList())}>
-        <SendSMSModal
-          handleEditClose={handleEditClose}
-          openEdit={openEdit}
-          smsTemps={smsTemps}
-          setOpenEdit={setOpenEdit}
-          usersData={studentIds}
-        />
       </Box>
     </Box>
   )

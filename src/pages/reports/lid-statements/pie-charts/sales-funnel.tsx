@@ -51,7 +51,7 @@ const SalesFunnel = () => {
             data={updatedFunnelData}
             margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
             valueFormat='>-.0f'
-            colors={{ scheme: 'blues' }}
+            colors={{ scheme: 'nivo' }}
             borderWidth={20}
             labelColor={textColor}
             beforeSeparatorLength={100}

@@ -8,6 +8,7 @@ import SellerDetailModal from '@/components/seller-detail-modal'
 import useResponsive from '@/@core/hooks/useResponsive'
 import { TrendCard } from '@components/TrendCard'
 import { useRouter } from 'next/router'
+import { ComingSoon } from '@components/ComingSoon'
 
 type DashboardCard = {
   title: string
@@ -115,38 +116,55 @@ const LidsReportsCard = () => {
 
   return (
     <Box
-      display="flex"
+      display='flex'
       flexDirection={{ md: 'row', xs: 'column' }}
-      justifyContent="space-between"
+      justifyContent='space-between'
       sx={{ width: '100%', gap: 2 }}
     >
       {isLoading ? (
         !isMobile ? (
           <Box display={'flex'} justifyContent={'space-between'} gap={4} sx={{ width: '100%' }}>
-            <Skeleton width={'100%'} height={200} variant="rounded" />
-            <Skeleton width={'100%'} height={200} variant="rounded" />
-            <Skeleton width={'100%'} height={200} variant="rounded" />
-            <Skeleton width={'100%'} height={200} variant="rounded" />
-            <Skeleton width={'100%'} height={200} variant="rounded" />
+            <Skeleton width={'100%'} height={200} variant='rounded' />
+            <Skeleton width={'100%'} height={200} variant='rounded' />
+            <Skeleton width={'100%'} height={200} variant='rounded' />
+            <Skeleton width={'100%'} height={200} variant='rounded' />
+            <Skeleton width={'100%'} height={200} variant='rounded' />
           </Box>
         ) : (
-          <Skeleton width={'100%'} height={250} variant="rounded" />
+          <Skeleton width={'100%'} height={250} variant='rounded' />
         )
       ) : (
         cards.map((item, index) => (
-          <Box key={index} flex="1 1 calc(20% - 16px)" minWidth={150}>
-            <TrendCard
-              title={item.title}
-              id={item.id}
-              count={item.count}
-              icon={item.icon}
-              iconColor={item.iconColor}
-              process={item.process}
-              trendDirection={item.trendDirection}
-              trendColor={item.trendColor}
-              pillColor={item.pillColor}
-              onClick={() => handleOpenModal(item.id)}
-            />
+          <Box key={index} flex='1 1 calc(20% - 16px)' minWidth={150}>
+            {!item.process ? (
+              <ComingSoon sx={{ height: '100%' }} size='small' title={'Malumot yetarli emas'}>
+                <TrendCard
+                  title={item.title}
+                  id={item.id}
+                  count={item.count}
+                  icon={item.icon}
+                  iconColor={item.iconColor}
+                  process={item.process}
+                  trendDirection={item.trendDirection}
+                  trendColor={item.trendColor}
+                  pillColor={item.pillColor}
+                  onClick={() => handleOpenModal(item.id)}
+                />
+              </ComingSoon>
+            ) : (
+              <TrendCard
+                title={item.title}
+                id={item.id}
+                count={item.count}
+                icon={item.icon}
+                iconColor={item.iconColor}
+                process={item.process}
+                trendDirection={item.trendDirection}
+                trendColor={item.trendColor}
+                pillColor={item.pillColor}
+                onClick={() => handleOpenModal(item.id)}
+              />
+            )}
           </Box>
         ))
       )}
