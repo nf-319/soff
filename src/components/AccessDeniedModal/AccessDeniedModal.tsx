@@ -57,7 +57,7 @@ export const AccessDeniedModal: FC<Props> = ({ open, onClose }) => {
           Ushbu SMS xizmatidan foydalanish uchun avval tarif sotib olishingiz kerak.
         </Typography>
 
-        <Button component={Link} href='https://t.me/soffcrm_manager' target='_blank' variant='contained' sx={{ mt: 1 }}>
+        <Button component={Link} href='/crm-payments' variant='contained' sx={{ mt: 1 }}>
           Tarifni sotib olish
         </Button>
       </DialogContent>
