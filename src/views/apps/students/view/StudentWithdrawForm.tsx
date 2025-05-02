@@ -5,10 +5,16 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import { useTranslation } from 'react-i18next'
-import { Box, Card, Typography } from '@mui/material'
+import { Box, Card, TextField, Typography } from '@mui/material'
 import { useAppSelector } from 'src/store'
 import usePayment from 'src/hooks/usePayment'
 import { BanknoteIcon, Calendar, User } from 'lucide-react'
+import { useGet, usePost } from '@/hooks/useApi'
+import { useRouter } from 'next/router'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
+import toast from 'react-hot-toast'
+import { LoadingButton } from '@mui/lab'
 
 type Props = {
   openEdit: any
@@ -17,12 +23,13 @@ type Props = {
 
 export default function StudentWithDrawForm({ openEdit, setOpenEdit }: Props) {
   const { t } = useTranslation()
-  const { payments } = useAppSelector(state => state.students)
+  const { query } = useRouter()
   const { getPaymentMethod } = usePayment()
   const [selectedPayment, setSelectedPayment] = useState<any>(null)
+  const { data } = useGet(`common/student-payment/list/${query.student}/?condition=payment`, { options:{enabled:!!openEdit}})
+
   const handleEditClose = () => {
     setOpenEdit(null)
-    setSelectedPayment(null)
   }
 
   useEffect(() => {
@@ -44,9 +51,11 @@ export default function StudentWithDrawForm({ openEdit, setOpenEdit }: Props) {
           {t("O'quvchi to'lovlari")}
         </DialogTitle>
         <DialogContent>
-          {payments?.map((item: any, index) => (
+          {data?.map((item: any, index: number) => (
             <Card
-              onClick={() => setSelectedPayment(item)}
+              onClick={() => {
+                setSelectedPayment(item)
+              }}
               key={index}
               sx={{
                 mb: 3,
@@ -121,6 +130,104 @@ export default function StudentWithDrawForm({ openEdit, setOpenEdit }: Props) {
             Yopish
           </Button>
         </DialogActions>
+      </Dialog>
+      <ReturnCashModal
+        handleClose={handleEditClose}
+        paymentData={selectedPayment}
+        setPaymentData={setSelectedPayment}
+      />
+    </div>
+  )
+}
+
+const ReturnCashModal = ({
+  paymentData,
+  setPaymentData,
+  handleClose
+}: {
+  handleClose: () => void
+  paymentData: any
+  setPaymentData: (status: any) => void
+}) => {
+  const { mutate, isPending } = usePost()
+
+  const validationSchema = Yup.object({
+    amount: Yup.number().typeError('Faqat raqam kiriting').required('Pul miqdori majburiy'),
+    description: Yup.string().nullable()
+  })
+  const formik = useFormik({
+    initialValues: {
+      amount: '',
+      description: ''
+    },
+    validationSchema,
+    onSubmit: async values => {
+      mutate(
+        'system/refund-payment/',
+        {
+          ...values,
+          payment: paymentData.id
+        },
+        {
+          onSuccess: () => {
+            onClose()
+            handleClose()
+
+            toast.success('Pul qaytarish muvvafaqiyatli boldi')
+          },
+          onError: err => {
+            console.log(err)
+            formik.setErrors(err.response.data)
+          }
+        }
+      )
+    }
+  })
+
+  function onClose() {
+    setPaymentData(null)
+    formik.resetForm()
+  }
+
+  return (
+    <div>
+      <Dialog maxWidth='xs' fullWidth open={!!paymentData} onClose={onClose}>
+        <DialogTitle>Pul qaytarish</DialogTitle>
+        <form onSubmit={formik.handleSubmit}>
+          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <TextField
+              fullWidth
+              name='amount'
+              label='Pul miqdori'
+              type='number'
+              value={formik.values.amount}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.amount && Boolean(formik.errors.amount)}
+              helperText={formik.touched.amount && formik.errors.amount}
+            />
+            <TextField
+              fullWidth
+              name='description'
+              label='Izoh'
+              multiline
+              rows={3}
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.description && Boolean(formik.errors.description)}
+              helperText={formik.touched.description && formik.errors.description}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={onClose} color='secondary'>
+              Bekor qilish
+            </Button>
+            <LoadingButton loading={isPending} type='submit' variant='contained' color='primary'>
+              Saqlash
+            </LoadingButton>
+          </DialogActions>
+        </form>
       </Dialog>
     </div>
   )
