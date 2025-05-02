@@ -61,8 +61,6 @@ const LoadingSkeleton: FC = () => (
   </>
 );
 
-
-
 const EmptyState: React.FC = () => {
   const { t } = useTranslation();
 
@@ -163,7 +161,7 @@ const RoomsPage: React.FC = () => {
     if (!companyInfo.access) {
       setAccessDeniedOpen(true)
     }
-  })
+  }, [companyInfo.access])
 
   const handleBack = () => {
     router.back();
@@ -175,7 +173,9 @@ const RoomsPage: React.FC = () => {
       sx={{
         p: { xs: 2, md: 3 },
         backgroundColor: 'background.paper',
-        borderRadius: 1
+        borderRadius: 1,
+        height: '100vh',
+        overflow: 'hidden',
       }}
     >
       <Box

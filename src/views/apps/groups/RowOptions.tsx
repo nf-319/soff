@@ -1,4 +1,5 @@
 //@ts-nocheck
+'use client'
 
 import { IconButton, Menu } from '@mui/material'
 import { MouseEvent, useEffect, useState } from 'react'
@@ -11,36 +12,31 @@ import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import {
   deleteGroups,
-  fetchGroups,
   getDashboardLessons,
   getGroupsDetails,
-  handleOpenEdit,
   handleChangeBranchOpenEdit,
-  updateParams,
   setDeleteGroupId
 } from 'src/store/apps/groups'
 import { disablePage } from 'src/store/apps/page'
 import { toast } from 'react-hot-toast'
 import Excel from '../../../components/excelButton/Excel'
-import axios from 'axios'
 import { handleEditClickOpen, studentsUpdateParams } from 'src/store/apps/groupDetails'
 import { useQueryClient } from '@tanstack/react-query'
 import ceoConfigs from 'src/configs/ceo'
 import { GroupType } from '../../../types/types'
-import Delete from './view/GroupViewLeft/Delete'
+import { GroupCreateEditDrawer } from '@/components/GroupDrawerModal'
 
 const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }) => {
   const { queryParams } = useAppSelector(state => state.groups)
   const dispatch = useAppDispatch()
   const [isDeleting, setDeleting] = useState(false)
   const queryClient = useQueryClient()
+  const [openEditModal, setOpenEditModal] = useState<'create'|'edit'|null>(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
   const [suspendDialogOpen2, setSuspendDialogOpen2] = useState<boolean>(false)
   const [group, setGroup] = useState<any>()
   const rowOptionsOpen = Boolean(anchorEl)
-
-
 
   useEffect(() => {
     if (groups && id !== undefined) {
@@ -70,7 +66,7 @@ const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }
 
   const handleEdit = async (id: any) => {
     setAnchorEl(null)
-    dispatch(handleOpenEdit(true))
+    setOpenEditModal('edit')
     const filtered = groups?.find(item => item.id == id)
     const queryString = new URLSearchParams({
       day_of_week: filtered?.week_days?.toString(),
@@ -157,7 +153,12 @@ const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }
                 </MenuItem>} */}
 
         {group?.status !== 'archived' && (
-          <MenuItem onClick={() => { dispatch(handleEditClickOpen('delete')),dispatch(setDeleteGroupId(id)) }} sx={{ '& svg': { mr: 2 } }}>
+          <MenuItem
+            onClick={() => {
+              dispatch(handleEditClickOpen('delete')), dispatch(setDeleteGroupId(id))
+            }}
+            sx={{ '& svg': { mr: 2 } }}
+          >
             <IconifyIcon icon='material-symbols-light:recommend-outline' fontSize={20} />
             {t('Guruhni yakunlash')}
           </MenuItem>
@@ -187,6 +188,7 @@ const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }
         open={suspendDialogOpen2}
         setOpen={setSuspendDialogOpen2}
       />
+      <GroupCreateEditDrawer open={openEditModal} setOpen={setOpenEditModal} />
     </>
   )
 }

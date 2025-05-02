@@ -49,9 +49,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import Delete from '@/views/apps/groups/view/GroupViewLeft/Delete'
 import { GroupCreateEditDrawer } from '@/components/GroupDrawerModal'
 import { Plus } from 'lucide-react'
+import RowOptions from '@/views/apps/groups/RowOptions'
 
 const IconifyIcon = dynamic(() => import('../../components/icon'))
-const RowOptions = dynamic(() => import('src/views/apps/groups/RowOptions'))
 
 export interface customTableProps {
   xs: number
