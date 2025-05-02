@@ -93,7 +93,6 @@ const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) 
       title: `${t('Bonuslar')} (so'm)`,
       dataIndex: 'bonus_amount',
       renderId: (id, bonus_amount) => (
-        console.log(bonus_amount),
         (
           <input
             className='salary-table__input'

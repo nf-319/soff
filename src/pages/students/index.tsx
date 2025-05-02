@@ -11,8 +11,7 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  Tooltip,
-  useMediaQuery
+  Tooltip
 } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import DataTable from '../../components/table'
@@ -26,7 +25,6 @@ import { useAppDispatch, useAppSelector } from 'src/store'
 import { setStudentId, updateStudentParams } from 'src/store/apps/students'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { setOpenEdit } from 'src/store/apps/students'
-import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
 import { AuthContext } from 'src/context/AuthContext'
 import { toast } from 'react-hot-toast'
 import useResponsive from 'src/@core/hooks/useResponsive'
@@ -35,6 +33,13 @@ import ExcelStudents from '../../components/excelButton/ExcelStudents'
 import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
 import { useGet } from 'src/hooks/useApi'
 import { useQueryClient } from '@tanstack/react-query'
+import { AccessDeniedModal } from '@components/AccessDeniedModal'
+import { fetchSmsList } from '@store/apps/settings'
+import { ModalTypes, SendSMSModal } from '@/views/apps/students/view/UserViewLeft'
+import { MessageSquareText } from 'lucide-react'
+import useSMS from '@hooks/useSMS'
+import Divider from '@mui/material/Divider'
+import { Toggle } from 'rsuite'
 
 export type customTableProps = {
   xs: number
@@ -46,17 +51,20 @@ export type customTableProps = {
 export default function StudentsPage() {
   const { t } = useTranslation()
   const router = useRouter()
-  const isMobile = useMediaQuery('(max-width:564px)');
+  const { isMobile } = useResponsive()
   const { user } = useContext(AuthContext)
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
+
   const { queryParams } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const querySearch = new URLSearchParams(window.location.search).get('q')
   const { search, ...filteredParams } = queryParams
-
-    
+  const [openModalEdit, setOpenModalEdit] = useState<ModalTypes | null>(null)
+  const { smsTemps, getSMSTemps } = useSMS()
+  const [accessModal, setAccessModal] = useState<boolean>(false)
+  const { companyInfo } = useAppSelector(item => item.user)
 
   const queryString = new URLSearchParams(
     Object.fromEntries(
@@ -148,10 +156,10 @@ export default function StudentsPage() {
                   item.status === 'active'
                     ? 'success'
                     : item.status === 'archive'
-                    ? 'error'
-                    : item.status === 'frozen'
-                    ? 'secondary'
-                    : 'warning'
+                      ? 'error'
+                      : item.status === 'frozen'
+                        ? 'secondary'
+                        : 'warning'
                 }
               />
             </Box>
@@ -224,58 +232,168 @@ export default function StudentsPage() {
     }
   }, [])
 
+  const handleEditClickOpen = (value: ModalTypes) => {
+    setOpenEdit(value)
+  }
+
+  const handleEditClose = () => {
+    setOpenEdit(null)
+  }
+
+  const handleModalOpen = () => {
+    if (companyInfo.access) {
+      setAccessModal(false)
+      void getSMSTemps()
+      handleEditClickOpen('sms')
+    } else {
+      setAccessModal(true)
+    }
+  }
+
+  const handleSwitch = (value: 'archive' | 'active') => {
+    dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
+  }
+
+
   useEffect(() => {
-    void queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
   }, [user?.active_branch])
 
   return (
-    <div>
-      {isMobile && <VideoHeader item={videoUrls.students} />}
-
+    <Box display='flex' flexDirection='column' gap={3}>
       <Box
         className='students-page-header'
-        sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0' }}
-        py={2}
+        sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 2 }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: { xs: 'wrap', md: 'nowrap' },
+            alignItems: 'center',
+            justifyContent: { xs: 'space-between', md: 'start' },
+            gap: { xs: 2, md: 3 }
+          }}
+        >
           <Typography variant='h5'>{t("O'quvchilar")}</Typography>
-          {!isLoading  && <Chip label={`${data?.count || 0}`} variant='outlined' color='primary' />}
-          {!isLoading  && !isMobile && (
-            <Chip label={`${formatCurrency(data?.total_debts) || 0}` + " so'm"} variant='outlined' color='error' />
+
+          {isMobile && (
+            <Button
+              onClick={() => dispatch(setOpenEdit('create'))}
+              variant='contained'
+              startIcon={<IconifyIcon icon='ic:baseline-plus' />}
+            >
+              <Tooltip title={t('Yangi o‘quvchi qo‘shish.')}>
+                <span>{t("Yangi qo'shish")}</span>
+              </Tooltip>
+            </Button>
           )}
-        </Box>
 
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          {!isMobile && <VideoHeader item={videoUrls.students} />}
-
-          <Button
-            onClick={() => dispatch(setOpenEdit('create'))}
-            variant='contained'
-            size='small'
-            startIcon={<IconifyIcon icon='ic:baseline-plus' />}
+          <Box
+            display='flex'
+            alignItems='center'
+            gap={3}
+            justifyContent={{ xs: 'space-between', md: 'start' }}
+            width='100%'
           >
-            <Tooltip title={t("Yangi o‘quvchi qo‘shish.")}>
-              <span>{t("Yangi qo'shish")}</span>
-            </Tooltip>
-          </Button>
+            <Chip label={`O'quvchilar soni: ${data?.count || 0} ta`} variant='outlined' color='primary' />
+            <Chip
+              label={`Qazdorlik: ${formatCurrency(data?.total_debts) || 0}` + " so'm"}
+              variant='outlined'
+              color='error'
+            />
+          </Box>
         </Box>
+
+        {!isMobile && (
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Toggle
+                checked={queryParams.status === 'archive'}
+                color='red'
+                checkedChildren={t('Arxiv')}
+                unCheckedChildren={t('Arxiv')}
+                onChange={e => handleSwitch(e ? 'archive' : 'active')}
+              />
+            </Box>
+
+            <Box>
+              <ExcelStudents
+                size='medium'
+                tooltip={t('Ko‘rinib turgan jadvalni Excel faylga yuklab olish.')}
+                url='student/offset-list/'
+                queryString={queryString}
+              />
+            </Box>
+
+            <Button
+              onClick={handleModalOpen}
+              variant='outlined'
+              color='warning'
+              startIcon={<MessageSquareText size={18} />}
+            >
+              <Tooltip title={t('Ro‘yxatdagi o‘quvchilarga SMS yuborish.')}>
+                <span>{t('Sms yuborish')}</span>
+              </Tooltip>
+            </Button>
+
+            <Button
+              onClick={() => dispatch(setOpenEdit('create'))}
+              variant='contained'
+              startIcon={<IconifyIcon icon='ic:baseline-plus' />}
+            >
+              <Tooltip title={t('Yangi o‘quvchi qo‘shish.')}>
+                <span>{t("Yangi qo'shish")}</span>
+              </Tooltip>
+            </Button>
+          </Box>
+        )}
       </Box>
 
       {isMobile && (
-        <Box>
-          <Button
-            size='small'
-            sx={{ marginLeft: 'auto', width: '100%', marginBottom: 2 }}
-            variant='outlined'
-            onClick={() => setOpen(true)}
-          >
+        <Box display='flex' gap={2}>
+          <Button sx={{ width: '100%' }} variant='outlined' onClick={() => setOpen(true)}>
             {t('Filterlash')}
           </Button>
+
           <ExcelStudents size='small' url='student/offset-list/' queryString={queryString} />
         </Box>
       )}
 
-      {!isMobile && <StudentsFilter students={data?.results} />}
+      <Divider />
+
+      <Box hidden={!isMobile} display='flex' alignItems='center' justifyContent='end' gap={3}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Toggle
+            checked={queryParams.status === 'archive'}
+            color='red'
+            checkedChildren={t('Arxiv')}
+            unCheckedChildren={t('Arxiv')}
+            onChange={e => handleSwitch(e ? 'archive' : 'active')}
+          />
+        </Box>
+
+        <Box>
+          <ExcelStudents
+            size='medium'
+            tooltip={t('Ko‘rinib turgan jadvalni Excel faylga yuklab olish.')}
+            url='student/offset-list/'
+            queryString={queryString}
+          />
+        </Box>
+
+        <Button
+          onClick={handleModalOpen}
+          variant='outlined'
+          color='warning'
+          startIcon={<MessageSquareText size={18} />}
+        >
+          <Tooltip title={t('Ro‘yxatdagi o‘quvchilarga SMS yuborish.')}>
+            <span>{t('Sms yuborish')}</span>
+          </Tooltip>
+        </Button>
+      </Box>
+
+      {!isMobile && <StudentsFilter />}
 
       <DataTable
         color
@@ -343,6 +461,18 @@ export default function StudentsPage() {
           <Button onClick={() => setOpen(false)}>{t('Davom etish')}</Button>
         </DialogActions>
       </Dialog>
-    </div>
+
+      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
+
+      <Box sx={{ display: { xs: 'none', sm: 'block' } }} onClick={() => dispatch(fetchSmsList())}>
+        <SendSMSModal
+          handleEditClose={handleEditClose}
+          openEdit={openModalEdit}
+          smsTemps={smsTemps}
+          setOpenEdit={setOpenModalEdit}
+          usersData={data?.results?.map((item: any) => item.id)}
+        />
+      </Box>
+    </Box>
   )
 }

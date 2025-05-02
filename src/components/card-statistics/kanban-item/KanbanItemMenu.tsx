@@ -2,8 +2,9 @@ import { Box, Menu, MenuItem } from '@mui/material'
 import { useAppSelector } from '../../../store'
 import IconifyIcon from '../../icon'
 import { useTranslation } from 'react-i18next'
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
+import { AccessDeniedModal } from '@components/AccessDeniedModal'
 
 type Props = {
   anchorEl: any
@@ -19,11 +20,12 @@ export const KanbanItemMenu: FC<Props> = ({
   setAnchorEl,
   getSMSTemps,
   getBranches,
-  setOpen: setOpenNative,
-  is_amocrm
+  setOpen: setOpenNative
 }) => {
   const { queryParams } = useAppSelector(state => state.leads)
+  const { companyInfo } = useAppSelector(state => state.user)
   const { t } = useTranslation()
+  const [accessModal, setAccessModal] = useState<boolean>(false)
   const rowOptionsOpen = Boolean(anchorEl)
   const router = useRouter()
   const handleRowOptionsClose = () => {
@@ -33,6 +35,15 @@ export const KanbanItemMenu: FC<Props> = ({
   const setOpen = (value: any) => {
     setAnchorEl(null)
     setOpenNative(value)
+  }
+
+  const handleModalsOpen = () => {
+    if (companyInfo.access) {
+      void getSMSTemps()
+      setOpen('sms')
+    } else {
+      setAccessModal(true)
+    }
   }
 
   return (
@@ -53,7 +64,7 @@ export const KanbanItemMenu: FC<Props> = ({
     >
       {queryParams.is_active ? (
         <Box>
-          {is_amocrm ? (
+          {router.query.is_amocrm ? (
             <>
               <MenuItem onClick={() => setOpen('add-group')} sx={{ '& svg': { mr: 2 } }}>
                 <IconifyIcon icon='material-symbols:group-add' fontSize={17} />
@@ -61,11 +72,15 @@ export const KanbanItemMenu: FC<Props> = ({
               </MenuItem>
               <MenuItem onClick={() => setOpen('merge-to')} sx={{ '& svg': { mr: 2 } }}>
                 <IconifyIcon icon='subway:round-arrow-2' fontSize={17} />
-                {t("Soff crmga qo'shish")}
+                {t("Crm lidlariga qo'shish")}
               </MenuItem>
               <MenuItem onClick={() => setOpen('merge-to-amo')} sx={{ '& svg': { mr: 2 } }}>
                 <IconifyIcon icon='subway:round-arrow-2' fontSize={17} />
                 {t("Boshqa bo'limga o'tkazish")}
+              </MenuItem>
+              <MenuItem onClick={() => setOpen('delete')} sx={{ '& svg': { mr: 2 } }}>
+                <IconifyIcon icon='mdi:delete' fontSize={20} />
+                {t("O'chirish")}
               </MenuItem>
             </>
           ) : (
@@ -74,7 +89,7 @@ export const KanbanItemMenu: FC<Props> = ({
                 <IconifyIcon icon='ph:flag-light' fontSize={20} />
                 {t('Yangi eslatma')}
               </MenuItem>
-              <MenuItem onClick={() => (getSMSTemps(), setOpen('sms'))} sx={{ '& svg': { mr: 2 } }}>
+              <MenuItem onClick={handleModalsOpen} sx={{ '& svg': { mr: 2 } }}>
                 <IconifyIcon icon='mdi:sms' fontSize={20} />
                 {t('SMS yuborish')}
               </MenuItem>
@@ -120,6 +135,8 @@ export const KanbanItemMenu: FC<Props> = ({
           </MenuItem>
         </>
       )}
+
+      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
     </Menu>
   )
 }

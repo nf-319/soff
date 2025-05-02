@@ -1,428 +1,428 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Autocomplete,
   Box,
-  Button,
   FormControl,
   InputAdornment,
   InputLabel,
   MenuItem,
   OutlinedInput,
-  Popper,
   Select,
   TextField,
-  Tooltip,
-  Typography
+  CircularProgress, Popper
 } from '@mui/material'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { useTranslation } from 'react-i18next'
-import IconifyIcon from '../../../components/icon'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { updateStudentParams } from 'src/store/apps/students'
 import useCourses from 'src/hooks/useCourses'
 import useDebounce from 'src/hooks/useDebounce'
-import { Toggle } from 'rsuite'
-import 'rsuite/Toggle/styles/index.css'
 import api from 'src/@core/utils/api'
-import { MetaTypes } from 'src/types/apps/groupsTypes'
-import { ModalTypes, SendSMSModal } from './view/UserViewLeft'
-import useSMS from 'src/hooks/useSMS'
-import 'rsuite/DateRangePicker/styles/index.css'
-import { DatePicker } from 'rsuite'
 import { format } from 'date-fns'
-import { fetchSchoolsList, fetchSmsList } from 'src/store/apps/settings'
-import ExcelStudents from '../../../components/excelButton/ExcelStudents'
+import { fetchSchoolsList } from 'src/store/apps/settings'
 import ceoConfigs from 'src/configs/ceo'
 import { useRouter } from 'next/router'
-import { styled } from '@mui/material/styles'
+import { Search } from 'lucide-react'
 import useResponsive from '@/@core/hooks/useResponsive'
 
-type StudentsFilterProps = {
-  students?: any[]
-}
-
-const StudentsFilter = ({ students }: StudentsFilterProps) => {
+const StudentsFilter = () => {
   const router = useRouter()
-  const { isMobile } = useResponsive()
   const dispatch = useAppDispatch()
   const { queryParams } = useAppSelector(state => state.students)
   const { schools } = useAppSelector(state => state.settings)
-  const [key, setKey] = useState<string>('')
+  const [activeFilter, setActiveFilter] = useState('')
   const { getCourses, courses } = useCourses()
-  const [groups, setGroups] = useState<any>()
-  const [teachers, setTeachers] = useState<any>()
-  const [isActive, setIsActive] = useState<boolean>(true)
+  const [groups, setGroups] = useState([])
+  const [teachers, setTeachers] = useState([])
   const { t } = useTranslation()
-  const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
-  const { smsTemps, getSMSTemps } = useSMS()
+  const [loadingGroups, setLoadingGroups] = useState(false)
+  const [loadingTeachers, setLoadingTeachers] = useState(false)
   const querySearch = new URLSearchParams(window.location.search).get('q')
-  const [search, setSearch] = useState<string>(querySearch || '')
+  const [search, setSearch] = useState(querySearch || '')
   const debounceSearch = useDebounce(search, 300)
-  const studentIds = students?.map(student => student.id)
-  const [teacherId, setTeacherId] = useState<any>()
-  const [groupId, setGroupId] = useState<any>()
+  const [teacherId, setTeacherId] = useState('')
+  const [groupId, setGroupId] = useState('')
+  const isInitialMount = useRef(true)
+  const isUpdating = useRef(false)
+  const dataFetchedRef = useRef({
+    courses: false,
+    groups: false,
+    teachers: false,
+    schools: false
+  })
 
-  const handleEditClickOpen = (value: ModalTypes) => {
-    setOpenEdit(value)
-  }
-  const queryString = new URLSearchParams({ ...queryParams } as Record<string, string>).toString()
+  const getGroups = async () => {
+    if (dataFetchedRef.current.groups) return
 
-  const handleEditClose = () => {
-    setOpenEdit(null)
-  }
-
-  async function getGroups() {
-    await api
-      .get(`common/group-check-list/?teacher=${teacherId || ''}`)
-      .then(res => setGroups(res.data))
-      .catch(error => console.log(error))
-  }
-  async function getTeachers() {
-    await api
-      .get(`${ceoConfigs.employee_checklist}?role=teacher&group=${groupId || ''}`)
-      .then(res => setTeachers(res.data))
-      .catch(error => console.log(error))
-  }
-
-  async function handleFilter(key: string, value: string | number | null) {
-    dispatch(updateStudentParams({ [key]: value }))
-
-    if (key === 'status') {
-      dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
+    try {
+      setLoadingGroups(true)
+      const queryParam = teacherId ? `?teacher=${teacherId}` : ''
+      const res = await api.get(`common/group-check-list/${queryParam}`)
+      setGroups(res.data)
+      dataFetchedRef.current.groups = true
+    } catch (error) {
+      console.error('Error fetching groups:', error)
+    } finally {
+      setLoadingGroups(false)
     }
+  }
+
+  const getTeachers = async () => {
+    if (dataFetchedRef.current.teachers) return
+
+    try {
+      setLoadingTeachers(true)
+      const queryParam = groupId ? `?group=${groupId}` : ''
+      const res = await api.get(`${ceoConfigs.employee_checklist}?role=teacher${queryParam}`)
+      setTeachers(res.data)
+      dataFetchedRef.current.teachers = true
+    } catch (error) {
+      console.error('Error fetching teachers:', error)
+    } finally {
+      setLoadingTeachers(false)
+    }
+  }
+
+  const handleFilter = (key: any, value: any) => {
+    isUpdating.current = true
+
+    let updatedParams: Record<any, any> = { [key]: value }
+
     if (key === 'debt_date') {
-      setIsActive(false)
-      dispatch(updateStudentParams({ debt_date: `${value}` }))
+      updatedParams = { debt_date: value ? `${value}` : '' }
     } else if (key === 'amount') {
-      dispatch(updateStudentParams({ debt_date: '' }))
       if (value === 'is_debtor') {
-        setIsActive(false)
-        dispatch(updateStudentParams({ is_debtor: true, last_payment: '', not_in_debt: '' }))
+        updatedParams = { is_debtor: true, last_payment: '', not_in_debt: '' }
       } else if (value === 'not_in_debt') {
-        setIsActive(false)
-        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: true }))
+        updatedParams = { is_debtor: '', last_payment: '', not_in_debt: true }
       } else if (value === 'last_payment') {
-        setIsActive(true)
-        dispatch(updateStudentParams({ last_payment: true, is_debtor: '', not_in_debt: '' }))
+        updatedParams = { last_payment: true, is_debtor: '', not_in_debt: '' }
       } else if (value === 'all') {
-        setIsActive(true)
-        dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '' }))
+        updatedParams = { is_debtor: '', last_payment: '', not_in_debt: '' }
+      }
+    } else if (value === '') {
+      updatedParams = { [key]: null }
+    }
+
+    dispatch(updateStudentParams(updatedParams))
+
+    if (key === 'teacher') {
+      setTeacherId(value || '')
+      dataFetchedRef.current.groups = false
+    } else if (key === 'group') {
+      setGroupId(value || '')
+      dataFetchedRef.current.teachers = false
+    }
+  }
+
+  const handleDateChange = (date: any) => {
+    if (!date) {
+      handleFilter('debt_date', '')
+    } else {
+      handleFilter('debt_date', format(date, 'MM-yyyy'))
+    }
+  }
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      const {
+        q,
+        status,
+        course,
+        school,
+        group_status,
+        group,
+        teacher,
+        is_debtor,
+        last_payment,
+        not_in_debt,
+        debt_date
+      } = router.query
+
+      const newParams = {
+        search: (q || ''),
+        status: (status || ''),
+        course: (course || ''),
+        school: (school || ''),
+        group_status: (group_status || ''),
+        group: (group || ''),
+        teacher: (teacher || ''),
+        is_debtor: (is_debtor || ''),
+        last_payment: (last_payment || ''),
+        not_in_debt: (not_in_debt || ''),
+        debt_date: (debt_date || '')
+      }
+
+      if (JSON.stringify(newParams) !== JSON.stringify(queryParams)) {
+        isUpdating.current = true
+        dispatch(updateStudentParams(newParams))
+
+        if (teacher) setTeacherId(String(teacher))
+        if (group) setGroupId(String(group))
+      }
+
+      isInitialMount.current = false
+    }
+  }, [router.query, dispatch, queryParams])
+
+  useEffect(() => {
+    if (!isUpdating.current) {
+      const { q, ...restQuery } = router.query
+
+      if (debounceSearch && debounceSearch !== q) {
+        router.push(
+          {
+            pathname: '/students',
+            query: { ...restQuery, q: debounceSearch }
+          },
+          undefined,
+          { shallow: true }
+        )
+      } else if (!debounceSearch && q) {
+        router.push(
+          {
+            pathname: '/students',
+            query: restQuery
+          },
+          undefined,
+          { shallow: true }
+        )
       }
     }
-  }
-
-  const StyledPopper = styled(Popper)({
-    minWidth: '300px'
-  })
-
-  const TeacherPopper = styled(Popper)({
-    minWidth: '200px'
-  })
+  }, [debounceSearch, router])
 
   useEffect(() => {
-    const { q, ...restQuery } = router.query
-
-    if (debounceSearch) {
-      void router.push(
-        {
-          pathname: '/students',
-          query: { ...restQuery, q: debounceSearch }
-        },
-        undefined,
-        { shallow: true }
-      )
-    } else if (q) {
-      void router.push(
-        {
-          pathname: '/students',
-          query: restQuery
-        },
-        undefined,
-        { shallow: true }
-      )
-    }
-  }, [debounceSearch])
+    isUpdating.current = false
+  }, [])
 
   useEffect(() => {
-    if (key == 'course') {
+    if (activeFilter === 'course' && !dataFetchedRef.current.courses) {
       void getCourses()
-    } else if (key == 'group') {
+      dataFetchedRef.current.courses = true
+    } else if (activeFilter === 'group') {
       void getGroups()
-    } else if (key == 'teacher') {
+    } else if (activeFilter === 'teacher') {
       void getTeachers()
-    } else if (key == 'school') {
+    } else if (activeFilter === 'school' && !dataFetchedRef.current.schools) {
       dispatch(fetchSchoolsList())
+      dataFetchedRef.current.schools = true
     }
-  }, [key])
+  }, [activeFilter, getCourses, dispatch])
 
-  const groupOptions = groups?.map((item: MetaTypes) => ({
+  const groupOptions = groups?.map((item: any) => ({
     label: item?.name,
     value: item?.id
-  }))
+  })) || []
 
   const teacherOptions = teachers?.map((item: any) => ({
     label: item?.first_name,
     value: item?.id
-  }))
+  })) || []
 
   return (
-    <Box display='flex' gap={2} alignItems='center' flexWrap={'wrap'} justifyContent='space-between' width='100%'>
-      <Box
-        display={'flex'}
-        width='100%'
-        gap={2}
-        flexWrap={{ sm: 'wrap', md: 'nowrap' }}
-        flexDirection={{ xs: 'column', sm: 'row' }}
-      >
-        <FormControl fullWidth>
-          <InputLabel size='small' id='search-input'>
-            {t('Qidirish')}
-          </InputLabel>
-
-          <OutlinedInput
-            onChange={e => setSearch(e.target.value)}
-            value={search}
-            endAdornment={
-              <InputAdornment position='end'>
-                <IconifyIcon icon={'tabler:search'} />
-              </InputAdornment>
-            }
-            label='Qidirish'
-            id='search-input'
-            placeholder='Qidirish...'
-            size='small'
-          />
-        </FormControl>
-
-        <FormControl fullWidth>
-          <InputLabel size='small' id='demo-simple-select-outlined-label'>
-            {t('Kurslar')}
-          </InputLabel>
-
-          <Select
-            size='small'
-            onOpen={() => setKey('course')}
-            key={'course'}
-            label={t('Kurslar')}
-            defaultValue={''}
-            id='demo-simple-select-outlined'
-            labelId='demo-simple-select-outlined-label'
-            onChange={(e: any) => {
-              if (e.target.value === '') {
-                handleFilter('course', null)
-              } else {
-                handleFilter('course', e.target.value)
-              }
-            }}
-          >
-            <MenuItem value={''}>
-              <b>{t('Barchasi')}</b>
-            </MenuItem>
-            {courses.map(course => (
-              <MenuItem key={course.id} value={course.id}>
-                {course.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <InputLabel size='small' id='demo-simple-select-outlined-label'>
-            {t('Maktab')}
-          </InputLabel>
-          <Select
-            onOpen={() => setKey('school')}
-            size='small'
-            label={t('Maktab')}
-            id='demo-simple-select-outlined'
-            labelId='demo-simple-select-outlined-label'
-            onChange={(e: any) => {
-              if (e.target.value === '') {
-                handleFilter('school', null)
-              } else {
-                handleFilter('school', e.target.value)
-              }
-            }}
-          >
-            <MenuItem value={''}>
-              <b>{t('Barchasi')}</b>
-            </MenuItem>
-            {schools?.map((school: any) => (
-              <MenuItem key={school.id} value={school.id}>
-                {school.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth>
-          <InputLabel size='small' id='demo-simple-select-outlined-label'>
-            {t('Guruhdagi holati')}
-          </InputLabel>
-          <Select
-            size='small'
-            onOpen={() => setKey('group_status')}
-            label={t('Guruhdagi holati')}
-            value={queryParams.group_status}
-            id='demo-simple-select-outlined'
-            labelId='demo-simple-select-outlined-label'
-            onChange={(e: any) => handleFilter('group_status', e.target.value)}
-          >
-            <MenuItem value=''>
-              <b>{t('Barchasi')}</b>
-            </MenuItem>
-            <MenuItem value={'active'}>{t('active')}</MenuItem>
-            <MenuItem value={'new'}>{t('test')}</MenuItem>
-            <MenuItem value={'frozen'}>{t('frozen')}</MenuItem>
-            <MenuItem value={'not_activated'}>{t('Sinov darsidan ketganlar')}</MenuItem>
-            <MenuItem value={'without_group'}>{t('Guruhsiz')}</MenuItem>
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth>
-          <InputLabel size='small' id='demo-simple-select-outlined-label'>
-            {t("To'lov holati")}
-          </InputLabel>
-          <Select
-            size='small'
-            onClick={() => setKey('payment_status')}
-            label={t("To'lov holati")}
-            value={
-              queryParams.is_debtor
-                ? 'is_debtor'
-                : queryParams.not_in_debt
-                ? 'not_in_debt'
-                : Boolean(queryParams.last_payment)
-                ? 'last_payment'
-                : ''
-            }
-            id='demo-simple-select-outlined'
-            labelId='demo-simple-select-outlined-label'
-            onChange={(e: any) => {
-              if (e.target.value === 'is_debtor') {
-                handleFilter('amount', 'is_debtor')
-              } else if (e.target.value === 'last_payment') {
-                handleFilter('amount', 'last_payment')
-              } else if (e.target.value === 'not_in_debt') {
-                handleFilter('amount', 'not_in_debt')
-              } else {
-                handleFilter('amount', 'all')
-              }
-            }}
-          >
-            <MenuItem value=''>
-              <b>{t('Barchasi')}</b>
-            </MenuItem>
-            <MenuItem value={'last_payment'}>{t("To'lov vaqti yaqinlashgan")}</MenuItem>
-            <MenuItem value={'is_debtor'}>{t('Qarzdor')}</MenuItem>
-            <MenuItem value={'not_in_debt'}>{t("Qarzdor bo'lmagan")}</MenuItem>
-          </Select>
-        </FormControl>
-
-        <div>
-          <FormControl sx={{ width: !isMobile ? 180 : '100%', position: 'relative', mt: isMobile ? 3 : 0 }}>
-            <InputLabel
-              sx={{ position: 'absolute', top: -30, left: -10 }}
-              size='small'
-              id='demo-simple-select-outlined-label'
-            >
-              <p style={{ fontSize: 12 }}>{t('Oy kesimida balans')}</p>
-            </InputLabel>
-            <DatePicker
-              cleanable={true}
-              size='lg'
-              placeholder='Oy va yil'
-              format='MM/yyyy'
-              onChange={value => {
-                if (!value) {
-                  void handleFilter('debt_date', '')
-                } else {
-                  void handleFilter('debt_date', format(value, 'MM-yyyy'))
-                }
-              }}
-              shouldDisableDate={date => date?.getTime() > Date.now()}
-            />
-          </FormControl>
-        </div>
-
-        <div onClick={() => setKey('group')} style={{ width: '100%' }}>
-          <Autocomplete
-            fullWidth
-            loading={!groupOptions}
-            options={groupOptions || []}
-            onChange={(_: any, v: any) => {
-              void handleFilter('group', v?.value)
-              setGroupId(v?.value)
-            }}
-            PopperComponent={StyledPopper}
-            size='small'
-            renderInput={params => <TextField {...params} label='Guruh' />}
-          />
-        </div>
-        <div onClick={() => setKey('teacher')} style={{ width: '100%' }}>
-          <Autocomplete
-            fullWidth
-            loading={!teacherOptions}
-            disablePortal
-            value={teacherOptions?.find((option: any) => option.value === queryParams.teacher) || null}
-            options={teacherOptions || []}
-            PopperComponent={TeacherPopper}
-            onChange={(e: any, v: any) => {
-              void handleFilter('teacher', v?.value)
-              setTeacherId(v?.value)
-            }}
-            size='small'
-            renderInput={params => <TextField {...params} label={t('Ustoz')} />}
-          />
-        </div>
-
-        {isActive && (
-          <Box sx={{ display: 'flex', alignItems: 'center', width: 180 }}>
-            <Toggle
-              checked={queryParams.status === 'archive'}
-              color='red'
-              checkedChildren={t('Arxiv')}
-              unCheckedChildren={t('Arxiv')}
-              onChange={e => {
-                if (e) {
-                  handleFilter('status', 'archive')
-                } else {
-                  handleFilter('status', 'active')
-                }
-              }}
-            />
-          </Box>
-        )}
-        <ExcelStudents
-          tooltip='Ko‘rinib turgan jadvalni Excel faylga yuklab olish.'
-          size='medium'
-          url='/student/offset-list/'
-          queryString={queryString}
-        />
-        <Button
-          onClick={() => {
-            void getSMSTemps()
-            handleEditClickOpen('sms')
-          }}
-          variant='outlined'
-          color='warning'
-          fullWidth
+    <Box display='flex' flexDirection={{xs: 'column', md: 'row'}} gap={2} width='100%'>
+      <FormControl fullWidth>
+        <InputLabel size='small' id='search-input'>
+          {t('Qidirish')}
+        </InputLabel>
+        <OutlinedInput
+          onChange={e => setSearch(e.target.value)}
+          value={search}
+          endAdornment={
+            <InputAdornment position='end'>
+              <Search size={18} />
+            </InputAdornment>
+          }
+          label={t('Qidirish')}
+          id='search-input'
+          placeholder={t('Qidirish...')}
           size='small'
-          startIcon={<IconifyIcon icon='material-symbols-light:sms-outline' />}
-        >
-          <Tooltip title={t('Ro‘yxatdagi o‘quvchilarga SMS yuborish.')}>
-            <span>{t('Sms yuborish')}</span>
-          </Tooltip>
-        </Button>
-      </Box>
-
-      <div onClick={() => dispatch(fetchSmsList())}>
-        <SendSMSModal
-          handleEditClose={handleEditClose}
-          openEdit={openEdit}
-          smsTemps={smsTemps}
-          setOpenEdit={setOpenEdit}
-          usersData={studentIds}
         />
-      </div>
+      </FormControl>
+
+      <FormControl fullWidth>
+        <InputLabel size='small' id='course-select-label'>
+          {t('Kurslar')}
+        </InputLabel>
+
+        <Select
+          size='small'
+          onOpen={() => setActiveFilter('course')}
+          label={t('Kurslar')}
+          value={queryParams.course || ''}
+          id='course-select'
+          labelId='course-select-label'
+          onChange={e => handleFilter('course', e.target.value)}
+        >
+          <MenuItem value=''>{t('Barchasi')}</MenuItem>
+          {courses.map(course => (
+            <MenuItem key={course.id} value={course.id}>
+              {course.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <FormControl fullWidth>
+        <InputLabel size='small' id='school-select-label'>
+          {t('Maktab')}
+        </InputLabel>
+        <Select
+          size='small'
+          onOpen={() => setActiveFilter('school')}
+          label={t('Maktab')}
+          value={queryParams.school || ''}
+          id='school-select'
+          labelId='school-select-label'
+          onChange={e => handleFilter('school', e.target.value)}
+        >
+          <MenuItem value=''>{t('Barchasi')}</MenuItem>
+          {schools?.map((school: any) => (
+            <MenuItem key={school.id} value={school.id}>
+              {school.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <FormControl fullWidth>
+        <InputLabel size='small' id='group-status-select-label'>
+          {t('Guruhdagi holati')}
+        </InputLabel>
+        <Select
+          size='small'
+          label={t('Guruhdagi holati')}
+          value={queryParams.group_status || ''}
+          id='group-status-select'
+          labelId='group-status-select-label'
+          onChange={e => handleFilter('group_status', e.target.value)}
+        >
+          <MenuItem value=''>{t('Barchasi')}</MenuItem>
+          <MenuItem value='active'>{t('active')}</MenuItem>
+          <MenuItem value='new'>{t('test')}</MenuItem>
+          <MenuItem value='frozen'>{t('frozen')}</MenuItem>
+          <MenuItem value='not_activated'>{t('Sinov darsidan ketganlar')}</MenuItem>
+          <MenuItem value='without_group'>{t('Guruhsiz')}</MenuItem>
+        </Select>
+      </FormControl>
+
+      <FormControl fullWidth>
+        <InputLabel size='small' id='payment-status-select-label'>
+          {t("To'lov holati")}
+        </InputLabel>
+        <Select
+          size='small'
+          label={t("To'lov holati")}
+          value={
+            queryParams.is_debtor
+              ? 'is_debtor'
+              : queryParams.not_in_debt
+              ? 'not_in_debt'
+              : queryParams.last_payment
+              ? 'last_payment'
+              : ''
+          }
+          id='payment-status-select'
+          labelId='payment-status-select-label'
+          onChange={e => handleFilter('amount', e.target.value || 'all')}
+        >
+          <MenuItem value=''>{t('Barchasi')}</MenuItem>
+          <MenuItem value='last_payment'>{t("To'lov vaqti yaqinlashgan")}</MenuItem>
+          <MenuItem value='is_debtor'>{t('Qarzdor')}</MenuItem>
+          <MenuItem value='not_in_debt'>{t("Qarzdor bo'lmagan")}</MenuItem>
+        </Select>
+      </FormControl>
+
+      <FormControl fullWidth>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DatePicker
+            label={t('Oy kesimida balans')}
+            views={['month', 'year']}
+            format='MM/yyyy'
+            slotProps={{
+              textField: {
+                size: 'small',
+                InputLabelProps: {
+                  shrink: true,
+                  sx: {
+                    display: 'block',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxWidth: '100%',
+                  },
+                  title: t('Oy kesimida balans'),
+                },
+              },
+            }}
+            onChange={handleDateChange}
+            disableFuture
+          />
+        </LocalizationProvider>
+      </FormControl>
+
+
+      <FormControl fullWidth>
+        <Autocomplete
+          disablePortal
+          size='small'
+          options={groupOptions}
+          loading={loadingGroups}
+          loadingText={t('Yuklanmoqda...')}
+          noOptionsText={t("Ma'lumot topilmadi")}
+          value={groupOptions.find(option => option.value === queryParams.group_status) || null}
+          onOpen={() => setActiveFilter('group')}
+          onChange={(_, v) => handleFilter('group', v?.value || '')}
+          PopperComponent={props => <Popper {...props} style={{ ...props.style, width: 300 }} />}
+          renderInput={params => (
+            <TextField
+              {...params}
+              label={t('Guruh')}
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {loadingGroups ? <CircularProgress size={20} /> : null}
+                    {params.InputProps.endAdornment}
+                  </>
+                )
+              }}
+            />
+          )}
+        />
+      </FormControl>
+
+      <FormControl fullWidth>
+        <Autocomplete
+          disablePortal
+          size='small'
+          options={teacherOptions}
+          loading={loadingTeachers}
+          loadingText='Yuklanmoqda...'
+          noOptionsText="Ma'lumot topilmadi"
+          value={teacherOptions.find(option => option.value === queryParams.teacher) || null}
+          onOpen={() => setActiveFilter('teacher')}
+          onChange={(_, v) => handleFilter('teacher', v?.value || '')}
+          PopperComponent={props => <Popper {...props} style={{ ...props.style, width: 300 }} />}
+          renderInput={params => (
+            <TextField
+              {...params}
+              label={t('Ustoz')}
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {loadingTeachers ? <CircularProgress size={20} /> : null}
+                    {params.InputProps.endAdornment}
+                  </>
+                )
+              }}
+            />
+          )}
+        />
+      </FormControl>
     </Box>
   )
 }

@@ -96,5 +96,4 @@ export interface GroupFormInitialValue {
   start_at: string
   day_of_week: string | string[]
   end_at: string
-  end_date?:string
 }

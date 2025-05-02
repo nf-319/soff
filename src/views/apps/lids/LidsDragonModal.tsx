@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Chip,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -14,19 +15,8 @@ import {
 } from '@mui/material'
 import { Bell, Clock, Info, MessageSquare, Phone, PlusIcon, User, UserIcon } from 'lucide-react'
 
-interface LidsDragonModalProps {
-  openModal: boolean
-  handleClose: (status: boolean) => void
-  selectedLead: {
-    created_at: string
-    first_name: string
-    id: number
-    last_activity: string
-    phone: string
-  }
-}
 import React, { useEffect, useState } from 'react'
-import { EmptyContent } from '../../../components/empty-content'
+import { EmptyContent } from '@components/empty-content'
 import IconifyIcon from '../../../components/icon'
 import api from 'src/@core/utils/api'
 import { formatDate } from 'src/@core/utils/format'
@@ -41,6 +31,19 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 import AddToGroupForm from './anonimUser/AddToGroupForm'
 import { fetchGroupChecklist } from 'src/store/apps/groups'
 import Link from 'next/link'
+import { useGet } from '@/hooks/useApi'
+
+interface LidsDragonModalProps {
+  openModal: boolean
+  handleClose: (status: boolean) => void
+  selectedLead: {
+    created_at: string
+    first_name: string
+    id: number
+    last_activity?: string
+    phone: string
+  }
+}
 
 type InfoItemProps = {
   icon: React.ReactNode
@@ -51,7 +54,7 @@ type InfoItemProps = {
 const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value }) => {
   const { settings } = useSettings()
   return label === 'Telefon raqami' ? (
-    <Link href={`tel:${value}`} style={{textDecoration:'none'}}>
+    <Link href={`tel:${value}`} style={{ textDecoration:'none' }}>
       <div
         style={{ cursor: 'pointer' }}
         className={`d-flex align-items-center p-3 ${
@@ -84,12 +87,14 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value }) => {
 export default InfoItem
 
 export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDragonModalProps) {
-  const [value, setValue] = useState<'lead-user-description' | 'anonim-user' | 'sms-history'>('anonim-user')
+  const [value, setValue] = useState<'lead-user-description' | 'anonim-user' | 'sms-history' | 'history'>('anonim-user')
   const [leadDetail, setLeadDetail] = useState<any>(null)
   const { sms_list } = useAppSelector(state => state.settings)
   const { groupChecklist } = useAppSelector(state => state.groups)
+  const { companyInfo } = useAppSelector(state => state.user)
 
   const [smsModal, setSmsModalOpen] = useState(false)
+  const [accessModal, setAccessModal] = useState<boolean>(false)
   const [addGroupModal, setAddGroupModal] = useState(false)
   const [detailLoading, setDetailLoading] = useState(false)
   const { settings } = useSettings()
@@ -122,6 +127,14 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
     setValue(newValue)
   }
 
+  const handleModalsOpen = () => {
+    if(companyInfo.access) {
+      setSmsModalOpen(true)
+    } else {
+      setAccessModal(true)
+    }
+  }
+
   useEffect(() => {
     if (openModal) {
       dispatch(fetchGroupChecklist(''))
@@ -134,7 +147,8 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
       fullWidth
       open={openModal}
       onClose={() => {
-        handleClose(false), setValue('anonim-user')
+        handleClose(false);
+        setValue('anonim-user')
       }}
     >
       <DialogTitle>
@@ -213,6 +227,15 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
                 </Box>
               }
               value='sms-history'
+            />
+            <Tab
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <User style={{ marginRight: 2 }} size={15} />
+                  Lead tarix
+                </Box>
+              }
+              value='history'
             />
           </Tabs>
 
@@ -338,7 +361,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
                     <Box margin={4}>
                       <Button
                         variant='contained'
-                        onClick={() => setSmsModalOpen(true)}
+                        onClick={handleModalsOpen}
                         fullWidth
                         sx={{ marginTop: 2 }}
                         startIcon={<PlusIcon />}
@@ -359,6 +382,59 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
                         <Box display='flex' alignItems='center'>
                           <div className='text-primary me-3'>{<MessageSquare />}</div>
                           <Typography fontSize={15}>{item?.message}</Typography>
+                        </Box>
+                        <Box display='flex' alignItems='center'>
+                          <div className='text-primary me-3'>{<Clock />}</div>
+                          <Typography fontSize={15}>{item?.created_at}</Typography>
+                        </Box>
+                      </Box>
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
+            {value === 'history' && (
+              <div>
+                {detailLoading ? (
+                  <Box display='flex' flexDirection='column' gap={2}>
+                    <Skeleton variant='rounded' sx={{ margin: 2 }} height={70} />
+                    <Skeleton variant='rounded' sx={{ margin: 2 }} height={70} />
+                    <Skeleton variant='rounded' sx={{ margin: 2 }} height={70} />
+                    <Skeleton variant='rounded' sx={{ margin: 2 }} height={70} />
+                  </Box>
+                ) : (
+                  <>
+                    {leadDetail?.map((item: any) => (
+                      <Box
+                        className='shadow-sm p-3'
+                        display='flex'
+                        flexDirection='column'
+                        gap={2}
+                        sx={{ background: 'white', borderRadius: 1 }}
+                        margin={4}
+                        padding={3}
+                      >
+                        <Box display='flex' alignItems='center'>
+                          <div className='text-primary me-3'>{<UserIcon />}</div>
+                          <Typography fontSize={15}>{item?.admin}</Typography>
+                        </Box>
+                        <Box display='flex' alignItems='center'>
+                          <div className='text-primary me-3'>{<MessageSquare />}</div>
+                          <Typography fontSize={15}>
+                            {item?.new_status == 'new' ? (
+                              <Chip label='Yangi' color='default' />
+                            ) : item?.new_status == 'connected' ? (
+                              <Chip label="Bog'lanildi" color='info' />
+                            ) : item?.new_status == 'not_connected' ? (
+                              <Chip label="Bog'lana olmadi" color='warning' />
+                            ) : item?.new_status == 'test_period' ? (
+                              <Chip label='Sinov darsida' color='primary' />
+                            ) : item?.new_status == 'enrolled' ? (
+                              <Chip label="Sotuv" color='success' />
+                            ) : (
+                              <Chip label="Yo'qotilgan" color='error' />
+                            )}
+                          </Typography>
                         </Box>
                         <Box display='flex' alignItems='center'>
                           <div className='text-primary me-3'>{<Clock />}</div>
@@ -396,7 +472,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
 
         <DialogContent sx={{ minWidth: '300px' }}>
           <SendSmsAnonimUserForm
-            smsTemps={sms_list}
+            smsTemps={sms_list.result}
             smsLoading={false}
             open={smsModal}
             user={selectedLead?.id}

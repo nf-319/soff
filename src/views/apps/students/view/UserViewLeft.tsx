@@ -17,7 +17,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import { useTranslation } from 'react-i18next'
 import IconifyIcon from 'src/components/icon'
-import { Checkbox, FormHelperText, Skeleton } from '@mui/material'
+import {  Checkbox, FormHelperText, Skeleton } from '@mui/material'
 import Form from 'src/components/form'
 import UserViewStudentsList from './UserViewStudentsList'
 import useStudent, { StudentTypes } from 'src/hooks/useStudents'
@@ -41,6 +41,7 @@ import StudentCard from './card'
 import Link from 'next/link'
 import { Box } from '@mui/system'
 import { MailCheck } from 'lucide-react'
+import { useGet } from '@hooks/useApi'
 
 export type ModalTypes = 'group' | 'withdraw' | 'payment' | 'sms' | 'delete' | 'edit' | 'notes' | 'parent'
 
@@ -146,6 +147,7 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
           )}
         </Grid>
 
+
         <Dialog
           open={openEdit === 'group'}
           onClose={handleEditClose}
@@ -218,13 +220,11 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
 
               {groupDate && (
                 <FormControl sx={{ width: '100%' }}>
-                  {/* <InputLabel htmlFor='qwqwq' size='small'>{t('Qo\'shilish sanasi')}</InputLabel> */}
                   <TextField
                     type='date'
                     size='small'
                     label={t("Qo'shilish sanasi")}
                     name='start_date'
-                    // min={groupShort?.find(el => el.id === groupDate)?.start_date || ''}
                     defaultValue={today}
                     style={{ background: 'transparent', width: '100%' }}
                   />
@@ -242,7 +242,6 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
                     name='fixed_price'
                     type='number'
                     error={!!error.fixed_price}
-                    // onChange={(e: any) => setDiscount(e.target.value)}
                     fullWidth
                   />
                   <FormHelperText className='mb-2' error={true}>
@@ -281,10 +280,9 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
             </Form>
           </DialogContent>
         </Dialog>
-        {/*   Payment  */}
         <StudentPaymentForm openEdit={openEdit} setOpenEdit={setOpenEdit} />
         <StudentWithDrawForm openEdit={openEdit} setOpenEdit={setOpenEdit} />
-        {/*   Edit Student  */}
+
         <Dialog
           open={openEdit === 'edit'}
           onClose={handleEditClose}
@@ -351,7 +349,6 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
             )}
           </DialogContent>
         </Dialog>
-        {/*   Delete  */}
         <Dialog
           open={openEdit === 'delete'}
           onClose={handleEditClose}
@@ -364,7 +361,6 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
           </DialogTitle>
           <DialogContent>Delete</DialogContent>
         </Dialog>
-        {/*   New Note  */}
         <Dialog
           open={openEdit === 'notes'}
           onClose={handleEditClose}
@@ -421,19 +417,11 @@ const UserViewLeft = ({ userData }: { userData: any }) => {
 
 export default UserViewLeft
 
-export const SendSMSModal = ({
-  for_lead,
-  handleEditClose,
-  openEdit,
-  setOpenEdit,
-  userData,
-  teacherData,
-  usersData
-}: any) => {
+export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData, teacherData, usersData }: any) => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
-  const [isErrorText, setIsErrorText] = useState<null | any>(null)
+  const [isErrorText, setIsErrorText] = useState<null | string>(null)
   const [isActive, setIsActive] = useState(false)
   const { sms_list, smschild_list } = useAppSelector(state => state.settings)
   const [parent_id, setParentId] = useState<number | null>(null)
@@ -459,7 +447,6 @@ export const SendSMSModal = ({
     setLoading(true)
     const data = {
       ...value,
-      for_lead: for_lead || false,
       users: userData ? [userData.id] : usersData,
       is_partly: isActive
     }
@@ -474,11 +461,14 @@ export const SendSMSModal = ({
       await dispatch(userData?.id)
     } catch (err: any) {
       if (err.response.status) {
-        setIsErrorText(err.response.data)
+        const errorMsg = `${err.response.data?.msg} (Mavjud SMSlar ${err.response.data?.allowed_sms_count} ta)` || 'Nomaʼlum xatolik yuz berdi'
+        setIsErrorText(errorMsg)
         setLoading(false)
+        toast.error(errorMsg)
       } else {
-        console.log(err)
+        console.error(err)
         setLoading(false)
+        toast.error('Tarmoq xatoligi yoki serverga ulanishda muammo!')
       }
     }
   }
@@ -486,21 +476,21 @@ export const SendSMSModal = ({
   const handleSendMessages = () => {
     setIsSuccess(false)
     setOpenEdit(null)
-    handleEditClose()
     toast.success('Smslar yuborildi')
     setParentId(null)
   }
+
+  useEffect(() => {
+    if(openEdit === 'sms')
+      dispatch(fetchSmsList())
+  }, [openEdit])
 
   useEffect(() => {
     if (parent_id) {
       dispatch(fetchSmsListQuery(parent_id))
     }
   }, [parent_id])
-  useEffect(() => {
-    if (openEdit === 'sms') {
-      dispatch(fetchSmsList())
-    }
-  }, [])
+
   return (
     <Dialog
       open={openEdit === 'sms'}
@@ -566,7 +556,7 @@ export const SendSMSModal = ({
                 id='demo-simple-select-outlined'
                 labelId='demo-simple-select-outlined-label'
               >
-                {sms_list.map(item => (
+                {sms_list?.result?.map(item => (
                   <MenuItem value={item.id}>{item.description}</MenuItem>
                 ))}
               </Select>
@@ -584,9 +574,11 @@ export const SendSMSModal = ({
                   labelId='demo-simple-select-outlined-label'
                   onChange={e => formik?.setFieldValue('message', e.target.value)}
                 >
-                  {smschild_list.map((el: any) => (
+                  {smschild_list?.result?.map((el: any) => (
                     <MenuItem value={el.description} sx={{ wordBreak: 'break-word' }}>
-                      <span style={{ maxWidth: '250px', wordBreak: 'break-word' }}>{el.description}</span>
+                      <span style={{ maxWidth: '250px', wordBreak: 'break-word' }}>
+                        {el.description}
+                      </span>
                     </MenuItem>
                   ))}
                 </Select>
@@ -611,19 +603,15 @@ export const SendSMSModal = ({
                 {formik.errors.message}
               </FormHelperText>
             </FormControl>
-            {isErrorText && (
-              <p style={{ color: 'red', padding: 3 }}>
-                {isErrorText?.message} {`(Sms limit : ${isErrorText?.allowed_sms_count})`}
-              </p>
-            )}
-            {isErrorText && (
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+            <p style={{ color: 'red', padding: 3 }}>{isErrorText}</p>
+            {userData?.length && isErrorText && (
+              <div className='d-flex align-items-start'>
                 <Checkbox
                   checked={isActive}
                   onChange={handleChangeActive}
                   inputProps={{ 'aria-label': 'controlled' }}
                 />
-                <p style={{ fontSize: '14px' }}>Sms limit yetganicha habar yuborilsin</p>
+                <p>Sms limit yetganicha habar yuborilsin (10) ta</p>
               </div>
             )}
             <DialogActions sx={{ justifyContent: 'center' }}>

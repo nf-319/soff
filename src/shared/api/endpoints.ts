@@ -3,10 +3,16 @@ export const enum Endpoints {
   GlobalNotifications = 'owner/global-notifications/',
   OwnerListClient = 'owner/list/client/',
   Notifications = 'common/notifications/',
-  ChecklistGroup = 'common/group-check-list/',
   ChecklistTeacher = 'employee/check-list/?role=teacher',
   ChecklistCourses = 'common/course/checklist/',
   NotificationRead = 'common/notification-read/{id}/',
   FinancialsIncomeOverview = 'financials/income-overview/',
+  Branches = 'common/branches/',
+  LeadsDashboard = 'leads/dashboard/',
+  LeadsYearlyStats = 'leads/yearly-stats/',
+  LeadsSourceStats = 'leads/source-stats/',
+  ReportLeadsSellers = 'leads/sellers/',
+  ReportLeadsList = 'leads/list/',
+  ReportLeadsChart = 'leads/separate-leads-chart/',
+  ReportLeadsSellerDetail = 'leads/course-distribution/'
 }
-

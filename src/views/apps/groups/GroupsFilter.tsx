@@ -13,8 +13,7 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
-  Tooltip,
-  useMediaQuery
+  Tooltip
 } from '@mui/material'
 import { useRouter } from 'next/router'
 
@@ -26,17 +25,17 @@ import api from 'src/@core/utils/api'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setOnlineLessonLoading } from 'src/store/apps/groupDetails'
 import { updateParams } from 'src/store/apps/groups'
-import useResponsive from '@/@core/hooks/useResponsive'
 import { useGetTeachers } from '@/shared/query-hooks/teachers/teachers'
 import { useGetChecklistCourses } from '@/shared/query-hooks'
 import { LaptopMinimal, Search } from 'lucide-react'
 import useDebounce from '@hooks/useDebounce'
 import { useEffect, useState } from 'react'
+import useResponsive from '@/@core/hooks/useResponsive'
 
 export const GroupsFilter = () => {
   const router = useRouter()
   const { query } = router
-  const isMobile = useMediaQuery('(max-width:564px)');
+  const { isMobile } = useResponsive()
   const { queryParams } = useAppSelector(state => state.groups)
   const { onlineLessonLoading } = useAppSelector(state => state.groupDetails)
   const { data: teachersData } = useGetTeachers()
@@ -44,6 +43,7 @@ export const GroupsFilter = () => {
   const [searchTerm, setSearchTerm] = useState(query.search || '')
   const search = useDebounce(searchTerm, 400)
 
+  const day = new Date().getDay()
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
 
@@ -109,11 +109,19 @@ export const GroupsFilter = () => {
     value: item.id
   }))
 
+  useEffect(() => {
+    if(day % 2 === 0) {
+      dispatch(updateParams({ day_of_week: 'tuesday,thursday,saturday' }))
+    } else {
+      dispatch(updateParams({ day_of_week: 'monday,wednesday,friday' }))
+    }
+  }, [day])
+
   if (isMobile) {
     return (
       <form id='mobile-filter-form'>
         <Box display={'flex'} gap={2} flexDirection={'column'} paddingTop={isMobile ? 3 : 0} rowGap={isMobile ? 4 : 0}>
-          <FormControl sx={{ width: '100%' }}>
+          <FormControl sx={{ width: '100%', maxWidth: 260 }}>
             <InputLabel size='small' id='search-input'>
               {t('Qidirish')}
             </InputLabel>
@@ -314,6 +322,7 @@ export const GroupsFilter = () => {
             url='common/groups/export/'
             queryString={queryString}
           />
+
           <Tooltip title={t('Online darsni boshlash uchun bosing.')}>
             <LoadingButton
               loading={onlineLessonLoading}

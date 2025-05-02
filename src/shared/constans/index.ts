@@ -1,0 +1,1 @@
+export { uzbekMonths } from './month'

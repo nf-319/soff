@@ -66,6 +66,12 @@ export type ClientPaymentType = {
 
 export interface CompanyDetailsPageTypes {
   details: {
+    provider_data?: {
+      id: number
+      login: string
+      password: string
+      type: string
+    }
     order_data: {
       amount: string | null
       description: string
@@ -84,8 +90,8 @@ export interface CompanyDetailsPageTypes {
       students_count: number
       employees_count: number
     }
-    salary_service:string
-    domain:string
+    salary_service: string
+    domain: string
     date: string
     expiration_date: string
     name: string

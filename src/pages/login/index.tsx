@@ -104,15 +104,15 @@ const LoginPage = () => {
         !window.location.hostname.split('.').includes('c-panel') &&
         !window.location.hostname.split('.').includes('localhost')
       ) {
-        const resp = await api.get('common/settings/list/')
-        dispatch(setCompanyInfo(resp.data[0]))
+        const resp = await api.get('common/settings/')
+        dispatch(setCompanyInfo(resp.data))
       }
 
       const isMarketable = userRoles.includes('marketolog')
       const paymentPage = response.data.payment_page
       const returnUrl = router.query.returnUrl
       const redirectURL = isMarketable
-        ? '/lids'
+        ? '/lid-statements'
         : paymentPage
         ? '/crm-payments'
         : returnUrl && returnUrl !== '/'
@@ -122,7 +122,6 @@ const LoginPage = () => {
       await router.push(redirectURL as string)
 
       dispatch(setRoles(userRoles))
-      console.log(response.data?.payment_days)
       auth.setUser({
         payment_days: response.data?.payment_days,
         last_login: response.data?.last_login,
@@ -139,7 +138,6 @@ const LoginPage = () => {
         branches: response.data?.branches,
         active_branch: response.data.active_branch
       })
-      console.log(auth.user?.payment_days)
       setLoading(false)
       auth.initAuth()
     } catch (err: any) {

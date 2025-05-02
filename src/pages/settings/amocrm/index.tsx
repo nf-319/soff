@@ -23,7 +23,7 @@ const AmoCrmPage = () => {
   async function getAmoCrmData() {
     setPageLoader(true)
     await api
-      .get('/amocrm/data/')
+      .get('amocrm/data/')
       .then(res => {
         formik.setValues(res.data)
       })
@@ -37,7 +37,6 @@ const AmoCrmPage = () => {
     getAmoCrmData()
   }, [])
 
-  // Validation Schema
   const validationSchema = Yup.object({
     client_secret: Yup.string().required('Secret Key is required'),
     client_id: Yup.string().required('Integration ID is required'),
@@ -45,14 +44,13 @@ const AmoCrmPage = () => {
     subdomain: Yup.string().required('Sub Domain is required')
   })
 
-  // Formik hook for form management
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: validationSchema,
     onSubmit: async values => {
       setLoading(true)
       await api
-        .post('/amocrm/init-tokens/', values)
+        .post('amocrm/integration/', values)
         .then(res => {
           setLoading(false)
           toast.success('Tekshiruvdan otdingiz')
