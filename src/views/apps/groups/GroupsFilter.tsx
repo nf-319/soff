@@ -310,7 +310,7 @@ export const GroupsFilter = () => {
               <MenuItem value={'monday,tuesday,wednesday,thursday,friday,saturday,sunday'}>{t('Har kuni')}</MenuItem>
             </Select>
           </FormControl>
-          <Exwwcel
+          <Excel
             tooltip='Ko‘rinib turgan jadvalni Excel fayliga yuklab oling.'
             url='common/groups/export/'
             queryString={queryString}
