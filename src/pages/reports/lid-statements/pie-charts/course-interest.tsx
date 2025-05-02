@@ -1,8 +1,9 @@
 import { EmptyContent } from '@/components/empty-content'
 import { ReportLeadsCourseType } from '@/types/report'
-import { Card, Box, Typography, Grid, styled } from '@mui/material'
+import { Card, Box, Typography, Grid, styled, SxProps } from '@mui/material'
 import { ResponsivePie } from '@nivo/pie'
 import { useSettings } from 'src/@core/hooks/useSettings'
+import { FC } from 'react'
 
 const LegendItem = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -16,7 +17,13 @@ const LegendItem = styled(Box)(({ theme }) => ({
   whiteSpace: 'nowrap',
 }))
 
-const CourseInterest = ({ data, isCard = false }: { data: ReportLeadsCourseType[], isCard?: boolean }) => {
+type Props = {
+  data: ReportLeadsCourseType[]
+  isCard?: boolean
+  sx?: SxProps
+}
+
+const CourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
   const { settings } = useSettings()
   const isDark = settings.mode === 'dark'
 
@@ -46,6 +53,7 @@ const CourseInterest = ({ data, isCard = false }: { data: ReportLeadsCourseType[
         border: isCard ? '1px solid lightgray' : 'none',
         display: 'flex',
         flexDirection: 'column',
+        ...sx
       }}
     >
       <Typography sx={{ px: 6, pt: 4, pb: 2 }} color={'black'} fontSize={20} fontWeight={700}>

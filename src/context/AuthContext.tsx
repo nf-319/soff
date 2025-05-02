@@ -89,7 +89,7 @@ const AuthProvider = ({ children }: Props) => {
         !window.location.hostname.split('.').includes('c-panel') &&
         !window.location.hostname.split('.').includes('localhost')
       ) {
-        const resp = await api.get('common/settings/list/')
+        const resp = await api.get('common/settings/')
         dispatch(setCompanyInfo(resp.data[0]))
       }
     } else {
@@ -128,7 +128,7 @@ const AuthProvider = ({ children }: Props) => {
             !window.location.hostname.split('.').includes('c-panel') &&
             !window.location.hostname.split('.').includes('localhost')
           ) {
-            const resp = await api.get('common/settings/list/')
+            const resp = await api.get('common/settings/')
             dispatch(setCompanyInfo(resp.data[0]))
           }
 

@@ -91,7 +91,7 @@ export default function AllSettings() {
 
   async function getSettingsList() {
     setSettingsLoading(true)
-    await api.get('common/settings/list/').then(res => {
+    await api.get('common/settings/').then(res => {
       dispatch(setCompanyInfo(res.data[0]))
     })
     setSettingsLoading(false)
@@ -199,7 +199,7 @@ export default function AllSettings() {
       }
       await api.patch('common/settings/update/', formData)
 
-      const getresp = await api.get('common/settings/list/')
+      const getresp = await api.get('common/settings/')
 
       dispatch(setCompanyInfo(getresp.data[0]))
       setEditable(null)

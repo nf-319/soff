@@ -19,6 +19,7 @@ import { EmptyContent } from '../empty-content'
 import { useGet } from '@/hooks/useApi'
 import { ResponsiveLine } from '@nivo/line'
 import { uzbekMonths } from '@/shared/constans'
+import CourseInterest from '@/pages/reports/lid-statements/pie-charts/course-interest'
 
 const SellerDetailModal = ({
   sellerId,
@@ -34,12 +35,6 @@ const SellerDetailModal = ({
   const isDark = settings.mode == 'dark'
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
   const textColor = isDark ? '#ffffff' : '#333333'
-
-  const courseInterestData = sellerData?.course_distribution?.map((item: any) => ({
-    id: item.name,
-    label: item.name,
-    value: item.count
-  }))
 
   const currentDate = new Date()
   const currentMonth = currentDate.getMonth()
@@ -74,8 +69,9 @@ const SellerDetailModal = ({
     <Dialog maxWidth='md' fullWidth onClose={() => setSellerId(null)} open={!!sellerId}>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant='h5' fontWeight={700}>
-          Eng yaxshi sotuvchi
+          Sotuvchi malumotlari
         </Typography>
+
         <IconButton onClick={() => setSellerId(null)}>
           <X />
         </IconButton>
@@ -133,10 +129,13 @@ const SellerDetailModal = ({
                   min: 'auto',
                   max: 'auto',
                   stacked: false,
-                  reverse: false
+                  reverse: false,
+                  clamp: true
                 }}
                 yFormat=' >-.0f'
-                curve='cardinal'
+                curve='monotoneX'
+                enableArea={false}
+                areaBaselineValue={0}
                 axisTop={null}
                 axisRight={null}
                 axisBottom={{
@@ -218,83 +217,7 @@ const SellerDetailModal = ({
               />
             )}
           </Card>
-          <Card
-            sx={{
-              padding: 4,
-              height: { xs: 300, sm: 300 },
-              width: '100%',
-              boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
-              display: 'flex',
-              flexDirection: 'column'
-            }}
-          >
-            <Typography sx={{ pb: 2 }} color={'black'} fontSize={20} fontWeight={700}>
-              Kurslar
-            </Typography>
-            {isLoading ? (
-              <Skeleton height={350} sx={{ px: 3 }} />
-            ) : !courseInterestData?.length ? (
-              <EmptyContent />
-            ) : (
-              <Box sx={{ height: 300, flexGrow: 1, width: '100%' }}>
-                <ResponsivePie
-                  data={courseInterestData}
-                  margin={{ top: 20, right: 80, bottom: 80, left: 80 }}
-                  innerRadius={0.5}
-                  padAngle={0.7}
-                  cornerRadius={3}
-                  activeOuterRadiusOffset={8}
-                  borderWidth={1}
-                  borderColor={{
-                    from: 'color',
-                    modifiers: [['darker', 0.2]]
-                  }}
-                  arcLinkLabelsSkipAngle={10}
-                  arcLinkLabelsTextColor={textColor}
-                  arcLinkLabelsThickness={2}
-                  arcLinkLabelsColor={{ from: 'color' }}
-                  arcLabelsSkipAngle={10}
-                  arcLabelsTextColor={{
-                    from: 'color',
-                    modifiers: [['darker', 2]]
-                  }}
-                  legends={[
-                    {
-                      anchor: 'bottom',
-                      direction: 'row',
-                      justify: false,
-                      translateX: 0,
-                      translateY: 66,
-                      itemsSpacing: 16,
-                      itemWidth: 120,
-                      itemHeight: 20,
-                      itemTextColor: textColor,
-                      itemDirection: 'left-to-right',
-                      itemOpacity: 1,
-                      symbolSize: 14,
-                      symbolShape: 'circle',
-                      effects: [
-                        {
-                          on: 'hover',
-                          style: {
-                            itemTextColor: '#3f51b5'
-                          }
-                        }
-                      ]
-                    }
-                  ]}
-                  theme={{
-                    tooltip: {
-                      container: {
-                        background: isDark ? '#1e1e1e' : '#ffffff',
-                        color: textColor
-                      }
-                    }
-                  }}
-                />
-              </Box>
-            )}
-          </Card>
+          <CourseInterest sx={{ height: 300 }} data={sellerData?.course_distribution || []} />
         </Box>
         <Box mt={5}>
           <Card>
