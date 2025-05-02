@@ -458,11 +458,14 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
       await dispatch(userData?.id)
     } catch (err: any) {
       if (err.response.status) {
-        setIsErrorText(err.response.data.message)
+        const errorMsg = `${err.response.data?.msg} (Mavjud SMSlar ${err.response.data?.allowed_sms_count} ta)` || 'Nomaʼlum xatolik yuz berdi'
+        setIsErrorText(errorMsg)
         setLoading(false)
+        toast.error(errorMsg)
       } else {
         console.error(err)
         setLoading(false)
+        toast.error('Tarmoq xatoligi yoki serverga ulanishda muammo!')
       }
     }
   }
@@ -598,7 +601,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
               </FormHelperText>
             </FormControl>
             <p style={{ color: 'red', padding: 3 }}>{isErrorText}</p>
-            {isErrorText && (
+            {userData?.length && isErrorText && (
               <div className='d-flex align-items-start'>
                 <Checkbox
                   checked={isActive}
