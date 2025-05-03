@@ -8,16 +8,18 @@ import { MenuOpenType } from './LeadsKanban'
 import { LidsDragonModal } from '../../views/apps/lids/LidsDragonModal'
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
 import { useRouter } from 'next/router'
+import { useQuery } from '@tanstack/react-query'
+import api from '@/@core/utils/api'
 
 type Props = {
   provided?: DraggableProvided
   snapshot?: DraggableStateSnapshot
   lead: any
   onClose?: boolean
-  defaultId?:any,
+  defaultId?: any
 }
 
-export const LeadKanbanItem: FC<Props> = ({defaultId, provided, snapshot, lead, onClose }) => {
+export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead, onClose }) => {
   const { settings } = useSettings()
   const [studentModalOpen, setStudentModalOpen] = useState<boolean>(false)
   const [selectedLead, setSelectedLead] = useState<any | null>(null)
@@ -25,19 +27,38 @@ export const LeadKanbanItem: FC<Props> = ({defaultId, provided, snapshot, lead, 
   const [menuOpen, setMenuOpen] = useState<MenuOpenType>(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const { query } = useRouter()
+  const [leadId, setLeadId] = useState<number | null>(null)
+
   const handleMenuOpen = (event: any, lead: any) => {
     setStudentModalOpen(true)
     setSelectedLead(lead)
   }
+  const fetchLeadById = async (id: number) => {
+    const { data } = await api.get(`amocrm/leads/detail/${id}/`)
+    return data
+  }
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['lead', lead.id],
+    queryFn: () => fetchLeadById(Number(lead.id)),
+    enabled: false
+  })
 
   const handleClick = (event: any, lead: any) => {
     setCurrentLead(lead)
     setAnchorEl(event.currentTarget)
   }
 
+  function handleGetAmoLeadDetail(id: number) {
+    setLeadId(id)
+    refetch()
+  }
+
   return (
     <>
       <div
+        onClick={() => {
+          !!query.is_amocrm && handleGetAmoLeadDetail(lead.id)
+        }}
         className={`shadow-sm p-3 ${settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'} rounded`}
         ref={provided?.innerRef}
         {...provided?.draggableProps}
@@ -64,7 +85,7 @@ export const LeadKanbanItem: FC<Props> = ({defaultId, provided, snapshot, lead, 
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <Phone width={18} height={18} color='blue' />
-            <Typography fontSize={12}>{lead?.phone}</Typography>
+            <Typography fontSize={12}>{lead?.phone || data?.phone}</Typography>
           </div>
           {lead?.admin_name && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3 }}>
@@ -75,11 +96,9 @@ export const LeadKanbanItem: FC<Props> = ({defaultId, provided, snapshot, lead, 
         </div>
 
         <Box display='flex' alignItems='center'>
-          {!query.is_amocrm && (
-            <IconButton onClick={event => handleMenuOpen(event, lead)}>
-              <EyeIcon />
-            </IconButton>
-          )}
+          <IconButton onClick={event => handleMenuOpen(event, lead)}>
+            <EyeIcon />
+          </IconButton>
 
           <IconButton onClick={event => handleClick(event, lead)}>
             <Ellipsis
@@ -92,7 +111,7 @@ export const LeadKanbanItem: FC<Props> = ({defaultId, provided, snapshot, lead, 
       </div>
 
       <LeadsMenu
-         defaultId={defaultId}
+        defaultId={defaultId}
         currentId={currentLead}
         currentLead={currentLead}
         menuOpen={menuOpen}

@@ -98,7 +98,7 @@ const Lids = () => {
       setSelectedAmoLeadTab(amoCrmLeadData[0]?.id)
       setSelectedAmoData(amoCrmLeadData[0])
     }
-  }, [amoCrmLeadData, amoCrmLoading, selectedAmoLeadTab])
+  }, [is_amocrm, amoCrmLeadData])
 
   useEffect(() => {
     if (!leadData || leadData.results.length === 0) return

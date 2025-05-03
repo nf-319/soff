@@ -32,6 +32,7 @@ import AddToGroupForm from './anonimUser/AddToGroupForm'
 import { fetchGroupChecklist } from 'src/store/apps/groups'
 import Link from 'next/link'
 import { useGet } from '@/hooks/useApi'
+import { useRouter } from 'next/router'
 
 interface LidsDragonModalProps {
   openModal: boolean
@@ -54,7 +55,7 @@ type InfoItemProps = {
 const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value }) => {
   const { settings } = useSettings()
   return label === 'Telefon raqami' ? (
-    <Link href={`tel:${value}`} style={{ textDecoration:'none' }}>
+    <Link href={`tel:${value}`} style={{ textDecoration: 'none' }}>
       <div
         style={{ cursor: 'pointer' }}
         className={`d-flex align-items-center p-3 ${
@@ -87,12 +88,14 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value }) => {
 export default InfoItem
 
 export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDragonModalProps) {
-  const [value, setValue] = useState<'lead-user-description' | 'anonim-user' | 'sms-history' | 'history'>('anonim-user')
+  const { query } = useRouter()
+  const [value, setValue] = useState<'lead-user-description' | 'anonim-user' | 'sms-history' | 'history'>(
+    query.is_amocrm ? 'lead-user-description' : 'anonim-user'
+  )
   const [leadDetail, setLeadDetail] = useState<any>(null)
   const { sms_list } = useAppSelector(state => state.settings)
   const { groupChecklist } = useAppSelector(state => state.groups)
   const { companyInfo } = useAppSelector(state => state.user)
-
   const [smsModal, setSmsModalOpen] = useState(false)
   const [accessModal, setAccessModal] = useState<boolean>(false)
   const [addGroupModal, setAddGroupModal] = useState(false)
@@ -118,17 +121,37 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
       console.error(error)
     }
   }
+  const handleGetAmoUserDetails = async (value: string, id: number) => {
+    setDetailLoading(true)
+    try {
+      await api
+        .get(`amocrm/lead/notes/${selectedLead?.id}/`)
+        .then(res => {
+          setLeadDetail(res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+      setDetailLoading(false)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   const handleChange = async (
     event: React.SyntheticEvent,
     newValue: 'lead-user-description' | 'anonim-user' | 'sms-history'
   ) => {
-    handleGetUserDetails(newValue, selectedLead?.id)
+    if (query.is_amocrm) {
+      handleGetAmoUserDetails(newValue, selectedLead?.id)
+    } else {
+      handleGetUserDetails(newValue, selectedLead?.id)
+    }
     setValue(newValue)
   }
 
   const handleModalsOpen = () => {
-    if(companyInfo.access) {
+    if (companyInfo.access) {
       setSmsModalOpen(true)
     } else {
       setAccessModal(true)
@@ -138,17 +161,23 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
   useEffect(() => {
     if (openModal) {
       dispatch(fetchGroupChecklist(''))
-      handleGetUserDetails(value, selectedLead?.id)
+      if (query.is_amocrm) {
+        handleGetAmoUserDetails(value, selectedLead?.id)
+      } else {
+        handleGetUserDetails(value, selectedLead?.id)
+      }
     }
-  }, [selectedLead?.id])
+  }, [selectedLead?.id, openModal])
+
+  console.log(leadDetail)
 
   return (
     <Dialog
       fullWidth
       open={openModal}
       onClose={() => {
-        handleClose(false);
-        setValue('anonim-user')
+        handleClose(false)
+        setValue(query.is_amocrm ? 'lead-user-description' : 'anonim-user')
       }}
     >
       <DialogTitle>
@@ -189,55 +218,80 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
           </div>
         </div>
         <Box sx={{ width: '100%', marginTop: 2 }}>
-          <Tabs
-            variant={isMobile ? 'scrollable' : 'fullWidth'}
-            scrollButtons={isMobile ? 'auto' : false}
-            value={value}
-            onChange={handleChange}
-            aria-label='user tabs'
-            sx={{
-              '& .MuiTabs-flexContainer': {
-                flexDirection: isMobile ? 'column' : 'row'
-              }
-            }}
-          >
-            <Tab
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Info style={{ marginRight: 5 }} width={16} height={16} />
-                  Ma'lumotlar
-                </Box>
-              }
-              value='anonim-user'
-            />
-            <Tab
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Bell style={{ marginRight: 5 }} width={16} height={16} />
-                  Eslatmalar
-                </Box>
-              }
-              value='lead-user-description'
-            />
-            <Tab
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <MessageSquare style={{ marginRight: 5 }} width={16} height={16} />
-                  Sms tarixi
-                </Box>
-              }
-              value='sms-history'
-            />
-            <Tab
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <User style={{ marginRight: 2 }} size={15} />
-                  Lead tarix
-                </Box>
-              }
-              value='history'
-            />
-          </Tabs>
+          {query.is_amocrm ? (
+            <Tabs
+              variant={isMobile ? 'scrollable' : 'fullWidth'}
+              scrollButtons={isMobile ? 'auto' : false}
+              value={value}
+              onChange={handleChange}
+              aria-label='user tabs'
+              sx={{
+                '& .MuiTabs-flexContainer': {
+                  flexDirection: isMobile ? 'column' : 'row'
+                }
+              }}
+            >
+              <Tab
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Bell style={{ marginRight: 5 }} width={16} height={16} />
+                    Eslatmalar
+                  </Box>
+                }
+                value='lead-user-description'
+              />
+            </Tabs>
+          ) : (
+            <Tabs
+              variant={isMobile ? 'scrollable' : 'fullWidth'}
+              scrollButtons={isMobile ? 'auto' : false}
+              value={value}
+              onChange={handleChange}
+              aria-label='user tabs'
+              sx={{
+                '& .MuiTabs-flexContainer': {
+                  flexDirection: isMobile ? 'column' : 'row'
+                }
+              }}
+            >
+              <Tab
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Info style={{ marginRight: 5 }} width={16} height={16} />
+                    Ma'lumotlar
+                  </Box>
+                }
+                value='anonim-user'
+              />
+              <Tab
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Bell style={{ marginRight: 5 }} width={16} height={16} />
+                    Eslatmalar
+                  </Box>
+                }
+                value='lead-user-description'
+              />
+              <Tab
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <MessageSquare style={{ marginRight: 5 }} width={16} height={16} />
+                    Sms tarixi
+                  </Box>
+                }
+                value='sms-history'
+              />
+              <Tab
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <User style={{ marginRight: 2 }} size={15} />
+                    Lead tarix
+                  </Box>
+                }
+                value='history'
+              />
+            </Tabs>
+          )}
 
           <Box
             sx={{
@@ -301,6 +355,21 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
                     <Skeleton variant='rounded' sx={{ margin: 2 }} height={70} />
                     <Skeleton variant='rounded' sx={{ margin: 2 }} height={70} />
                   </Box>
+                ) : !leadDetail?.length ? (
+                  <>
+                    <EmptyContent />
+                    <Box margin={4}>
+                      <Button
+                        variant='contained'
+                        onClick={() => setNodeModal(true)}
+                        fullWidth
+                        sx={{ marginTop: 2 }}
+                        startIcon={<PlusIcon />}
+                      >
+                        Yangi Eslatma
+                      </Button>
+                    </Box>
+                  </>
                 ) : (
                   <>
                     <Box margin={4}>
@@ -356,6 +425,21 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
                     <Skeleton variant='rounded' sx={{ margin: 2 }} height={70} />
                     <Skeleton variant='rounded' sx={{ margin: 2 }} height={70} />
                   </Box>
+                ) : !leadDetail.length ? (
+                  <>
+                    <EmptyContent />
+                    <Box margin={4}>
+                      <Button
+                        variant='contained'
+                        onClick={handleModalsOpen}
+                        fullWidth
+                        sx={{ marginTop: 2 }}
+                        startIcon={<PlusIcon />}
+                      >
+                        Yangi Sms
+                      </Button>
+                    </Box>
+                  </>
                 ) : (
                   <>
                     <Box margin={4}>
@@ -402,6 +486,8 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
                     <Skeleton variant='rounded' sx={{ margin: 2 }} height={70} />
                     <Skeleton variant='rounded' sx={{ margin: 2 }} height={70} />
                   </Box>
+                ) : !leadDetail.length ? (
+                  <EmptyContent />
                 ) : (
                   <>
                     {leadDetail?.map((item: any) => (
@@ -430,7 +516,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
                             ) : item?.new_status == 'test_period' ? (
                               <Chip label='Sinov darsida' color='primary' />
                             ) : item?.new_status == 'enrolled' ? (
-                              <Chip label="Sotuv" color='success' />
+                              <Chip label='Sotuv' color='success' />
                             ) : (
                               <Chip label="Yo'qotilgan" color='error' />
                             )}
