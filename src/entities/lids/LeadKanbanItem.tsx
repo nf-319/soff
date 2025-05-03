@@ -83,10 +83,12 @@ export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead,
             </Box>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <Phone width={18} height={18} color='blue' />
-            <Typography fontSize={12}>{lead?.phone || data?.phone}</Typography>
-          </div>
+          {(lead?.phone || data?.phone) && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <Phone width={18} height={18} color='blue' />
+              <Typography fontSize={12}>{lead?.phone || data?.phone}</Typography>
+            </div>
+          )}
           {lead?.admin_name && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3 }}>
               <AdminPanelSettingsOutlinedIcon style={{ fontSize: 13 }} />
