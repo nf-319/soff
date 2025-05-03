@@ -31,34 +31,33 @@ import { toast } from 'react-hot-toast'
 import SourceStatsVertical from '../../components/card-statistics/card-source-vertical'
 import { EmptyContent } from '../../components/empty-content'
 
-// Dynamically import components
 const CustomeDrawer = dynamic(() => import('../settings/office/courses').then(mod => mod.CustomeDrawer))
 
 const steps = [
   {
     text: 'Посещение веб-сайта',
     width: 90,
-    color: 'blue' // You can use direct CSS color names here
+    color: 'blue'
   },
   {
     text: 'Поиск и оценка продукта',
     width: 75,
-    color: 'primary' // Theme-based color
+    color: 'primary'
   },
   {
     text: 'Добавление продукта в "корзину"',
     width: 60,
-    color: 'secondary' // Theme-based color
+    color: 'secondary'
   },
   {
     text: 'Оформление заказа',
     width: 45,
-    color: 'purple' // You may need to define a custom color if it's not from the theme
+    color: 'purple'
   },
   {
     text: 'Покупка',
     width: 30,
-    color: 'error' // Theme-based color
+    color: 'error'
   }
 ]
 
@@ -81,15 +80,6 @@ const Stats = () => {
       .get(`leads/statistic/`, { params: { start_date, end_date } })
       .then(resp => setSources(resp.data.result))
       .catch(err => console.error(err))
-  }
-
-  const handleFilter = (value: any) => {
-    setFilter(value)
-    if (value === 'a') {
-      setSources(sources.sort((a, b) => a.name.localeCompare(b.name)))
-    } else {
-      setSources(sources.sort((a, b) => b.students_count - a.students_count))
-    }
   }
 
   const handleChangeDate = (e: any) => {
@@ -139,11 +129,17 @@ const Stats = () => {
       <Box>
         {tabIndex == 0 ? (
           <Box>
-            <Box sx={{ display: 'flex', gap: '10px', flexGrow: 1, alignItems: 'center' }}>
-              <IconButtonMui color='primary'>
-                <IconifyIcon icon={'ep:back'} style={{ cursor: 'pointer' }} onClick={() => Router.back()} />
-              </IconButtonMui>
+            <Box sx={{ paddingY: 5, display: 'flex', gap: '10px', flexGrow: 1, alignItems: 'center' }}>
               <Typography sx={{ fontSize: '20px', flexGrow: 1 }}>{t('Manbalar hisoboti')}</Typography>
+              <Button
+                onClick={() => setOpen(true)}
+                variant='contained'
+                sx={{ marginLeft: 'auto' }}
+                size='medium'
+                startIcon={<IconifyIcon icon={'carbon:add'} />}
+              >
+                {t('Yangi Manba')}
+              </Button>
             </Box>
             <Box
               sx={{ alignItems: 'center', paddingBottom: '20px', flexWrap: 'nowrap', width: '100%', display: 'flex' }}
@@ -155,16 +151,6 @@ const Stats = () => {
                 size='sm'
                 style={{ marginRight: 20 }}
               />
-
-              <Button
-                onClick={() => setOpen(true)}
-                variant='contained'
-                sx={{ marginLeft: 'auto' }}
-                size='small'
-                startIcon={<IconifyIcon icon={'carbon:add'} />}
-              >
-                {t('Yangi Manba')}
-              </Button>
             </Box>
             <Box sx={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
               {sources.length ? (
