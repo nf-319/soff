@@ -1,34 +1,42 @@
-import { Box, Card, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
-import { useState } from 'react'
-import { useSettings } from 'src/@core/hooks/useSettings'
-import { ResponsiveFunnel } from '@nivo/funnel'
-import { useGet } from '@/hooks/useApi'
-import { EmptyContent } from '@/components/empty-content'
-import { useRouter } from 'next/router'
+import { Box, Card, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
+import { useSettings } from 'src/@core/hooks/useSettings';
+import { ResponsiveFunnel } from '@nivo/funnel';
+import { useGet } from '@/hooks/useApi';
+import { EmptyContent } from '@/components/empty-content';
+import { useRouter } from 'next/router';
 
 const SalesFunnel = () => {
-  const { settings } = useSettings()
-  const router = useRouter()
-  const { branch } = router.query
-  const isDark = settings.mode == 'dark'
-  const textColor = isDark ? '#ffffff' : '#333333'
-  const { data } = useGet('leads/sales-funnel/', { params: { branch: String(branch) }, options: { enabled: !!branch } })
+  const { settings } = useSettings();
+  const router = useRouter();
+  const { branch } = router.query;
+  const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
+
+  const isDark = settings.mode === 'dark';
+  const textColor = isDark ? '#ffffff' : '#333333';
+
+  const { data, isLoading } = useGet('leads/sales-funnel/', {
+    params: { branch: branchParam },
+    options: { enabled: !!branchParam },
+  });
 
   const labelMap: { [key: string]: string } = {
     all_leads: 'All Leads',
-
     connected_leads: 'Contacted',
     test_period: 'Demo Given',
-    enrolled_leads: 'Enrolled'
-  }
+    enrolled_leads: 'Enrolled',
+  };
 
   const updatedFunnelData = data
     ? Object.entries(data).map(([key, value]) => ({
-        id: labelMap[key],
-        value: Number(value),
-        label: labelMap[key]
-      }))
-    : []
+      id: labelMap[key],
+      value: Number(value),
+      label: labelMap[key],
+    }))
+    : [];
+
+  if (isLoading || !branchParam) {
+    return <Box>Loading...</Box>;
+  }
 
   return (
     <Card
@@ -37,7 +45,7 @@ const SalesFunnel = () => {
         width: '100%',
         boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
       }}
     >
       <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
@@ -68,8 +76,8 @@ const SalesFunnel = () => {
                 text: {
                   fontSize: 14,
                   fontWeight: 'bold',
-                  fill: textColor
-                }
+                  fill: textColor,
+                },
               },
               tooltip: {
                 container: {
@@ -77,16 +85,16 @@ const SalesFunnel = () => {
                   color: textColor,
                   fontSize: 12,
                   borderRadius: 4,
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                }
-              }
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                },
+              },
             }}
             animate={true}
           />
         </Box>
       )}
     </Card>
-  )
-}
+  );
+};
 
-export default SalesFunnel
+export default SalesFunnel;

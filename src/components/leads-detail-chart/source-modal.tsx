@@ -66,7 +66,7 @@ const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (st
                     tickRotation: 30,
                     legendPosition: 'middle',
                     legendOffset: 50,
-                    format: (value) => truncateLabel(value),
+                    format: value => truncateLabel(value)
                   }}
                   axisLeft={{
                     tickSize: 5,
@@ -157,38 +157,42 @@ const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (st
               Manba ma'lumotlari
             </Typography>
             <Grid container spacing={3}>
-              {data?.sources?.map((item: any, index: number) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Card
-                    sx={{
-                      boxShadow: 'none',
-                      backgroundColor: '#f9f9f9',
-                      borderRadius: 1,
-                      border: '1px solid lightgray',
-                      transition: '0.3s',
-                      '&:hover': {
-                        transform: 'translateY(-4px)'
-                      }
-                    }}
-                  >
-                    <CardContent>
-                      <Typography sx={{ color: '#333', fontWeight: 'bold', mb: 1 }}>{item?.name}</Typography>
-                      <Typography sx={{ mb: 0.5 }}>
-                        Umumiy lidlar:{' '}
-                        <Typography component='span' sx={{ fontWeight: 600, color: '#1976d2' }}>
-                          {item?.total_count}
+              {!data?.sources?.length ? (
+                <EmptyContent title="Manba ma'lumotlari yo'q" />
+              ) : (
+                data?.sources?.map((item: any, index: number) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Card
+                      sx={{
+                        boxShadow: 'none',
+                        backgroundColor: '#f9f9f9',
+                        borderRadius: 1,
+                        border: '1px solid lightgray',
+                        transition: '0.3s',
+                        '&:hover': {
+                          transform: 'translateY(-4px)'
+                        }
+                      }}
+                    >
+                      <CardContent>
+                        <Typography sx={{ color: '#333', fontWeight: 'bold', mb: 1 }}>{item?.name}</Typography>
+                        <Typography sx={{ mb: 0.5 }}>
+                          Umumiy lidlar:{' '}
+                          <Typography component='span' sx={{ fontWeight: 600, color: '#1976d2' }}>
+                            {item?.total_count}
+                          </Typography>
                         </Typography>
-                      </Typography>
-                      <Typography>
-                        Konversatsiya:{' '}
-                        <Typography component='span' sx={{ fontWeight: 600, color: '#1976d2' }}>
-                          {item?.conversion_rate}
+                        <Typography>
+                          Konversatsiya:{' '}
+                          <Typography component='span' sx={{ fontWeight: 600, color: '#1976d2' }}>
+                            {item?.conversion_rate}
+                          </Typography>
                         </Typography>
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))
+              )}
             </Grid>
           </Card>
         </DialogContent>

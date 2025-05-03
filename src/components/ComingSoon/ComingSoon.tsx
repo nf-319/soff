@@ -13,6 +13,8 @@ type ComingSoonProps = {
   showBackground?: boolean;
   size?: 'small' | 'medium' | 'large';
   sx?: SxProps<Theme>;
+  brightness?: string;
+  blur?: string;
 }
 
 export const ComingSoon: FC<ComingSoonProps> = ({
@@ -21,12 +23,15 @@ export const ComingSoon: FC<ComingSoonProps> = ({
   title,
   releaseDate,
   active = false,
+  blur = '3px',
+  brightness = '0.8',
   textColor = 'white',
   hidden = false,
   showBackground = true,
   size = 'medium',
-  sx
+  sx,
 }) => {
+
   if (hidden) {
     return null
   }
@@ -66,7 +71,7 @@ export const ComingSoon: FC<ComingSoonProps> = ({
     >
       <Box
         sx={{
-          filter: 'brightness(0.7) blur(0.5px)',
+          filter: `brightness(${brightness}) blur(${blur})`,
           opacity: 0.75,
           width: '100%',
           height: '100%',
@@ -145,7 +150,7 @@ export const ComingSoon: FC<ComingSoonProps> = ({
               whiteSpace: 'nowrap',
               fontSize: `calc(${currentSize.fontSize} - 0.1rem)`,
               opacity: 0.9,
-              textShadow: !showBackground ? '0 2px 4px rgba(0, 0, 0, 0.5)' : 'none',
+              textShadow: !showBackground ? '0 2px 4px rgba(0, 0, 0, 0.5)' : 'none'
             }}
           >
             <CalendarTodayIcon sx={{ fontSize: 'inherit', mr: 0.5 }} />
@@ -154,7 +159,6 @@ export const ComingSoon: FC<ComingSoonProps> = ({
             </Typography>
           </Box>
         )}
-
       </Paper>
     </Box>
   )

@@ -1,62 +1,73 @@
-import { Card, Typography } from '@mui/material'
-import { useSettings } from 'src/@core/hooks/useSettings'
-import { ResponsiveLine } from '@nivo/line'
-import useResponsive from '@/@core/hooks/useResponsive'
-import { EmptyContent } from '@/components/empty-content'
-import { uzbekMonths } from '@/shared/constans'
-import { useRouter } from 'next/router'
-import { useGet } from '@hooks/useApi'
-import { Endpoints } from '@api/endpoints'
-import { ReportLeadsYearlyStats } from '@/types/report'
+import { Card, Typography } from '@mui/material';
+import { useSettings } from 'src/@core/hooks/useSettings';
+import { ResponsiveLine } from '@nivo/line';
+import useResponsive from '@/@core/hooks/useResponsive';
+import { EmptyContent } from '@/components/empty-content';
+import { uzbekMonths } from '@/shared/constans';
+import { useRouter } from 'next/router';
+import { useGet } from '@hooks/useApi';
+import { Endpoints } from '@api/endpoints';
+import { ReportLeadsYearlyStats } from '@/types/report';
+import { Box } from '@mui/system'
 
 const YearlyTrend = () => {
-  const { settings } = useSettings()
-  const router = useRouter()
-  const { branch } = router.query
-  const { data } = useGet<ReportLeadsYearlyStats[]>(Endpoints.LeadsYearlyStats, { params: { branch: String(branch) }, options: { enabled: !!branch } })
-  const isDark = settings.mode == 'dark'
-  const textColor = isDark ? '#ffffff' : '#333333'
-  const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-  const { isMobile } = useResponsive()
+  const { settings } = useSettings();
+  const router = useRouter();
+  const { branch } = router.query;
+  const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
 
-  const currentDate = new Date()
-  const currentMonth = currentDate.getMonth()
+  const { data, isLoading } = useGet<ReportLeadsYearlyStats[]>(Endpoints.LeadsYearlyStats, {
+    params: { branch: branchParam },
+    options: { enabled: !!branchParam },
+  });
 
-  const availableMonths = uzbekMonths.slice(0, currentMonth + 1)
+  const isDark = settings.mode === 'dark';
+  const textColor = isDark ? '#ffffff' : '#333333';
+  const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+  const { isMobile } = useResponsive();
 
-  const fillMissingMonths = (dataArray:any[] , valueKey: string) => {
-    const monthMap = new Map(dataArray?.map(item => [parseInt(item.month, 10), parseInt(item[valueKey], 10)]))
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+
+  const availableMonths = uzbekMonths.slice(0, currentMonth + 1);
+
+  const fillMissingMonths = (dataArray: any[], valueKey: string) => {
+    const monthMap = new Map(dataArray?.map((item) => [parseInt(item.month, 10), parseInt(item[valueKey], 10)]));
 
     return availableMonths.map((name, index) => ({
       x: name,
-      y: monthMap.get(index + 1) ?? 0
-    }))
-  }
+      y: monthMap.get(index + 1) ?? 0,
+    }));
+  };
 
   const yearlyTrendData = [
     {
       id: 'Yangi lidlar',
       color: 'hsl(240, 70%, 50%)',
-      data: fillMissingMonths(data ?? [], 'new_count')
+      data: fillMissingMonths(data ?? [], 'new_count'),
     },
     {
       id: 'Roʻyxatdan oʻtgan',
       color: 'hsl(120, 70%, 50%)',
-      data: fillMissingMonths(data ?? [], 'enrolled_count')
+      data: fillMissingMonths(data ?? [], 'enrolled_count'),
     },
     {
       id: "Yo'qotilgan Lidlar",
       color: 'hsl(0, 70%, 50%)',
-      data: fillMissingMonths(data ?? [], 'lost_count')
-    }
-  ]
+      data: fillMissingMonths(data ?? [], 'lost_count'),
+    },
+  ];
+
+  if (isLoading || !branchParam) {
+    return <Box>Loading...</Box>;
+  }
 
   return (
     <Card
       sx={{
         width: '100%',
         height: { xs: 300, sm: 400, md: 500 },
-        p: 2
+        p: 2,
       }}
     >
       <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
@@ -75,7 +86,7 @@ const YearlyTrend = () => {
             min: 0,
             max: 'auto',
             stacked: false,
-            reverse: false
+            reverse: false,
           }}
           yFormat=' >-.0f'
           curve='cardinal'
@@ -87,7 +98,7 @@ const YearlyTrend = () => {
             tickRotation: 0,
             legendOffset: 36,
             legendPosition: 'middle',
-            truncateTickAt: 0
+            truncateTickAt: 0,
           }}
           axisLeft={{
             tickSize: 5,
@@ -95,7 +106,7 @@ const YearlyTrend = () => {
             tickRotation: 0,
             legendOffset: -40,
             legendPosition: 'middle',
-            truncateTickAt: 0
+            truncateTickAt: 0,
           }}
           enableGridX={false}
           colors={{ scheme: 'category10' }}
@@ -127,11 +138,11 @@ const YearlyTrend = () => {
                   on: 'hover',
                   style: {
                     itemBackground: 'rgba(0, 0, 0, .03)',
-                    itemOpacity: 1
-                  }
-                }
-              ]
-            }
+                    itemOpacity: 1,
+                  },
+                },
+              ],
+            },
           ]}
           motionConfig='stiff'
           theme={{
@@ -139,35 +150,35 @@ const YearlyTrend = () => {
               domain: {
                 line: {
                   stroke: textColor,
-                  strokeWidth: 1
-                }
+                  strokeWidth: 1,
+                },
               },
               ticks: {
                 line: {
                   stroke: textColor,
-                  strokeWidth: 1
+                  strokeWidth: 1,
                 },
                 text: {
-                  fill: textColor
-                }
+                  fill: textColor,
+                },
               },
               legend: {
                 text: {
                   fill: textColor,
-                  fontSize: 12
-                }
-              }
+                  fontSize: 12,
+                },
+              },
             },
             grid: {
               line: {
                 stroke: gridColor,
-                strokeWidth: 1
-              }
+                strokeWidth: 1,
+              },
             },
             legends: {
               text: {
-                fill: textColor
-              }
+                fill: textColor,
+              },
             },
             tooltip: {
               container: {
@@ -175,21 +186,21 @@ const YearlyTrend = () => {
                 color: textColor,
                 fontSize: 12,
                 borderRadius: 4,
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-              }
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              },
             },
             crosshair: {
               line: {
                 stroke: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
                 strokeWidth: 1,
-                strokeOpacity: 0.75
-              }
-            }
+                strokeOpacity: 0.75,
+              },
+            },
           }}
         />
       )}
     </Card>
-  )
-}
+  );
+};
 
-export default YearlyTrend
+export default YearlyTrend;

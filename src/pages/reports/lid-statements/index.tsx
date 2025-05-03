@@ -1,26 +1,28 @@
-'use client'
+'use client';
 
-import { Box } from '@mui/material'
-import LidsReportsFilter from './filter'
-import LidsReportsCard from './card'
-import SalesFunnel from './pie-charts/sales-funnel'
-import YearlyTrend from './pie-charts/yearly-trend'
-import CourseInterest from './pie-charts/course-interest'
-import MarketingSources from './pie-charts/marketing-sources'
-import LeadsSellers from './leads-sellers'
-import LeadsList from './leads-list'
-import { useRouter } from 'next/router'
-import { useGet } from '@hooks/useApi'
-import { Endpoints } from '@api/endpoints'
+import { Box } from '@mui/material';
+import LidsReportsFilter from './filter';
+import LidsReportsCard from './card';
+import SalesFunnel from './pie-charts/sales-funnel';
+import YearlyTrend from './pie-charts/yearly-trend';
+import CourseInterest from './pie-charts/course-interest';
+import MarketingSources from './pie-charts/marketing-sources';
+import LeadsSellers from './leads-sellers';
+import LeadsList from './leads-list';
+import { useRouter } from 'next/router';
+import { useGet } from '@hooks/useApi';
+import { Endpoints } from '@api/endpoints';
 
 const LidsReports = () => {
-  const router = useRouter()
-  const { branch } = router.query
-  console.log(branch)
+  const router = useRouter();
+  const { branch } = router.query;
+
+  const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
+
   const { data } = useGet(Endpoints.LeadsSourceStats, {
-    params: { branch: String(branch) },
-    options: { enabled: !!branch }
-  })
+    params: { branch: branchParam },
+    options: { enabled: !!branchParam },
+  });
 
   return (
     <Box sx={{ paddingY: 4, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -51,7 +53,7 @@ const LidsReports = () => {
       <LeadsSellers />
       <LeadsList />
     </Box>
-  )
-}
+  );
+};
 
-export default LidsReports
+export default LidsReports;
