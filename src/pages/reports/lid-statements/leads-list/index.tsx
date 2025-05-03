@@ -97,12 +97,12 @@ const LeadsList = () => {
     {
       field: 'first_name',
       headerName: t('ism'),
-      flex: 1,
+      width: 150,
     },
     {
       field: 'phone',
       headerName: t('Telefon raqam'),
-      flex: 1,
+      width: 80,
     },
     {
       field: 'admin',
@@ -112,7 +112,6 @@ const LeadsList = () => {
     {
       field: 'status',
       headerName: t('Status'),
-      flex: 1,
       renderCell: (params: any) => {
         const status = params.value;
         const statusInfo = statusMap[status] || { label: status, color: 'default' };
@@ -210,9 +209,11 @@ const LeadsList = () => {
       <Box
         sx={{
           width: '100%',
-          overflow: 'hidden',
+          overflowY: 'hidden',
+          overflowX: 'auto',
           '& .MuiDataGrid-root': {
-            overflow: 'hidden',
+            overflowY: 'hidden',
+            overflowX: 'auto',
             borderRadius: 1,
             border: '1px solid #e0e0e0'
           }

@@ -1,5 +1,5 @@
 import { Box, Skeleton } from '@mui/material';
-import { ArrowRightLeft, Megaphone, TriangleAlert, User, LucideIcon } from 'lucide-react';
+import { ArrowRightLeft, Megaphone, TriangleAlert, User, LucideIcon, Award } from 'lucide-react'
 import { useGetReportLeads } from '@/shared/query-hooks/report-leads/reportLeads';
 import { useState } from 'react';
 import LeadsDashboardCardModal from '@/components/leads-detail-chart';
@@ -103,14 +103,14 @@ const LidsReportsCard = () => {
     },
     {
       id: data?.best_seller?.id,
-      icon: User,
-      title: `Eng yaxshi sotuvchi ${data?.best_seller?.first_name}`,
+      icon: Award,
+      title: `${data?.best_seller?.first_name} - eng yaxshi sotuvchi`,
       process: data?.best_seller_progress || 0,
       count: data?.best_seller_leads_count || 0,
       trendColor: '#fff',
       trendDirection: getProcess(data?.best_seller_leads_count),
       pillColor: getFillColor(data?.best_seller_progress),
-      iconColor: '#ffc300',
+      iconColor: '#029b49',
     },
   ];
 
