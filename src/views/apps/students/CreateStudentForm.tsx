@@ -123,6 +123,7 @@ export default function CreateStudentForm() {
 
       const resp = await dispatch(createStudent(newValues))
 
+      console.log(resp)
       if (resp.meta.requestStatus === 'rejected') {
         formik.setErrors(resp.payload)
       } else {
@@ -409,7 +410,11 @@ export default function CreateStudentForm() {
                     value={values.parent_phone}
                     onChange={handleChange}
                     onBlur={handleBlur}
+                    error={!!errors.parent_phone}
                   />
+                  {errors.parent_phone && touched.parent_phone && (
+                    <FormHelperText error={true}>{errors.parent_phone[0]}</FormHelperText>
+                  )}
                 </FormControl>
                 <FormControl sx={{ width: '100%' }}>
                   <TextField
