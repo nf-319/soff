@@ -155,10 +155,10 @@ const Lids = () => {
         ) : is_amocrm ? (
           amoCrmLeadData?.length && (
             <Select
-              placeholder={"Bo'lim"}
+              placeholder="Bo'lim"
               sx={{ marginBottom: isMobile ? 4 : 0 }}
               fullWidth={isMobile}
-              size='medium'
+              size='small'
               value={selectedAmoLeadTab}
               onChange={e => handleAmoTabChange(e)}
               displayEmpty
@@ -174,7 +174,7 @@ const Lids = () => {
           <Select
             sx={{ marginBottom: isMobile ? 4 : 0 }}
             fullWidth={isMobile}
-            size='medium'
+            size='small'
             value={selectedTab}
             onChange={handleTabChange}
             displayEmpty

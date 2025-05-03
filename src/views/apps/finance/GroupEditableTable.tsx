@@ -1,58 +1,7 @@
-import { Box, Card, Checkbox, Paper, Radio, Typography, styled } from '@mui/material'
+import { Box, Card, Checkbox, Radio, Typography } from '@mui/material'
 import React from 'react'
-import IconifyIcon from '../../../components/icon'
-import { formatCurrency } from 'src/@core/utils/format-currency'
-import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
-
-interface GroupStatsType {
-    id: number
-    name: string
-    student_count: number
-    plan: number
-    income: number
-}
-
-
-interface ExpensesType {
-    id: Number
-    description: string
-    amount: number
-}
-
-const NavigationMenu = styled(Paper)(({ theme }) => ({
-    overflowY: 'auto',
-    display: 'flex',
-
-    '&::-webkit-scrollbar': {
-        width: 6
-    },
-    '&::-webkit-scrollbar-thumb': {
-        borderRadius: 10,
-        background: hexToRGBA('#FF4D49', theme.palette.mode === 'light' ? 0.4 : 0.2),
-    },
-    '&::-webkit-scrollbar-track': {
-        borderRadius: 10,
-        background: 'transparent'
-    },
-    '& .MuiList-root': {
-        paddingTop: 0,
-        paddingBottom: 0
-    },
-    '& .menu-group.Mui-selected': {
-        borderRadius: 0,
-        backgroundColor: theme.palette.action.hover
-    }
-}))
-
-const Div = styled(Box)(({ theme }) => ({
-    padding: '10px',
-    background: hexToRGBA('#FF4D49', theme.palette.mode === 'light' ? 0.4 : 0.2),
-}))
-
-
 
 export default function GroupFinanceTable() {
-
     return (
         <Card>
             <Box sx={{ padding: '5px 0' }}>

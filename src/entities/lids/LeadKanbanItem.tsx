@@ -1,4 +1,4 @@
-import { Ellipsis, EyeIcon, Phone, Shield, User, UserRound } from 'lucide-react'
+import { Ellipsis, EyeIcon, User } from 'lucide-react'
 import { Box, IconButton, Typography } from '@mui/material'
 import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd'
 import { FC, useState } from 'react'
@@ -28,6 +28,7 @@ export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead,
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const { query } = useRouter()
   const [leadId, setLeadId] = useState<number | null>(null)
+
 
   const handleMenuOpen = (event: any, lead: any) => {
     setStudentModalOpen(true)
@@ -76,19 +77,28 @@ export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead,
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <User width={20} height={20} color='blue' />
-            <Box display='flex' alignItems='flex-start' width='100%'>
-              <Typography sx={{ whiteSpace: 'nowrap' }}>{lead?.first_name}</Typography>
+          <Box style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Box
+              sx={{
+                border: '1px solid #666CFF',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                borderRadius: "100%",
+                justifyContent: 'center',
+              }}
+              width={40}
+              height={40}
+            >
+              <User width={20} height={20} color="#666CFF" />
             </Box>
-          </div>
 
-          {(lead?.phone || data?.phone) && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <Phone width={18} height={18} color='blue' />
-              <Typography fontSize={12}>{lead?.phone || data?.phone}</Typography>
-            </div>
-          )}
+            <Box width='100%'>
+              <Typography sx={{ whiteSpace: 'nowrap', textAlign: 'start', fontWeight: 600 }}>{lead?.first_name}</Typography>
+              <Typography fontSize={12}>{lead?.phone}</Typography>
+            </Box>
+          </Box>
+
           {lead?.admin_name && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3 }}>
               <AdminPanelSettingsOutlinedIcon style={{ fontSize: 13 }} />

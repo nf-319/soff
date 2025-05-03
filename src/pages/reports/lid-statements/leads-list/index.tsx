@@ -102,7 +102,7 @@ const LeadsList = () => {
     {
       field: 'phone',
       headerName: t('Telefon raqam'),
-      width: 80,
+      width: 180,
     },
     {
       field: 'admin',

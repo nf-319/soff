@@ -179,7 +179,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
       }}
     >
       <DialogTitle>
-        <Typography variant='h5'>O'quvchi ma'lumotlari</Typography>
+        <Typography variant='h5'>O'quvchi malumotlari</Typography>
       </DialogTitle>
 
       <DialogContent>
@@ -211,8 +211,9 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
           </div>
 
           <div className='col-6'>
-            <InfoItem icon={<ChartPie />} label='Holati' value={selectedLead?.phone} />
+            <InfoItem icon={<ChartPie />} label='Holati' value="Issiq" />
           </div>
+
           <div className='col-12'>
             <Button onClick={() => setAddGroupModal(true)} variant='contained' fullWidth startIcon={<Add />}>
               Guruhga qo'shish
