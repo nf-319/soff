@@ -218,7 +218,7 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
                 />
                 {!!errors.amount && touched.amount && <FormHelperText error>{errors.amount}</FormHelperText>}
               </FormControl>
-              {Number(values.refund_amount) !== 0 && (
+              {openEdit?.refund_amount && (
                 <FormControl fullWidth>
                   <AmountInput
                     label={t('Qaytarilgan Summa')}
