@@ -35,7 +35,7 @@ export default function MergeToDepartment({ defaultId, setOpen, open, currentId,
   const { t } = useTranslation()
   const { query } = useRouter()
   const dispatch = useAppDispatch()
-  const { loading, pipelines } = useAppSelector(state => state.leads)
+  const { loading } = useAppSelector(state => state.leads)
   const [department, setDepartment] = useState<any>(null)
   const [loadingAmo, setLoading] = useState(false)
   const { user } = useAuth()
@@ -72,6 +72,9 @@ export default function MergeToDepartment({ defaultId, setOpen, open, currentId,
       setOpen(null)
       void queryClient.invalidateQueries({ queryKey: ['amocrm/pipelines/?with_steps=true'] })
       void queryClient.invalidateQueries({ queryKey: [`amocrm/leads/?pipeline_id=${defaultId}`] })
+    },
+    onError: (err: any) => {
+      formik.setErrors(err.response.data)
     }
   })
   const { mutate: exportAmoLeadMutation, isPending: exportLoading } = useMutation({
@@ -83,8 +86,12 @@ export default function MergeToDepartment({ defaultId, setOpen, open, currentId,
     },
     onSuccess: () => {
       setOpen(null)
+      
       void queryClient.invalidateQueries({ queryKey: ['amocrm/pipelines/?with_steps=true'] })
       void queryClient.invalidateQueries({ queryKey: [`amocrm/leads/?pipeline_id=${defaultId}`] })
+    },
+    onError: (err: any) => {
+      formik.setErrors(err.response.data)
     }
   })
 
