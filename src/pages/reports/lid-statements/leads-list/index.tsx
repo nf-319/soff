@@ -102,14 +102,15 @@ const LeadsList = () => {
     {
       field: 'phone',
       headerName: t('Telefon raqam'),
-      width: 80,
+      width: 150,
     },
     {
       field: 'admin',
       headerName: t('admin'),
-      flex: 1.4,
+      width: 150,
     },
     {
+      width:150,
       field: 'status',
       headerName: t('Status'),
       renderCell: (params: any) => {
@@ -127,7 +128,7 @@ const LeadsList = () => {
     {
       field: 'temperature',
       headerName: 'Harorat',
-      flex: 1,
+      width: 150,
       renderCell: (params: any) => {
         const status = params.value;
         const statusInfo = temperatureMap[status] || { label: status || "Belgilanmagan", color: 'default' };
@@ -143,12 +144,12 @@ const LeadsList = () => {
     {
       field: 'course',
       headerName: t('Kurs'),
-      flex: 1,
+      width: 150,
     },
     {
       field: 'source',
       headerName: t('Manba'),
-      flex: 1,
+      width: 150,
     },
   ];
 
