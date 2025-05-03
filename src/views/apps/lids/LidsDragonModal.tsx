@@ -394,15 +394,25 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
                         padding={3}
                       >
                         <Box display='flex' alignItems='center' justifyContent='space-between'>
-                          <Box display='flex' alignItems='center'>
-                            <div className='text-primary me-3'>{<User />}</div>
-                            <Typography>{item?.admin}</Typography>
-                          </Box>
-                          <Box display='flex' alignItems='center'>
-                            <div className='text-primary me-3'>{<Clock />}</div>
-                            <Typography>{item?.created_at}</Typography>
-                          </Box>
+                          {item?.admin && (
+                            <Box display='flex' alignItems='center'>
+                              <div className='text-primary me-3'>{<User />}</div>
+                              <Typography>{item?.admin}</Typography>
+                            </Box>
+                          )}
+                          {item?.created_at && (
+                            <Box display='flex' alignItems='center'>
+                              <div className='text-primary me-3'>{<Clock />}</div>
+                              <Typography>{item?.created_at}</Typography>
+                            </Box>
+                          )}
                         </Box>
+                        {item?.text && (
+                          <Box display='flex' alignItems='center'>
+                            <div className='text-primary me-3'>{<Bell />}</div>
+                            <Typography>{item?.text}</Typography>
+                          </Box>
+                        )}
                         {item?.body && (
                           <Box display='flex' alignItems='center'>
                             <div className='text-primary me-3'>{<Bell />}</div>
