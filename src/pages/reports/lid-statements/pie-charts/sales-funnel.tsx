@@ -1,9 +1,10 @@
-import { Box, Card, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
+import { Box, Card, Tooltip, Typography } from '@mui/material'
 import { useSettings } from 'src/@core/hooks/useSettings';
 import { ResponsiveFunnel } from '@nivo/funnel';
 import { useGet } from '@/hooks/useApi';
 import { EmptyContent } from '@/components/empty-content';
 import { useRouter } from 'next/router';
+import { CircleHelp } from 'lucide-react';
 
 const SalesFunnel = () => {
   const { settings } = useSettings();
@@ -20,10 +21,10 @@ const SalesFunnel = () => {
   });
 
   const labelMap: { [key: string]: string } = {
-    all_leads: 'All Leads',
-    connected_leads: 'Contacted',
-    test_period: 'Demo Given',
-    enrolled_leads: 'Enrolled',
+    all_leads: 'Barcha lidlar',
+    connected_leads: "Bog'lanilganlar",
+    test_period: 'Sinov muddatidagilar',
+    enrolled_leads: 'Yozilganlar',
   };
 
   const updatedFunnelData = data
@@ -45,12 +46,19 @@ const SalesFunnel = () => {
         width: '100%',
         boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column'
       }}
     >
-      <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
-        Savdo voronkasi
-      </Typography>
+      <Box display='flex' gap={3} sx={{ px: 6, py: 4 }}>
+        <Typography color={'black'} fontSize={20} fontWeight={700}>
+          Savdo voronkasi
+        </Typography>
+
+        <Tooltip title="Bu savdo voronkasi haqida ma'lumot">
+          <CircleHelp style={{ cursor: 'pointer', color: '#9e9e9e', marginTop: 'auto', marginBottom: 'auto' }} />
+        </Tooltip>
+      </Box>
+
       {!updatedFunnelData?.length ? (
         <EmptyContent />
       ) : (
@@ -76,8 +84,8 @@ const SalesFunnel = () => {
                 text: {
                   fontSize: 14,
                   fontWeight: 'bold',
-                  fill: textColor,
-                },
+                  fill: textColor
+                }
               },
               tooltip: {
                 container: {
@@ -85,16 +93,16 @@ const SalesFunnel = () => {
                   color: textColor,
                   fontSize: 12,
                   borderRadius: 4,
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                },
-              },
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                }
+              }
             }}
             animate={true}
           />
         </Box>
       )}
     </Card>
-  );
+  )
 };
 
 export default SalesFunnel;

@@ -1,4 +1,4 @@
-import { Card, Typography } from '@mui/material';
+import { Card, Tooltip, Typography } from '@mui/material'
 import { useSettings } from 'src/@core/hooks/useSettings';
 import { ResponsiveLine } from '@nivo/line';
 import useResponsive from '@/@core/hooks/useResponsive';
@@ -9,6 +9,7 @@ import { useGet } from '@hooks/useApi';
 import { Endpoints } from '@api/endpoints';
 import { ReportLeadsYearlyStats } from '@/types/report';
 import { Box } from '@mui/system'
+import { CircleHelp } from 'lucide-react'
 
 const YearlyTrend = () => {
   const { settings } = useSettings();
@@ -67,12 +68,18 @@ const YearlyTrend = () => {
       sx={{
         width: '100%',
         height: { xs: 300, sm: 400, md: 500 },
-        p: 2,
+        p: 2
       }}
     >
-      <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
-        Yillik yetakchi trendi
-      </Typography>
+      <Box display='flex' gap={3} sx={{ px: 6, py: 4 }}>
+        <Typography color="black" fontSize={20} fontWeight={700}>
+          Yillik yetakchi trendi
+        </Typography>
+
+        <Tooltip title="Bu yillik savdo haqida ma'lumot">
+          <CircleHelp style={{ cursor: 'pointer', color: '#9e9e9e', marginTop: 'auto', marginBottom: 'auto' }} />
+        </Tooltip>
+      </Box>
 
       {!yearlyTrendData[0].data.length ? (
         <EmptyContent />
@@ -87,10 +94,13 @@ const YearlyTrend = () => {
             max: 'auto',
             stacked: false,
             reverse: false,
+            clamp: true
           }}
           yFormat=' >-.0f'
-          curve='cardinal'
+          curve='monotoneX'
           axisTop={null}
+          enableArea={false}
+          areaBaselineValue={0}
           axisRight={null}
           axisBottom={{
             tickSize: 5,
@@ -98,7 +108,7 @@ const YearlyTrend = () => {
             tickRotation: 0,
             legendOffset: 36,
             legendPosition: 'middle',
-            truncateTickAt: 0,
+            truncateTickAt: 0
           }}
           axisLeft={{
             tickSize: 5,
@@ -106,7 +116,7 @@ const YearlyTrend = () => {
             tickRotation: 0,
             legendOffset: -40,
             legendPosition: 'middle',
-            truncateTickAt: 0,
+            truncateTickAt: 0
           }}
           enableGridX={false}
           colors={{ scheme: 'category10' }}
@@ -138,11 +148,11 @@ const YearlyTrend = () => {
                   on: 'hover',
                   style: {
                     itemBackground: 'rgba(0, 0, 0, .03)',
-                    itemOpacity: 1,
-                  },
-                },
-              ],
-            },
+                    itemOpacity: 1
+                  }
+                }
+              ]
+            }
           ]}
           motionConfig='stiff'
           theme={{
@@ -150,35 +160,35 @@ const YearlyTrend = () => {
               domain: {
                 line: {
                   stroke: textColor,
-                  strokeWidth: 1,
-                },
+                  strokeWidth: 1
+                }
               },
               ticks: {
                 line: {
                   stroke: textColor,
-                  strokeWidth: 1,
+                  strokeWidth: 1
                 },
                 text: {
-                  fill: textColor,
-                },
+                  fill: textColor
+                }
               },
               legend: {
                 text: {
                   fill: textColor,
-                  fontSize: 12,
-                },
-              },
+                  fontSize: 12
+                }
+              }
             },
             grid: {
               line: {
                 stroke: gridColor,
-                strokeWidth: 1,
-              },
+                strokeWidth: 1
+              }
             },
             legends: {
               text: {
-                fill: textColor,
-              },
+                fill: textColor
+              }
             },
             tooltip: {
               container: {
@@ -186,21 +196,21 @@ const YearlyTrend = () => {
                 color: textColor,
                 fontSize: 12,
                 borderRadius: 4,
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-              },
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+              }
             },
             crosshair: {
               line: {
                 stroke: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
                 strokeWidth: 1,
-                strokeOpacity: 0.75,
-              },
-            },
+                strokeOpacity: 0.75
+              }
+            }
           }}
         />
       )}
     </Card>
-  );
+  )
 };
 
 export default YearlyTrend;
