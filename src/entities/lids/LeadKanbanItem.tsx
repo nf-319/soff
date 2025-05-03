@@ -49,16 +49,16 @@ export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead,
   }
 
   function handleGetAmoLeadDetail(id: number) {
-    setLeadId(id)
-    refetch()
+    if(query.is_amocrm) {
+      setLeadId(id)
+      void refetch()
+    }
   }
 
   return (
     <>
       <div
-        onClick={() => {
-          !!query.is_amocrm && handleGetAmoLeadDetail(lead.id)
-        }}
+        onClick={() => handleGetAmoLeadDetail(lead.id)}
         className={`shadow-sm p-3 ${settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'} rounded`}
         ref={provided?.innerRef}
         {...provided?.draggableProps}
