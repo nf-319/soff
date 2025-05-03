@@ -30,7 +30,7 @@ const LidsReportsFilter = () => {
   }, [user]);
 
   useEffect(() => {
-    if (!branch) return; // Prevent URL updates until branch is set
+    if (!branch) return;
 
     const params = new URLSearchParams();
     if (duration) params.set('duration', duration);
@@ -44,14 +44,16 @@ const LidsReportsFilter = () => {
       sx={{
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
-        alignItems: 'center',
+        alignItems: 'start',
         gap: isMobile ? 6 : 0,
-        justifyContent: 'space-between',
+        justifyContent: 'space-between'
       }}
     >
       <Typography variant='h4'>Lidlar Hisoboti</Typography>
 
-      <Box sx={{ display: 'flex', gap: 5, flexDirection: isMobile ? 'column' : 'row' }}>
+      <Box
+        sx={{ display: 'flex', gap: {xs: 3, md: 5 }, width: { xs: '100%', md: 'auto' } }}
+      >
         <ComingSoon releaseDate={defaultReleaseDate} size='small' blur='0.8px'>
           <FormControl fullWidth>
             <InputLabel id='duration-label'>Oy</InputLabel>
@@ -59,7 +61,8 @@ const LidsReportsFilter = () => {
               labelId='duration-label'
               value={duration}
               size='small'
-              onChange={(e) => setDuration(e.target.value)}
+              fullWidth
+              onChange={e => setDuration(e.target.value)}
               label='Oy'
             >
               <MenuItem value='3'>3 oy</MenuItem>
@@ -76,10 +79,10 @@ const LidsReportsFilter = () => {
             size='small'
             labelId='branch-label'
             value={branch}
-            onChange={(e) => setBranch(e.target.value)}
+            onChange={e => setBranch(e.target.value)}
             label='Branch'
           >
-            {data?.results.map((item) => (
+            {data?.results.map(item => (
               <MenuItem key={item.id} value={item.id}>
                 {item.name}
               </MenuItem>
@@ -88,7 +91,7 @@ const LidsReportsFilter = () => {
         </FormControl>
       </Box>
     </Box>
-  );
+  )
 };
 
 export default LidsReportsFilter;

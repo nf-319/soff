@@ -36,7 +36,7 @@ const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (st
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Box flexDirection={{ xs: 'column', md: 'row' }} sx={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <Box flexDirection='column' sx={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <Card sx={{ border: '1px solid lightgray ', boxShadow: 'none', width: '100%', height: 300 }}>
               <Typography sx={{ px: 6, pt: 4, pb: 2 }} color={'black'} fontSize={20} fontWeight={700}>
                 Manba
@@ -150,7 +150,7 @@ const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (st
                 />
               )}
             </Card>
-            <CourseInterest isCard data={data?.courses || []} />
+            <CourseInterest isCard data={data?.courses || []} sx={{ height: 500 }} />
           </Box>
           <Card sx={{ p: 4, mt: 4 }}>
             <Typography variant='h5' pb={3}>

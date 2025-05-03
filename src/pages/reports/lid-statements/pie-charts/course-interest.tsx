@@ -1,10 +1,11 @@
 import { EmptyContent } from '@/components/empty-content'
 import { ReportLeadsCourseType } from '@/types/report'
-import { Card, Box, Typography, Grid, styled, SxProps } from '@mui/material'
+import { Card, Box, Typography, Grid, styled, SxProps, Tooltip } from '@mui/material'
 import { ResponsivePie } from '@nivo/pie'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import { FC } from 'react'
 import { ComingSoon } from '@components/ComingSoon'
+import { CircleHelp } from 'lucide-react'
 
 const LegendItem = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -51,7 +52,7 @@ const CourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
     <ComingSoon
       text='Kurslarda malumot yetarli emas'
       brightness='0.9'
-      size="medium"
+      size='medium'
       active={isActive}
       sx={{
         height: isCard ? 300 : '100%',
@@ -69,9 +70,15 @@ const CourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
           ...sx
         }}
       >
-        <Typography sx={{ px: 6, pt: 4, pb: 2 }} color={'black'} fontSize={20} fontWeight={700}>
-          Kurslar
-        </Typography>
+        <Box display='flex' gap={3} sx={{ px: 6, py: 4 }}>
+          <Typography color='black' fontSize={20} fontWeight={700}>
+            Kurslar
+          </Typography>
+
+          <Tooltip title="Bu kurslar haqida malumot">
+            <CircleHelp style={{ cursor: 'pointer', color: '#9e9e9e', marginTop: 'auto', marginBottom: 'auto' }} />
+          </Tooltip>
+        </Box>
 
         {!courseInterestData.length ? (
           <EmptyContent />
