@@ -13,15 +13,13 @@ import {
   Tooltip,
   Card,
   CardContent,
-  Divider,
-  ButtonGroup,
   Button,
   useTheme,
   Chip
 } from '@mui/material'
 import { formatCurrency } from '@utils/format-currency'
 import { useGetFinance } from '@/shared/query-hooks'
-import { DateRange, Refresh, TrendingUp, TrendingDown, Assessment, BarChart } from '@mui/icons-material'
+import { DateRange, Refresh, TrendingUp, TrendingDown, Assessment } from '@mui/icons-material'
 
 const monthMap: Record<number, string> = {
   1: 'Yanvar',
@@ -235,7 +233,7 @@ export const FinanceResults: FC = () => {
                     Erishilgan summa
                   </Typography>
                   <Typography variant='h5' fontWeight='bold' color={percentage >= 25 ? 'white' : 'text.primary'}>
-                    {formatCurrency(done_amount)} so'm
+                    {formatCurrency(done_amount || 0)} so'm
                   </Typography>
                   <Chip
                     label={`${percentage.toFixed(1)}%`}
@@ -259,13 +257,13 @@ export const FinanceResults: FC = () => {
                   </Typography>
                   <Chip
                     label={`${(100 - parseFloat(percentage.toFixed(1))).toFixed(1)}%`}
-                    color={percentage >= 70 ? 'success' : percentage >= 40 ? 'warning' : 'error'}
+                    color={(100 - percentage) >= 70 ? 'error' : (100 - percentage) >= 40 ? 'warning' : 'success'}
                     size='small'
                     sx={{
                       mt: 1,
                       fontWeight: 'bold',
                       color: 'white',
-                      backgroundColor: percentage >= 25 ? 'rgba(255,255,255,0.3)' : undefined
+                      backgroundColor: percentage >= 65 ? 'rgba(255,255,255,0.3)' : undefined
                     }}
                   />
                 </Box>
@@ -295,7 +293,7 @@ export const FinanceResults: FC = () => {
                 <Assessment sx={{ opacity: 0.8 }} />
               </Box>
               <Typography variant='h5' fontWeight='bold' sx={{ color: '#fff' }}>
-                {formatCurrency(planned_amount)} so'm
+                {formatCurrency(planned_amount || 0)} so'm
               </Typography>
             </CardContent>
           </Card>
@@ -306,7 +304,7 @@ export const FinanceResults: FC = () => {
             sx={{
               height: '100%',
               boxShadow: 2,
-              background: `linear-gradient(145deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
+              background: `linear-gradient(145deg, ${theme.palette.warning.main}, ${theme.palette.warning.dark})`,
               color: 'white',
               transition: 'transform 0.3s ease',
               '&:hover': { transform: 'translateY(-5px)' }
@@ -320,7 +318,7 @@ export const FinanceResults: FC = () => {
                 <TrendingDown sx={{ opacity: 0.8 }} />
               </Box>
               <Typography variant='h5' fontWeight='bold' sx={{ color: '#fff' }} >
-                {formatCurrency(future_amount)} so'm
+                {formatCurrency(debts_amount || 0)} so'm
               </Typography>
             </CardContent>
           </Card>
@@ -330,7 +328,7 @@ export const FinanceResults: FC = () => {
             sx={{
               height: '100%',
               boxShadow: 2,
-              background: `linear-gradient(145deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
+              background: `linear-gradient(145deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
               color: 'white',
               transition: 'transform 0.3s ease',
               '&:hover': { transform: 'translateY(-5px)' }
@@ -341,10 +339,10 @@ export const FinanceResults: FC = () => {
                 <Typography variant='subtitle1' fontWeight='medium' sx={{ color: '#fff' }} >
                   Ortiqcha to'lovlar
                 </Typography>
-                <TrendingDown sx={{ opacity: 0.8 }} />
+                <TrendingUp sx={{ opacity: 0.8 }} />
               </Box>
               <Typography variant='h5' fontWeight='bold' sx={{ color: '#fff' }} >
-                {formatCurrency(future_amount)} so'm
+                {formatCurrency(future_amount || 0)} so'm
               </Typography>
             </CardContent>
           </Card>

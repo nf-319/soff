@@ -45,7 +45,7 @@ type Props = {
 }
 
 export function GroupCreateEditDrawer({ open, setOpen }: Props) {
-  const { isOpenAddGroup, groupData, queryParams, isOpenEdit, formParams, initialValues } = useAppSelector(
+  const { groupData, queryParams, isOpenEdit, formParams, initialValues } = useAppSelector(
     state => state.groups
   )
   const dispatch = useAppDispatch()
@@ -485,7 +485,7 @@ export function GroupCreateEditDrawer({ open, setOpen }: Props) {
                 </FormHelperText>
               </FormControl>
 
-              {isOpenEdit && (
+              {isOpenEdit || open !== 'create' && (
                 <FormControl sx={{ width: '100%' }}>
                   <TextField
                     size='small'
@@ -495,6 +495,7 @@ export function GroupCreateEditDrawer({ open, setOpen }: Props) {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.end_date}
+                    InputLabelProps={{ shrink: true }}
                     error={!!formik.errors.end_date && formik.touched.end_date}
                   />
                   <FormHelperText error={!!formik.errors.end_date && formik.touched.end_date}>
