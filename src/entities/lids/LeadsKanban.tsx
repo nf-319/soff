@@ -33,10 +33,8 @@ import EditDepartmentItemForm from 'src/views/apps/lids/departmentItem/EditDepar
 import { EditAnonimDialogDialog } from 'src/views/apps/lids/anonimUser/EditAnonimUserDialog'
 import toast from 'react-hot-toast'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
-import Link from 'next/link'
 import { LeadKanbanItem } from './LeadKanbanItem'
 import { SendSMSModal } from '@/views/apps/students/view/UserViewLeft'
-import { AmoLeads } from '@/pages/lids'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
 import { MessageSquare } from 'lucide-react'
 
@@ -160,6 +158,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
         department: data.departmentId
       })
     },
+
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/'] })
     }
@@ -466,7 +465,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                             </Box>
 
                             <div
-                              style={{ marginBottom: 10, maxHeight: '50vh', paddingRight: 10, overflow: 'auto' }}
+                              style={{ marginBottom: 10, marginTop: 10, maxHeight: '50vh', paddingRight: 10, overflow: 'auto' }}
                               className='kanban__section__content'
                             >
                               {section.leads && section.leads.length > 0 ? (

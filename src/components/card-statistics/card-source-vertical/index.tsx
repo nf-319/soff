@@ -1,19 +1,12 @@
-// ** MUI Imports
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
-
-// ** Custom Components Imports
 import CustomAvatar from '../../mui/avatar'
-
-// ** Types Imports
 import { CardStatsVerticalProps } from '../types'
 import useResponsive from '../../../@core/hooks/useResponsive'
-import { formatCurrency } from '../../../@core/utils/format-currency'
 
 const SourceStatsVertical = (props: CardStatsVerticalProps) => {
-  // ** Props
   const { title, color, icon, stats } = props
 
   const { isMobile, isTablet } = useResponsive()
