@@ -1,70 +1,67 @@
-'use client'
+'use client';
 
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select, Tooltip,
-  Typography
-} from '@mui/material'
-import { useContext, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import useResponsive from 'src/@core/hooks/useResponsive'
-import { AuthContext } from '@/context/AuthContext'
-import { ComingSoon } from '@components/ComingSoon'
-import { useGetBranches } from '@/shared/query-hooks/branches/branches'
-import { uzbekMonths } from '@/shared/constans'
+import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import useResponsive from 'src/@core/hooks/useResponsive';
+import { AuthContext } from '@/context/AuthContext';
+import { ComingSoon } from '@components/ComingSoon';
+import { useGetBranches } from '@/shared/query-hooks/branches/branches';
+import { uzbekMonths } from '@/shared/constans';
 
 const LidsReportsFilter = () => {
-  const [duration, setDuration] = useState('3')
-  const [branch, setBranch] = useState<string | number>('')
-  const { user } = useContext(AuthContext)
-  const { isMobile } = useResponsive()
-  const { data } = useGetBranches()
-  const router = useRouter()
+  const [duration, setDuration] = useState('3');
+  const [branch, setBranch] = useState<string | number>('');
+  const { user } = useContext(AuthContext);
+  const { isMobile } = useResponsive();
+  const { data } = useGetBranches();
+  const router = useRouter();
 
-  const currentDate = new Date()
-  const nextMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1)
-  const monthUz = uzbekMonths[nextMonthDate.getMonth()]
-  const year = nextMonthDate.getFullYear()
-  const defaultReleaseDate = `${monthUz}, ${year}`
+  const currentDate = new Date();
+  const nextMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1);
+  const monthUz = uzbekMonths[nextMonthDate.getMonth()];
+  const year = nextMonthDate.getFullYear();
+  const defaultReleaseDate = `${monthUz}, ${year}`;
 
   useEffect(() => {
     if (user?.active_branch) {
-      setBranch(user.active_branch)
+      setBranch(user.active_branch);
     }
-  }, [user])
+  }, [user]);
 
   useEffect(() => {
-    const params = new URLSearchParams()
+    if (!branch) return;
 
-    if (duration) params.set('duration', duration)
-    if (branch) params.set('branch', branch.toString())
+    const params = new URLSearchParams();
+    if (duration) params.set('duration', duration);
+    if (branch) params.set('branch', branch.toString());
 
-    router.replace(`?${params.toString()}`)
-  }, [duration, branch, router])
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }, [duration, branch, router]);
 
   return (
     <Box
       sx={{
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
-        alignItems: 'center',
+        alignItems: 'start',
         gap: isMobile ? 6 : 0,
         justifyContent: 'space-between'
       }}
     >
       <Typography variant='h4'>Lidlar Hisoboti</Typography>
 
-      <Box sx={{ display: 'flex', gap: 5, flexDirection: isMobile ? 'column' : 'row' }}>
-        <ComingSoon releaseDate={defaultReleaseDate} size='small'>
+      <Box
+        sx={{ display: 'flex', gap: {xs: 3, md: 5 }, width: { xs: '100%', md: 'auto' } }}
+      >
+        <ComingSoon releaseDate={defaultReleaseDate} size='small' blur='0.8px'>
           <FormControl fullWidth>
             <InputLabel id='duration-label'>Oy</InputLabel>
             <Select
               labelId='duration-label'
               value={duration}
               size='small'
+              fullWidth
               onChange={e => setDuration(e.target.value)}
               label='Oy'
             >
@@ -95,6 +92,6 @@ const LidsReportsFilter = () => {
       </Box>
     </Box>
   )
-}
+};
 
-export default LidsReportsFilter
+export default LidsReportsFilter;

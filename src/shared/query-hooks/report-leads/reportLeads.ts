@@ -27,26 +27,36 @@ export const useGetReportLeads = (branch?: string) =>
   useQuery({
     queryKey: [QueryKeys.ReportLead, branch],
     queryFn: () => getReportLeads(branch),
-    enabled: true,
+    enabled: !!branch,
   })
 
 
-const getLeadsSellers = async () => {
+const getLeadsSellers = async (branch?: string) => {
   try {
-    const response = await api.get<ReposrtLeadsSellers[]>(Endpoints.ReportLeadsSellers)
+    const response = await api.get<ReposrtLeadsSellers[]>(Endpoints.ReportLeadsSellers, {
+      params: { branch: branch }
+    })
+
     return response.data
   } catch (error) {
     console.error(error)
   }
 }
 
-export const useGetLeadsSellers = () =>
+export const useGetLeadsSellers = (branch?: string) =>
   useQuery({
     queryKey: [QueryKeys.ReportsLeadsSellers],
-    queryFn: getLeadsSellers
+    queryFn: () => getLeadsSellers(branch),
+    enabled: !!branch,
   })
 
-const getReportLeadsList = async (params?: { page?: number; limit?: number }) => {
+const getReportLeadsList = async (params?: {
+  page?: number
+  limit?: number
+  branch?: string
+  temperature?: string
+  state?: string
+}) => {
   try {
     const response = await api.get<ReportsLeadsListType>(Endpoints.ReportLeadsList, {
       params
@@ -58,10 +68,17 @@ const getReportLeadsList = async (params?: { page?: number; limit?: number }) =>
   }
 }
 
-export const useGetReportLeadsList = (params?: { page?: number; limit?: number }) =>
+export const useGetReportLeadsList = (params?: {
+  page?: number
+  limit?: number
+  branch?: string
+  temperature?: string
+  state?: string
+}) =>
   useQuery({
     queryKey: [QueryKeys.ReportLeadsList, params],
-    queryFn: () => getReportLeadsList(params)
+    queryFn: () => getReportLeadsList(params),
+    enabled: !!params
   })
 
 const getReportLeadsChart = async (params?: any) => {

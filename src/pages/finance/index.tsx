@@ -40,6 +40,7 @@ import { EmptyContent } from '../../components/empty-content'
 import { Close } from '@mui/icons-material'
 import { VscodeIconsFileTypeExcel2 } from '../../components/excelButton/ExcelIcon'
 import { useQuery } from '@tanstack/react-query'
+import { FinanceResults } from '@components/FinanceResults'
 
 export function formatDateString(date: Date) {
   const day = String(date.getDate()).padStart(2, '0')
@@ -59,8 +60,6 @@ const CardStatistics = () => {
     incomeCategoriesData,
     isGettingExpenseCategories,
     isGettingIncomeCategories,
-    all_numbers,
-    numbersLoad
   } = useAppSelector(state => state.finance)
   const { user } = useContext(AuthContext)
   const router = useRouter()
@@ -70,21 +69,6 @@ const CardStatistics = () => {
   const [salaries, setSalaries] = useState<any>([])
   const { isMobile } = useResponsive()
   const [salariesLoading, setSalariesLoading] = useState(false)
-
-  const month: any = {
-    '01': 'Yanvar',
-    '02': 'Fevral',
-    '03': 'Mart',
-    '04': 'Aprel',
-    '05': 'May',
-    '06': 'Iyun',
-    '07': 'Iyul',
-    '08': 'Avgust',
-    '09': 'Sentabr',
-    '10': 'Oktabr',
-    '11': 'Noyabr',
-    '12': 'Dekabr'
-  }
 
   const withdrawCol: customTableDataProps[] = [
     {
@@ -262,7 +246,7 @@ const CardStatistics = () => {
       !user?.role.includes('watcher') &&
       !user?.role.includes('marketolog')
     ) {
-      router.push('/')
+      void router.push('/')
       toast.error('Sahifaga kirish huquqingiz yoq!')
     }
     Promise.all([getSalaries()])
@@ -294,82 +278,9 @@ const CardStatistics = () => {
 
           <Grid item xs={12} md={8} mb={10}>
             <CardStatisticsLiveVisitors />
-            {numbersLoad ? (
-              <Skeleton width={'100%'} height={250} />
-            ) : (
-              all_numbers && (
-                <Box width='100%' mx='auto' pt={5}>
-                  <Paper elevation={3} sx={{ p: 4, borderRadius: 1 }}>
-                    {all_numbers.month ? (
-                      <Typography variant='h6' align='center' gutterBottom>
-                        {all_numbers.year} - {month[all_numbers.month]} oyidagi natijalar
-                      </Typography>
-                    ) : (
-                      <Typography variant='h6' align='center' gutterBottom>
-                        {all_numbers.year} - yildagi natijalar
-                      </Typography>
-                    )}
-
-                    <Box position='relative' display='flex' flexDirection='column' alignItems='center'>
-                      <LinearProgress
-                        variant='determinate'
-                        value={all_numbers.plans.percentage}
-                        sx={{ p: 4, height: 200, borderRadius: 2, mt: 1, width: '100%' }}
-                      />
-                      <Box
-                        position='absolute'
-                        top={'50%'}
-                        px={5}
-                        display='flex'
-                        width={'100%'}
-                        alignItems={'center'}
-                        justifyContent={'space-between'}
-                        left={'50%'}
-                        sx={{ transform: 'translate(-50%, -50%)', textAlign: 'center' }}
-                      >
-                        <Box>
-                          <Typography
-                            textAlign={'start'}
-                            color={all_numbers.plans.percentage >= 25 ? 'white' : 'black'}
-                            variant='h6'
-                          >
-                            Erishilgan summa:
-                            <br /> {formatNumber(all_numbers.plans.done_amount)} so'm
-                          </Typography>
-                          <Typography
-                            color={all_numbers.plans.percentage >= 25 ? 'white' : 'black'}
-                            textAlign={'start'}
-                          >
-                            {all_numbers.plans.percentage.toFixed(1)}%
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography
-                            textAlign={'end'}
-                            color={all_numbers.plans.percentage >= 65 ? 'white' : 'black'}
-                            variant='h6'
-                            mt={2}
-                          >
-                            Qarzdorlik summasi:
-                            <br /> {formatNumber(all_numbers.plans?.debt_amount || 0)} so'm
-                          </Typography>
-
-                          <Typography color={all_numbers.plans.percentage >= 65 ? 'white' : 'black'} textAlign="end">
-                            {(100 - parseFloat(all_numbers.plans.percentage.toFixed(1))).toFixed(1)}%
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Box>
-
-                    <Box mt={3} textAlign='center'>
-                      <Typography variant='h6' color='primary'>
-                        Kutilgan summa: {formatCurrency(all_numbers.plans.planned_amount)} so'm
-                      </Typography>
-                    </Box>
-                  </Paper>
-                </Box>
-              )
-            )}
+            <Box mt={4}>
+              <FinanceResults />
+            </Box>
           </Grid>
 
           <Grid item xs={12}>

@@ -41,10 +41,11 @@ export const TrendCard = ({
           cursor: 'pointer'
         }
       }}
+      onClick={onClick}
     >
-      <Box display='flex' flexDirection='column' gap={5}>
+      <Box display='flex' flexDirection='column' gap={3}>
         <Box className='d-flex justify-content-between align-items-start'>
-          <Icon size={40} color={iconColor || 'black'} />
+          <Icon size={32} color={iconColor || 'black'} />
           {process !== null && (
             <Box
               sx={{
@@ -59,7 +60,7 @@ export const TrendCard = ({
             >
               <TrendIcon size={16} color={trendColor} />
               <Typography color={trendColor} fontSize={13} fontWeight={500}>
-                {process}
+                {process}%
               </Typography>
             </Box>
           )}
@@ -76,7 +77,8 @@ export const TrendCard = ({
         >
           {title}
         </Typography>
-        <div onClick={onClick}>
+
+        <div>
           <Typography
             sx={{
               color: 'black',

@@ -1,55 +1,67 @@
-import { Card, Typography } from '@mui/material'
-import { useSettings } from 'src/@core/hooks/useSettings'
-import { ResponsiveLine } from '@nivo/line'
-import useResponsive from '@/@core/hooks/useResponsive'
-import { EmptyContent } from '@/components/empty-content'
-import { uzbekMonths } from '@/shared/constans'
-import { useRouter } from 'next/router'
-import { useGet } from '@hooks/useApi'
-import { Endpoints } from '@api/endpoints'
-import { ReportLeadsYearlyStats } from '@/types/report'
+import { Card, Tooltip, Typography } from '@mui/material'
+import { useSettings } from 'src/@core/hooks/useSettings';
+import { ResponsiveLine } from '@nivo/line';
+import useResponsive from '@/@core/hooks/useResponsive';
+import { EmptyContent } from '@/components/empty-content';
+import { uzbekMonths } from '@/shared/constans';
+import { useRouter } from 'next/router';
+import { useGet } from '@hooks/useApi';
+import { Endpoints } from '@api/endpoints';
+import { ReportLeadsYearlyStats } from '@/types/report';
+import { Box } from '@mui/system'
+import { CircleHelp } from 'lucide-react'
 
 const YearlyTrend = () => {
-  const { settings } = useSettings()
-  const router = useRouter()
-  const { branch } = router.query
-  const { data } = useGet<ReportLeadsYearlyStats[]>(Endpoints.LeadsYearlyStats, { params: { branch: String(branch) }, options: { enabled: !!branch } })
-  const isDark = settings.mode == 'dark'
-  const textColor = isDark ? '#ffffff' : '#333333'
-  const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-  const { isMobile } = useResponsive()
+  const { settings } = useSettings();
+  const router = useRouter();
+  const { branch } = router.query;
+  const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
 
-  const currentDate = new Date()
-  const currentMonth = currentDate.getMonth()
+  const { data, isLoading } = useGet<ReportLeadsYearlyStats[]>(Endpoints.LeadsYearlyStats, {
+    params: { branch: branchParam },
+    options: { enabled: !!branchParam },
+  });
 
-  const availableMonths = uzbekMonths.slice(0, currentMonth + 1)
+  const isDark = settings.mode === 'dark';
+  const textColor = isDark ? '#ffffff' : '#333333';
+  const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+  const { isMobile } = useResponsive();
 
-  const fillMissingMonths = (dataArray:any[] , valueKey: string) => {
-    const monthMap = new Map(dataArray?.map(item => [parseInt(item.month, 10), parseInt(item[valueKey], 10)]))
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+
+  const availableMonths = uzbekMonths.slice(0, currentMonth + 1);
+
+  const fillMissingMonths = (dataArray: any[], valueKey: string) => {
+    const monthMap = new Map(dataArray?.map((item) => [parseInt(item.month, 10), parseInt(item[valueKey], 10)]));
 
     return availableMonths.map((name, index) => ({
       x: name,
-      y: monthMap.get(index + 1) ?? 0
-    }))
-  }
+      y: monthMap.get(index + 1) ?? 0,
+    }));
+  };
 
   const yearlyTrendData = [
     {
       id: 'Yangi lidlar',
       color: 'hsl(240, 70%, 50%)',
-      data: fillMissingMonths(data ?? [], 'new_count')
+      data: fillMissingMonths(data ?? [], 'new_count'),
     },
     {
       id: 'Roʻyxatdan oʻtgan',
       color: 'hsl(120, 70%, 50%)',
-      data: fillMissingMonths(data ?? [], 'enrolled_count')
+      data: fillMissingMonths(data ?? [], 'enrolled_count'),
     },
     {
       id: "Yo'qotilgan Lidlar",
       color: 'hsl(0, 70%, 50%)',
-      data: fillMissingMonths(data ?? [], 'lost_count')
-    }
-  ]
+      data: fillMissingMonths(data ?? [], 'lost_count'),
+    },
+  ];
+
+  if (isLoading || !branchParam) {
+    return <Box>Loading...</Box>;
+  }
 
   return (
     <Card
@@ -59,9 +71,15 @@ const YearlyTrend = () => {
         p: 2
       }}
     >
-      <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
-        Yillik yetakchi trendi
-      </Typography>
+      <Box display='flex' gap={3} sx={{ px: 6, py: 4 }}>
+        <Typography color="black" fontSize={20} fontWeight={700}>
+          Yillik yetakchi trendi
+        </Typography>
+
+        <Tooltip title="Bu yillik savdo haqida ma'lumot">
+          <CircleHelp style={{ cursor: 'pointer', color: '#9e9e9e', marginTop: 'auto', marginBottom: 'auto' }} />
+        </Tooltip>
+      </Box>
 
       {!yearlyTrendData[0].data.length ? (
         <EmptyContent />
@@ -75,11 +93,14 @@ const YearlyTrend = () => {
             min: 0,
             max: 'auto',
             stacked: false,
-            reverse: false
+            reverse: false,
+            clamp: true
           }}
           yFormat=' >-.0f'
-          curve='cardinal'
+          curve='monotoneX'
           axisTop={null}
+          enableArea={false}
+          areaBaselineValue={0}
           axisRight={null}
           axisBottom={{
             tickSize: 5,
@@ -190,6 +211,6 @@ const YearlyTrend = () => {
       )}
     </Card>
   )
-}
+};
 
-export default YearlyTrend
+export default YearlyTrend;

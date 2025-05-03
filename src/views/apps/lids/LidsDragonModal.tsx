@@ -13,7 +13,7 @@ import {
   Tabs,
   Typography
 } from '@mui/material'
-import { Bell, Clock, Info, MessageSquare, Phone, PlusIcon, User, UserIcon } from 'lucide-react'
+import { Bell, ChartPie, Clock, Info, MessageSquare, Phone, PlusIcon, User, UserIcon } from 'lucide-react'
 
 import React, { useEffect, useState } from 'react'
 import { EmptyContent } from '@components/empty-content'
@@ -22,16 +22,14 @@ import api from 'src/@core/utils/api'
 import { formatDate } from 'src/@core/utils/format'
 import AddNoteAnonimUser from './anonimUser/AddNoteAnonimUser'
 import { useTranslation } from 'react-i18next'
-import { setOpen } from 'src/store/apps/leads'
 import SendSmsAnonimUserForm from './anonimUser/SendSmsAnonimUserForm'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { Add, HelpOutline, QuestionAnswer, QuestionAnswerOutlined } from '@mui/icons-material'
+import { Add, HelpOutline, QuestionAnswerOutlined } from '@mui/icons-material'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import AddToGroupForm from './anonimUser/AddToGroupForm'
 import { fetchGroupChecklist } from 'src/store/apps/groups'
 import Link from 'next/link'
-import { useGet } from '@/hooks/useApi'
 
 interface LidsDragonModalProps {
   openModal: boolean
@@ -123,7 +121,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
     event: React.SyntheticEvent,
     newValue: 'lead-user-description' | 'anonim-user' | 'sms-history'
   ) => {
-    handleGetUserDetails(newValue, selectedLead?.id)
+    void handleGetUserDetails(newValue, selectedLead?.id)
     setValue(newValue)
   }
 
@@ -138,7 +136,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
   useEffect(() => {
     if (openModal) {
       dispatch(fetchGroupChecklist(''))
-      handleGetUserDetails(value, selectedLead?.id)
+      void handleGetUserDetails(value, selectedLead?.id)
     }
   }, [selectedLead?.id])
 
@@ -179,8 +177,12 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
             <InfoItem icon={<Clock />} label='Yaratilgan sanasi' value={formatDate(selectedLead?.created_at)} />
           </div>
 
-          <div className='col-12'>
+          <div className='col-6'>
             <InfoItem icon={<Phone />} label='Telefon raqami' value={selectedLead?.phone} />
+          </div>
+
+          <div className='col-6'>
+            <InfoItem icon={<ChartPie />} label='Holati' value={selectedLead?.phone} />
           </div>
           <div className='col-12'>
             <Button onClick={() => setAddGroupModal(true)} variant='contained' fullWidth startIcon={<Add />}>

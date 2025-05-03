@@ -1,34 +1,43 @@
-import { Box, Card, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
-import { useState } from 'react'
-import { useSettings } from 'src/@core/hooks/useSettings'
-import { ResponsiveFunnel } from '@nivo/funnel'
-import { useGet } from '@/hooks/useApi'
-import { EmptyContent } from '@/components/empty-content'
-import { useRouter } from 'next/router'
+import { Box, Card, Tooltip, Typography } from '@mui/material'
+import { useSettings } from 'src/@core/hooks/useSettings';
+import { ResponsiveFunnel } from '@nivo/funnel';
+import { useGet } from '@/hooks/useApi';
+import { EmptyContent } from '@/components/empty-content';
+import { useRouter } from 'next/router';
+import { CircleHelp } from 'lucide-react';
 
 const SalesFunnel = () => {
-  const { settings } = useSettings()
-  const router = useRouter()
-  const { branch } = router.query
-  const isDark = settings.mode == 'dark'
-  const textColor = isDark ? '#ffffff' : '#333333'
-  const { data } = useGet('leads/sales-funnel/', { params: { branch: String(branch) }, options: { enabled: !!branch } })
+  const { settings } = useSettings();
+  const router = useRouter();
+  const { branch } = router.query;
+  const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
+
+  const isDark = settings.mode === 'dark';
+  const textColor = isDark ? '#ffffff' : '#333333';
+
+  const { data, isLoading } = useGet('leads/sales-funnel/', {
+    params: { branch: branchParam },
+    options: { enabled: !!branchParam },
+  });
 
   const labelMap: { [key: string]: string } = {
-    all_leads: 'All Leads',
-
-    connected_leads: 'Contacted',
-    test_period: 'Demo Given',
-    enrolled_leads: 'Enrolled'
-  }
+    all_leads: 'Barcha lidlar',
+    connected_leads: "Bog'lanilganlar",
+    test_period: 'Sinov muddatidagilar',
+    enrolled_leads: 'Yozilganlar',
+  };
 
   const updatedFunnelData = data
     ? Object.entries(data).map(([key, value]) => ({
-        id: labelMap[key],
-        value: Number(value),
-        label: labelMap[key]
-      }))
-    : []
+      id: labelMap[key],
+      value: Number(value),
+      label: labelMap[key],
+    }))
+    : [];
+
+  if (isLoading || !branchParam) {
+    return <Box>Loading...</Box>;
+  }
 
   return (
     <Card
@@ -40,9 +49,16 @@ const SalesFunnel = () => {
         flexDirection: 'column'
       }}
     >
-      <Typography sx={{ px: 6, py: 4 }} color={'black'} fontSize={20} fontWeight={700}>
-        Savdo voronkasi
-      </Typography>
+      <Box display='flex' gap={3} sx={{ px: 6, py: 4 }}>
+        <Typography color={'black'} fontSize={20} fontWeight={700}>
+          Savdo voronkasi
+        </Typography>
+
+        <Tooltip title="Bu savdo voronkasi haqida ma'lumot">
+          <CircleHelp style={{ cursor: 'pointer', color: '#9e9e9e', marginTop: 'auto', marginBottom: 'auto' }} />
+        </Tooltip>
+      </Box>
+
       {!updatedFunnelData?.length ? (
         <EmptyContent />
       ) : (
@@ -87,6 +103,6 @@ const SalesFunnel = () => {
       )}
     </Card>
   )
-}
+};
 
-export default SalesFunnel
+export default SalesFunnel;

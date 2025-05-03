@@ -9,5 +9,6 @@ export const enum QueryKeys {
   ReportsLeadsSellers = 'leads-sellers',
   ReportLeadsList = 'leads-list',
   ReportLeadsChart = 'leads-card-chart',
-  ReportsLeadsSellerDetail = 'leads-seller-detail'
+  ReportsLeadsSellerDetail = 'leads-seller-detail',
+  FinancialsIncomeOverview = 'financials_income_overview'
 }
