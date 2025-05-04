@@ -71,9 +71,10 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
 
       if (values.amount && Number(values.amount) > 0) {
         data.amount = revereAmount(values.amount)
-        data.refund_amount = revereAmount(values.amount)
       }
-
+      if (values.refund_amount && Number(values.refund_amount) > 0) {
+        data.refund_amount = revereAmount(values.refund_amount)
+      }
       if (values.bonus && Number(values.bonus) > 0) {
         data.bonus = revereAmount(values.bonus)
       }
@@ -217,7 +218,7 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
                 />
                 {!!errors.amount && touched.amount && <FormHelperText error>{errors.amount}</FormHelperText>}
               </FormControl>
-              {Number(values.refund_amount) !== 0 && (
+              {openEdit?.refund_amount && (
                 <FormControl fullWidth>
                   <AmountInput
                     label={t('Qaytarilgan Summa')}

@@ -33,51 +33,21 @@ import { EmptyContent } from '../../components/empty-content'
 
 const CustomeDrawer = dynamic(() => import('../settings/office/courses').then(mod => mod.CustomeDrawer))
 
-const steps = [
-  {
-    text: 'Посещение веб-сайта',
-    width: 90,
-    color: 'blue'
-  },
-  {
-    text: 'Поиск и оценка продукта',
-    width: 75,
-    color: 'primary'
-  },
-  {
-    text: 'Добавление продукта в "корзину"',
-    width: 60,
-    color: 'secondary'
-  },
-  {
-    text: 'Оформление заказа',
-    width: 45,
-    color: 'purple'
-  },
-  {
-    text: 'Покупка',
-    width: 30,
-    color: 'error'
-  }
-]
-
 const Stats = () => {
-  const [sources, setSources] = useState<{ id: number; name: string; students_count: number }[]>([])
-  const [filter, setFilter] = useState<'a' | 1>('a')
+  const [sources, setSources] = useState<{ id: number; name: string; count: number }[]>([])
   const [date, setDate] = useState<any>('')
   const { t } = useTranslation()
   const [loading, setLoading] = useState<boolean>(false)
   const [open, setOpen] = useState<boolean>(false)
   const router = useRouter()
   const { user } = useContext(AuthContext)
-  const [tabIndex, setTabIndex] = useState(0)
 
   const getSources = async () => {
     const start_date = date?.[0] ? format(date?.[0], 'yyyy-MM-dd') : ''
     const end_date = date?.[1] ? format(date?.[1], 'yyyy-MM-dd') : ''
 
     await api
-      .get(`leads/statistic/`, { params: { start_date, end_date } })
+      .get(`leads/statistic/`, { params: { start_date, end_date, branch: user?.active_branch } })
       .then(resp => setSources(resp.data.result))
       .catch(err => console.error(err))
   }
@@ -118,95 +88,49 @@ const Stats = () => {
       !user?.role.includes('watcher') &&
       !user?.role.includes('marketolog')
     ) {
-      router.push('/')
+      void router.push('/')
       toast.error('Sahifaga kirish huquqingiz yoq!')
     }
-    getSources()
+    void getSources()
   }, [date])
 
   return (
     <div>
       <Box>
-        {tabIndex == 0 ? (
-          <Box>
-            <Box sx={{ paddingY: 5, display: 'flex', gap: '10px', flexGrow: 1, alignItems: 'center' }}>
-              <Typography sx={{ fontSize: '20px', flexGrow: 1 }}>{t('Manbalar hisoboti')}</Typography>
-              <Button
-                onClick={() => setOpen(true)}
-                variant='contained'
-                sx={{ marginLeft: 'auto' }}
-                size='medium'
-                startIcon={<IconifyIcon icon={'carbon:add'} />}
-              >
-                {t('Yangi Manba')}
-              </Button>
-            </Box>
-            <Box
-              sx={{ alignItems: 'center', paddingBottom: '20px', flexWrap: 'nowrap', width: '100%', display: 'flex' }}
-            >
-              <DateRangePicker
-                format='yyyy-MM-dd'
-                onChange={handleChangeDate}
-                translate={'yes'}
-                size='sm'
-                style={{ marginRight: 20 }}
-              />
-            </Box>
-            <Box sx={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-              {sources.length ? (
-                sources.map((el, i) => (
-                  <Box key={i} className='' sx={{ cursor: 'pointer', minHeight: '100px', minWidth: '180px' }}>
-                    <SourceStatsVertical title={el.name} stats={`${el.students_count}`} color={'success'} />
-                  </Box>
-                ))
-              ) : (
-                <EmptyContent />
-              )}
-            </Box>
-          </Box>
-        ) : (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              minHeight: '100vh',
-              padding: 2
-            }}
+        <Box sx={{ display: 'flex', gap: '10px', flexGrow: 1, alignItems: 'center' }}>
+          <Typography sx={{ fontSize: '20px', flexGrow: 1 }}>{t('Manbalar hisoboti')}</Typography>
+          <Button
+            onClick={() => setOpen(true)}
+            variant='contained'
+            sx={{ marginLeft: 'auto' }}
+            size='small'
+            startIcon={<IconifyIcon icon={'carbon:add'} />}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 1,
-                maxWidth: 960,
-                width: '100%'
-              }}
-            >
-              {steps.map((step, index) => (
-                <Card
-                  key={index}
-                  sx={{
-                    width: `${step.width}%`,
-                    backgroundColor:
-                      step.color === 'blue' ? 'blue' : (theme: any) => theme.palette[step.color]?.main || step.color,
-                    transition: 'all 0.3s',
-                    '&:hover': {
-                      transform: 'scale(1.02)'
-                    }
-                  }}
-                >
-                  <Box sx={{ padding: 2, textAlign: 'center' }}>
-                    <Typography variant='h6' sx={{ color: 'white' }}>
-                      {step.text}
-                    </Typography>
-                  </Box>
-                </Card>
-              ))}
-            </Box>
-          </Box>
-        )}
+            {t('Yangi Manba')}
+          </Button>
+        </Box>
+        <Box
+          sx={{ alignItems: 'center', paddingBottom: '20px', flexWrap: 'nowrap', width: '100%', display: 'flex' }}
+        >
+          <DateRangePicker
+            format='yyyy-MM-dd'
+            onChange={handleChangeDate}
+            translate={'yes'}
+            size='sm'
+            style={{ marginRight: 20 }}
+          />
+        </Box>
+        <Box sx={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+          {sources.length ? (
+            sources.map((el, i) => (
+              <Box key={i} className='' sx={{ cursor: 'pointer', minHeight: '100px', minWidth: '180px' }}>
+                <SourceStatsVertical title={el.name} stats={String(el.count)} color={'success'} />
+              </Box>
+            ))
+          ) : (
+            <EmptyContent />
+          )}
+        </Box>
       </Box>
 
       <CustomeDrawer open={open} variant='temporary' anchor='right'>

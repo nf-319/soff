@@ -24,13 +24,13 @@ const LidsReportsFilter = () => {
   const defaultReleaseDate = `${monthUz}, ${year}`;
 
   useEffect(() => {
-    if (user?.active_branch) {
-      setBranch(user.active_branch);
+    if (user?.role !== 'admin' && user?.active_branch) {
+      setBranch(user.active_branch)
     }
-  }, [user]);
+  }, [user])
 
   useEffect(() => {
-    if (!branch) return;
+    if (!branch && branch !== '') return;
 
     const params = new URLSearchParams();
     if (duration) params.set('duration', duration);
@@ -74,14 +74,18 @@ const LidsReportsFilter = () => {
         </ComingSoon>
 
         <FormControl fullWidth>
-          <InputLabel id='branch-label'>Branch</InputLabel>
+          <InputLabel id='branch-label'>Filiallar</InputLabel>
           <Select
             size='small'
             labelId='branch-label'
+            label='Filiallar'
             value={branch}
-            onChange={e => setBranch(e.target.value)}
-            label='Branch'
+            onChange={e => {
+              setBranch(e.target.value)
+            }}
           >
+            <MenuItem value=''>Barcha filiallar</MenuItem>
+
             {data?.results.map(item => (
               <MenuItem key={item.id} value={item.id}>
                 {item.name}
