@@ -1,1 +1,1 @@
-export const APP_BAR_ACCESS = ["soffstudy",'c-panel','leadbaza']
+export const APP_BAR_ACCESS = ['soffstudy', 'c-panel', 'leadbaza', 'test']
