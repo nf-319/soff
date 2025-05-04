@@ -117,7 +117,7 @@ const UserView = ({ tab, student }: any) => {
           <span>
             {Number(params.value) <= 0
               ? `${formatCurrency(Number(params.value) * -1)} UZS`
-              : `${formatCurrency(params.value)} UZS`}
+              : `${formatCurrency(params.value) || 0} UZS`}
           </span>
         </Tooltip>
       )

@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import { useTranslation } from 'react-i18next'
 import { Box, Card, TextField, Typography } from '@mui/material'
-import { useAppSelector } from 'src/store'
+import { useAppDispatch, useAppSelector } from 'src/store'
 import usePayment from 'src/hooks/usePayment'
 import { BanknoteIcon, Calendar, User } from 'lucide-react'
 import { useGet, usePost } from '@/hooks/useApi'
@@ -15,6 +15,7 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import toast from 'react-hot-toast'
 import { LoadingButton } from '@mui/lab'
+import { fetchStudentPayment } from '@/store/apps/students'
 
 type Props = {
   openEdit: any
@@ -26,7 +27,9 @@ export default function StudentWithDrawForm({ openEdit, setOpenEdit }: Props) {
   const { query } = useRouter()
   const { getPaymentMethod } = usePayment()
   const [selectedPayment, setSelectedPayment] = useState<any>(null)
-  const { data } = useGet(`common/student-payment/list/${query.student}/?condition=payment`, { options:{enabled:!!openEdit}})
+  const { data } = useGet(`common/student-payment/list/${query.student}/?condition=payment`, {
+    options: { enabled: !!openEdit }
+  })
 
   const handleEditClose = () => {
     setOpenEdit(null)
@@ -149,8 +152,9 @@ const ReturnCashModal = ({
   paymentData: any
   setPaymentData: (status: any) => void
 }) => {
+  const { query } = useRouter()
   const { mutate, isPending } = usePost()
-
+  const dispatch = useAppDispatch()
   const validationSchema = Yup.object({
     amount: Yup.number().typeError('Faqat raqam kiriting').required('Pul miqdori majburiy'),
     description: Yup.string().nullable()
@@ -172,7 +176,7 @@ const ReturnCashModal = ({
           onSuccess: () => {
             onClose()
             handleClose()
-
+            dispatch(fetchStudentPayment(query.student))
             toast.success('Pul qaytarish muvvafaqiyatli boldi')
           },
           onError: err => {
