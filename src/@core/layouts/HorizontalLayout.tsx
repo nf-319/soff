@@ -20,6 +20,7 @@ import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
 import AppBarWarning from 'src/components/AppBarWarning'
+import { APP_BAR_ACCESS } from '@/shared/config'
 
 const HorizontalLayoutWrapper = styled(Box)({
   height: '100%',
@@ -37,7 +38,7 @@ const MainContentWrapper = styled(Box)<BoxProps>({
 
 const Toolbar = styled(MuiToolbar)<ToolbarProps>(({ theme }) => ({
   width: '100%',
-  marginTop: "10px !important",
+  marginTop: '10px !important',
   padding: `${theme.spacing(0, 6)} !important`,
   [theme.breakpoints.down('sm')]: {
     paddingLeft: theme.spacing(2),
@@ -80,12 +81,12 @@ const HorizontalLayout = (props: LayoutProps) => {
   const { user } = useContext(AuthContext)
   const [showWarning, setShowWarning] = useState(false)
   const userData = localStorage.getItem('userData')
-  const subdomin = location.hostname.split(".")[0]
+  const subdomain = window.location.hostname.split('.')[0]
 
   const formattedUserData = JSON.parse(userData as string)
 
   useEffect(() => {
-    if (subdomin !== "c-panel" && formattedUserData.payment_days >= 0) {
+    if (!APP_BAR_ACCESS.includes(subdomain) && formattedUserData.payment_days >= 0) {
       setShowWarning(true)
     } else {
       setShowWarning(false)

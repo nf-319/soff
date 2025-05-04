@@ -14,9 +14,8 @@ import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import QRCodeScanner from '../components/qrCodeScanner'
 import api from '../@core/utils/api'
-import { setCompanyInfo } from '../store/apps/user'
+import { setCompanyInfo } from '@store/apps/user'
 import { useDispatch } from 'react-redux'
-import AppBarWarningVertical from 'src/components/AppBarWarningVertical'
 
 type Props = {
   contentHeightFixed?: boolean
