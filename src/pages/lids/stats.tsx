@@ -98,20 +98,7 @@ const Stats = () => {
     <div>
       <Box>
         <Box sx={{ display: 'flex', gap: '10px', flexGrow: 1, alignItems: 'center' }}>
-          <IconButtonMui color='primary'>
-            <IconifyIcon icon={'ep:back'} style={{ cursor: 'pointer' }} onClick={() => Router.back()} />
-          </IconButtonMui>
           <Typography sx={{ fontSize: '20px', flexGrow: 1 }}>{t('Manbalar hisoboti')}</Typography>
-        </Box>
-        <Box sx={{ alignItems: 'center', paddingBottom: '20px', flexWrap: 'nowrap', width: '100%', display: 'flex' }}>
-          <DateRangePicker
-            format='yyyy-MM-dd'
-            onChange={handleChangeDate}
-            translate={'yes'}
-            size='sm'
-            style={{ marginRight: 20 }}
-          />
-
           <Button
             onClick={() => setOpen(true)}
             variant='contained'
@@ -121,6 +108,17 @@ const Stats = () => {
           >
             {t('Yangi Manba')}
           </Button>
+        </Box>
+        <Box
+          sx={{ alignItems: 'center', paddingBottom: '20px', flexWrap: 'nowrap', width: '100%', display: 'flex' }}
+        >
+          <DateRangePicker
+            format='yyyy-MM-dd'
+            onChange={handleChangeDate}
+            translate={'yes'}
+            size='sm'
+            style={{ marginRight: 20 }}
+          />
         </Box>
         <Box sx={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
           {sources.length ? (

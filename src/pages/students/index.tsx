@@ -11,7 +11,8 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  Tooltip
+  Tooltip,
+  Switch
 } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import DataTable from '../../components/table'
@@ -36,7 +37,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
 import { fetchSmsList } from '@store/apps/settings'
 import { ModalTypes, SendSMSModal } from '@/views/apps/students/view/UserViewLeft'
-import { MessageSquareText } from 'lucide-react'
+import { Archive, ArchiveIcon, ArchiveRestore, MessageSquareText } from 'lucide-react'
 import useSMS from '@hooks/useSMS'
 import Divider from '@mui/material/Divider'
 import { Toggle } from 'rsuite'
@@ -156,10 +157,10 @@ export default function StudentsPage() {
                   item.status === 'active'
                     ? 'success'
                     : item.status === 'archive'
-                      ? 'error'
-                      : item.status === 'frozen'
-                        ? 'secondary'
-                        : 'warning'
+                    ? 'error'
+                    : item.status === 'frozen'
+                    ? 'secondary'
+                    : 'warning'
                 }
               />
             </Box>
@@ -254,7 +255,6 @@ export default function StudentsPage() {
     dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
   }
 
-
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
   }, [user?.active_branch])
@@ -306,16 +306,6 @@ export default function StudentsPage() {
 
         {!isMobile && (
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Toggle
-                checked={queryParams.status === 'archive'}
-                color='red'
-                checkedChildren={t('Arxiv')}
-                unCheckedChildren={t('Arxiv')}
-                onChange={e => handleSwitch(e ? 'archive' : 'active')}
-              />
-            </Box>
-
             <Box>
               <ExcelStudents
                 size='medium'
@@ -324,7 +314,6 @@ export default function StudentsPage() {
                 queryString={queryString}
               />
             </Box>
-
             <Button
               onClick={handleModalOpen}
               variant='outlined'
@@ -335,7 +324,28 @@ export default function StudentsPage() {
                 <span>{t('Sms yuborish')}</span>
               </Tooltip>
             </Button>
-
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Tooltip
+                title={
+                  queryParams.status === 'archive' ? t('Faol leadlarni ko‘rish.') : t('Arxivdagi leadlarni ko‘rish.')
+                }
+                arrow
+              >
+                <Button
+                  variant={queryParams.status === 'archive' ? 'contained' : 'outlined'}
+                  startIcon={queryParams.status === 'archive' ? <Archive size={16} /> : <ArchiveRestore size={16} />}
+                  onClick={() => handleSwitch(queryParams.status === 'archive' ? 'active' : 'archive')}
+                  size='medium'
+                  sx={{
+                    textTransform: 'none',
+                    minWidth: 100,
+                    justifyContent: 'flex-start'
+                  }}
+                >
+                  {queryParams.status === 'archive' ? t('Arxiv') : t('Faol')}
+                </Button>
+              </Tooltip>
+            </Box>
             <Button
               onClick={() => dispatch(setOpenEdit('create'))}
               variant='contained'
@@ -350,48 +360,53 @@ export default function StudentsPage() {
       </Box>
 
       {isMobile && (
-        <Box display='flex' gap={2}>
-          <Button sx={{ width: '100%' }} variant='outlined' onClick={() => setOpen(true)}>
-            {t('Filterlash')}
-          </Button>
+        <>
+          <Box display='flex' gap={3}>
+            <Button sx={{ width: '100%' }} variant='outlined' onClick={() => setOpen(true)}>
+              {t('Filterlash')}
+            </Button>
 
-          <ExcelStudents size='small' url='student/offset-list/' queryString={queryString} />
-        </Box>
+            <ExcelStudents size='small' url='student/offset-list/' queryString={queryString} />
+          </Box>
+          <Box hidden={!isMobile} display='flex' alignItems='center' justifyContent='end' gap={3}>
+            <Box width={'100%'}>
+              <Tooltip
+                title={
+                  queryParams.status === 'archive' ? t('Faol leadlarni ko‘rish.') : t('Arxivdagi leadlarni ko‘rish.')
+                }
+                arrow
+              >
+                <Button
+                  fullWidth
+                  variant={queryParams.status === 'archive' ? 'contained' : 'outlined'}
+                  startIcon={queryParams.status === 'archive' ? <Archive size={16} /> : <ArchiveRestore size={16} />}
+                  onClick={() => handleSwitch(queryParams.status === 'archive' ? 'active' : 'archive')}
+                  size='medium'
+                  sx={{
+                    textTransform: 'none'
+                  }}
+                >
+                  {queryParams.status === 'archive' ? t('Arxiv') : t('Faol')}
+                </Button>
+              </Tooltip>
+            </Box>
+
+            <Button
+              fullWidth
+              onClick={handleModalOpen}
+              variant='outlined'
+              color='warning'
+              startIcon={<MessageSquareText size={18} />}
+            >
+              <Tooltip title={t('Ro‘yxatdagi o‘quvchilarga SMS yuborish.')}>
+                <span>{t('Sms yuborish')}</span>
+              </Tooltip>
+            </Button>
+          </Box>
+        </>
       )}
 
       <Divider />
-
-      <Box hidden={!isMobile} display='flex' alignItems='center' justifyContent='end' gap={3}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Toggle
-            checked={queryParams.status === 'archive'}
-            color='red'
-            checkedChildren={t('Arxiv')}
-            unCheckedChildren={t('Arxiv')}
-            onChange={e => handleSwitch(e ? 'archive' : 'active')}
-          />
-        </Box>
-
-        <Box>
-          <ExcelStudents
-            size='medium'
-            tooltip={t('Ko‘rinib turgan jadvalni Excel faylga yuklab olish.')}
-            url='student/offset-list/'
-            queryString={queryString}
-          />
-        </Box>
-
-        <Button
-          onClick={handleModalOpen}
-          variant='outlined'
-          color='warning'
-          startIcon={<MessageSquareText size={18} />}
-        >
-          <Tooltip title={t('Ro‘yxatdagi o‘quvchilarga SMS yuborish.')}>
-            <span>{t('Sms yuborish')}</span>
-          </Tooltip>
-        </Button>
-      </Box>
 
       {!isMobile && <StudentsFilter />}
 
