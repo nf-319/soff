@@ -19,6 +19,7 @@ import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
 import AppBarWarningVertical from 'src/components/AppBarWarningVertical'
+import { APP_BAR_ACCESS } from '@/shared/config'
 
 const VerticalLayoutWrapper = styled(Box)({
   height: '100%',
@@ -60,10 +61,14 @@ const VerticalLayout = (props: LayoutProps) => {
   const userData = localStorage.getItem('userData')
   const formattedUserData = JSON.parse(userData as string)
   const toggleNavVisibility = () => setNavVisible(!navVisible)
-  const subdomain = location.hash.split('.')[0]
+  const subdomain = window.location.hostname.split('.')[0]
+
 
   useEffect(() => {
-    if (subdomain !== 'c-panel' && formattedUserData.payment_days >= 0) {
+    if (
+     !APP_BAR_ACCESS.includes(subdomain) &&
+      formattedUserData.payment_days >= 0
+    ) {
       setShowWarning(true)
     } else {
       setShowWarning(false)

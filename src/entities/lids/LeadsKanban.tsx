@@ -18,10 +18,10 @@ import { useState, useEffect, FC } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { EmptyContent } from '../../components/empty-content'
+import { EmptyContent } from '@components/empty-content'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'
-import { useGet, usePatch } from 'src/hooks/useApi'
+import { useGet, usePatch, usePost } from 'src/hooks/useApi'
 import { RootState, useAppDispatch, useAppSelector } from 'src/store'
 import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
 import CreateAnonimUserForm from 'src/views/apps/lids/anonimUser/CreateAnonimUserForm'
@@ -82,6 +82,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const [deleteItem, setDeleteItem] = useState<any | null>(null)
   const { id, search, is_active, is_amocrm } = router.query
   const { mutate, isPending } = usePatch()
+  const { mutate: updateDepartmentMutation } = usePost()
   const [sectionLeads, setSectionLeads] = useState<any[]>([])
   const [accessModal, setAccessModal] = useState<boolean>(false)
   const [openSmsModal, setOpenSmsModal] = useState<string | null>(null)
@@ -115,6 +116,20 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
     }
   }, [selectedData, amoLeadDataChild])
 
+  const handleSubmit = (data: any) => {
+    updateDepartmentMutation(
+      'leads/departments/bulk-ordering/',
+      { departments: data },
+      {
+        onSuccess: response => {
+          console.log('Success:', response)
+        },
+        onError: error => {
+          console.error('Error:', error)
+        }
+      }
+    )
+  }
   const apiParams = {
     is_active: is_active ?? true
   }
@@ -224,7 +239,13 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
       const newResults = Array.from(localLeadData.results)
       const [movedSection] = newResults.splice(source.index, 1)
       newResults.splice(destination.index, 0, movedSection)
-
+      const newResultsOrdered = newResults.map((item, index) => ({
+        obj_id: item?.id,
+        order: index
+      }))
+      if (newResultsOrdered) {
+        handleSubmit(newResultsOrdered)
+      }
       setLocalLeadData({
         ...localLeadData,
         results: newResults
@@ -378,7 +399,6 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
             {...provided.droppableProps}
             className='kanban'
             style={{
-              paddingBottom: 20,
               display: 'flex',
               overflow: 'auto',
               flexDirection: isMobile ? 'column' : 'row',
