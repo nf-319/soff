@@ -1,5 +1,5 @@
 import { Button } from '@mui/material'
-import { Bell, MoveRight, TriangleAlert, X } from 'lucide-react'
+import { MoveRight, TriangleAlert, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useContext } from 'react'
 import { Alert, Container } from 'react-bootstrap'
