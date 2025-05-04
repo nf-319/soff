@@ -34,22 +34,22 @@ const LeadsSellers = () => {
     {
       field: 'phone',
       headerName: t('Telefon raqam'),
-      width:150,
+      width:250,
     },
     {
       field: 'worked_lead_count',
       headerName: t('Lidlar soni'),
-      width:150,
+      width:250,
     },
     {
       field: 'lost_leads',
       headerName: t('Yoqotilgan lidlar soni'),
-      width:150,
+      width:250,
     },
     {
       field: 'conversion_rate',
       headerName: 'Konversiya stavkasi',
-      width:150,
+      width: 250,
       renderCell: (params: any) => {
         const value = Number(params.value);
 

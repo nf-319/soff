@@ -84,8 +84,6 @@ const LidsReportsFilter = () => {
               setBranch(e.target.value)
             }}
           >
-            <MenuItem value=''>Barcha filiallar</MenuItem>
-
             {data?.results.map(item => (
               <MenuItem key={item.id} value={item.id}>
                 {item.name}

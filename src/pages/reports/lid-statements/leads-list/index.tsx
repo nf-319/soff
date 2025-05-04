@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, MenuItem, Select, Typography, Chip, Checkbox, CircularProgress } from '@mui/material'
+import { Box, Button, MenuItem, Select, Typography, Chip, CircularProgress } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { DataGrid } from '@mui/x-data-grid';
@@ -128,7 +128,7 @@ const LeadsList = () => {
     {
       field: 'temperature',
       headerName: 'Harorat',
-      width: 150,
+      width: 200,
       renderCell: (params: any) => {
         const status = params.value;
         const statusInfo = temperatureMap[status] || { label: status || "Belgilanmagan", color: 'default' };
@@ -144,7 +144,7 @@ const LeadsList = () => {
     {
       field: 'course',
       headerName: t('Kurs'),
-      width: 150,
+      width: 250,
     },
     {
       field: 'source',

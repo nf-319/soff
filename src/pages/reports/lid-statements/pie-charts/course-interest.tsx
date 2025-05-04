@@ -6,6 +6,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 import { FC } from 'react'
 import { ComingSoon } from '@components/ComingSoon'
 import { CircleHelp } from 'lucide-react'
+import { coursesEmpty } from '@/pages/reports/lid-statements/constants'
 
 const LegendItem = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -28,6 +29,7 @@ type Props = {
 const CourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
   const { settings } = useSettings()
   const isDark = settings.mode === 'dark'
+  const isActive = data.some(item => item.count > 0)
 
   const aggregatedData = data.reduce((acc, item) => {
     const existing = acc.find((entry) => entry.name === item.name)
@@ -39,14 +41,13 @@ const CourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
     return acc
   }, [] as ReportLeadsCourseType[])
 
-  const courseInterestData = aggregatedData.map((item, index) => ({
+  const courseInterestData = (isActive ? aggregatedData : coursesEmpty).map((item, index) => ({
     id: `${index}-${item?.name?.replace(/\s+/g, '-')}`,
     label: `${item?.name}-${index + 1}`,
     value: item.count,
-    color: `hsl(${(index * 360 / aggregatedData.length) % 360}, 50%, 60%)`,
+    color: `hsl(${((index * 360) / aggregatedData.length) % 360}, 50%, 60%)`
   }))
 
-  const isActive = data.some(item => item.count > 0)
 
   return (
     <ComingSoon
