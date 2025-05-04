@@ -29,7 +29,7 @@ const MarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {
 
   return (
     <ComingSoon
-      active={!isActive}
+      active={isActive}
       text='Marketing manbasi uchun malumot yetarli emas'
       brightness='0.9'
       size='medium'
@@ -59,7 +59,7 @@ const MarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {
 
         {marketingSourcesData.length ? (
           <ResponsiveBar
-            data={!isActive ? marketingSourcesData : otherMarketingSourcesData}
+            data={isActive ? marketingSourcesData : otherMarketingSourcesData}
             keys={['Manba']}
             indexBy='source'
             margin={{ top: 10, right: 30, bottom: 70, left: 60 }}
