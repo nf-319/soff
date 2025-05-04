@@ -17,6 +17,7 @@ import { useRouter } from 'next/router'
 import { useState, useEffect, FC } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { useTranslation } from 'react-i18next'
+import MessageIcon from '@mui/icons-material/Message';
 import { useSelector } from 'react-redux'
 import { EmptyContent } from '@components/empty-content'
 import useResponsive from 'src/@core/hooks/useResponsive'
@@ -88,7 +89,6 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const [openSmsModal, setOpenSmsModal] = useState<string | null>(null)
 
   const { companyInfo } = useAppSelector(item => item.user)
-
 
   const [mergedSteps, setMergedSteps] = useState<any[] | null>(null)
   const { data: amoLeadDataChild, isLoading: amoLeadDataChildLoding } = useGet(
@@ -392,7 +392,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
 
   return (
     <DragDropContext onDragEnd={is_amocrm ? onDragEndAmo : onDragEnd}>
-      <Droppable droppableId='section-list' direction={isMobile ? 'vertical' : 'horizontal'} type='SECTION'>
+      <Droppable droppableId='section-list' direction='horizontal' type='SECTION'>
         {provided => (
           <div
             ref={provided.innerRef}
@@ -401,7 +401,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
             style={{
               display: 'flex',
               overflow: 'auto',
-              flexDirection: isMobile ? 'column' : 'row',
+              flexDirection: 'row',
               alignItems: 'start',
               height: '100%',
               gap: 20
@@ -416,7 +416,9 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                       {...sectionProvided.draggableProps}
                       style={{
                         ...sectionProvided.draggableProps.style,
-                        opacity: sectionSnapshot.isDragging ? 0.8 : 1
+                        opacity: sectionSnapshot.isDragging ? 0.8 : 1,
+                        border: '1px solid #e0e0e0e0',
+                        borderRadius: 10
                       }}
                     >
                       <Droppable key={section.id} droppableId={String(section.id)} type='LEAD'>
@@ -459,7 +461,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                               <Box display={'flex'}>
                                 <Tooltip title={`${section.name}dagi barcha lidlarga SMS yuborish`}>
                                   <IconButton sx={{ cursor: 'pointer' }} onClick={() => handleAccessModal(section)}>
-                                    <MessageSquare size={20} fill='orange' color='orange' />
+                                    <MessageIcon sx={{ fontSize: 20, color: 'orange' }}  />
                                   </IconButton>
                                 </Tooltip>
 
@@ -485,7 +487,13 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                             </Box>
 
                             <div
-                              style={{ marginBottom: 10, marginTop: 10, maxHeight: '50vh', paddingRight: 10, overflow: 'auto' }}
+                              style={{
+                                marginBottom: 10,
+                                marginTop: 10,
+                                maxHeight: '50vh',
+                                paddingRight: 10,
+                                overflow: 'auto'
+                              }}
                               className='kanban__section__content'
                             >
                               {section.leads && section.leads.length > 0 ? (
@@ -504,7 +512,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                               ) : (
                                 <Box sx={{ p: 2, textAlign: 'center' }}>
                                   <Typography variant='body2' color='text.secondary'>
-                                    Bo'sh
+                                    Bo'sh kanban
                                   </Typography>
                                 </Box>
                               )}

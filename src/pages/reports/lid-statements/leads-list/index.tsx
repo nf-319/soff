@@ -11,13 +11,13 @@ import { uzbekLocaleText } from '@/views/apps/StudentsPoints/constants';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/router'
 
-const temperateOptions = [
+export const temperateOptions = [
   { value: '', label: 'Barcha haroratlar' },
   { value: 'hot', label: 'Issiq' },
-  { value: 'cold', label: 'Sovuq' },
   { value: 'warm', label: 'Iliq' },
+  { value: 'cold', label: 'Sovuq' },
 ]
-const states = [
+export const states = [
   { value: '', label: 'Barcha holatlar' },
   { value: 'new', label: 'Yangi' },
   { value: 'connected', label: "Bog'lanilgan" },
@@ -204,7 +204,6 @@ const LeadsList = () => {
             </MenuItem>
           ))}
         </Select>
-
       </Box>
 
       <Box

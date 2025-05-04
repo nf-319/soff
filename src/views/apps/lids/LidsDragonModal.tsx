@@ -5,15 +5,15 @@ import {
   Chip,
   Dialog,
   DialogContent,
-  DialogTitle,
+  DialogTitle, FormControl,
   FormControlLabel,
-  FormGroup,
+  FormGroup, InputLabel, Select,
   Skeleton,
   Tab,
   Tabs,
   Typography
 } from '@mui/material'
-import { Bell, ChartPie, Clock, Info, MessageSquare, Phone, PlusIcon, User, UserIcon } from 'lucide-react'
+import { Bell, ChartPie, ChevronDown, Clock, Info, MessageSquare, Phone, PlusIcon, User, UserIcon } from 'lucide-react'
 
 import React, { useEffect, useState } from 'react'
 import { EmptyContent } from '@components/empty-content'
@@ -32,6 +32,11 @@ import { fetchGroupChecklist } from 'src/store/apps/groups'
 import Link from 'next/link'
 import { useGet } from '@/hooks/useApi'
 import { useRouter } from 'next/router'
+import { AccessDeniedModal } from '@components/AccessDeniedModal'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import { useAuth } from '@hooks/useAuth'
+import { temperateOptions } from '@/pages/reports/lid-statements/leads-list'
 
 interface LidsDragonModalProps {
   openModal: boolean
@@ -49,17 +54,32 @@ type InfoItemProps = {
   icon: React.ReactNode
   label: string
   value: string
+  canEdit?: boolean
+  onValueChange?: (newValue: string) => void
 }
 
-const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value }) => {
+const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false, onValueChange }) => {
   const { settings } = useSettings()
+  const [currentValue, setCurrentValue] = useState<string>(value)
+  const { user } = useAuth()
+  const permissions = ['admin', 'ceo']
+  const hasEditPermission = permissions?.includes(user?.currentRole as string) || false
+  const isEditable = canEdit && hasEditPermission && label === 'Holati'
+
+  const handleStateChange = (newState: string) => {
+    setCurrentValue(newState)
+    if (onValueChange) {
+      onValueChange(newState)
+    }
+  }
+
   return label === 'Telefon raqami' ? (
-    <Link href={`tel:${value}`} style={{ textDecoration: 'none' }}>
+    <Link href={`tel:${value}`} style={{ textDecoration: 'none', height: '100%' }}>
       <div
-        style={{ cursor: 'pointer' }}
         className={`d-flex align-items-center p-3 ${
           settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'
         } rounded-3 shadow-sm hover:bg-secondary transition-all duration-200`}
+        style={{ cursor: 'pointer', border: '1px solid #e0e0e0', height: '100%' }}
       >
         <div className='text-primary me-3'>{icon}</div>
         <div>
@@ -70,15 +90,34 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value }) => {
     </Link>
   ) : (
     <div
-      style={{ cursor: 'pointer' }}
       className={`d-flex align-items-center p-3 ${
         settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'
       } rounded-3 shadow-sm hover:bg-secondary transition-all duration-200`}
+      style={{ cursor: 'pointer', border: '1px solid #e0e0e0', height: '100%' }}
     >
       <div className='text-primary me-3'>{icon}</div>
-      <div>
+      <div style={{ flex: 1 }}>
         <p className={`mb-1 ${settings.mode == 'dark' ? 'text-ligt' : 'text-muted'}`}>{label}</p>
-        <p className={`mb-0 font-weight-bold ${settings.mode == 'dark' ? 'text-ligt' : 'text-dark'}`}>{value}</p>
+        <div className={`mb-0 font-weight-bold ${settings.mode == 'dark' ? 'text-ligt' : 'text-dark'}`}>
+          {isEditable ? (
+            <FormControl fullWidth>
+              <Select
+                size='small'
+                fullWidth
+                value={value}
+                onChange={e => handleStateChange(e.target.value as string)}
+              >
+                {temperateOptions.slice(1, 4).map(option => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
+            currentValue
+          )}
+        </div>
       </div>
     </div>
   )
@@ -189,7 +228,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
             style={{
               width: '6rem',
               height: '6rem',
-              background: '#007bff',
+              background: '#666CFF',
               fontSize: '2rem',
               fontWeight: 'bold'
             }}
@@ -211,7 +250,15 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
           </div>
 
           <div className='col-6'>
-            <InfoItem icon={<ChartPie />} label='Holati' value="Issiq" />
+            <InfoItem
+                icon={<ChartPie />}
+                label='Holati'
+                value='cold'
+                canEdit={true}
+                onValueChange={(newValue) => {
+                  console.log('New state:', newValue);
+                }}
+              />
           </div>
 
           <div className='col-12'>
@@ -548,6 +595,7 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
           </Box>
         </Box>
       </DialogContent>
+      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
       <Dialog open={nodeModal} onClose={() => setNodeModal(false)}>
         <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography>{t('Yangi eslatma')}</Typography>

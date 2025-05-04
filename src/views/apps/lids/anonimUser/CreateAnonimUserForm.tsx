@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
-import { FormControl, FormHelperText, IconButton, InputLabel, MenuItem, Select, TextField } from '@mui/material'
+import { Box, FormControl, FormHelperText, IconButton, InputLabel, MenuItem, Select, TextField } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -26,6 +26,7 @@ import { useAuth } from 'src/hooks/useAuth'
 import { Ellipsis } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { LeadKanbanItem } from '@/entities/lids/LeadKanbanItem'
+import { states, temperateOptions } from '@/pages/reports/lid-statements/leads-list'
 
 type Props = {
   source?: any
@@ -39,6 +40,8 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
   const [skipLid, setSkipLid] = useState<boolean>(false)
   const queryClient = useQueryClient()
   const { user } = useAuth()
+  const [temperateValue, setTemperateValue] = useState('')
+  const [stateValue, setStateValue] = useState('')
   const query = window.location?.search?.split('?slug=')[1]
 
   const { id } = router.query
@@ -225,12 +228,43 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
         {!!errors.phone && touched.phone && <FormHelperText error>{formik.errors.phone}</FormHelperText>}
       </FormControl>
 
-      {errors?.user && (
-        <LeadKanbanItem
-          onClose
-          lead={newErrors.user}
-        />
-      )}
+      {errors?.user && <LeadKanbanItem onClose lead={newErrors.user} />}
+
+      <FormControl fullWidth>
+        <InputLabel size='small'>Holat</InputLabel>
+        <Select
+          label='Holat'
+          placeholder='Holatni tanlang'
+          size='small'
+          fullWidth
+          onChange={e => setStateValue(e.target.value as string)}
+          displayEmpty
+        >
+          {states.slice(1, 6).map(option => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <FormControl fullWidth>
+        <InputLabel size='small'>Harorati</InputLabel>
+        <Select
+          size='small'
+          value={temperateValue}
+          fullWidth
+          label='Harorati'
+          onChange={e => setTemperateValue(e.target.value)}
+          displayEmpty
+        >
+          {temperateOptions.slice(1, 4).map(option => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
       <FormControl fullWidth>
         <TextField
@@ -247,7 +281,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
       </FormControl>
 
       <LoadingButton loading={loading} type='submit' variant='outlined'>
-        {skipLid ? "Qayta yaratish" : 'Yaratish'}
+        {skipLid ? 'Qayta yaratish' : 'Yaratish'}
       </LoadingButton>
     </form>
   )
