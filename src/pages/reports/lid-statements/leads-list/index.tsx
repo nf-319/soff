@@ -164,9 +164,13 @@ const LeadsList = () => {
   return (
     <Box sx={{ backgroundColor: '#fff', p: 6, border: '1px solid #e0e0e0', borderRadius: 1, display: 'grid', gap: 3 }}>
       <Box display='flex' alignItems='center' justifyContent='space-between'>
-        <Typography variant='h5' sx={{ mb: 2 }}>
-          Lidlar ro'yxati
-        </Typography>
+        <Box>
+          <Typography variant='h5' sx={{ mb: 2 }}>
+            Lidlar ro'yxati
+          </Typography>
+
+          {/*<Chip label="" />*/}
+        </Box>
 
         <Chip
           color='default'
@@ -176,15 +180,9 @@ const LeadsList = () => {
         />
       </Box>
 
-      <Box display='flex' alignItems="center" justifyContent="center" width="100%" gap={3}>
-        <Select
-          size='small'
-          fullWidth
-          value={stateValue}
-          onChange={(e) => setStateValue(e.target.value)}
-          displayEmpty
-        >
-          {states.map((option) => (
+      <Box display='flex' alignItems='center' justifyContent='center' width='100%' gap={3}>
+        <Select size='small' fullWidth value={stateValue} onChange={e => setStateValue(e.target.value)} displayEmpty>
+          {states.map(option => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
@@ -195,10 +193,10 @@ const LeadsList = () => {
           size='small'
           value={temperateValue}
           fullWidth
-          onChange={(e) => setTemperateValue(e.target.value)}
+          onChange={e => setTemperateValue(e.target.value)}
           displayEmpty
         >
-          {temperateOptions.map((option) => (
+          {temperateOptions.map(option => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>

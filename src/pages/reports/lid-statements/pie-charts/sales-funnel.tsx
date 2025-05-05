@@ -1,4 +1,4 @@
-import { Box, Card, Tooltip, Typography } from '@mui/material'
+import { Box, Card, Tooltip, Typography, Skeleton } from '@mui/material'
 import { useSettings } from 'src/@core/hooks/useSettings';
 import { ResponsiveFunnel } from '@nivo/funnel';
 import { useGet } from '@/hooks/useApi';
@@ -39,8 +39,40 @@ const SalesFunnel = () => {
     }))
     : [];
 
+  const FunnelSkeleton = () => (
+    <Card
+      sx={{
+        height: { xs: 400, sm: 500 },
+        width: '100%',
+        boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+      <Box display='flex' gap={3} sx={{ px: 6, py: 4 }}>
+        <Skeleton variant="text" width={180} height={32} />
+        <Skeleton variant="circular" width={24} height={24} sx={{ mt: 'auto', mb: 'auto' }} />
+      </Box>
+      <Box sx={{ flexGrow: 1, width: '100%', px: 4, pb: 4, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {/* Funnel shaped skeleton */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <Skeleton variant="rectangular" width="90%" height={60} sx={{ mb: 2, borderRadius: 1 }} />
+        </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <Skeleton variant="rectangular" width="80%" height={60} sx={{ mb: 2, borderRadius: 1 }} />
+        </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <Skeleton variant="rectangular" width="70%" height={60} sx={{ mb: 2, borderRadius: 1 }} />
+        </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <Skeleton variant="rectangular" width="60%" height={60} sx={{ borderRadius: 1 }} />
+        </Box>
+      </Box>
+    </Card>
+  );
+
   if (isLoading || !branchParam) {
-    return <Box>Loading...</Box>;
+    return <FunnelSkeleton />;
   }
 
   return (
