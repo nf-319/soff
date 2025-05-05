@@ -17,7 +17,7 @@ import { useRouter } from 'next/router'
 import { useState, useEffect, FC } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { useTranslation } from 'react-i18next'
-import MessageIcon from '@mui/icons-material/Message';
+import MessageIcon from '@mui/icons-material/Message'
 import { useSelector } from 'react-redux'
 import { EmptyContent } from '@components/empty-content'
 import useResponsive from 'src/@core/hooks/useResponsive'
@@ -84,10 +84,10 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const { id, search, is_active, is_amocrm } = router.query
   const { mutate, isPending } = usePatch()
   const { mutate: updateDepartmentMutation } = usePost()
+
   const [sectionLeads, setSectionLeads] = useState<any[]>([])
   const [accessModal, setAccessModal] = useState<boolean>(false)
   const [openSmsModal, setOpenSmsModal] = useState<string | null>(null)
-
   const { companyInfo } = useAppSelector(item => item.user)
 
   const [mergedSteps, setMergedSteps] = useState<any[] | null>(null)
@@ -216,6 +216,25 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
           setDeleteItem(null)
           toast.success("Bo'lim o'chirildi")
           queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/'] })
+        },
+        onError: (err: any) => {
+          toast.error(err.response?.data || 'Xatolik yuz berdi')
+        }
+      }
+    )
+  }
+  const handleDeleteAmoDepartment = async () => {
+    if (!deleteItem?.id) return
+
+    updateDepartmentMutation(
+      `amocrm/delete/`,
+      { condition: 'status', data_id: deleteItem.id },
+      {
+        onSuccess: () => {
+          setDeleteItem(null)
+          toast.success("Bo'lim o'chirildi")
+          void queryClient.invalidateQueries({ queryKey: ['amocrm/pipelines/?with_steps=true'] })
+          void queryClient.invalidateQueries({ queryKey: [`amocrm/leads/?pipeline_id=${defaultId}`] })
         },
         onError: (err: any) => {
           toast.error(err.response?.data || 'Xatolik yuz berdi')
@@ -381,14 +400,13 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const amoLeadData = localAmoLeadData || mergedSteps
 
   const handleAccessModal = (section: any) => {
-    if (companyInfo?.access){
-      setOpenSmsModal('sms');
+    if (companyInfo?.access) {
+      setOpenSmsModal('sms')
       setSectionLeads(section?.leads)
     } else {
       setAccessModal(true)
     }
   }
-
 
   return (
     <DragDropContext onDragEnd={is_amocrm ? onDragEndAmo : onDragEnd}>
@@ -419,7 +437,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                         opacity: sectionSnapshot.isDragging ? 0.8 : 1,
                         border: '1px solid #e0e0e0e0',
                         borderRadius: 10,
-                        width: 450,
+                        width: 450
                       }}
                     >
                       <Droppable key={section.id} droppableId={String(section.id)} type='LEAD'>
@@ -438,7 +456,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                           >
                             <Box
                               display='flex'
-                              alignItems='center'
+                              alignItems='start'
                               justifyContent='space-between'
                               {...sectionProvided.dragHandleProps}
                               sx={{ cursor: 'grab' }}
@@ -446,7 +464,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                               <div
                                 style={{
                                   display: 'flex',
-                                  alignItems: 'center',
+                                  alignItems: 'start',
                                   gap: 5,
                                   background: settings.mode == 'dark' ? '#282A42' : 'white',
                                   borderRadius: 10,
@@ -462,19 +480,21 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                               <Box display={'flex'}>
                                 <Tooltip title={`${section.name}dagi barcha lidlarga SMS yuborish`}>
                                   <IconButton sx={{ cursor: 'pointer' }} onClick={() => handleAccessModal(section)}>
-                                    <MessageIcon sx={{ fontSize: 20, color: 'orange' }}  />
+                                    <MessageIcon sx={{ fontSize: 20, color: 'orange' }} />
                                   </IconButton>
                                 </Tooltip>
 
-                                <IconButton
-                                  sx={{ cursor: 'pointer' }}
-                                  onClick={() => {
-                                    setOpen(true)
-                                    setEdit(section)
-                                  }}
-                                >
-                                  <IconifyIcon icon='fluent:text-bullet-list-square-edit-20-filled' color='orange' />
-                                </IconButton>
+                                {!is_amocrm && (
+                                  <IconButton
+                                    sx={{ cursor: 'pointer' }}
+                                    onClick={() => {
+                                      setOpen(true)
+                                      setEdit(section)
+                                    }}
+                                  >
+                                    <IconifyIcon icon='fluent:text-bullet-list-square-edit-20-filled' color='orange' />
+                                  </IconButton>
+                                )}
 
                                 <IconButton
                                   sx={{ cursor: 'pointer' }}
@@ -608,7 +628,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
         loading={isPending}
         open={Boolean(deleteItem)}
         setOpen={setDeleteItem}
-        handleOk={handleDelete}
+        handleOk={is_amocrm ? handleDeleteAmoDepartment : handleDelete}
       />
       <SendSMSModal
         for_lead={true}
