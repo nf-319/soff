@@ -5,7 +5,7 @@ import { useGet } from '@/hooks/useApi';
 import { EmptyContent } from '@/components/empty-content';
 import { useRouter } from 'next/router';
 import { CircleHelp } from 'lucide-react';
-import { funnelsEmpty } from '@/pages/reports/lid-statements/constants'
+import { funnelsEmpty } from '@/shared/constans'
 import { ComingSoon } from '@components/ComingSoon'
 
 const SalesFunnel = () => {
