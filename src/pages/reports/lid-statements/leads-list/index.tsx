@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, MenuItem, Select, Typography, Chip, Checkbox, CircularProgress } from '@mui/material'
+import { Box, Button, MenuItem, Select, Typography, Chip, CircularProgress } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { DataGrid } from '@mui/x-data-grid';
@@ -11,13 +11,13 @@ import { uzbekLocaleText } from '@/views/apps/StudentsPoints/constants';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/router'
 
-const temperateOptions = [
+export const temperateOptions = [
   { value: '', label: 'Barcha haroratlar' },
   { value: 'hot', label: 'Issiq' },
-  { value: 'cold', label: 'Sovuq' },
   { value: 'warm', label: 'Iliq' },
+  { value: 'cold', label: 'Sovuq' },
 ]
-const states = [
+export const states = [
   { value: '', label: 'Barcha holatlar' },
   { value: 'new', label: 'Yangi' },
   { value: 'connected', label: "Bog'lanilgan" },
@@ -102,14 +102,15 @@ const LeadsList = () => {
     {
       field: 'phone',
       headerName: t('Telefon raqam'),
-      width: 180,
+      width: 150,
     },
     {
       field: 'admin',
       headerName: t('admin'),
-      flex: 1.4,
+      width: 150,
     },
     {
+      width:150,
       field: 'status',
       headerName: t('Status'),
       renderCell: (params: any) => {
@@ -127,7 +128,7 @@ const LeadsList = () => {
     {
       field: 'temperature',
       headerName: 'Harorat',
-      flex: 1,
+      width: 200,
       renderCell: (params: any) => {
         const status = params.value;
         const statusInfo = temperatureMap[status] || { label: status || "Belgilanmagan", color: 'default' };
@@ -143,12 +144,12 @@ const LeadsList = () => {
     {
       field: 'course',
       headerName: t('Kurs'),
-      flex: 1,
+      width: 250,
     },
     {
       field: 'source',
       headerName: t('Manba'),
-      flex: 1,
+      width: 150,
     },
   ];
 
@@ -203,7 +204,6 @@ const LeadsList = () => {
             </MenuItem>
           ))}
         </Select>
-
       </Box>
 
       <Box

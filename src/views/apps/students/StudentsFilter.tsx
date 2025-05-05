@@ -9,11 +9,9 @@ import {
   OutlinedInput,
   Select,
   TextField,
-  CircularProgress, Popper
+  CircularProgress,
+  Popper
 } from '@mui/material'
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { updateStudentParams } from 'src/store/apps/students'
@@ -25,7 +23,7 @@ import { fetchSchoolsList } from 'src/store/apps/settings'
 import ceoConfigs from 'src/configs/ceo'
 import { useRouter } from 'next/router'
 import { Search } from 'lucide-react'
-import useResponsive from '@/@core/hooks/useResponsive'
+import { DatePicker } from '@components/DatePicker'
 
 const StudentsFilter = () => {
   const router = useRouter()
@@ -44,8 +42,11 @@ const StudentsFilter = () => {
   const debounceSearch = useDebounce(search, 300)
   const [teacherId, setTeacherId] = useState('')
   const [groupId, setGroupId] = useState('')
+  const [date, setDate] = useState<Date | null>(null)
+
   const isInitialMount = useRef(true)
   const isUpdating = useRef(false)
+
   const dataFetchedRef = useRef({
     courses: false,
     groups: false,
@@ -117,12 +118,13 @@ const StudentsFilter = () => {
     }
   }
 
-  const handleDateChange = (date: any) => {
-    if (!date) {
+  const onDateChange = (newDate: Date | null) => {
+    if (!newDate) {
       handleFilter('debt_date', '')
     } else {
-      handleFilter('debt_date', format(date, 'MM-yyyy'))
+      handleFilter('debt_date', format(newDate, 'MM-yyyy'))
     }
+    setDate(newDate)
   }
 
   useEffect(() => {
@@ -222,7 +224,7 @@ const StudentsFilter = () => {
   })) || []
 
   return (
-    <Box display='flex' flexDirection={{xs: 'column', md: 'row'}} gap={2} width='100%'>
+    <Box display='flex' flexDirection={{ xs: 'column', md: 'row' }} gap={2} width='100%'>
       <FormControl fullWidth>
         <InputLabel size='small' id='search-input'>
           {t('Qidirish')}
@@ -336,33 +338,16 @@ const StudentsFilter = () => {
       </FormControl>
 
       <FormControl fullWidth>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DatePicker
-            label={t('Oy kesimida balans')}
-            views={['month', 'year']}
-            format='MM/yyyy'
-            slotProps={{
-              textField: {
-                size: 'small',
-                InputLabelProps: {
-                  shrink: true,
-                  sx: {
-                    display: 'block',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    maxWidth: '100%',
-                  },
-                  title: t('Oy kesimida balans'),
-                },
-              },
-            }}
-            onChange={handleDateChange}
-            disableFuture
-          />
-        </LocalizationProvider>
+        <DatePicker
+          label='Oy kesimida balans'
+          value={date}
+          onChange={onDateChange}
+          format='MM/yyyy'
+          views={['month', 'year']}
+          disableFuture
+          fullWidth
+        />
       </FormControl>
-
 
       <FormControl fullWidth>
         <Autocomplete

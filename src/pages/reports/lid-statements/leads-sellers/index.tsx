@@ -29,27 +29,27 @@ const LeadsSellers = () => {
     {
       field: 'first_name',
       headerName: t('ism'),
-      flex: 1,
+      width:150,
     },
     {
       field: 'phone',
       headerName: t('Telefon raqam'),
-      flex: 1,
+      width:250,
     },
     {
       field: 'worked_lead_count',
       headerName: t('Lidlar soni'),
-      flex: 1,
+      width:250,
     },
     {
       field: 'lost_leads',
       headerName: t('Yoqotilgan lidlar soni'),
-      flex: 1,
+      width:250,
     },
     {
       field: 'conversion_rate',
       headerName: 'Konversiya stavkasi',
-      flex: 1,
+      width: 250,
       renderCell: (params: any) => {
         const value = Number(params.value);
 

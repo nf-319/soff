@@ -17,11 +17,12 @@ import { useRouter } from 'next/router'
 import { useState, useEffect, FC } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { useTranslation } from 'react-i18next'
+import MessageIcon from '@mui/icons-material/Message';
 import { useSelector } from 'react-redux'
-import { EmptyContent } from '../../components/empty-content'
+import { EmptyContent } from '@components/empty-content'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'
-import { useGet, usePatch } from 'src/hooks/useApi'
+import { useGet, usePatch, usePost } from 'src/hooks/useApi'
 import { RootState, useAppDispatch, useAppSelector } from 'src/store'
 import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
 import CreateAnonimUserForm from 'src/views/apps/lids/anonimUser/CreateAnonimUserForm'
@@ -82,12 +83,12 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const [deleteItem, setDeleteItem] = useState<any | null>(null)
   const { id, search, is_active, is_amocrm } = router.query
   const { mutate, isPending } = usePatch()
+  const { mutate: updateDepartmentMutation } = usePost()
   const [sectionLeads, setSectionLeads] = useState<any[]>([])
   const [accessModal, setAccessModal] = useState<boolean>(false)
   const [openSmsModal, setOpenSmsModal] = useState<string | null>(null)
 
   const { companyInfo } = useAppSelector(item => item.user)
-
 
   const [mergedSteps, setMergedSteps] = useState<any[] | null>(null)
   const { data: amoLeadDataChild, isLoading: amoLeadDataChildLoding } = useGet(
@@ -115,6 +116,20 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
     }
   }, [selectedData, amoLeadDataChild])
 
+  const handleSubmit = (data: any) => {
+    updateDepartmentMutation(
+      'leads/departments/bulk-ordering/',
+      { departments: data },
+      {
+        onSuccess: response => {
+          console.log('Success:', response)
+        },
+        onError: error => {
+          console.error('Error:', error)
+        }
+      }
+    )
+  }
   const apiParams = {
     is_active: is_active ?? true
   }
@@ -224,7 +239,13 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
       const newResults = Array.from(localLeadData.results)
       const [movedSection] = newResults.splice(source.index, 1)
       newResults.splice(destination.index, 0, movedSection)
-
+      const newResultsOrdered = newResults.map((item, index) => ({
+        obj_id: item?.id,
+        order: index
+      }))
+      if (newResultsOrdered) {
+        handleSubmit(newResultsOrdered)
+      }
       setLocalLeadData({
         ...localLeadData,
         results: newResults
@@ -371,17 +392,16 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
 
   return (
     <DragDropContext onDragEnd={is_amocrm ? onDragEndAmo : onDragEnd}>
-      <Droppable droppableId='section-list' direction={isMobile ? 'vertical' : 'horizontal'} type='SECTION'>
+      <Droppable droppableId='section-list' direction='horizontal' type='SECTION'>
         {provided => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
             className='kanban'
             style={{
-              paddingBottom: 20,
               display: 'flex',
               overflow: 'auto',
-              flexDirection: isMobile ? 'column' : 'row',
+              flexDirection: 'row',
               alignItems: 'start',
               height: '100%',
               gap: 20
@@ -396,7 +416,10 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                       {...sectionProvided.draggableProps}
                       style={{
                         ...sectionProvided.draggableProps.style,
-                        opacity: sectionSnapshot.isDragging ? 0.8 : 1
+                        opacity: sectionSnapshot.isDragging ? 0.8 : 1,
+                        border: '1px solid #e0e0e0e0',
+                        borderRadius: 10,
+                        width: 450,
                       }}
                     >
                       <Droppable key={section.id} droppableId={String(section.id)} type='LEAD'>
@@ -439,7 +462,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                               <Box display={'flex'}>
                                 <Tooltip title={`${section.name}dagi barcha lidlarga SMS yuborish`}>
                                   <IconButton sx={{ cursor: 'pointer' }} onClick={() => handleAccessModal(section)}>
-                                    <MessageSquare size={20} fill='orange' color='orange' />
+                                    <MessageIcon sx={{ fontSize: 20, color: 'orange' }}  />
                                   </IconButton>
                                 </Tooltip>
 
@@ -465,7 +488,13 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                             </Box>
 
                             <div
-                              style={{ marginBottom: 10, marginTop: 10, maxHeight: '50vh', paddingRight: 10, overflow: 'auto' }}
+                              style={{
+                                marginBottom: 10,
+                                marginTop: 10,
+                                maxHeight: '50vh',
+                                paddingRight: 10,
+                                overflow: 'auto'
+                              }}
                               className='kanban__section__content'
                             >
                               {section.leads && section.leads.length > 0 ? (
@@ -484,7 +513,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                               ) : (
                                 <Box sx={{ p: 2, textAlign: 'center' }}>
                                   <Typography variant='body2' color='text.secondary'>
-                                    Bo'sh
+                                    Bo'sh kanban
                                   </Typography>
                                 </Box>
                               )}
@@ -549,7 +578,6 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
 
         <DialogContent
           sx={{
-            overflowY: 'visible',
             px: 3,
             pb: 3
           }}
