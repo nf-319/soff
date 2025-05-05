@@ -5,9 +5,11 @@ import {
   Chip,
   Dialog,
   DialogContent,
-  DialogTitle, FormControl,
+  DialogTitle,
+  FormControl,
   FormControlLabel,
-  FormGroup, Select,
+  FormGroup,
+  Select,
   Skeleton,
   Tab,
   Tabs,
@@ -49,6 +51,7 @@ import toast from 'react-hot-toast'
 import { useQueryClient } from '@tanstack/react-query'
 import { getFormatPhone } from '@/shared/utils'
 import { PhoneLink } from '@components/PhoneLink'
+import { QueryKeys } from '@/shared/query-hooks/queryKeys'
 
 interface LidsDragonModalProps {
   openModal: boolean
@@ -98,7 +101,9 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
         <div className='text-primary me-3'>{icon}</div>
         <div>
           <p className={`mb-1 ${settings.mode == 'dark' ? 'text-ligt' : 'text-muted'}`}>{label}</p>
-          <p className={`mb-0 font-weight-bold ${settings.mode == 'dark' ? 'text-ligt' : 'text-dark'}`}>{getFormatPhone(value ?? '')}</p>
+          <p className={`mb-0 font-weight-bold ${settings.mode == 'dark' ? 'text-ligt' : 'text-dark'}`}>
+            {getFormatPhone(value ?? '')}
+          </p>
         </div>
       </div>
     </PhoneLink>
@@ -115,12 +120,7 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
         <div className={`mb-0 font-weight-bold ${settings.mode == 'dark' ? 'text-ligt' : 'text-dark'}`}>
           {isEditable ? (
             <FormControl fullWidth>
-              <Select
-                size='small'
-                fullWidth
-                value={value}
-                onChange={e => handleStateChange(e.target.value as string)}
-              >
+              <Select size='small' fullWidth value={value} onChange={e => handleStateChange(e.target.value as string)}>
                 {option?.map((option: any) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
@@ -157,15 +157,15 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
   const [nodeModal, setNodeModal] = useState(false)
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
-  const [selectedLead, setSelectedLead] = useState<any>(initialLead);
+  const [selectedLead, setSelectedLead] = useState<any>(initialLead)
   const { mutate } = usePatch()
   const router = useRouter()
   const { is_active } = router.query
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    setSelectedLead(initialLead);
-  }, [initialLead]);
+    setSelectedLead(initialLead)
+  }, [initialLead])
 
   const handleGetUserDetails = async (value: string, id: number) => {
     setDetailLoading(true)
@@ -218,9 +218,9 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
               ...department,
               leads: department.leads.map((lead: any) =>
                 lead.id === selectedLead?.id ? { ...lead, temperature } : lead
-              ),
+              )
             }
-          }),
+          })
         }
       })
 
@@ -228,7 +228,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
       setSelectedLead((prev: any) => ({
         ...prev,
         temperature: temperature
-      }));
+      }))
       toast.success("Muvofiqiyatli o'zgardi")
     } catch (error: any) {
       console.error(error)
@@ -251,19 +251,25 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
 
             return {
               ...department,
-              leads: department.leads.map((lead: any) =>
-                lead.id === selectedLead?.id ? { ...lead, status } : lead
-              ),
+              leads: department.leads.map((lead: any) => (lead.id === selectedLead?.id ? { ...lead, status } : lead))
             }
-          }),
+          })
         }
       })
 
-      mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams)
-      setSelectedLead((prev: any) => ({
-        ...prev,
-        status: status
-      }));
+      mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams, {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['leads/sales-funnel/', 'leads/sales-funnel'] })
+          queryClient.invalidateQueries({
+            queryKey: [QueryKeys.ReportLeadsList]
+          })
+
+          setSelectedLead((prev: any) => ({
+            ...prev,
+            status: status
+          }))
+        }
+      })
       toast.success("Muvofiqiyatli o'zgardi")
     } catch (error: any) {
       console.error(error)
@@ -303,7 +309,6 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
   }, [selectedLead?.id, openModal])
 
   const newState = { value: '', label: 'Harorat belgilamaslik' }
-
 
   return (
     <Dialog
@@ -363,7 +368,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
               label='Holat'
               value={selectedLead?.status}
               canEdit={true}
-              option={states.slice(1, 6)}
+              option={states.slice(1, 7)}
               onValueChange={newValue => lidStatus(newValue)}
             />
           </div>

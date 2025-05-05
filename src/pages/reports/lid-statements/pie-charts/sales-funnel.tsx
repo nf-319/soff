@@ -20,6 +20,7 @@ const SalesFunnel = () => {
   const { data, isLoading } = useGet('leads/sales-funnel/', {
     params: { branch: branchParam },
     options: { enabled: !!branchParam },
+    deps:['leads/sales-funnel']
   });
 
   const isActive = data ? Object.values(data).some(value => (value as number) > 0) : false

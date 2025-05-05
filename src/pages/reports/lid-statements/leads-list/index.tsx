@@ -46,6 +46,7 @@ const LeadsList = () => {
     branch: branchParam,
     temperature: temperateValue,
     state: stateValue,
+  
   });
 
   useEffect(() => {

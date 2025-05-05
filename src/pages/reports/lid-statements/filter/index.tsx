@@ -1,28 +1,32 @@
-'use client';
+'use client'
 
 import { Box, Chip, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
-import { useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import useResponsive from 'src/@core/hooks/useResponsive';
-import { AuthContext } from '@/context/AuthContext';
-import { ComingSoon } from '@components/ComingSoon';
-import { useGetBranches } from '@/shared/query-hooks/branches/branches';
-import { uzbekMonths } from '@/shared/constans';
+import { useContext, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import useResponsive from 'src/@core/hooks/useResponsive'
+import { AuthContext } from '@/context/AuthContext'
+import { ComingSoon } from '@components/ComingSoon'
+import { useGetBranches } from '@/shared/query-hooks/branches/branches'
+import { uzbekMonths } from '@/shared/constans'
 
 const LidsReportsFilter = () => {
-  const [duration, setDuration] = useState('3');
-  const [branch, setBranch] = useState<string | number>('');
-  const { user } = useContext(AuthContext);
-  const { isMobile } = useResponsive();
-  const { data } = useGetBranches();
-  const router = useRouter();
+  const [duration, setDuration] = useState('3')
+  const [branch, setBranch] = useState<string | number>('')
+  const { user } = useContext(AuthContext)
+  const { isMobile } = useResponsive()
+  const { data } = useGetBranches()
+  const router = useRouter()
 
-  const currentDate = new Date();
-  const nextMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1);
-  const monthUz = uzbekMonths[nextMonthDate.getMonth()];
-  const year = nextMonthDate.getFullYear();
-  const defaultReleaseDate = `${monthUz}, ${year}`;
-
+  const currentDate = new Date()
+  const nextMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1)
+  const monthUz = uzbekMonths[nextMonthDate.getMonth()]
+  const year = nextMonthDate.getFullYear()
+  const defaultReleaseDate = `${monthUz}, ${year}`
+  const getUzbekMonthName = (monthNumber: number) => uzbekMonths[monthNumber + 1]
+  const [currentMonth, setCurrenMonth] = useState(getUzbekMonthName(Number(duration)))
+  useEffect(() => {
+    setCurrenMonth(getUzbekMonthName(Number(duration)))
+  }, [duration])
   useEffect(() => {
     if (user?.role !== 'admin' && user?.active_branch) {
       setBranch(user.active_branch)
@@ -30,14 +34,14 @@ const LidsReportsFilter = () => {
   }, [user])
 
   useEffect(() => {
-    if (!branch && branch !== '') return;
+    if (!branch && branch !== '') return
 
-    const params = new URLSearchParams();
-    if (duration) params.set('duration', duration);
-    if (branch) params.set('branch', branch.toString());
+    const params = new URLSearchParams()
+    if (duration) params.set('duration', duration)
+    if (branch) params.set('branch', branch.toString())
 
-    router.replace(`?${params.toString()}`, { scroll: false });
-  }, [duration, branch, router]);
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }, [duration, branch, router])
 
   return (
     <Box
@@ -49,10 +53,15 @@ const LidsReportsFilter = () => {
         justifyContent: 'space-between'
       }}
     >
-      <Box display="flex" alignItems='center' gap={3}>
-        <Typography variant='h4'>Lidlar Hisoboti</Typography>
+      <Box display='flex' alignItems='center' gap={3}>
+        <Typography variant='h4'>{currentMonth} Lidlar Hisoboti</Typography>
 
-        <Chip label='Test rejimda!' sx={{ padding: '20px', fontSize: '18px', fontWeight: 600 }} variant='outlined' color='warning' />
+        <Chip
+          label='Beta!'
+          sx={{ padding: '20px', fontSize: '18px', fontWeight: 600 }}
+          variant='outlined'
+          color='warning'
+        />
       </Box>
 
       <Box sx={{ display: 'flex', gap: { xs: 3, md: 5 }, width: { xs: '100%', md: 'auto' } }}>
@@ -96,6 +105,6 @@ const LidsReportsFilter = () => {
       </Box>
     </Box>
   )
-};
+}
 
-export default LidsReportsFilter;
+export default LidsReportsFilter
