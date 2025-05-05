@@ -16,6 +16,8 @@ import * as Yup from 'yup'
 import toast from 'react-hot-toast'
 import { LoadingButton } from '@mui/lab'
 import { fetchStudentPayment } from '@/store/apps/students'
+import { formatCurrency } from '@/@core/utils/format-currency'
+import AmountInput, { revereAmount } from '@/components/amount-input'
 
 type Props = {
   openEdit: any
@@ -102,7 +104,7 @@ export default function StudentWithDrawForm({ openEdit, setOpenEdit }: Props) {
                   </Typography>
                 </Box>
                 <Typography fontWeight={600} color={item?.amount >= 0 ? 'green' : 'red'}>
-                  {item?.amount} so'm
+                  {formatCurrency(item?.amount)} so'm
                 </Typography>
               </Box>
 
@@ -159,6 +161,8 @@ const ReturnCashModal = ({
     amount: Yup.number().typeError('Faqat raqam kiriting').required('Pul miqdori majburiy'),
     description: Yup.string().nullable()
   })
+
+
   const formik = useFormik({
     initialValues: {
       amount: '',
@@ -199,17 +203,18 @@ const ReturnCashModal = ({
         <DialogTitle>Pul qaytarish</DialogTitle>
         <form onSubmit={formik.handleSubmit}>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <TextField
-              fullWidth
+            <AmountInput
               name='amount'
               label='Pul miqdori'
-              type='number'
               value={formik.values.amount}
-              onChange={formik.handleChange}
+              onChange={e => formik.setFieldValue('amount', revereAmount(e.target.value))}
               onBlur={formik.handleBlur}
               error={formik.touched.amount && Boolean(formik.errors.amount)}
               helperText={formik.touched.amount && formik.errors.amount}
             />
+            <Typography color={'red'} fontSize={12}>{`Maksimum  ${formatCurrency(
+              paymentData?.amount
+            )} so'm qaytarsa bo'ladi`}</Typography>
             <TextField
               fullWidth
               name='description'
