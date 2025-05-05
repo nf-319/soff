@@ -152,6 +152,7 @@ const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (st
             </Card>
             <CourseInterest isCard data={data?.courses || []} sx={{ height: 500 }} />
           </Box>
+
           <Card sx={{ p: 4, mt: 4 }}>
             <Typography variant='h5' pb={3}>
               Manba ma'lumotlari

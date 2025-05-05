@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
+import { Box, Chip, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import useResponsive from 'src/@core/hooks/useResponsive';
@@ -43,17 +43,19 @@ const LidsReportsFilter = () => {
     <Box
       sx={{
         display: 'flex',
-        flexDirection: isMobile ? 'column' : 'row',
+        flexWrap: 'wrap',
         alignItems: 'start',
         gap: isMobile ? 6 : 0,
         justifyContent: 'space-between'
       }}
     >
-      <Typography variant='h4'>Lidlar Hisoboti</Typography>
+      <Box display="flex" alignItems='center' gap={3}>
+        <Typography variant='h4'>Lidlar Hisoboti</Typography>
 
-      <Box
-        sx={{ display: 'flex', gap: {xs: 3, md: 5 }, width: { xs: '100%', md: 'auto' } }}
-      >
+        <Chip label='Test rejimda!' sx={{ padding: '20px', fontSize: '18px', fontWeight: 600 }} variant='outlined' color='warning' />
+      </Box>
+
+      <Box sx={{ display: 'flex', gap: { xs: 3, md: 5 }, width: { xs: '100%', md: 'auto' } }}>
         <ComingSoon releaseDate={defaultReleaseDate} size='small' blur='0.8px'>
           <FormControl fullWidth>
             <InputLabel id='duration-label'>Oy</InputLabel>
