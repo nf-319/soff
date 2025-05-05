@@ -1,12 +1,13 @@
-"use client"
+'use client'
 
-import type React from "react"
-import type { Dispatch } from "react"
-import { useMemo, useCallback } from "react"
+import type React from 'react'
+import type { Dispatch } from 'react'
+import { useMemo, useCallback, useEffect, useRef } from 'react'
 import { Box, IconButton, Tooltip, Typography, useMediaQuery } from '@mui/material'
-import { CalendarCheck, Edit } from "lucide-react"
-import { UserViewItem } from "./UserViewItem"
-import { EmptyContent } from "src/components/empty-content"
+import { CalendarCheck, Edit } from 'lucide-react'
+import { UserViewItem } from './UserViewItem'
+import { EmptyContent } from 'src/components/empty-content'
+import dayjs from 'dayjs'
 
 interface Student {
   id: string | number
@@ -45,12 +46,22 @@ export const AttendanceTable = ({
   setUpdateTopic,
   setTopicId,
   t,
-  query,
+  query
 }: AttendanceTableProps) => {
-  const mediaQuery = useMediaQuery("(max-width: 600px)")
+  const mediaQuery = useMediaQuery('(max-width: 600px)')
   const displayDays = useMemo(() => {
     return days?.length > 0 ? days : Array(7).fill({ date: 'placeholder' })
   }, [days])
+
+  const today = dayjs().format('YYYY-MM-DD')
+  const focusRef = useRef<HTMLTableCellElement>(null)
+
+  useEffect(() => {
+    if (focusRef.current) {
+      focusRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      focusRef.current.style.backgroundColor = '#e0f7fa'
+    }
+  }, [])
 
   const students = useMemo(() => {
     return attendance?.students || []
@@ -61,7 +72,7 @@ export const AttendanceTable = ({
       borderCollapse: 'collapse',
       backgroundColor: isDark ? '#282A42' : '#fff',
       tableLayout: 'fixed',
-      width: mediaQuery ? "auto" : days?.length > 15 ? 'auto' : '100%'
+      width: mediaQuery ? 'auto' : days?.length > 15 ? 'auto' : '100%'
     }),
     [isDark]
   )
@@ -248,37 +259,42 @@ export const AttendanceTable = ({
             <td style={stickyHeaderStyles}>
               <Typography fontWeight={600}>{t("O'quvchilar")}</Typography>
             </td>
-            {displayDays.map((hour: any, index) => (
-              <th
-                key={hour.date || `placeholder-day-${index}`}
-                style={
-                  {
-                    ...dayHeaderStyles,
-                    cursor: hour.date !== 'placeholder' ? 'pointer' : 'default'
-                  } as React.CSSProperties
-                }
-                onClick={() => hour.date !== 'placeholder' && handleDayClick(hour.date)}
-              >
-                {hour.date !== 'placeholder' ? (
-                  <Box
-                    style={
-                      {
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '4px'
-                      } as React.CSSProperties
-                    }
-                  >
-                    <Typography fontWeight={600} style={{ fontSize: '16px' } as React.CSSProperties}>
-                      {`${hour.date.split('-')[2]}`}
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Box style={{ height: '24px' } as React.CSSProperties}></Box>
-                )}
-              </th>
-            ))}
+            {displayDays.map((hour: any, index) => {
+              const isToday = dayjs(hour?.date).format('YYYY-MM-DD') === today
+
+              return (
+                <th
+                  ref={isToday && !focusRef.current ? focusRef : null}
+                  key={hour.date || `placeholder-day-${index}`}
+                  style={
+                    {
+                      ...dayHeaderStyles,
+                      cursor: hour.date !== 'placeholder' ? 'pointer' : 'default'
+                    } as React.CSSProperties
+                  }
+                  onClick={() => hour.date !== 'placeholder' && handleDayClick(hour.date)}
+                >
+                  {hour.date !== 'placeholder' ? (
+                    <Box
+                      style={
+                        {
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '4px'
+                        } as React.CSSProperties
+                      }
+                    >
+                      <Typography fontWeight={600} style={{ fontSize: '16px' } as React.CSSProperties}>
+                        {`${hour.date.split('-')[2]}`}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Box style={{ height: '24px' } as React.CSSProperties}></Box>
+                  )}
+                </th>
+              )
+            })}
           </tr>
         </thead>
 
@@ -342,7 +358,6 @@ export const AttendanceTable = ({
                               borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
                             } as React.CSSProperties
                           }
-
                         >
                           <UserViewItem
                             currentDate={null}
@@ -480,4 +495,3 @@ export const AttendanceTable = ({
     </Box>
   )
 }
-

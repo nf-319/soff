@@ -19,7 +19,8 @@ import {
   Tabs,
   Tab,
   Divider,
-  useMediaQuery
+  useMediaQuery,
+  Grid
 } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import Link from 'next/link'
@@ -35,6 +36,10 @@ import AccordionActions from '@mui/material/AccordionActions'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import { GridExpandMoreIcon } from '@mui/x-data-grid'
+import UserViewStudentsList from '../ViewStudents/UserViewStudentsList'
+import { useAppDispatch, useAppSelector } from '@/store'
+import Status from '@/components/status'
+import { studentsUpdateParams } from '@/store/apps/groupDetails'
 const t = (text: string) => text
 
 interface ColorsType {
@@ -70,15 +75,15 @@ export default function GroupDetailsMobile({
   handleGetMeetLink
 }: GroupDetailsProps) {
   const [qrModalOpen, setQrModalOpen] = useState(false)
-  const mediaQuery = useMediaQuery('(max-width: 600px)')
+  const mediaQuery = useMediaQuery('(max-width: 540px)')
   const [qrCodeImage, setQrCodeImage] = useState<string | null>(null)
   const [isLoadingQrCode, setIsLoadingQrCode] = useState(false)
-
+  const { studentsQueryParams, isGettingStudents } = useAppSelector(state => state.groupDetails)
   const endDate = groupData?.end_date
   const today = dayjs()
   const endDateObj = dayjs(endDate)
   const daysLeft = endDateObj.diff(today, 'day')
-
+ const dispatch = useAppDispatch()
   const formattedDate = endDate?.split('-').reverse().join('.')
   const isTeacherOnly = user?.role.length === 1 && user?.role.includes('teacher')
 
@@ -148,7 +153,7 @@ export default function GroupDetailsMobile({
       <Card
         style={{ position: 'relative', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', transition: 'box-shadow 0.3s ease' }}
       >
-        <Accordion>
+        <Accordion onChange={e => console.log(e)}>
           <AccordionSummary expandIcon={<GridExpandMoreIcon />} aria-controls='panel1-content' id='panel1-header'>
             <Box
               style={{
@@ -379,8 +384,8 @@ export default function GroupDetailsMobile({
                 display: 'flex',
                 flexWrap: 'wrap',
                 justifyContent: 'center',
-                              gap: '8px',
-                borderRadius:2,
+                gap: '8px',
+                borderRadius: 2,
                 padding: '8px 8px 8px 8px',
                 backgroundColor: 'rgba(0, 0, 0, 0.02)'
               }}
@@ -518,6 +523,64 @@ export default function GroupDetailsMobile({
                 </>
               )}
             </CardActions>
+            {(user?.currentRole === 'teacher' ? groupData?.show_students : true) && (
+              <Grid item xs={12} sx={{mt:3}}>
+                <CardContent sx={{ p: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '10px' }}>
+                    {['new', 'active', 'archive', 'frozen'].map(el => (
+                      <div key={el} style={{ display: 'flex', alignItems: 'center', gap: '3px', cursor: 'pointer' }}>
+                        <Status
+                          color={
+                            el == 'active'
+                              ? 'success'
+                              : el == 'new'
+                              ? 'warning'
+                              : el == 'frozen'
+                              ? 'secondary'
+                              : 'error'
+                          }
+                        />{' '}
+                        {el == 'active'
+                          ? t('aktiv')
+                          : el == 'new'
+                          ? t('sinov')
+                          : el == 'frozen'
+                          ? t('frozen')
+                          : t('arxiv')}
+                      </div>
+                    ))}
+                  </div>
+
+                  <UserViewStudentsList />
+
+                  {!isGettingStudents && (
+                    <Box sx={{ width: '100%', display: 'flex', pt: '10px' }}>
+                      <Button
+                        startIcon={
+                          <IconifyIcon
+                            style={{ fontSize: '12px' }}
+                            icon={`icon-park-outline:to-${studentsQueryParams.status === 'archive' ? 'top' : 'bottom'}`}
+                          />
+                        }
+                        sx={{ fontSize: '10px', marginLeft: 'auto' }}
+                        size='small'
+                        color={studentsQueryParams.status === 'archive' ? 'primary' : 'error'}
+                        variant='text'
+                        onClick={() => {
+                          if (studentsQueryParams.status === 'archive') {
+                            dispatch(studentsUpdateParams({ status: 'active,new' }))
+                          } else dispatch(studentsUpdateParams({ status: 'archive' }))
+                        }}
+                      >
+                        {studentsQueryParams.status === 'archive'
+                          ? t('Arxivni yopish')
+                          : t("Arxivdagi o'quvchilarni ko'rish")}
+                      </Button>
+                    </Box>
+                  )}
+                </CardContent>
+              </Grid>
+            )}{' '}
           </AccordionDetails>
         </Accordion>
       </Card>
