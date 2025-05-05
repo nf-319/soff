@@ -13,7 +13,18 @@ import {
   Tabs,
   Typography
 } from '@mui/material'
-import { Bell, ChartPie, Clock, Info, MessageSquare, Phone, PlusIcon, User, UserIcon } from 'lucide-react'
+import {
+  Bell,
+  ChartPie,
+  Clock,
+  Info,
+  MessageSquare,
+  Phone,
+  PlusIcon,
+  ThermometerSnowflake,
+  User,
+  UserIcon
+} from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { EmptyContent } from '@components/empty-content'
 import IconifyIcon from '../../../components/icon'
@@ -34,9 +45,11 @@ import { useRouter } from 'next/router'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
 import MenuItem from '@mui/material/MenuItem'
 import { useAuth } from '@hooks/useAuth'
-import { temperateOptions } from '@/pages/reports/lid-statements/leads-list'
+import { states, temperateOptions } from '@/pages/reports/lid-statements/leads-list'
 import toast from 'react-hot-toast'
 import { useQueryClient } from '@tanstack/react-query'
+import { getFormatPhone } from '@/shared/utils'
+import { PhoneLink } from '@components/PhoneLink'
 
 interface LidsDragonModalProps {
   openModal: boolean
@@ -57,15 +70,16 @@ type InfoItemProps = {
   value: string
   canEdit?: boolean
   onValueChange?: (newValue: string) => void
+  option?: any
 }
 
-const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false, onValueChange }) => {
+const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false, onValueChange, option }) => {
   const { settings } = useSettings()
   const [currentValue, setCurrentValue] = useState<string>(value)
   const { user } = useAuth()
   const permissions = ['admin', 'ceo']
   const hasEditPermission = permissions?.includes(user?.currentRole as string) || false
-  const isEditable = canEdit && hasEditPermission && label === 'Holati'
+  const isEditable = canEdit && hasEditPermission
 
   const handleStateChange = (newState: string) => {
     setCurrentValue(newState)
@@ -75,7 +89,7 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
   }
 
   return label === 'Telefon raqami' ? (
-    <Link href={`tel:${value}`} style={{ textDecoration: 'none', height: '100%' }}>
+    <PhoneLink phone={value} style={{ textDecoration: 'none', height: '100%' }}>
       <div
         className={`d-flex align-items-center p-3 ${
           settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'
@@ -85,10 +99,10 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
         <div className='text-primary me-3'>{icon}</div>
         <div>
           <p className={`mb-1 ${settings.mode == 'dark' ? 'text-ligt' : 'text-muted'}`}>{label}</p>
-          <p className={`mb-0 font-weight-bold ${settings.mode == 'dark' ? 'text-ligt' : 'text-dark'}`}>{value}</p>
+          <p className={`mb-0 font-weight-bold ${settings.mode == 'dark' ? 'text-ligt' : 'text-dark'}`}>{getFormatPhone(value ?? '')}</p>
         </div>
       </div>
-    </Link>
+    </PhoneLink>
   ) : (
     <div
       className={`d-flex align-items-center p-3 ${
@@ -108,7 +122,7 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
                 value={value}
                 onChange={e => handleStateChange(e.target.value as string)}
               >
-                {temperateOptions.slice(1, 4).map(option => (
+                {option?.map((option: any) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>
@@ -153,10 +167,6 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
   useEffect(() => {
     setSelectedLead(initialLead);
   }, [initialLead]);
-
-  const apiParams = {
-    is_active: is_active ?? true
-  }
 
   const handleGetUserDetails = async (value: string, id: number) => {
     setDetailLoading(true)
@@ -227,6 +237,41 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
     }
   }
 
+  const lidStatus = async (status: string) => {
+    try {
+      const requestPrams = { status }
+      const key: any[] = ['leads/departments/leads/', 'departments-leads', true, 96]
+
+      queryClient.setQueryData(key, (oldData: any) => {
+        if (!oldData || !Array.isArray(oldData.results)) return oldData
+
+        return {
+          ...oldData,
+          results: oldData.results.map((department: any) => {
+            if (!Array.isArray(department.leads)) return department
+
+            return {
+              ...department,
+              leads: department.leads.map((lead: any) =>
+                lead.id === selectedLead?.id ? { ...lead, status } : lead
+              ),
+            }
+          }),
+        }
+      })
+
+      mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams)
+      setSelectedLead((prev: any) => ({
+        ...prev,
+        status: status
+      }));
+      toast.success("Muvofiqiyatli o'zgardi")
+    } catch (error: any) {
+      console.error(error)
+      toast.error(error.msg || "Nimadur xatolik, iltimos CRM bilan bo'glaning")
+    }
+  }
+
   const handleChange = async (
     event: React.SyntheticEvent,
     newValue: 'lead-user-description' | 'anonim-user' | 'sms-history'
@@ -258,6 +303,8 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
     }
   }, [selectedLead?.id, openModal])
 
+  const newState = { value: '', label: 'Harorat belgilamaslik' }
+
 
   return (
     <Dialog
@@ -273,7 +320,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
       </DialogTitle>
 
       <DialogContent>
-        <Box width='100%' display={'flex'} alignItems={'center'} justifyContent={'center'}>
+        <Box width='100%' display='flex' flexDirection='column' alignItems={'center'} justifyContent='center'>
           <div
             className='d-flex  justify-content-center align-items-center rounded-circle bg-gradient text-white'
             style={{
@@ -286,12 +333,12 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
           >
             {selectedLead?.first_name[0].toLocaleUpperCase()}
           </div>
+
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant='h6'>{selectedLead?.first_name}</Typography>
+          </Box>
         </Box>
         <div className='row g-4 mt-2'>
-          <div className='col-6 '>
-            <InfoItem icon={<User />} label='Ism' value={`${selectedLead?.first_name}`} />
-          </div>
-
           <div className='col-6'>
             <InfoItem icon={<Clock />} label='Yaratilgan sanasi' value={formatDate(selectedLead?.created_at)} />
           </div>
@@ -302,12 +349,24 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
 
           <div className='col-6'>
             <InfoItem
-                icon={<ChartPie />}
-                label='Holati'
-                value={selectedLead?.temperature || 'Belgilanmagan'}
-                canEdit={true}
-                onValueChange={newValue => lidTemperature(newValue)}
-              />
+              icon={<ThermometerSnowflake />}
+              label='Harorat'
+              value={selectedLead?.temperature}
+              canEdit={true}
+              option={[newState, ...temperateOptions.slice(1, 4)]}
+              onValueChange={newValue => lidTemperature(newValue)}
+            />
+          </div>
+
+          <div className='col-6'>
+            <InfoItem
+              icon={<ChartPie />}
+              label='Holat'
+              value={selectedLead?.status}
+              canEdit={true}
+              option={states.slice(1, 6)}
+              onValueChange={newValue => lidStatus(newValue)}
+            />
           </div>
 
           <div className='col-12'>
