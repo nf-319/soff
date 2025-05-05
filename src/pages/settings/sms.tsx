@@ -116,7 +116,7 @@ export default function RoomsPage() {
         sms_list.map(item => (
           <Accordion
             key={item.id}
-            sx={{ marginY: 5, borderRadius: 2, border: 'none', position: 'unset' }}
+            sx={{ marginY: 5, borderRadius: 1, border: 'none', position: 'unset' }}
             expanded={parentId === item.id}
             onChange={() => setParentId(parentId === item.id ? null : item.id)}
           >
@@ -153,7 +153,7 @@ export default function RoomsPage() {
                   <Box
                     className='bg-light'
                     sx={{
-                      borderRadius: 2,
+                      borderRadius: 1,
                       paddingY: 2,
                       paddingX: 4,
                       display: 'flex',

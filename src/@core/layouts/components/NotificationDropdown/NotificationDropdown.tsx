@@ -3,20 +3,9 @@
 import { useState, Fragment, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'react-i18next'
-import {
-  Box,
-  Button,
-  IconButton,
-  Typography,
-  useMediaQuery,
-  Tooltip,
-  Fade,
-  Divider,
-  Chip,
-  Avatar,
-} from '@mui/material'
+import { Box, Button, IconButton, Typography, useMediaQuery, Tooltip, Fade, Divider, Chip, Avatar } from '@mui/material'
 import { Theme, alpha } from '@mui/material/styles'
-import { Bell, BellRing, ChevronRight } from 'lucide-react'
+import { Bell, BellRing, ChevronRight, X } from 'lucide-react'
 import { Settings } from '@/@core/context/settingsContext'
 import { ScrollWrapper } from './ui/ScrollWrapper'
 import { NotificationsType } from './model/types'
@@ -26,11 +15,7 @@ import { useAuth } from '@hooks/useAuth'
 import wsService from '@api/socket/wsInstance'
 import Badge from '@mui/material/Badge'
 import { getFormatTimestamp } from '@utils/getFormatTimestamp'
-import {
-  NotificationContent,
-  StyledMenu,
-  StyledMenuItem,
-} from './NotificationDropdown.style'
+import { NotificationContent, StyledMenu, StyledMenuItem } from './NotificationDropdown.style'
 import { useNotificationsNotRead } from '@hooks/useNotification'
 import { toast } from 'sonner'
 import Image from 'next/image'
@@ -100,7 +85,7 @@ const NotificationDropdown = (props: Props) => {
     try {
       const notification = new Notification(title, {
         body: body.replace(/<[^>]*>?/gm, ''),
-        icon: companyInfo?.logo || '/images/default-logo.jpg',
+        icon: companyInfo?.logo || '/images/default-logo.jpg'
       })
 
       notification.onclick = () => {
@@ -113,38 +98,94 @@ const NotificationDropdown = (props: Props) => {
   }
 
   const showToastNotification = (title: string, body: string, id: number) => {
-    toast(
-      <Link href={`/notifications?id=${id}`} style={{ display: 'flex', gap: 10, alignItems: 'center', textDecoration: "none" }}>
-        <Image
-          src={companyInfo?.logo || '/images/default-logo.jpg'}
-          alt='User'
-          width={24}
-          height={24}
-          style={{ borderRadius: '4px' }}
-        />
-
-        <div>
-          <strong style={{ fontWeight: 600, color: "#000" }}>{title}</strong>
-          <div
+    toast.custom(
+      (t: any) => (
+        <div
+        style={{
+          display: 'flex',
+          alignItems: 'start',
+          background: '#fff',
+          borderRadius: '8px',
+          padding: '12px',
+          boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+          width: 320,
+          gap: 10,
+          position: 'relative'
+        }}
+        >
+          <Link
+            href={`/notifications?id=${id}`}
             style={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              fontSize: 14,
-              color: '#555',
-              marginTop: 4,
+              display: 'flex',
+              gap: 10,
+              textDecoration: 'none',
+              flex: 1
             }}
           >
-            {body.replace(/<[^>]*>?/gm, '')}
-          </div>
+            <Image
+              src={companyInfo?.logo || '/images/default-logo.jpg'}
+              alt='User'
+              width={24}
+              height={24}
+              style={{ borderRadius: '4px' }}
+            />
+
+            <div style={{width:'100%'}}>
+              <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <strong style={{ fontWeight: 600, color: '#000' }}>{title}</strong>
+                <Typography
+                  fontSize={12}
+                  sx={{
+                    paddingRight: 6,
+                    cursor: 'pointer',
+                    color: 'primary.main',
+                    transition: 'color 0.2s',
+                    '&:hover': {
+                      textDecoration: 'underline',
+                      color: 'primary.dark'
+                    }
+                  }}
+                >
+                  Batafsil
+                </Typography>
+              </div>
+              <div
+                style={{
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  fontSize: 14,
+                  color: '#555',
+                  marginTop: 4
+                }}
+              >
+                {body.replace(/<[^>]*>?/gm, '')}
+              </div>
+            </div>
+          </Link>
+
+          <IconButton
+            size='small'
+            onClick={() => toast.dismiss(t.id)}
+            sx={{
+              position: 'absolute',
+              top: 6,
+              right: 6,
+              color: '#888',
+              '&:hover': {
+                color: '#000'
+              }
+            }}
+          >
+            <X size={16} />
+          </IconButton>
         </div>
-      </Link>,
+      ),
       {
         duration: 3000,
-        position: 'top-right',
-        dismissible: true,
+        position: 'top-right'
       }
     )
   }
@@ -173,16 +214,15 @@ const NotificationDropdown = (props: Props) => {
 
   const handleNewNotifications = (message: NotificationSocketType) => {
     setNotificationCount(message.count)
-
+      console.log(message);
+      
     if (message?.notifications?.length > 0) {
-      setNotificationData((prev) => [
+      setNotificationData(prev => [
         ...message.notifications,
-        ...prev.filter(
-          (item) => !message.notifications.some((newItem) => newItem.id === item.id)
-        ),
+        ...prev.filter(item => !message.notifications.some(newItem => newItem.id === item.id))
       ])
 
-      message.notifications.forEach((notification) => {
+      message.notifications.forEach(notification => {
         if (notification.id && !shownNotificationsRef.current.has(notification.id)) {
           const title = notification.title || 'Yangi xabarnoma'
           const body = notification.body || ''
@@ -225,26 +265,26 @@ const NotificationDropdown = (props: Props) => {
     <Fragment>
       <Tooltip title={t('Xabarnomalar')} arrow>
         <IconButton
-          color="inherit"
-          aria-label="Notifications"
-          aria-haspopup="true"
-          onClick={(event) => handleNotificationDropdownOpen(event.currentTarget)}
-          aria-controls="notification-menu"
+          color='inherit'
+          aria-label='Notifications'
+          aria-haspopup='true'
+          onClick={event => handleNotificationDropdownOpen(event.currentTarget)}
+          aria-controls='notification-menu'
           aria-expanded={isMenuOpen ? 'true' : undefined}
           sx={{
             position: 'relative',
             transition: 'transform 0.2s',
-            '&:hover': { transform: 'scale(1.05)' },
+            '&:hover': { transform: 'scale(1.05)' }
           }}
         >
-          <Badge color="error" variant="standard" badgeContent={notificationCount} max={9}>
+          <Badge color='error' variant='standard' badgeContent={notificationCount} max={9}>
             <Bell size={24} />
           </Badge>
         </IconButton>
       </Tooltip>
 
       <StyledMenu
-        id="notification-menu"
+        id='notification-menu'
         anchorEl={anchorEl}
         open={isMenuOpen}
         onClose={handleDropdownClose}
@@ -255,32 +295,32 @@ const NotificationDropdown = (props: Props) => {
       >
         <Box
           sx={{
-            px: "10px",
+            px: '10px',
             py: 2,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            borderBottom: (theme) => `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-            backgroundColor: 'white',
+            borderBottom: theme => `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+            backgroundColor: 'white'
           }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem', color: 'text.primary' }}>
+          <Typography variant='h6' sx={{ fontWeight: 600, fontSize: '1rem', color: 'text.primary' }}>
             {t('Xabarnomalar')}
           </Typography>
 
           {notificationCount > 0 && (
             <Chip
-              size="small"
-              color="primary"
-              variant="outlined"
+              size='small'
+              color='primary'
+              variant='outlined'
               label={`${notificationCount} ta yangi xabar`}
               sx={{
                 height: 24,
                 fontSize: '0.75rem',
                 fontWeight: 500,
                 borderRadius: '12px',
-                backgroundColor: (theme) => alpha(theme.palette.grey[200], 0.8),
-                borderColor: (theme) => alpha(theme.palette.grey[300], 0.5),
+                backgroundColor: theme => alpha(theme.palette.grey[200], 0.8),
+                borderColor: theme => alpha(theme.palette.grey[300], 0.5)
               }}
             />
           )}
@@ -289,20 +329,17 @@ const NotificationDropdown = (props: Props) => {
         <ScrollWrapper hidden={hidden}>
           {notificationData.length > 0 ? (
             notificationData.map((notification: NotificationsType, index: number) => (
-              <StyledMenuItem
-                key={notification.id || index}
-                onClick={() => handleClickNotification(notification.id)}
-              >
+              <StyledMenuItem key={notification.id || index} onClick={() => handleClickNotification(notification.id)}>
                 <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2, pl: 1.5 }}>
-                  <Box width="100%" display="flex" alignItems="flex-start" gap={2}>
+                  <Box width='100%' display='flex' alignItems='flex-start' gap={2}>
                     <Avatar
                       sx={{
                         width: 40,
                         height: 40,
-                        backgroundColor: (theme) => theme.palette.primary.main,
+                        backgroundColor: theme => theme.palette.primary.main,
                         color: 'white',
                         flexShrink: 0,
-                        border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                        border: theme => `1px solid ${alpha(theme.palette.primary.main, 0.1)}`
                       }}
                     >
                       <BellRing size={20} />
@@ -313,22 +350,39 @@ const NotificationDropdown = (props: Props) => {
                         display: 'flex',
                         flexDirection: 'column',
                         width: '100%',
-                        overflow: 'hidden',
+                        overflow: 'hidden'
                       }}
                     >
-                      <Typography
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: '0.9rem',
-                          mb: 0.5,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          color: 'text.primary',
-                        }}
-                      >
-                        {notification?.title}
-                      </Typography>
+                      <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+                        <Typography
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '0.9rem',
+                            mb: 0.5,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            color: 'text.primary'
+                          }}
+                        >
+                          {notification?.title}
+                        </Typography>
+                        <Typography
+                          fontSize={12}
+                          sx={{
+                            paddingRight: 4,
+                            cursor: 'pointer',
+                            color: 'primary.main',
+                            transition: 'color 0.2s',
+                            '&:hover': {
+                              textDecoration: 'underline',
+                              color: 'primary.dark'
+                            }
+                          }}
+                        >
+                          Batafsil
+                        </Typography>
+                      </Box>
 
                       <NotificationContent>{renderHTML(notification?.body || '')}</NotificationContent>
 
@@ -337,13 +391,13 @@ const NotificationDropdown = (props: Props) => {
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          mt: 1.5,
+                          mt: 1.5
                         }}
                       >
                         <Typography
-                          variant="caption"
+                          variant='caption'
                           sx={{
-                            color: 'text.disabled',
+                            color: 'text.disabled'
                           }}
                         >
                           {getFormatTimestamp(notification?.created_at)}
@@ -365,17 +419,17 @@ const NotificationDropdown = (props: Props) => {
             <Box sx={{ p: 2, backgroundColor: 'white' }}>
               <Button
                 fullWidth
-                variant="contained"
+                variant='contained'
                 onClick={handleViewAll}
                 endIcon={<ChevronRight size={16} />}
                 sx={{
                   borderRadius: '8px',
                   boxShadow: 1,
-                  backgroundColor: (theme) => theme.palette.primary.main,
+                  backgroundColor: theme => theme.palette.primary.main,
                   '&:hover': {
                     boxShadow: 2,
-                    backgroundColor: (theme) => theme.palette.primary.dark,
-                  },
+                    backgroundColor: theme => theme.palette.primary.dark
+                  }
                 }}
               >
                 {t('Barcha xabarnomalar')}

@@ -84,8 +84,6 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
   }
 
   async function handleFilter(key: string, value: string | number | null) {
-    dispatch(updateStudentParams({ [key]: value }))
-
     if (key === 'status') {
       dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
     }
@@ -107,6 +105,8 @@ const StudentsFilter = ({ students }: StudentsFilterProps) => {
         setIsActive(true)
         dispatch(updateStudentParams({ is_debtor: '', last_payment: '', not_in_debt: '' }))
       }
+    } else {
+      dispatch(updateStudentParams({ [key]: value }))
     }
   }
 
