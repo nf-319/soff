@@ -31,6 +31,7 @@ import 'src/configs/i18n';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import 'src/iconify-bundle/icons-bundle-react';
 import './globals.css';
+import ToastPortal from '@/layouts/ToastPortal'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -97,10 +98,7 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
                           </Guard>
                         </WindowWrapper>
 
-                        <ReactHotToast>
-                          <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
-                        </ReactHotToast>
-                        <SonnetToaster richColors position="top-right" />
+                        <ToastPortal settings={settings} />
                       </ThemeComponent>
                     )
                   }}
