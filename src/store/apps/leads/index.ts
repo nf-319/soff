@@ -146,6 +146,8 @@ export const editDepartmentStudent = createAsyncThunk(
       } else {
         response = await api.patch(`leads/anonim-user/update/${data.id}/`, {
           first_name: data.first_name,
+          status: data.status,
+          temperature: data.temperate,
           phone: data.phone
         })
       }

@@ -29,7 +29,7 @@ const CreateSmsCategoryDialog = () => {
   }
 
   const validationSchema = Yup.object({
-    category: Yup.string().required('Kategoriya nomini kiriting')
+    category: Yup.string().required(t('Kategoriya nomi') || 'Kategoriya nomi')
   })
 
   const formik = useFormik({
@@ -64,9 +64,8 @@ const CreateSmsCategoryDialog = () => {
     >
       <form onSubmit={formik.handleSubmit}>
         <DialogTitle>
-          <Typography variant='h5'>{t('SMS kategoriya yaratish')}</Typography>
+          <Typography>{t('SMS kategoriya yaratish')}</Typography>
         </DialogTitle>
-
         <DialogContent>
           <FormControl sx={{ marginTop: 2 }} fullWidth>
             <TextField
@@ -83,7 +82,7 @@ const CreateSmsCategoryDialog = () => {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button variant='outlined' onClick={handleClose}>
+          <Button variant='contained' color='error' onClick={handleClose}>
             {t('Bekor qilish')}
           </Button>
           <LoadingButton loading={loading} disabled={!formik.isValid} variant='contained' type='submit'>

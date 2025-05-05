@@ -72,7 +72,6 @@ export default function EditModal() {
       setLoading(false)
     }
   })
-  console.log(formik.values, employee)
 
   function onClose() {
     dispatch(setOpenCreateModal(false))

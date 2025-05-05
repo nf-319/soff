@@ -50,8 +50,6 @@ export const StudentPoints = () => {
   const debounceSearch = useDebounce(search, 400)
   const { search: searchQuery, branch, start_date, end_date } = router.query
 
-  console.log(branch)
-
   const { mutate: addMutate } = usePost()
   const {
     data: pointStudents,

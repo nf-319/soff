@@ -111,7 +111,6 @@ export default function EditSmsform({ initialValues }: Props) {
       </FormControl>
 
       <LoadingButton loading={loading} type='submit' variant='contained' fullWidth>
-        {' '}
         {t('Saqlash')}
       </LoadingButton>
     </form>

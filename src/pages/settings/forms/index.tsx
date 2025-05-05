@@ -31,7 +31,6 @@ import CustomDialog from 'src/views/apps/settings/form/CustomDialog'
 import { useFormik } from 'formik'
 import { AuthContext } from 'src/context/AuthContext'
 import { Edit, Trash2 } from 'lucide-react'
-import { ComingSoon } from '../../../components/CommingSoon'
 import { FormUpdateModal } from '@/entities/FormsUpdateModal'
 
 export default function FormsPage() {

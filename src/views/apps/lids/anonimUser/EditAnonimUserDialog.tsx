@@ -46,11 +46,11 @@ export const EditAnonimDialogDialog: FC<Props> = ({ department, onClose, lead, o
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ minWidth: '320px' }}>
+      <DialogContent sx={{ minWidth: '400px' }}>
         <EditAnonimUserForm
           onClose={() => {
             setOpen(null)
-            void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
+            queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
           }}
           laed
           department={department}

@@ -22,13 +22,12 @@ import api from 'src/@core/utils/api'
 import { setCompanyInfo } from 'src/store/apps/user'
 import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
+import showResponseError from 'src/@core/utils/show-response-error'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { AuthContext } from 'src/context/AuthContext'
 import { toast } from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
-import { useGet } from '@hooks/useApi'
-import { Endpoints } from '@/hooks/endpoints'
 
 const VisuallyHiddenInput = styled('input')({
   clipPath: 'inset(50%)',
@@ -83,14 +82,23 @@ export default function AllSettings() {
   const { getPaymentMethod, paymentMethods, createPaymentMethod, updatePaymentMethod } = usePayment()
   const { getBranches, branches } = useBranches()
   const dispatch = useAppDispatch()
-  const { refetch } = useGet(Endpoints.CompanySettingList, { options: { enabled: false } })
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const { t } = useTranslation()
   const { setUser, user } = useContext(AuthContext)
 
+  async function getSettingsList() {
+    await api.get('common/settings/').then(res => {
+      dispatch(setCompanyInfo(res.data))
+    })
+  }
+
   async function handleChangeExtraSettings(event: any) {
     void updateSettings('extra_settings', event.target.checked)
   }
+
+  useEffect(() => {
+    void getSettingsList()
+  }, [])
 
   const inputRef = useRef<any | null>(null)
 
@@ -186,13 +194,17 @@ export default function AllSettings() {
       }
       await api.patch('common/settings/update/', formData)
 
-      const getresp = await refetch()
+      const response = await api.get('common/settings/')
 
-      dispatch(setCompanyInfo(getresp.data))
+      console.log(response)
+
+      dispatch(setCompanyInfo(response.data))
       setEditable(null)
       setId(null)
     } catch (err: any) {
-      console.error(err)
+      if (err?.response?.data) {
+        console.error(err?.response?.data)
+      }
     } finally {
       setLoading(null)
     }

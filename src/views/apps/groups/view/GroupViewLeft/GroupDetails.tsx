@@ -14,6 +14,7 @@ import GroupDetailsWrapper from './GroupDetailsWrapper'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
 import GroupDetailsMobile from './GroupDetailWrapperMobile'
 import { useMediaQuery } from '@mui/material'
+import { GroupCreateEditDrawer } from '@components/GroupDrawerModal'
 
 export default function GroupDetails() {
   const { groupData, isGettingGroupDetails, onlineLessonLoading } = useAppSelector(state => state.groupDetails)
@@ -35,7 +36,7 @@ export default function GroupDetails() {
   }
 
   const handleEdit = async (id: any) => {
-    dispatch(handleOpenEdit(true))
+    setOpenEditModal('edit')
     const filtered = { ...groupData }
     const queryString = new URLSearchParams({
       day_of_week: filtered?.day_of_week?.toString(),
@@ -87,7 +88,7 @@ export default function GroupDetails() {
         />
       )}
       <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
-      <EditGroupModal />
+      <GroupCreateEditDrawer open={openEditModal} setOpen={setOpenEditModal} />
     </>
   )
 }

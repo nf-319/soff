@@ -20,11 +20,10 @@ import StudentPaymentEditForm from './StudentPaymentEdit'
 import { LoadingButton } from '@mui/lab'
 import usePayment from 'src/hooks/usePayment'
 
-
 export const handleCheckPrint = async (id: number | string) => {
   try {
     const response = await api.get(`common/generate-check/${id}/`, {
-      responseType: 'blob',
+      responseType: 'blob'
     })
 
     const blobUrl = URL.createObjectURL(response.data)
@@ -75,7 +74,7 @@ const UserView = ({ tab, student }: any) => {
     },
     {
       headerName: t('Turi'),
-      width: 130,
+      width: 100,
       field: 'condition',
       renderCell: params => (
         <Tooltip title={params.value == 'debt' ? 'Qarzdorlik' : params.value == 'refund' ? 'Qaytarilgan' : "To'landi"}>
@@ -110,7 +109,21 @@ const UserView = ({ tab, student }: any) => {
       )
     },
     {
-      width: 130,
+      width: 120,
+      headerName: t('Qaytarilgan Summa'),
+      field: 'refund_amount',
+      renderCell: params => (
+        <Tooltip title={`${formatCurrency(params?.value)} UZS`}>
+          <span>
+            {Number(params.value) <= 0
+              ? `${formatCurrency(Number(params.value) * -1)} UZS`
+              : `${formatCurrency(params.value) || 0} UZS`}
+          </span>
+        </Tooltip>
+      )
+    },
+    {
+      width: 120,
       headerName: t('Bonus'),
       field: 'bonus',
       renderCell: params => (
@@ -124,7 +137,7 @@ const UserView = ({ tab, student }: any) => {
       )
     },
     {
-      width: 140,
+      width: 120,
       headerName: t('Guruh'),
       field: 'group_name',
       renderCell: params => (
@@ -202,7 +215,7 @@ const UserView = ({ tab, student }: any) => {
 
     try {
       const response = await api.get(`common/generate-check/${id}/`, {
-        responseType: 'blob',
+        responseType: 'blob'
       })
 
       const blob = new Blob([response.data], { type: 'application/pdf' }) // MIME type explicitly
@@ -217,7 +230,6 @@ const UserView = ({ tab, student }: any) => {
 
       document.body.removeChild(downloadLink)
       URL.revokeObjectURL(blobUrl)
-
     } catch (error) {
       console.error('Download error:', error)
     } finally {

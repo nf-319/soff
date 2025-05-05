@@ -1,7 +1,8 @@
+
 export interface QueryParams {
   page?: string
   search?: string
-  paid?: string
+  paid?:string
   payment_status_nearly?: string
   debtor?: string
 }
@@ -13,7 +14,7 @@ export type CPanelTypes = {
   isOpenClientSMSModal: boolean
   isOpenCreateSMSTariff: boolean
   isGettingSMSTariffs: boolean
-  queryParams: QueryParams
+  queryParams:QueryParams,
   isOpenClientModal: boolean
   open: string | null
   tariffs: TariffResponseType[]

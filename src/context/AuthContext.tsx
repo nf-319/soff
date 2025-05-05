@@ -11,8 +11,6 @@ import api from 'src/@core/utils/api'
 import { setCompanyInfo, setRoles } from 'src/store/apps/user'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch } from 'src/store'
-import { useGet } from '@hooks/useApi'
-import { Endpoints } from '@hooks/endpoints'
 
 const defaultProvider: AuthValuesType = {
   user: null,
@@ -35,7 +33,6 @@ const AuthProvider = ({ children }: Props) => {
   const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
   const { i18n } = useTranslation()
-  const { refetch } = useGet(Endpoints.CompanySettingList, { options: { enabled: false } })
   const router = useRouter()
   const { pathname, query, asPath } = router
 
@@ -45,7 +42,7 @@ const AuthProvider = ({ children }: Props) => {
     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)!
     if (storedToken) {
       const settings: any = window.localStorage.getItem('settings')
-      void i18n.changeLanguage(JSON.parse(settings)?.locale || 'uz')
+      i18n.changeLanguage(JSON.parse(settings)?.locale || 'uz')
 
       setLoading(true)
 
@@ -79,14 +76,6 @@ const AuthProvider = ({ children }: Props) => {
             active_branch: response.data.active_branch,
             qr_code: response.data.qr_code
           })
-
-          if (
-            !window.location.hostname.split('.').includes('c-panel') &&
-            !window.location.hostname.split('.').includes('localhost')
-          ) {
-            const data = await refetch()
-            await dispatch(setCompanyInfo(data.data))
-          }
         })
         .catch(() => {
           localStorage.clear()
@@ -94,6 +83,15 @@ const AuthProvider = ({ children }: Props) => {
           setLoading(false)
           router.replace('/login')
         })
+
+
+      if (
+        !window.location.hostname.split('.').includes('c-panel') &&
+        !window.location.hostname.split('.').includes('localhost')
+      ) {
+        const resp = await api.get('common/settings/')
+        dispatch(setCompanyInfo(resp.data))
+      }
     } else {
       setLoading(false)
       window.localStorage.removeItem('accessToken')
@@ -130,17 +128,16 @@ const AuthProvider = ({ children }: Props) => {
             !window.location.hostname.split('.').includes('c-panel') &&
             !window.location.hostname.split('.').includes('localhost')
           ) {
-            const data = await refetch()
-            console.log(data.data)
-            await dispatch(setCompanyInfo(data.data))
+            const resp = await api.get('common/settings/')
+            dispatch(setCompanyInfo(resp.data))
           }
 
           const returnUrl = router.query.returnUrl
 
           const redirectURL = isMarketolog ? '/lids' : returnUrl && returnUrl !== '/' ? returnUrl : '/'
-          void router.replace(redirectURL as string)
+          router.replace(redirectURL as string)
         } else {
-          void router.replace('/crm-payments')
+          router.replace('/crm-payments')
         }
 
         dispatch(setRoles(userRoles))

@@ -37,7 +37,7 @@ const SmsSettings = () => {
     | null
   >(null)
 
-  const { data, isLoading, refetch } = useGet(Endpoints.CompanySettingList)
+  const { refetch } = useGet(Endpoints.CompanySettingList, { options: { enabled: false } })
 
   const updateSettings = async (key: any, value: any) => {
     try {
@@ -64,278 +64,278 @@ const SmsSettings = () => {
       ) {
         if (key === 'on_birthday') {
           setLoading('birthdate')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('payment_warning', data?.auto_sms?.payment_warning)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_score', data?.auto_sms?.on_score)
-          formData.append('score_text', data?.auto_sms?.score_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('payment_warning', companyInfo.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
+          formData.append('score_text', companyInfo.auto_sms?.score_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else if (key === 'birthday_text') {
           setLoading('birthdate')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('payment_warning', data?.auto_sms?.payment_warning)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_score', data?.auto_sms?.on_score)
-          formData.append('score_text', data?.auto_sms?.score_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('payment_warning', companyInfo.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
+          formData.append('score_text', companyInfo.auto_sms?.score_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else if (key === 'payment_warning') {
           setLoading('payment')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('on_score', data?.auto_sms?.on_score)
-          formData.append('score_text', data?.auto_sms?.score_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
+          formData.append('score_text', companyInfo.auto_sms?.score_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else if (key === 'payment_text') {
           setLoading('payment')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
           formData.append('payment_warning', true)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('on_score', data?.auto_sms?.on_score)
-          formData.append('score_text', data?.auto_sms?.score_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
+          formData.append('score_text', companyInfo.auto_sms?.score_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else if (key === 'for_exam') {
           setLoading('exam')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
           formData.append('payment_warning', true)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('on_score', data?.auto_sms?.on_score)
-          formData.append('score_text', data?.auto_sms?.score_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
+          formData.append('score_text', companyInfo.auto_sms?.score_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else if (key === 'exam_text') {
           setLoading('exam')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
           formData.append('payment_warning', true)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('on_score', data?.auto_sms?.on_score)
-          formData.append('score_text', data?.auto_sms?.score_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
+          formData.append('score_text', companyInfo.auto_sms?.score_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else if (key === 'on_score') {
           setLoading('score')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('payment_warning', data?.auto_sms?.payment_warning)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('score_text', data?.auto_sms?.score_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('payment_warning', companyInfo.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('score_text', companyInfo.auto_sms?.score_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else if (key === 'score_text') {
           setLoading('score')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('on_score', data?.auto_sms?.on_score)
-          formData.append('payment_warning', data?.auto_sms?.payment_warning)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
+          formData.append('payment_warning', companyInfo.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else if (key === 'for_payment') {
           setLoading('create_payment')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('on_score', data?.auto_sms?.on_score)
-          formData.append('payment_warning', data?.auto_sms?.payment_warning)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
+          formData.append('payment_warning', companyInfo.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else if (key === 'create_payment_text') {
           setLoading('create_payment')
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('on_score', data?.auto_sms?.on_score)
-          formData.append('payment_warning', data?.auto_sms?.payment_warning)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
+          formData.append('payment_warning', companyInfo.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else if (key === 'on_attend') {
           setLoading('attend')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          // formData.append('on_attend', !data?.auto_sms?.on_attend)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('payment_warning', data?.auto_sms?.payment_warning)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('score_text', data?.auto_sms?.score_text)
-          formData.append('on_score', data?.auto_sms?.on_score)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          // formData.append('on_attend', !companyInfo.auto_sms?.on_attend)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('payment_warning', companyInfo.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('score_text', companyInfo.auto_sms?.score_text)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
 
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else if (key === 'attend_text') {
           setLoading('attend')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('payment_warning', data?.auto_sms?.payment_warning)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('on_score', data?.auto_sms?.on_score)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('payment_warning', companyInfo.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else if (key === 'for_debtor') {
           setLoading('debtor')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('for_debtor', !data?.auto_sms?.for_debtor)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('for_debtor', !companyInfo.auto_sms?.for_debtor)
 
-          formData.append('debt_text', data?.auto_sms?.attend_text)
-          formData.append('payment_warning', data?.auto_sms?.payment_warning)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('score_text', data?.auto_sms?.score_text)
-          formData.append('on_score', data?.auto_sms?.on_score)
+          formData.append('debt_text', companyInfo.auto_sms?.attend_text)
+          formData.append('payment_warning', companyInfo.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('score_text', companyInfo.auto_sms?.score_text)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
 
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
         } else if (key === 'debt_text') {
           setLoading('debtor')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('payment_warning', data?.auto_sms?.payment_warning)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('absent_text', data?.auto_sms?.absent_text)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('on_score', data?.auto_sms?.on_score)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('payment_warning', companyInfo.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('absent_text', companyInfo.auto_sms?.absent_text)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
         } else if (key === 'on_absent') {
           setLoading('absend')
           formData.append(
             'absent_text',
             'Assalomu Alaykum, siz kecha dars qoldirdingiz iltimos sababini bildirishni unurtmang'
           )
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('payment_warning', data?.auto_sms?.payment_warning)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_score', data?.auto_sms?.on_score)
-          formData.append('score_text', data?.auto_sms?.score_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('payment_warning', companyInfo.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
+          formData.append('score_text', companyInfo.auto_sms?.score_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         } else {
           setLoading('absend')
-          formData.append('create_payment_text', data?.auto_sms?.create_payment_text)
-          formData.append('for_payment', data?.auto_sms?.for_payment)
-          formData.append('exam_text', data?.auto_sms?.exam_text)
-          formData.append('for_exam', data?.auto_sms?.for_exam)
-          formData.append('on_absent', data?.auto_sms?.on_absent)
-          formData.append('on_birthday', data?.auto_sms?.on_birthday)
-          formData.append('birthday_text', data?.auto_sms?.birthday_text)
-          formData.append('payment_warning', data?.auto_sms?.payment_warning)
-          formData.append('payment_text', data?.auto_sms?.payment_text)
-          formData.append('on_score', data?.auto_sms?.on_score)
-          formData.append('score_text', data?.auto_sms?.score_text)
-          formData.append('on_attend', data?.auto_sms?.on_attend)
-          formData.append('attend_text', data?.auto_sms?.attend_text)
-          formData.append('for_debtor', data?.auto_sms?.for_debtor)
-          formData.append('debt_text', data?.auto_sms?.debt_text)
+          formData.append('create_payment_text', companyInfo.auto_sms?.create_payment_text)
+          formData.append('for_payment', companyInfo.auto_sms?.for_payment)
+          formData.append('exam_text', companyInfo.auto_sms?.exam_text)
+          formData.append('for_exam', companyInfo.auto_sms?.for_exam)
+          formData.append('on_absent', companyInfo.auto_sms?.on_absent)
+          formData.append('on_birthday', companyInfo.auto_sms?.on_birthday)
+          formData.append('birthday_text', companyInfo.auto_sms?.birthday_text)
+          formData.append('payment_warning', companyInfo.auto_sms?.payment_warning)
+          formData.append('payment_text', companyInfo.auto_sms?.payment_text)
+          formData.append('on_score', companyInfo.auto_sms?.on_score)
+          formData.append('score_text', companyInfo.auto_sms?.score_text)
+          formData.append('on_attend', companyInfo.auto_sms?.on_attend)
+          formData.append('attend_text', companyInfo.auto_sms?.attend_text)
+          formData.append('for_debtor', companyInfo.auto_sms?.for_debtor)
+          formData.append('debt_text', companyInfo.auto_sms?.debt_text)
         }
 
         await api.put('common/auto-sms/update/', formData)
@@ -347,7 +347,7 @@ const SmsSettings = () => {
       }
 
       const newData = await refetch()
-     
+
       dispatch(setCompanyInfo(newData?.data))
     } catch (err: any) {
       console.error(err)
@@ -357,12 +357,10 @@ const SmsSettings = () => {
   }
 
   useEffect(() => {
-    if (data?.access === false && !isLoading) {
+    if (!companyInfo.access) {
       setAccessModal(true)
     }
-  }, [data, isLoading])
-
-  
+  })
 
   const handleBack = () => {
     setAccessModal(false)
@@ -372,64 +370,64 @@ const SmsSettings = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '100%' }}>
       <SmsCard
-        companyName={data?.training_center_name}
+        companyName={companyInfo.training_center_name}
         title="Tug'ilgan kunda sms bilan tabriklash"
         loading={loading === 'birthdate'}
         onSwitch='on_birthday'
         name='birthday_text'
-        onSwitchInfo={Boolean(data?.auto_sms?.on_birthday)}
+        onSwitchInfo={Boolean(companyInfo.auto_sms?.on_birthday)}
         placeholders={PLACEHOLDERS.birthdate}
         updateSettings={updateSettings}
-        defaultValue={data?.auto_sms?.birthday_text}
+        defaultValue={companyInfo.auto_sms?.birthday_text}
       />
       <SmsCard
-        companyName={data?.training_center_name}
+        companyName={companyInfo.training_center_name}
         title='Imtihon natijasini sms yuborish'
         loading={loading === 'exam'}
         onSwitch='for_exam'
         name='exam_text'
-        onSwitchInfo={Boolean(data?.auto_sms?.for_exam)}
+        onSwitchInfo={Boolean(companyInfo.auto_sms?.for_exam)}
         placeholders={PLACEHOLDERS.exam}
         updateSettings={updateSettings}
-        defaultValue={data?.auto_sms?.exam_text}
+        defaultValue={companyInfo.auto_sms?.exam_text}
       />
 
       <SmsCard
-        companyName={data?.training_center_name}
+        companyName={companyInfo.training_center_name}
         title="To'lov qilgandan so'ng sms yuborish"
         loading={loading === 'create_payment'}
         onSwitch='for_payment'
         name='create_payment_text'
-        onSwitchInfo={Boolean(data?.auto_sms?.for_payment)}
+        onSwitchInfo={Boolean(companyInfo.auto_sms?.for_payment)}
         placeholders={PLACEHOLDERS.paid}
         updateSettings={updateSettings}
-        defaultValue={data?.auto_sms?.create_payment_text}
+        defaultValue={companyInfo.auto_sms?.create_payment_text}
       />
 
       <SmsCard
-        companyName={data?.training_center_name}
+        companyName={companyInfo.training_center_name}
         title='Darsga kelmaganlarga sms yuborish'
         alert='Darsga kelmagan o‘quvchilarga yo‘qlama yakunlangach SMS xabarnoma yuboriladi.'
         loading={loading === 'absend'}
         onSwitch='on_absent'
         name='absent_text'
-        onSwitchInfo={Boolean(data?.auto_sms?.on_absent)}
+        onSwitchInfo={Boolean(companyInfo.auto_sms?.on_absent)}
         placeholders={PLACEHOLDERS.notComeLesson}
         updateSettings={updateSettings}
-        defaultValue={data?.auto_sms?.absent_text}
+        defaultValue={companyInfo.auto_sms?.absent_text}
       />
 
       <SmsCard
-        companyName={data?.training_center_name}
+        companyName={companyInfo.training_center_name}
         title='Darsga kelganlarga sms yuborish'
         alert='Kelgan o‘quvchiga dars tugagach SMS xabarnoma yuboriladi.'
         loading={loading === 'attend'}
         onSwitch='on_attend'
         name='attend_text'
-        onSwitchInfo={Boolean(data?.auto_sms?.on_attend)}
+        onSwitchInfo={Boolean(companyInfo.auto_sms?.on_attend)}
         placeholders={PLACEHOLDERS.comeLesson}
         updateSettings={updateSettings}
-        defaultValue={data?.auto_sms?.attend_text}
+        defaultValue={companyInfo.auto_sms?.attend_text}
       />
 
       <SmsCard
@@ -437,12 +435,12 @@ const SmsSettings = () => {
         alert="Sms xabarnoma o'quvchiga to'lovga 7 kun qolganda yuboriladi"
         loading={loading === 'payment'}
         onSwitch='payment_warning'
-        companyName={data?.training_center_name}
+        companyName={companyInfo.training_center_name}
         name='payment_text'
-        onSwitchInfo={Boolean(data?.auto_sms?.payment_warning)}
+        onSwitchInfo={Boolean(companyInfo.auto_sms?.payment_warning)}
         placeholders={PLACEHOLDERS.whosePayment}
         updateSettings={updateSettings}
-        defaultValue={data?.auto_sms?.payment_text}
+        defaultValue={companyInfo.auto_sms?.payment_text}
       />
 
       <SmsCard
@@ -451,11 +449,11 @@ const SmsSettings = () => {
         loading={loading === 'debtor'}
         onSwitch='for_debtor'
         name='debt_text'
-        companyName={data?.training_center_name}
-        onSwitchInfo={Boolean(data?.auto_sms?.for_debtor)}
+        companyName={companyInfo.training_center_name}
+        onSwitchInfo={Boolean(companyInfo.auto_sms?.for_debtor)}
         placeholders={PLACEHOLDERS.deptStudents}
         updateSettings={updateSettings}
-        defaultValue={data?.auto_sms?.debt_text}
+        defaultValue={companyInfo.auto_sms?.debt_text}
       />
 
       <SmsCard
@@ -463,12 +461,12 @@ const SmsSettings = () => {
         alert='Baholar qo‘yilgach, SMS xabarnoma yuboriladi.'
         loading={loading === 'debtor'}
         onSwitch='on_score'
-        companyName={data?.training_center_name}
+        companyName={companyInfo.training_center_name}
         name='score_text'
-        onSwitchInfo={Boolean(data?.auto_sms?.on_score)}
+        onSwitchInfo={Boolean(companyInfo.auto_sms?.on_score)}
         placeholders={PLACEHOLDERS.gradeStudents}
         updateSettings={updateSettings}
-        defaultValue={data?.auto_sms?.score_text}
+        defaultValue={companyInfo.auto_sms?.score_text}
       />
 
       <AccessDeniedModal open={accessModal} onClose={handleBack} />

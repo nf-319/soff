@@ -46,7 +46,7 @@ export const CPanelNavigation = (t: any): any => {
       path: '/c-panel/settings'
     },
     {
-      title: t('Xabarnomalar'),
+      title: t('Xabarnoma'),
       icon: 'mdi:bell-outline',
       path: '/c-panel/notifications'
     }
@@ -182,6 +182,10 @@ const Navigation = (t: any): VerticalNavItemsType => {
           path: '/reports/student-points'
         },
         {
+          title: 'Lidlar Hisoboti',
+          path: '/reports/lid-statements'
+        },
+        {
           title: t('Davomatlar'),
           path: '/reports/attendances'
         },
@@ -294,6 +298,10 @@ const Navigation = (t: any): VerticalNavItemsType => {
         {
           title: "O'quvchilar Bonuslari",
           path: '/reports/student-points'
+        },
+        {
+          title: 'Lidlar Hisoboti',
+          path: '/reports/lid-statements'
         },
         {
           title: t('Davomatlar'),

@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, PropsWithChildren, useContext } from 'react'
+import { FC, PropsWithChildren, useContext, useEffect } from 'react'
 import { Theme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Layout from 'src/@core/layouts/Layout'
@@ -13,6 +13,9 @@ import { AuthContext } from 'src/context/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import QRCodeScanner from '../components/qrCodeScanner'
+import { useAppDispatch, useAppSelector } from '@/store'
+import { setCompanyInfo } from '@store/apps/user'
+import api from '@utils/api'
 
 type Props = {
   contentHeightFixed?: boolean
@@ -21,6 +24,8 @@ type Props = {
 const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed }) => {
   const { settings, saveSettings } = useSettings()
   const { user } = useContext(AuthContext)
+  const { companyInfo } = useAppSelector(state => state.user)
+  const dispatch = useAppDispatch()
   const { t } = useTranslation()
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
   const router = useRouter()
@@ -28,6 +33,20 @@ const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed
   if (hidden && settings.layout === 'horizontal') {
     settings.layout = 'vertical'
   }
+
+  useEffect(() => {
+    const fetchCompanyInfo = async () => {
+      try {
+        const resp = await api.get('common/settings/')
+        dispatch(setCompanyInfo(resp.data))
+      } catch (error) {
+        console.error('Error fetching company info:', error)
+      }
+    }
+
+    void fetchCompanyInfo()
+  }, [dispatch])
+
 
   return (
     <Layout

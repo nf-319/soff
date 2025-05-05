@@ -7,23 +7,18 @@ import CenterSetting from './CenterSetting'
 import SmsSettings from 'src/pages/settings/ceo/sms-settings'
 
 interface TabOption {
-  label: string;
-  value: string;
+  label: string
+  value: string
 }
 
 const tabOptions: TabOption[] = [
   { label: '🏢 Markaz Sozlamalari', value: 'center' },
-  { label: '📩 Auto SMS Sozlamalari', value: 'sms' }
+  { label: '📩 Auto SMS Sozlamalari', value: 'sms' },
 ]
 
 export const AllSettings = () => {
   const router = useRouter()
-  const searchParams = new URLSearchParams(window.location.search)
-  const [tabIndex, setTabIndex] = useState<string>(searchParams.get('tab') || 'center')
-
-  useEffect(() => {
-    setTabIndex('center')
-  }, [searchParams.get('tab')])
+  const [tabIndex, setTabIndex] = useState<string>('center') // doimiy default
 
   useEffect(() => {
     if (router.isReady) {
@@ -31,6 +26,8 @@ export const AllSettings = () => {
 
       if (tabFromURL && tabOptions.some(tab => tab.value === tabFromURL)) {
         setTabIndex(tabFromURL)
+      } else {
+        setTabIndex('center')
       }
     }
   }, [router.isReady, router.query.tab])
@@ -46,28 +43,31 @@ export const AllSettings = () => {
       delete query.tab
     }
 
-    void router.push({
-      pathname: router.pathname,
-      query: query
-    }, undefined, { shallow: true })
+    void router.push(
+      {
+        pathname: router.pathname,
+        query: query,
+      },
+      undefined,
+      { shallow: true }
+    )
   }
 
   return (
     <Box>
+      <Tabs
+        value={tabIndex}
+        sx={{ marginBottom: 3 }}
+        onChange={handleTabChange}
+        variant="fullWidth"
+      >
+        {tabOptions.map(tab => (
+          <Tab key={tab.value} label={tab.label} value={tab.value} />
+        ))}
+      </Tabs>
 
-        <Tabs
-          value={tabIndex}
-          sx={{ marginBottom: 3 }}
-          onChange={handleTabChange}
-          variant="fullWidth"
-        >
-          {tabOptions.map(tab => (
-            <Tab key={tab.value} label={tab.label} value={tab.value} />
-          ))}
-        </Tabs>
-
-        {tabIndex === 'center' && <CenterSetting />}
-        {tabIndex === 'sms' && <SmsSettings />}
+      {tabIndex === 'center' && <CenterSetting />}
+      {tabIndex === 'sms' && <SmsSettings />}
     </Box>
   )
 }

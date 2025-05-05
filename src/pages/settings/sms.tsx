@@ -35,6 +35,7 @@ import UserSuspendDialog from '../../views/apps/mentors/view/UserSuspendDialog';
 import { ChipProps } from '@mui/material/Chip'
 import { PLACEHOLDERS } from '@/views/apps/sms-settings/constants'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
+import { useRouter } from 'next/router'
 
 interface SmsCategory {
   id: number;
@@ -59,8 +60,6 @@ const LoadingSkeleton: FC = () => (
     ))}
   </>
 );
-
-
 
 const EmptyState: React.FC = () => {
   const { t } = useTranslation();
@@ -96,7 +95,7 @@ const RoomsPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
+  const router = useRouter();
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false);
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
@@ -159,10 +158,14 @@ const RoomsPage: React.FC = () => {
   }, [parentId, dispatch]);
 
   useEffect(() => {
-    if (!companyInfo?.access) {
+    if (!companyInfo.access) {
       setAccessDeniedOpen(true)
     }
-  }, [companyInfo])
+  }, [companyInfo.access])
+
+  const handleBack = () => {
+    router.back();
+  }
 
   return (
     <Paper
@@ -170,7 +173,9 @@ const RoomsPage: React.FC = () => {
       sx={{
         p: { xs: 2, md: 3 },
         backgroundColor: 'background.paper',
-        borderRadius: 1
+        borderRadius: 1,
+        height: '100vh',
+        overflow: 'hidden',
       }}
     >
       <Box
@@ -200,10 +205,6 @@ const RoomsPage: React.FC = () => {
             width: { xs: '100%', md: 'auto' }
           }}
         >
-          <VideoHeader
-            item={{ url: '', title: t('SMS qo\'llanmasi') }}
-          />
-
           <Button
             onClick={() => dispatch(setOpenCreateSmsCategory(true))}
             variant="outlined"
@@ -328,7 +329,7 @@ const RoomsPage: React.FC = () => {
         handleOk={handleDelete}
       />
 
-      <AccessDeniedModal open={accessDeniedOpen} />
+      <AccessDeniedModal open={accessDeniedOpen} onClose={handleBack} />
     </Paper>
   );
 };

@@ -87,8 +87,6 @@ const Lids = () => {
     deps: ['amo-leads']
   })
 
-  console.log(amoCrmError)
-
   useEffect(() => {
     if (amoCrmError?.response?.data) {
       toast.error(amoCrmError.response.data.msg)
@@ -100,7 +98,7 @@ const Lids = () => {
       setSelectedAmoLeadTab(amoCrmLeadData[0]?.id)
       setSelectedAmoData(amoCrmLeadData[0])
     }
-  }, [amoCrmLeadData, amoCrmLoading, selectedAmoLeadTab])
+  }, [is_amocrm, amoCrmLeadData])
 
   useEffect(() => {
     if (!leadData || leadData.results.length === 0) return
@@ -157,10 +155,10 @@ const Lids = () => {
         ) : is_amocrm ? (
           amoCrmLeadData?.length && (
             <Select
-              placeholder={"Bo'lim"}
+              placeholder="Bo'lim"
               sx={{ marginBottom: isMobile ? 4 : 0 }}
               fullWidth={isMobile}
-              size='medium'
+              size='small'
               value={selectedAmoLeadTab}
               onChange={e => handleAmoTabChange(e)}
               displayEmpty
@@ -176,7 +174,7 @@ const Lids = () => {
           <Select
             sx={{ marginBottom: isMobile ? 4 : 0 }}
             fullWidth={isMobile}
-            size='medium'
+            size='small'
             value={selectedTab}
             onChange={handleTabChange}
             displayEmpty

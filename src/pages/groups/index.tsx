@@ -23,10 +23,6 @@ import useResponsive from 'src/@core/hooks/useResponsive'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import {
   getDashboardLessons,
-  getMetaData,
-  handleOpenAddModal,
-  setRoomsData,
-  setTeacherData,
   updateParams
 } from 'src/store/apps/groups'
 import { useRouter } from 'next/router'
@@ -53,9 +49,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import Delete from '@/views/apps/groups/view/GroupViewLeft/Delete'
 import { GroupCreateEditDrawer } from '@/components/GroupDrawerModal'
 import { Plus } from 'lucide-react'
+import RowOptions from '@/views/apps/groups/RowOptions'
 
 const IconifyIcon = dynamic(() => import('../../components/icon'))
-const RowOptions = dynamic(() => import('src/views/apps/groups/RowOptions'))
 
 export interface customTableProps {
   xs: number
@@ -165,7 +161,7 @@ export default function GroupsPage() {
               setUpdateStatusModal(true)
               setGroupId(status?.id)
             } else {
-              console.log('Archived status clicked, but no action triggered.')
+              console.info('Archived status clicked, but no action triggered.')
             }
           }}
         >
