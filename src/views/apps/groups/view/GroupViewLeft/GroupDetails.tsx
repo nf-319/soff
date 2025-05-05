@@ -12,6 +12,8 @@ import { getDashboardLessons, getGroupsDetails, handleOpenEdit } from 'src/store
 import api from 'src/@core/utils/api'
 import GroupDetailsWrapper from './GroupDetailsWrapper'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
+import GroupDetailsMobile from './GroupDetailWrapperMobile'
+import { useMediaQuery } from '@mui/material'
 import { GroupCreateEditDrawer } from '@components/GroupDrawerModal'
 
 export default function GroupDetails() {
@@ -19,7 +21,7 @@ export default function GroupDetails() {
   const { companyInfo } = useAppSelector(state => state.user)
   const dispatch = useAppDispatch()
   const [openEditModal, setOpenEditModal] = useState<'create' | 'edit' | null>(null)
-
+  const isMobile = useMediaQuery('(max-width:540px)')
   const [accessModal, setAccessModal] = useState<boolean>(false)
   const { user } = useContext(AuthContext)
   const router = useRouter()
@@ -62,16 +64,29 @@ export default function GroupDetails() {
 
   return (
     <>
-      <GroupDetailsWrapper
-        groupData={groupData}
-        isGettingGroupDetails={isGettingGroupDetails}
-        onlineLessonLoading={onlineLessonLoading}
-        user={user}
-        handleEdit={handleEdit}
-        handleOpenSendSMSModal={handleOpenSendSMSModal}
-        handleEditClickOpen={(type: any) => dispatch(handleEditClickOpen(type))}
-        handleGetMeetLink={handleGetMeetLink}
-      />
+      {isMobile ? (
+        <GroupDetailsMobile
+          groupData={groupData}
+          isGettingGroupDetails={isGettingGroupDetails}
+          onlineLessonLoading={onlineLessonLoading}
+          user={user}
+          handleEdit={handleEdit}
+          handleOpenSendSMSModal={handleOpenSendSMSModal}
+          handleEditClickOpen={(type: any) => dispatch(handleEditClickOpen(type))}
+          handleGetMeetLink={handleGetMeetLink}
+        />
+      ) : (
+        <GroupDetailsWrapper
+          groupData={groupData}
+          isGettingGroupDetails={isGettingGroupDetails}
+          onlineLessonLoading={onlineLessonLoading}
+          user={user}
+          handleEdit={handleEdit}
+          handleOpenSendSMSModal={handleOpenSendSMSModal}
+          handleEditClickOpen={(type: any) => dispatch(handleEditClickOpen(type))}
+          handleGetMeetLink={handleGetMeetLink}
+        />
+      )}
       <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
       <GroupCreateEditDrawer open={openEditModal} setOpen={setOpenEditModal} />
     </>
