@@ -24,7 +24,6 @@ type Props = {
 const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed }) => {
   const { settings, saveSettings } = useSettings()
   const { user } = useContext(AuthContext)
-  const { companyInfo } = useAppSelector(state => state.user)
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
@@ -46,7 +45,6 @@ const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed
 
     void fetchCompanyInfo()
   }, [dispatch])
-
 
   return (
     <Layout

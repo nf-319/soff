@@ -43,7 +43,7 @@ const SalesFunnel = () => {
   const FunnelSkeleton = () => (
     <Card
       sx={{
-        height: { xs: 400, sm: 500 },
+        height: { xs: '100%', sm: 500 },
         width: '100%',
         boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
         display: 'flex',
@@ -55,7 +55,6 @@ const SalesFunnel = () => {
         <Skeleton variant="circular" width={24} height={24} sx={{ mt: 'auto', mb: 'auto' }} />
       </Box>
       <Box sx={{ flexGrow: 1, width: '100%', px: 4, pb: 4, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        {/* Funnel shaped skeleton */}
         <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
           <Skeleton variant="rectangular" width="90%" height={60} sx={{ mb: 2, borderRadius: 1 }} />
         </Box>
@@ -80,7 +79,7 @@ const SalesFunnel = () => {
     <ComingSoon active={isActive} text='Sotuv varonkasi uchun malumot yetarli emas' brightness='0.9' size='medium'>
       <Card
         sx={{
-          height: { xs: 400, sm: 500 },
+          height: { xs: '100%', sm: 500 },
           width: '100%',
           boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
           display: 'flex',

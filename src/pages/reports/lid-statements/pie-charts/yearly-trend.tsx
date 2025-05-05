@@ -63,7 +63,7 @@ const YearlyTrend = () => {
     <Card
       sx={{
         width: '100%',
-        height: { xs: 300, sm: 400, md: 500 },
+        height: { xs: '100%', sm: 400, md: 500 },
         p: 2
       }}
     >
@@ -172,7 +172,7 @@ const YearlyTrend = () => {
     <Card
       sx={{
         width: '100%',
-        height: { xs: 300, sm: 400, md: 500 },
+        height: { xs: '100%', sm: 400, md: 500 },
         p: 2
       }}
     >

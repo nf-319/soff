@@ -429,15 +429,15 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
               (is_amocrm ? amoLeadData : displayData?.results)?.map((section: any, sectionIndex: any) => (
                 <Draggable key={section.id} draggableId={`section-${section.id}`} index={sectionIndex}>
                   {(sectionProvided, sectionSnapshot) => (
-                    <div
+                    <Box
                       ref={sectionProvided.innerRef}
                       {...sectionProvided.draggableProps}
-                      style={{
+                      sx={{
                         ...sectionProvided.draggableProps.style,
                         opacity: sectionSnapshot.isDragging ? 0.8 : 1,
                         border: '1px solid #e0e0e0e0',
                         borderRadius: 10,
-                        width: 450
+                        width: { xs: 350, sm: 400, md: 450 }
                       }}
                     >
                       <Droppable key={section.id} droppableId={String(section.id)} type='LEAD'>
@@ -468,13 +468,14 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                                   gap: 5,
                                   background: settings.mode == 'dark' ? '#282A42' : 'white',
                                   borderRadius: 10,
-                                  minWidth: 240,
                                   fontSize: 25
                                 }}
                               >
                                 {section.name}
 
-                                <Chip color='primary' variant='outlined' label={section?.leads?.length} />
+                                <Tooltip title='Lidlar soni'>
+                                  <Chip color='primary' variant='outlined' label={section?.leads?.length} />
+                                </Tooltip>
                               </div>
 
                               <Box display={'flex'}>
@@ -559,7 +560,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                           </div>
                         )}
                       </Droppable>
-                    </div>
+                    </Box>
                   )}
                 </Draggable>
               ))

@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Chip, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
+import { Box, FormControl, InputLabel, MenuItem, Select, Tooltip, Typography } from '@mui/material'
 import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import useResponsive from 'src/@core/hooks/useResponsive'
@@ -8,6 +8,7 @@ import { AuthContext } from '@/context/AuthContext'
 import { ComingSoon } from '@components/ComingSoon'
 import { useGetBranches } from '@/shared/query-hooks/branches/branches'
 import { uzbekMonths } from '@/shared/constans'
+import { CalendarIcon, BeakerIcon } from 'lucide-react'
 
 const LidsReportsFilter = () => {
   const [duration, setDuration] = useState('3')
@@ -24,9 +25,11 @@ const LidsReportsFilter = () => {
   const defaultReleaseDate = `${monthUz}, ${year}`
   const getUzbekMonthName = (monthNumber: number) => uzbekMonths[monthNumber + 1]
   const [currentMonth, setCurrenMonth] = useState(getUzbekMonthName(Number(duration)))
+
   useEffect(() => {
     setCurrenMonth(getUzbekMonthName(Number(duration)))
   }, [duration])
+
   useEffect(() => {
     if (user?.role !== 'admin' && user?.active_branch) {
       setBranch(user.active_branch)
@@ -49,22 +52,62 @@ const LidsReportsFilter = () => {
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'start',
-        gap: isMobile ? 6 : 0,
+        gap: isMobile ? 6 : 3,
         justifyContent: 'space-between'
       }}
     >
-      <Box display='flex' alignItems='center' gap={3}>
-        <Typography variant='h4'>{currentMonth} Lidlar Hisoboti</Typography>
+      <Box display="flex" justifyContent="center" gap={3} alignItems='center'>
+        <Typography variant='h4' sx={{ mb: 2 }}>
+          Lidlar Hisoboti
+        </Typography>
 
-        <Chip
-          label='Beta!'
-          sx={{ padding: '20px', fontSize: '18px', fontWeight: 600 }}
-          variant='outlined'
-          color='warning'
-        />
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <Tooltip title="Joriy Oy">
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: 'primary.main',
+                color: 'white',
+                borderRadius: '8px',
+                padding: '8px 14px',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
+            >
+              <CalendarIcon size={20} style={{ marginRight: 8 }} />
+              {currentMonth}
+            </Box>
+          </Tooltip>
+
+          <Tooltip title='Hozirda hisobot demo versiyada ishlamoqda'>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: 'warning.main',
+                color: 'white',
+                borderRadius: '8px',
+                padding: '8px 14px',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
+            >
+              <BeakerIcon size={20} style={{ marginRight: 8 }} />
+              BETA
+            </Box>
+          </Tooltip>
+        </Box>
       </Box>
 
-      <Box sx={{ display: 'flex', gap: { xs: 3, md: 5 }, width: { xs: '100%', md: 'auto' } }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: { xs: 3, md: 5 },
+          width: { xs: '100%', md: 'auto' },
+          alignSelf: 'flex-end'
+        }}
+      >
         <ComingSoon releaseDate={defaultReleaseDate} size='small' blur='0.8px'>
           <FormControl fullWidth>
             <InputLabel id='duration-label'>Oy</InputLabel>

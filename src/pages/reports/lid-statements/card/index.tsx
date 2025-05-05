@@ -116,7 +116,7 @@ const LidsReportsCard = () => {
 
   if (isLoading || !branchParam) {
     return !isMobile ? (
-      <Box display={'flex'} justifyContent={'space-between'} gap={4} sx={{ width: '100%' }}>
+      <Box display='flex' flexDirection={{ xs: 'column', md: 'row' }} justifyContent={'space-between'} gap={4} sx={{ width: '100%' }}>
         <Skeleton width={'100%'} height={200} variant='rounded' />
         <Skeleton width={'100%'} height={200} variant='rounded' />
         <Skeleton width={'100%'} height={200} variant='rounded' />
