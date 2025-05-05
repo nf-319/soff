@@ -7,14 +7,13 @@ import {
   DialogContent,
   DialogTitle, FormControl,
   FormControlLabel,
-  FormGroup, InputLabel, Select,
+  FormGroup, Select,
   Skeleton,
   Tab,
   Tabs,
   Typography
 } from '@mui/material'
-import { Bell, ChartPie, ChevronDown, Clock, Info, MessageSquare, Phone, PlusIcon, User, UserIcon } from 'lucide-react'
-
+import { Bell, ChartPie, Clock, Info, MessageSquare, Phone, PlusIcon, User, UserIcon } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { EmptyContent } from '@components/empty-content'
 import IconifyIcon from '../../../components/icon'
@@ -30,13 +29,14 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 import AddToGroupForm from './anonimUser/AddToGroupForm'
 import { fetchGroupChecklist } from 'src/store/apps/groups'
 import Link from 'next/link'
-import { useGet } from '@/hooks/useApi'
+import { usePatch } from '@/hooks/useApi'
 import { useRouter } from 'next/router'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
-import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import { useAuth } from '@hooks/useAuth'
 import { temperateOptions } from '@/pages/reports/lid-statements/leads-list'
+import toast from 'react-hot-toast'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface LidsDragonModalProps {
   openModal: boolean
@@ -45,6 +45,7 @@ interface LidsDragonModalProps {
     created_at: string
     first_name: string
     id: number
+    temperature: string | null
     last_activity?: string
     phone: string
   }
@@ -125,7 +126,7 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
 
 export default InfoItem
 
-export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDragonModalProps) {
+export function LidsDragonModal({ selectedLead: initialLead, openModal, handleClose }: LidsDragonModalProps) {
   const { query } = useRouter()
   const [value, setValue] = useState<'lead-user-description' | 'anonim-user' | 'sms-history' | 'history'>(
     query.is_amocrm ? 'lead-user-description' : 'anonim-user'
@@ -143,11 +144,25 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
   const [nodeModal, setNodeModal] = useState(false)
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
+  const [selectedLead, setSelectedLead] = useState<any>(initialLead);
+  const { mutate } = usePatch()
+  const router = useRouter()
+  const { is_active } = router.query
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    setSelectedLead(initialLead);
+  }, [initialLead]);
+
+  const apiParams = {
+    is_active: is_active ?? true
+  }
+
   const handleGetUserDetails = async (value: string, id: number) => {
     setDetailLoading(true)
     try {
       await api
-        .get(`leads/${value}/${selectedLead?.id}/`)
+        .get(`leads/${value}/${initialLead?.id}/`)
         .then(res => {
           setLeadDetail(res.data)
         })
@@ -159,11 +174,12 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
       console.error(error)
     }
   }
+
   const handleGetAmoUserDetails = async (value: string, id: number) => {
     setDetailLoading(true)
     try {
       await api
-        .get(`amocrm/lead/notes/${selectedLead?.id}/`)
+        .get(`amocrm/lead/notes/${initialLead?.id}/`)
         .then(res => {
           setLeadDetail(res.data)
         })
@@ -173,6 +189,41 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
       setDetailLoading(false)
     } catch (error) {
       console.error(error)
+    }
+  }
+
+  const lidTemperature = async (temperature: string) => {
+    try {
+      const requestPrams = { temperature }
+      const key: any[] = ['leads/departments/leads/', 'departments-leads', true, 96]
+
+      queryClient.setQueryData(key, (oldData: any) => {
+        if (!oldData || !Array.isArray(oldData.results)) return oldData
+
+        return {
+          ...oldData,
+          results: oldData.results.map((department: any) => {
+            if (!Array.isArray(department.leads)) return department
+
+            return {
+              ...department,
+              leads: department.leads.map((lead: any) =>
+                lead.id === selectedLead?.id ? { ...lead, temperature } : lead
+              ),
+            }
+          }),
+        }
+      })
+
+      mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams)
+      setSelectedLead((prev: any) => ({
+        ...prev,
+        temperature: temperature
+      }));
+      toast.success("Muvofiqiyatli o'zgardi")
+    } catch (error: any) {
+      console.error(error)
+      toast.error(error.msg || "Nimadur xatolik, iltimos CRM bilan bo'glaning")
     }
   }
 
@@ -253,11 +304,9 @@ export function LidsDragonModal({ selectedLead, openModal, handleClose }: LidsDr
             <InfoItem
                 icon={<ChartPie />}
                 label='Holati'
-                value='cold'
+                value={selectedLead?.temperature || 'Belgilanmagan'}
                 canEdit={true}
-                onValueChange={(newValue) => {
-                  console.log('New state:', newValue);
-                }}
+                onValueChange={newValue => lidTemperature(newValue)}
               />
           </div>
 

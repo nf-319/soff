@@ -41,7 +41,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
   const queryClient = useQueryClient()
   const { user } = useAuth()
   const [temperateValue, setTemperateValue] = useState('')
-  const [stateValue, setStateValue] = useState('')
+  const [stateValue, setStateValue] = useState('new')
   const query = window.location?.search?.split('?slug=')[1]
 
   const { id } = router.query
@@ -237,6 +237,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
           placeholder='Holatni tanlang'
           size='small'
           fullWidth
+          value={stateValue}
           onChange={e => setStateValue(e.target.value as string)}
           displayEmpty
         >

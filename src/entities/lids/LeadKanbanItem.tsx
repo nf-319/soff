@@ -1,4 +1,12 @@
-import { ClockArrowDown, Ellipsis, EyeIcon, User } from 'lucide-react'
+import {
+  ChartCandlestick,
+  ClockArrowDown,
+  Ellipsis,
+  EyeIcon,
+  MonitorDown,
+  ThermometerSnowflake,
+  User
+} from 'lucide-react'
 import { Box, IconButton, Tooltip, Typography } from '@mui/material'
 import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd'
 import { FC, useState } from 'react'
@@ -12,6 +20,7 @@ import { useQuery } from '@tanstack/react-query'
 import api from '@/@core/utils/api'
 import { getFormatDate } from '@/shared/utils/getFormatDate'
 import Divider from '@mui/material/Divider'
+import { LID_STATUS, LID_TEMPERATURE } from '@/shared/config/sourse'
 
 type Props = {
   provided?: DraggableProvided
@@ -22,7 +31,6 @@ type Props = {
 }
 
 export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead, onClose }) => {
-  const { settings } = useSettings()
   const [studentModalOpen, setStudentModalOpen] = useState<boolean>(false)
   const [selectedLead, setSelectedLead] = useState<any | null>(null)
   const [currentLead, setCurrentLead] = useState<any>(null)
@@ -40,7 +48,7 @@ export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead,
     const { data } = await api.get(`amocrm/leads/detail/${id}/`)
     return data
   }
-  const { data, isLoading, refetch } = useQuery({
+  const { refetch } = useQuery({
     queryKey: ['lead', lead.id],
     queryFn: () => fetchLeadById(Number(lead.id)),
     enabled: false
@@ -95,8 +103,8 @@ export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead,
               <User width={20} height={20} color='#666CFF' />
             </Box>
 
-            <Box width='100%'>
-              <Typography sx={{ whiteSpace: 'nowrap', textAlign: 'start', fontWeight: 600 }}>
+            <Box width='100%' sx={{ textAlign: 'start' }}>
+              <Typography sx={{ whiteSpace: 'nowrap', fontWeight: 600 }}>
                 {lead?.first_name}
               </Typography>
               <Typography fontSize={12}>{lead?.phone}</Typography>
@@ -107,6 +115,7 @@ export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead,
 
           <Box
             display='flex'
+            flexWrap='wrap'
             alignItems='start'
             justifyContent='start'
             gap={3}
@@ -133,6 +142,36 @@ export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead,
                   <ClockArrowDown size={13} />
                   <Typography color='inherit' fontSize={11}>
                     {getFormatDate(lead?.last_activity)}
+                  </Typography>
+                </div>
+              </Tooltip>
+            )}
+            {lead?.source && (
+              <Tooltip title='Manba'>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#FFA955' }}>
+                  <MonitorDown size={13} />
+                  <Typography color='inherit' fontSize={11}>
+                    {lead?.source}
+                  </Typography>
+                </div>
+              </Tooltip>
+            )}
+            {Boolean(lead?.temperature) && (
+              <Tooltip title='Harorat'>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#1B56FD' }}>
+                  <ThermometerSnowflake size={13} />
+                  <Typography color='inherit' fontSize={11}>
+                    {LID_TEMPERATURE[lead?.temperature as keyof typeof LID_TEMPERATURE]}
+                  </Typography>
+                </div>
+              </Tooltip>
+            )}
+            {lead?.status && (
+              <Tooltip title='Daraja'>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#E83F25' }}>
+                  <ChartCandlestick size={13} />
+                  <Typography color='inherit' fontSize={11}>
+                    {LID_STATUS[lead?.status as keyof typeof LID_STATUS]}
                   </Typography>
                 </div>
               </Tooltip>

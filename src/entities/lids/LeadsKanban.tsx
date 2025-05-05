@@ -418,7 +418,8 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                         ...sectionProvided.draggableProps.style,
                         opacity: sectionSnapshot.isDragging ? 0.8 : 1,
                         border: '1px solid #e0e0e0e0',
-                        borderRadius: 10
+                        borderRadius: 10,
+                        width: 450,
                       }}
                     >
                       <Droppable key={section.id} droppableId={String(section.id)} type='LEAD'>
