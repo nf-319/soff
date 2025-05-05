@@ -10,7 +10,6 @@ import EmployeeCreateDialog from 'src/views/apps/settings/employees/TeacherCreat
 import { useAppDispatch, useAppSelector } from 'src/store'
 import {
   editEmployeeStatus,
-  fetchEmployees,
   setEmployeeData,
   setEmployeeId,
   setOpenCreateSms,
@@ -31,6 +30,7 @@ import useSMS from 'src/hooks/useSMS'
 import { SendSMSModal } from 'src/views/apps/students/view/UserViewLeft'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import ceoConfigs from 'src/configs/ceo'
+import { useGet } from '@/hooks/useApi'
 
 export interface customTableProps {
   xs: number
@@ -47,8 +47,11 @@ export default function GroupsPage() {
     state => state.settings
   )
 
-  const { isMobile } = useResponsive()
+  const { data, refetch } = useGet(ceoConfigs.employee, { params: queryParams })
 
+  console.log(data)
+
+  const { isMobile } = useResponsive()
 
   const dispatch = useAppDispatch()
   const { smsTemps } = useSMS()
@@ -83,7 +86,7 @@ export default function GroupsPage() {
       try {
         await api.delete(`${ceoConfigs.employee_delete}${id}/`)
         toast.success("Xodim muvaffaqiyatli o'chirildi")
-        dispatch(fetchEmployees(queryParams))
+        refetch()
       } catch (err: any) {
         if (err?.response?.data) {
           toast.error(err?.response?.data?.msg)
@@ -113,7 +116,6 @@ export default function GroupsPage() {
         toast.error("Tiklab bo'lmadi")
       } else {
         dispatch(updateQueryParams({ page: 1, status: 'active' }))
-        dispatch(fetchEmployees({ ...queryParams, page: 1, status: 'active' }))
         toast.success('Xodim qaytarildi')
       }
       setLoading(false)
@@ -249,18 +251,19 @@ export default function GroupsPage() {
 
   const handleFilter = async (value: number | string) => {
     dispatch(updateQueryParams({ role: value }))
-    await dispatch(fetchEmployees({ ...queryParams, role: value }))
   }
   const handleChangeStatus = async (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
     dispatch(updateQueryParams({ status: checked ? 'archive' : 'active', page: '1' }))
-    await dispatch(fetchEmployees({ ...queryParams, status: checked ? 'archive' : 'active', page: 1 }))
   }
+
+  const totalCount = data?.roles?.reduce((sum:any, role:any) => sum + role.count, 0)
+
 
   const buttons = [
     <Button key={''} onClick={() => handleFilter('')} variant={queryParams.role === '' ? 'contained' : 'outlined'}>
-      {t('Barchasi')} - {employees.length}
+      {t('Barchasi')} - {totalCount||0}
     </Button>,
-    ...roles.map(el => (
+    data?.roles?.map((el:any) => (
       <Button
         key={el.id}
         onClick={() => handleFilter(el.id)}
@@ -273,7 +276,6 @@ export default function GroupsPage() {
 
   const handlePagination = (page: number) => {
     dispatch(updateQueryParams({ page }))
-    dispatch(fetchEmployees({ ...queryParams, page: page }))
   }
 
   useEffect(() => {
@@ -286,12 +288,12 @@ export default function GroupsPage() {
       push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
     }
-    dispatch(fetchEmployees(queryParams))
   }, [])
   const handleEditClose = () => {
     dispatch(setOpenSms(null))
     dispatch(setEmployeeId(null))
   }
+
   return (
     <div>
       <VideoHeader item={videoUrls.employees} />
@@ -332,7 +334,7 @@ export default function GroupsPage() {
         </ButtonGroup>
         <Link href='/settings/ceo/users/attandance-table'>
           <Button variant='contained' size='medium'>
-            {t("Xodimlar Davomati")}
+            {t('Xodimlar Davomati')}
           </Button>
         </Link>
         <FormControlLabel
@@ -341,11 +343,11 @@ export default function GroupsPage() {
         />
       </Box>
 
-      <DataTable loading={is_pending} columns={columns} data={employees} />
-      {Math.ceil(employees_count / 10) > 1 && !is_pending && (
+      <DataTable loading={is_pending} columns={columns} data={data?.results || []} />
+      {Math.ceil(data?.count / 10) > 1 && !is_pending && (
         <Pagination
           defaultPage={queryParams.page ? Number(queryParams.page) : 1}
-          count={Math.ceil(employees_count / 10)}
+          count={Math.ceil(data?.count / 10)}
           variant='outlined'
           shape='rounded'
           onChange={(_: any, page) => handlePagination(page)}
