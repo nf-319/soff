@@ -55,7 +55,7 @@ const getReportLeadsList = async (params?: {
   limit?: number
   branch?: string
   temperature?: string
-  state?: string
+  status?: string
 }) => {
   try {
     const response = await api.get<ReportsLeadsListType>(Endpoints.ReportLeadsList, {
@@ -73,7 +73,7 @@ export const useGetReportLeadsList = (params?: {
   limit?: number
   branch?: string
   temperature?: string
-  state?: string
+  status?: string
 }) =>
   useQuery({
     queryKey: [QueryKeys.ReportLeadsList, params],

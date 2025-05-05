@@ -41,7 +41,7 @@ const LidsReports = () => {
         </div>
         <div className='col-12 col-md-6'>
           <Box sx={{ height: { xs: 450, sm: 500 } }}>
-            <CourseInterest data={data?.courses || []} />
+            <CourseInterest data={data?.courses || []} sx={{ height: '100%' }} />
           </Box>
         </div>
         <div className='col-12 col-md-6'>

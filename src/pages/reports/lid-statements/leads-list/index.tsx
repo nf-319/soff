@@ -32,7 +32,6 @@ const LeadsList = () => {
   const router = useRouter();
   const { branch } = router.query;
   const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
-
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [pageSizeOffset, setPageSizeOffset] = useState(0);
@@ -45,7 +44,7 @@ const LeadsList = () => {
     limit: pageSize,
     branch: branchParam,
     temperature: temperateValue,
-    state: stateValue,
+    status: stateValue,
   });
 
   useEffect(() => {
@@ -168,8 +167,6 @@ const LeadsList = () => {
           <Typography variant='h5' sx={{ mb: 2 }}>
             Lidlar ro'yxati
           </Typography>
-
-          {/*<Chip label="" />*/}
         </Box>
 
         <Chip
