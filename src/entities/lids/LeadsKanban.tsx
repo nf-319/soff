@@ -578,7 +578,6 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
 
         <DialogContent
           sx={{
-            overflowY: 'visible',
             px: 3,
             pb: 3
           }}

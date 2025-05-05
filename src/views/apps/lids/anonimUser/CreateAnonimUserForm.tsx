@@ -101,7 +101,15 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
     initialValues,
     validationSchema,
     onSubmit: async values => {
-      const resp = await dispatch(createDepartmentStudent({ ...values, skip_error: skipLid, phone: reversePhone(values.phone) }))
+      const resp = await dispatch(
+        createDepartmentStudent({
+          ...values,
+          skip_error: skipLid,
+          temperate: temperateValue,
+          status: stateValue,
+          phone: reversePhone(values.phone)
+        })
+      )
 
       if (resp.meta.requestStatus === 'rejected') {
         formik.setErrors(resp.payload)
@@ -124,6 +132,8 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
       formik.resetForm()
     }
   }, [])
+
+  const newState = { value: '', label: 'Harorat belgilamaslik' }
 
   return (
     <form
@@ -250,7 +260,9 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
       </FormControl>
 
       <FormControl fullWidth>
-        <InputLabel size='small'>Harorati</InputLabel>
+        <InputLabel size='small'>
+          Harorati
+        </InputLabel>
         <Select
           size='small'
           value={temperateValue}
@@ -259,7 +271,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
           onChange={e => setTemperateValue(e.target.value)}
           displayEmpty
         >
-          {temperateOptions.slice(1, 4).map(option => (
+          {[newState, ...temperateOptions.slice(1, 4)].map(option => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
