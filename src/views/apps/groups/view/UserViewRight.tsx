@@ -100,6 +100,7 @@ const UserViewRight: FC<Props> = ({ tab }) => {
         <TabList
           variant='scrollable'
           scrollButtons='auto'
+          
           onChange={handleChange}
           aria-label='forced scroll tabs example'
           sx={{ borderBottom: theme => `1px solid ${theme.palette.divider}` }}
