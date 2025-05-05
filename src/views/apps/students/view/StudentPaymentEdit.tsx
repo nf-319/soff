@@ -132,6 +132,9 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
     }
   }, [openEdit])
 
+  console.log(openEdit);
+  
+
   return (
     <div>
       <Dialog
@@ -218,7 +221,7 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
                 />
                 {!!errors.amount && touched.amount && <FormHelperText error>{errors.amount}</FormHelperText>}
               </FormControl>
-              {openEdit?.refund_amount && (
+              {!!openEdit?.refund_amount && (
                 <FormControl fullWidth>
                   <AmountInput
                     label={t('Qaytarilgan Summa')}
