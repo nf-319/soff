@@ -143,7 +143,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
     }
   }, [])
 
-  const newState = { value: '', label: 'Harorat belgilanmagan' }
+  const newState = { value: '', label: '----' }
 
   return (
     <form
@@ -261,7 +261,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
           onChange={e => setStateValue(e.target.value as string)}
           displayEmpty
         >
-          {states.slice(1, 6).map(option => (
+          {states.slice(1, 7).map(option => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>

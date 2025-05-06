@@ -41,12 +41,24 @@ const CourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
     return acc
   }, [] as ReportLeadsCourseType[])
 
-  const courseInterestData = (isActive ? aggregatedData : coursesEmpty).map((item, index) => ({
-    id: `${index}-${item?.name?.replace(/\s+/g, '-')}`,
-    label: `${item?.name}-${index + 1}`,
-    value: item.count,
-    color: `hsl(${((index * 360) / aggregatedData.length) % 360}, 50%, 60%)`
-  }))
+  const courseInterestData = (() => {
+    const nameCounts: Record<string, number> = {}
+
+    return (isActive ? aggregatedData : coursesEmpty).map((item) => {
+      nameCounts[item.name] = (nameCounts[item.name] || 0) + 1
+
+      const label = nameCounts[item.name] === 1
+        ? item.name
+        : `${item.name}-${nameCounts[item.name]}`
+
+      return {
+        id: item.name,
+        label,
+        value: item.count,
+        color: `hsl(${((Object.keys(nameCounts).indexOf(item.name) * 360) / Object.keys(nameCounts).length) % 360}, 50%, 60%)`
+      }
+    })
+  })()
 
   return (
     <ComingSoon

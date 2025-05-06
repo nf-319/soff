@@ -52,6 +52,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { getFormatPhone } from '@/shared/utils'
 import { PhoneLink } from '@components/PhoneLink'
 import { QueryKeys } from '@/shared/query-hooks/queryKeys'
+import { lidStatusOption } from '@/shared/constans/lid-statements'
 
 interface LidsDragonModalProps {
   openModal: boolean
@@ -90,6 +91,26 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
     }
   }
 
+  useEffect(() => {
+    setCurrentValue(value)
+  }, [value, label, canEdit])
+
+  const filteredOptions = (() => {
+    if (label !== 'Holat') return option
+
+    if (value === 'new') {
+      return option
+    }
+
+    return option?.filter((o: any) => o.value !== 'new')
+  })()
+
+  const GETSTATUS = {
+    'enrolled': "Sotuv bo'ldi",
+    'test_period': 'Sinov darsida'
+  }
+
+
   return label === 'Telefon raqami' ? (
     <PhoneLink phone={value} style={{ textDecoration: 'none', height: '100%' }}>
       <div
@@ -109,19 +130,23 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
     </PhoneLink>
   ) : (
     <div
-      className={`d-flex align-items-center p-3 ${
-        settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'
-      } rounded-3 shadow-sm hover:bg-secondary transition-all duration-200`}
+      className='d-flex align-items-center p-3 bg-light rounded-3 shadow-sm hover:bg-secondary transition-all duration-200'
       style={{ cursor: 'pointer', border: '1px solid #e0e0e0', height: '100%' }}
     >
       <div className='text-primary me-3'>{icon}</div>
       <div style={{ flex: 1 }}>
-        <p className={`mb-1 ${settings.mode == 'dark' ? 'text-ligt' : 'text-muted'}`}>{label}</p>
-        <div className={`mb-0 font-weight-bold ${settings.mode == 'dark' ? 'text-ligt' : 'text-dark'}`}>
-          {isEditable ? (
+        <p className='mb-1'>{label}</p>
+        <div className='mb-0 font-weight-bold text-dark'>
+          {currentValue === "test_period" || currentValue === "enrolled" ? <p>{GETSTATUS[currentValue]}</p> : isEditable ? (
             <FormControl fullWidth>
-              <Select size='small' fullWidth value={value} onChange={e => handleStateChange(e.target.value as string)}>
-                {option?.map((option: any) => (
+              <Select
+                size='small'
+                fullWidth
+                value={currentValue}
+                displayEmpty
+                onChange={e => handleStateChange(e.target.value as string)}
+              >
+                {filteredOptions?.map((option: any) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>
@@ -129,7 +154,7 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
               </Select>
             </FormControl>
           ) : (
-            currentValue
+            <p>{currentValue}</p>
           )}
         </div>
       </div>
@@ -159,8 +184,6 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
   const dispatch = useAppDispatch()
   const [selectedLead, setSelectedLead] = useState<any>(initialLead)
   const { mutate } = usePatch()
-  const router = useRouter()
-  const { is_active } = router.query
   const queryClient = useQueryClient()
 
   useEffect(() => {
@@ -176,7 +199,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
           setLeadDetail(res.data)
         })
         .catch(err => {
-          console.log(err)
+          console.error(err)
         })
       setDetailLoading(false)
     } catch (error) {
@@ -204,7 +227,21 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
   const lidTemperature = async (temperature: string) => {
     try {
       const requestPrams = { temperature }
-      const key: any[] = ['leads/departments/leads/', 'departments-leads', true, 96]
+      const allQueries = queryClient.getQueryCache().findAll()
+      const matchedQuery = allQueries.find(q =>
+        Array.isArray(q.queryKey) &&
+        q.queryKey[0] === 'leads/departments/leads/' &&
+        q.queryKey[1] === 'departments-leads' &&
+        q.queryKey[2] === true &&
+        typeof q.queryKey[3] === 'number'
+      )
+
+      if (!matchedQuery) {
+        toast.error("Mos keladigan query topilmadi")
+        return
+      }
+
+      const key = matchedQuery.queryKey as [string, string, boolean, number]
 
       queryClient.setQueryData(key, (oldData: any) => {
         if (!oldData || !Array.isArray(oldData.results)) return oldData
@@ -236,10 +273,26 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
     }
   }
 
+
   const lidStatus = async (status: string) => {
     try {
       const requestPrams = { status }
-      const key: any[] = ['leads/departments/leads/', 'departments-leads', true, 96]
+
+      const allQueries = queryClient.getQueryCache().findAll()
+      const matchedQuery = allQueries.find(q =>
+        Array.isArray(q.queryKey) &&
+        q.queryKey[0] === 'leads/departments/leads/' &&
+        q.queryKey[1] === 'departments-leads' &&
+        q.queryKey[2] === true &&
+        typeof q.queryKey[3] === 'number'
+      )
+
+      if (!matchedQuery) {
+        toast.error("Mos keladigan query topilmadi")
+        return
+      }
+
+      const key = matchedQuery.queryKey as [string, string, boolean, number]
 
       queryClient.setQueryData(key, (oldData: any) => {
         if (!oldData || !Array.isArray(oldData.results)) return oldData
@@ -251,25 +304,23 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
 
             return {
               ...department,
-              leads: department.leads.map((lead: any) => (lead.id === selectedLead?.id ? { ...lead, status } : lead))
+              leads: department.leads.map((lead: any) =>
+                lead.id === selectedLead?.id ? { ...lead, status } : lead
+              ),
             }
-          })
+          }),
         }
       })
 
       mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams, {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ['leads/sales-funnel/', 'leads/sales-funnel'] })
-          queryClient.invalidateQueries({
-            queryKey: [QueryKeys.ReportLeadsList]
-          })
+          queryClient.invalidateQueries({ queryKey: [QueryKeys.ReportLeadsList] })
 
-          setSelectedLead((prev: any) => ({
-            ...prev,
-            status: status
-          }))
-        }
+          setSelectedLead((prev: any) => ({ ...prev, status }))
+        },
       })
+
       toast.success("Muvofiqiyatli o'zgardi")
     } catch (error: any) {
       console.error(error)
@@ -282,9 +333,9 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
     newValue: 'lead-user-description' | 'anonim-user' | 'sms-history'
   ) => {
     if (query.is_amocrm) {
-      handleGetAmoUserDetails(newValue, selectedLead?.id)
+      void handleGetAmoUserDetails(newValue, selectedLead?.id)
     } else {
-      handleGetUserDetails(newValue, selectedLead?.id)
+      void handleGetUserDetails(newValue, selectedLead?.id)
     }
     setValue(newValue)
   }
@@ -301,14 +352,14 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
     if (openModal) {
       dispatch(fetchGroupChecklist(''))
       if (query.is_amocrm) {
-        handleGetAmoUserDetails(value, selectedLead?.id)
+        void handleGetAmoUserDetails(value, selectedLead?.id)
       } else {
-        handleGetUserDetails(value, selectedLead?.id)
+        void handleGetUserDetails(value, selectedLead?.id)
       }
     }
   }, [selectedLead?.id, openModal])
 
-  const newState = { value: '', label: 'Harorat belgilamaslik' }
+  const newState = { value: null, label: '----' }
 
   return (
     <Dialog
@@ -366,9 +417,9 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
             <InfoItem
               icon={<ChartPie />}
               label='Holat'
-              value={selectedLead?.status}
+              value={selectedLead?.status || 'new'}
               canEdit={true}
-              option={states.slice(1, 7)}
+              option={lidStatusOption}
               onValueChange={newValue => lidStatus(newValue)}
             />
           </div>

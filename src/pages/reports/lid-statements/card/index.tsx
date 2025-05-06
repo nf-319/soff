@@ -16,6 +16,7 @@ type DashboardCard = {
   count: string | number;
   icon: LucideIcon;
   iconColor?: string;
+  hidden: boolean;
   process?: string | number;
   trendDirection?: 'up' | 'down';
   trendColor?: string;
@@ -66,6 +67,7 @@ const LidsReportsCard = () => {
       count: data?.new_leads || 0,
       trendDirection: getProcess(data?.new_leads_progress),
       trendColor: '#fff',
+      hidden: false,
       pillColor: getFillColor(data?.new_leads_progress),
       iconColor: 'black',
     },
@@ -76,6 +78,7 @@ const LidsReportsCard = () => {
       count: data?.conversion || 0,
       trendDirection: getProcess(data?.conversion_progress),
       trendColor: '#fff',
+      hidden: true,
       pillColor: getFillColor(data?.conversion_progress),
       iconColor: '#29bf12',
     },
@@ -87,6 +90,7 @@ const LidsReportsCard = () => {
       count: data?.lost_leads || 0,
       trendDirection: getProcess(data?.lost_leads_progress),
       trendColor: '#fff',
+      hidden: false,
       pillColor: getFillColor(data?.lost_leads_progress),
       iconColor: '#ef233c',
     },
@@ -95,9 +99,10 @@ const LidsReportsCard = () => {
       icon: Megaphone,
       title: 'Eng yaxshi marketing manbasi',
       process: data?.top_lead_source_progress || 0,
-      count: `${data?.top_lead_source} : ${data?.top_lead_source_count}` || 0,
+      count: `${data?.top_lead_source}: ${data?.top_lead_source_count}` || 0,
       trendDirection: getProcess(data?.top_lead_source_progress),
       trendColor: '#fff',
+      hidden: false,
       pillColor: getFillColor(data?.top_lead_source_progress),
       iconColor: '#ffc300',
     },
@@ -106,8 +111,9 @@ const LidsReportsCard = () => {
       icon: Award,
       title: `${data?.best_seller?.first_name} - eng yaxshi sotuvchi`,
       process: data?.best_seller_progress || 0,
-      count: data?.best_seller_leads_count || 0,
+      count: `${data?.best_seller?.first_name}: ${data?.best_seller_leads_count || 0}`,
       trendColor: '#fff',
+      hidden: false,
       trendDirection: getProcess(data?.best_seller_leads_count),
       pillColor: getFillColor(data?.best_seller_progress),
       iconColor: '#029b49',
@@ -144,6 +150,7 @@ const LidsReportsCard = () => {
                 id={item.id}
                 count={item.count}
                 icon={item.icon}
+                hiddenMoreButton={!item.hidden}
                 iconColor={item.iconColor}
                 process={item.process}
                 trendDirection={item.trendDirection}
@@ -158,6 +165,7 @@ const LidsReportsCard = () => {
               id={item.id}
               count={item.count}
               icon={item.icon}
+              hiddenMoreButton={!item.hidden}
               iconColor={item.iconColor}
               process={item.process}
               trendDirection={item.trendDirection}

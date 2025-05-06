@@ -12,6 +12,7 @@ type TrendCardProps = {
   trendColor?: string
   pillColor?: string
   onClick?: () => void
+  hiddenMoreButton?: boolean
 }
 
 export const TrendCard = ({
@@ -23,7 +24,8 @@ export const TrendCard = ({
   trendDirection,
   trendColor,
   pillColor,
-  onClick
+  onClick,
+  hiddenMoreButton = false,
 }: TrendCardProps) => {
   const TrendIcon = trendDirection === 'up' ? TrendingUp : TrendingDown
 
@@ -78,23 +80,25 @@ export const TrendCard = ({
           {title}
         </Typography>
 
-        <div>
-          <Typography
-            sx={{
-              color: 'black',
-              fontSize: 15,
-              cursor: 'pointer',
-              transition: '0.3s',
-              p: 1,
-              borderRadius: 1,
-              '&:hover': {
-                backgroundColor: '#f0f0f0'
-              }
-            }}
-          >
-            To'liqroq malumot
-          </Typography>
-        </div>
+        {hiddenMoreButton && (
+          <div>
+            <Typography
+              sx={{
+                color: 'black',
+                fontSize: 15,
+                cursor: 'pointer',
+                transition: '0.3s',
+                p: 1,
+                borderRadius: 1,
+                '&:hover': {
+                  backgroundColor: '#f0f0f0'
+                }
+              }}
+            >
+              To'liqroq malumot
+            </Typography>
+          </div>
+        )}
       </Box>
     </Card>
   )

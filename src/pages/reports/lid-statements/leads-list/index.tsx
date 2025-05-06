@@ -17,6 +17,7 @@ export const temperateOptions = [
   { value: 'warm', label: 'Iliq' },
   { value: 'cold', label: 'Sovuq' },
 ]
+
 export const states = [
   { value: '', label: 'Barcha holatlar' },
   { value: 'new', label: 'Yangi' },

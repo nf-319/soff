@@ -55,3 +55,10 @@ export const marketingSourceEmpty = [
     count: 4
   }
 ]
+
+export const lidStatusOption = [
+  { value: 'new', label: 'Yangi' },
+  { value: 'connected', label: "Bog'lanilgan" },
+  { value: 'not_connected', label: "Bog'lanilmagan" },
+  { value: 'rejected', label: "Yo'qotilgan" },
+]

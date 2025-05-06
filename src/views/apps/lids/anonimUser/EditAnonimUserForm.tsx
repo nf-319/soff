@@ -19,6 +19,7 @@ import { reversePhone } from '../../../../components/phone-input/format-phone-nu
 import PhoneInput from '../../../../components/phone-input'
 import { useQueryClient } from '@tanstack/react-query'
 import { states, temperateOptions } from '@/pages/reports/lid-statements/leads-list'
+import { lidStatusOption } from '@/shared/constans/lid-statements'
 
 type Props = {
   item: any
@@ -81,7 +82,15 @@ export default function EditAnonimUserForm({ department, item, onClose, laed }: 
     }
   }, [])
 
-  const newState = { value: '', label: 'Harorat belgilamaslik' }
+  const filteredOptions = (() => {
+    if (stateValue === 'new') {
+      return lidStatusOption
+    }
+
+    return lidStatusOption?.filter((o: any) => o.value !== 'new' && o.value !== '')
+  })()
+
+  const newState = { value: '', label: '----' }
 
   return (
     <form
@@ -130,7 +139,7 @@ export default function EditAnonimUserForm({ department, item, onClose, laed }: 
           onChange={e => setStateValue(e.target.value as string)}
           displayEmpty
         >
-          {states.slice(1, 7).map(option => (
+          {filteredOptions.map(option => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>

@@ -28,8 +28,8 @@ const SalesFunnel = () => {
   const labelMap: { [key: string]: string } = {
     all_leads: 'Barcha lidlar',
     connected_leads: "Bog'lanilganlar",
-    test_period: 'Sinov muddatidagilar',
-    enrolled_leads: 'Yozilganlar',
+    test_period: 'Sinov darsidagilar',
+    enrolled_leads: 'Sotuv bo\'lganlar',
   };
 
   const updatedFunnelData = data
