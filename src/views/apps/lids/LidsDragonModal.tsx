@@ -229,13 +229,16 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
   const lidTemperature = async (temperature: string) => {
     try {
       const requestPrams = { temperature }
-      void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
-      mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams)
-      setSelectedLead((prev: any) => ({
-        ...prev,
-        temperature: temperature
-      }))
-      toast.success("Muvofiqiyatli o'zgardi")
+      mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams, {
+        onSuccess: () => {
+          void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
+          setSelectedLead((prev: any) => ({
+            ...prev,
+            temperature: temperature
+          }))
+          toast.success("Muvofiqiyatli o'zgardi")
+        }
+      })
     } catch (error: any) {
       console.error(error)
       toast.error(error.msg || "Nimadur xatolik, iltimos CRM bilan bo'glaning")
@@ -246,18 +249,16 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
     try {
       const requestPrams = { status }
 
-      void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
-
       mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams, {
         onSuccess: () => {
+          void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
           queryClient.invalidateQueries({ queryKey: ['leads/sales-funnel/', 'leads/sales-funnel'] })
           queryClient.invalidateQueries({ queryKey: [QueryKeys.ReportLeadsList] })
 
           setSelectedLead((prev: any) => ({ ...prev, status }))
+          toast.success("Muvofiqiyatli o'zgardi")
         }
       })
-
-      toast.success("Muvofiqiyatli o'zgardi")
     } catch (error: any) {
       console.error(error)
       toast.error(error.msg || "Nimadur xatolik, iltimos CRM bilan bo'glaning")
