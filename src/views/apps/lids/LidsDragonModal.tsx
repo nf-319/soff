@@ -107,10 +107,9 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
   })()
 
   const GETSTATUS = {
-    'enrolled': "Sotuv bo'ldi",
-    'test_period': 'Sinov darsida'
+    enrolled: "Sotuv bo'ldi",
+    test_period: 'Sinov darsida'
   }
-
 
   return label === 'Telefon raqami' ? (
     <PhoneLink phone={value} style={{ textDecoration: 'none', height: '100%' }}>
@@ -138,7 +137,9 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
       <div style={{ flex: 1 }}>
         <p className='mb-1'>{label}</p>
         <div className='mb-0 font-weight-bold text-dark'>
-          {currentValue === "test_period" || currentValue === "enrolled" ? <p>{GETSTATUS[currentValue]}</p> : isEditable ? (
+          {currentValue === 'test_period' || currentValue === 'enrolled' ? (
+            <p>{GETSTATUS[currentValue]}</p>
+          ) : isEditable ? (
             <FormControl fullWidth>
               <Select
                 size='small'
@@ -228,36 +229,36 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
   const lidTemperature = async (temperature: string) => {
     try {
       const requestPrams = { temperature }
-      void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
-      mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams)
-      setSelectedLead((prev: any) => ({
-        ...prev,
-        temperature: temperature
-      }))
-      toast.success("Muvofiqiyatli o'zgardi")
+      mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams, {
+        onSuccess: () => {
+          void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
+          setSelectedLead((prev: any) => ({
+            ...prev,
+            temperature: temperature
+          }))
+          toast.success("Muvofiqiyatli o'zgardi")
+        }
+      })
     } catch (error: any) {
       console.error(error)
       toast.error(error.msg || "Nimadur xatolik, iltimos CRM bilan bo'glaning")
     }
   }
 
-
   const lidStatus = async (status: string) => {
     try {
       const requestPrams = { status }
 
-      void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
-
       mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams, {
         onSuccess: () => {
+          void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
           queryClient.invalidateQueries({ queryKey: ['leads/sales-funnel/', 'leads/sales-funnel'] })
           queryClient.invalidateQueries({ queryKey: [QueryKeys.ReportLeadsList] })
 
           setSelectedLead((prev: any) => ({ ...prev, status }))
-        },
+          toast.success("Muvofiqiyatli o'zgardi")
+        }
       })
-
-      toast.success("Muvofiqiyatli o'zgardi")
     } catch (error: any) {
       console.error(error)
       toast.error(error.msg || "Nimadur xatolik, iltimos CRM bilan bo'glaning")
