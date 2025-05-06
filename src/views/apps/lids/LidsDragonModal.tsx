@@ -293,7 +293,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
         void handleGetUserDetails(value, selectedLead?.id)
       }
     }
-  }, [selectedLead?.id, openModal])
+  }, [openModal])
 
   const newState = { value: null, label: '----' }
 
