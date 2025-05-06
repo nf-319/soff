@@ -334,6 +334,8 @@ const StudentsFilter = () => {
           <MenuItem value='last_payment'>{t("To'lov vaqti yaqinlashgan")}</MenuItem>
           <MenuItem value='is_debtor'>{t('Qarzdor')}</MenuItem>
           <MenuItem value='not_in_debt'>{t("Qarzdor bo'lmagan")}</MenuItem>
+          <MenuItem value='not_in_debt'>{t("Ortiqcha to'lov")}</MenuItem>
+
         </Select>
       </FormControl>
 

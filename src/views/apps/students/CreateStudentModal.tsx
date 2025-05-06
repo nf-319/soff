@@ -6,6 +6,7 @@ import CreateStudentForm from './CreateStudentForm'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { setOpenEdit } from 'src/store/apps/students'
+import { useGet } from '@/hooks/useApi'
 
 const Drawer = styled(MuiDrawer)<DrawerProps>(({ theme }) => ({
   width: 400,
@@ -24,10 +25,10 @@ export default function CreateStudentModal() {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const { openEdit } = useAppSelector(state => state.students)
-
   const onClose = () => {
     dispatch(setOpenEdit(null))
   }
+
 
   useEffect(() => {
     return () => {
