@@ -107,10 +107,9 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
   })()
 
   const GETSTATUS = {
-    'enrolled': "Sotuv bo'ldi",
-    'test_period': 'Sinov darsida'
+    enrolled: "Sotuv bo'ldi",
+    test_period: 'Sinov darsida'
   }
-
 
   return label === 'Telefon raqami' ? (
     <PhoneLink phone={value} style={{ textDecoration: 'none', height: '100%' }}>
@@ -138,7 +137,9 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
       <div style={{ flex: 1 }}>
         <p className='mb-1'>{label}</p>
         <div className='mb-0 font-weight-bold text-dark'>
-          {currentValue === "test_period" || currentValue === "enrolled" ? <p>{GETSTATUS[currentValue]}</p> : isEditable ? (
+          {currentValue === 'test_period' || currentValue === 'enrolled' ? (
+            <p>{GETSTATUS[currentValue]}</p>
+          ) : isEditable ? (
             <FormControl fullWidth>
               <Select
                 size='small'
@@ -241,7 +242,6 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
     }
   }
 
-
   const lidStatus = async (status: string) => {
     try {
       const requestPrams = { status }
@@ -254,7 +254,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
           queryClient.invalidateQueries({ queryKey: [QueryKeys.ReportLeadsList] })
 
           setSelectedLead((prev: any) => ({ ...prev, status }))
-        },
+        }
       })
 
       toast.success("Muvofiqiyatli o'zgardi")
@@ -293,7 +293,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
         void handleGetUserDetails(value, selectedLead?.id)
       }
     }
-  }, [openModal])
+  }, [openModal, query.is_amocrm])
 
   const newState = { value: null, label: '----' }
 
