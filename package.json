@@ -3,9 +3,10 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 192.168.1.36",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start -p 3132",
+    "start:test": "next start -p 3131",
     "lint": "echo Lint tekshiruvi o‘chirildi",
     "types": "tsc --noEmit",
     "typecheck": "tsc --noEmit --incremental false",
