@@ -1,62 +1,35 @@
-import { Box, Skeleton } from '@mui/material';
-import { ArrowRightLeft, Megaphone, TriangleAlert, User, LucideIcon, Award } from 'lucide-react'
-import { useGetReportLeads } from '@/shared/query-hooks/report-leads/reportLeads';
-import { useState } from 'react';
-import LeadsDashboardCardModal from '@/components/leads-detail-chart';
-import ReportLeadsSourceModal from '@/components/leads-detail-chart/source-modal';
-import SellerDetailModal from '@/components/seller-detail-modal';
-import useResponsive from '@/@core/hooks/useResponsive';
-import { TrendCard } from '@components/TrendCard';
-import { useRouter } from 'next/router';
-import { ComingSoon } from '@components/ComingSoon';
+import { ComingSoon } from '@/components/ComingSoon'
+import { TrendCard } from '@/components/TrendCard'
+import { DashboardCard } from '@/pages/reports/lid-statements/card'
+import { Box } from '@mui/material'
+import { ArrowRightLeft, Award, Megaphone, TriangleAlert, User } from 'lucide-react'
 
-export type DashboardCard = {
-  title: string;
-  id?: string | number;
-  count: string | number;
-  icon: LucideIcon;
-  iconColor?: string;
-  hidden: boolean;
-  process?: string | number;
-  trendDirection?: 'up' | 'down';
-  trendColor?: string;
-  pillColor?: string;
-};
-
-const LidsReportsCard = () => {
-  const router = useRouter();
-  const { branch } = router.query;
-  const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
-
-  const { data, isLoading } = useGetReportLeads(branchParam);
-
-  const [modalContent, setModalContent] = useState<string | null>(null);
-  const [sourceModal, setSourceModal] = useState<boolean>(false);
-  const [selectedSeller, setSelectedSeller] = useState<any>(null);
-  const [sellerId, setSellerId] = useState<number | null>(null);
-  const { isMobile } = useResponsive();
-
-  const getProcess = (process?: number): 'up' | 'down' => {
-    const results = (process || 0) > 0;
-    return results ? 'up' : 'down';
-  };
-
+export function StudentsStatsCard() {
   const getFillColor = (process?: number): string => {
-    const results = (process || 0) > 0;
-    return results ? '#29bf12' : '#ef233c';
-  };
-
-  const handleOpenModal = (content?: string | number) => {
-    if (typeof content === 'number') {
-      setSellerId(content);
-      setSelectedSeller(data?.best_seller);
-    }
-    if (content === 'source') {
-      setSourceModal(true);
-    } else if (content) {
-      setModalContent(String(content));
-    }
-  };
+    const results = (process || 0) > 0
+    return results ? '#29bf12' : '#ef233c'
+  }
+  const getProcess = (process?: number): 'up' | 'down' => {
+    const results = (process || 0) > 0
+    return results ? 'up' : 'down'
+  }
+  const data = {
+    new_leads: 25,
+    new_leads_progress: 10,
+    conversion: 40,
+    conversion_progress: -5,
+    lost_leads: 12,
+    lost_leads_progress: 2,
+    top_lead_source: 'Instagram',
+    top_lead_source_count: 30,
+    top_lead_source_progress: 8,
+    best_seller: {
+      id: '123',
+      first_name: 'Ali'
+    },
+    best_seller_leads_count: 20,
+    best_seller_progress: 15
+  }
 
   const cards: DashboardCard[] = [
     {
@@ -69,7 +42,7 @@ const LidsReportsCard = () => {
       trendColor: '#fff',
       hidden: false,
       pillColor: getFillColor(data?.new_leads_progress),
-      iconColor: 'black',
+      iconColor: 'black'
     },
     {
       icon: ArrowRightLeft,
@@ -80,7 +53,7 @@ const LidsReportsCard = () => {
       trendColor: '#fff',
       hidden: true,
       pillColor: getFillColor(data?.conversion_progress),
-      iconColor: '#29bf12',
+      iconColor: '#29bf12'
     },
     {
       id: 'rejected',
@@ -92,7 +65,7 @@ const LidsReportsCard = () => {
       trendColor: '#fff',
       hidden: false,
       pillColor: getFillColor(data?.lost_leads_progress),
-      iconColor: '#ef233c',
+      iconColor: '#ef233c'
     },
     {
       id: 'source',
@@ -104,7 +77,7 @@ const LidsReportsCard = () => {
       trendColor: '#fff',
       hidden: false,
       pillColor: getFillColor(data?.top_lead_source_progress),
-      iconColor: '#ffc300',
+      iconColor: '#ffc300'
     },
     {
       id: data?.best_seller?.id,
@@ -116,24 +89,9 @@ const LidsReportsCard = () => {
       hidden: false,
       trendDirection: getProcess(data?.best_seller_leads_count),
       pillColor: getFillColor(data?.best_seller_progress),
-      iconColor: '#029b49',
-    },
-  ];
-
-  if (isLoading || !branchParam) {
-    return !isMobile ? (
-      <Box display='flex' flexDirection={{ xs: 'column', md: 'row' }} justifyContent={'space-between'} gap={4} sx={{ width: '100%' }}>
-        <Skeleton width={'100%'} height={200} variant='rounded' />
-        <Skeleton width={'100%'} height={200} variant='rounded' />
-        <Skeleton width={'100%'} height={200} variant='rounded' />
-        <Skeleton width={'100%'} height={200} variant='rounded' />
-        <Skeleton width={'100%'} height={200} variant='rounded' />
-      </Box>
-    ) : (
-      <Skeleton width={'100%'} height={250} variant='rounded' />
-    );
-  }
-
+      iconColor: '#029b49'
+    }
+  ]
   return (
     <Box
       display='flex'
@@ -156,7 +114,6 @@ const LidsReportsCard = () => {
                 trendDirection={item.trendDirection}
                 trendColor={item.trendColor}
                 pillColor={item.pillColor}
-                onClick={() => handleOpenModal(item.id)}
               />
             </ComingSoon>
           ) : (
@@ -171,16 +128,10 @@ const LidsReportsCard = () => {
               trendDirection={item.trendDirection}
               trendColor={item.trendColor}
               pillColor={item.pillColor}
-              onClick={() => handleOpenModal(item.id)}
             />
           )}
         </Box>
       ))}
-      <LeadsDashboardCardModal setOpen={setModalContent} id={modalContent} />
-      <ReportLeadsSourceModal open={sourceModal} setOpen={setSourceModal} />
-      <SellerDetailModal selectedSeller={selectedSeller} sellerId={sellerId} setSellerId={setSellerId} />
     </Box>
-  );
-};
-
-export default LidsReportsCard;
+  )
+}
