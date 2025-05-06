@@ -88,10 +88,10 @@ const SalesFunnel = () => {
       >
         <Box display='flex' gap={3} sx={{ px: 6, py: 4 }}>
           <Typography color={'black'} fontSize={20} fontWeight={700}>
-            Savdo voronkasi
+            Sotuv voronkasi
           </Typography>
 
-          <Tooltip title="Bu savdo voronkasi haqida ma'lumot">
+          <Tooltip title="Bu Sotuv voronkasi haqida ma'lumot">
             <CircleHelp style={{ cursor: 'pointer', color: '#9e9e9e', marginTop: 'auto', marginBottom: 'auto' }} />
           </Tooltip>
         </Box>
