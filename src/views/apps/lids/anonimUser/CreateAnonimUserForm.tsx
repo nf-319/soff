@@ -1,7 +1,17 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
-import { Box, FormControl, FormHelperText, IconButton, InputLabel, MenuItem, Select, TextField } from '@mui/material'
+import {
+  Box,
+  FormControl,
+  FormHelperText,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  TextField
+} from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -133,7 +143,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
     }
   }, [])
 
-  const newState = { value: '', label: 'Harorat belgilamaslik' }
+  const newState = { value: '', label: 'Harorat belgilanmagan' }
 
   return (
     <form
@@ -259,17 +269,24 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
         </Select>
       </FormControl>
 
-      <FormControl fullWidth>
-        <InputLabel size='small'>
-          Harorati
+      <FormControl fullWidth size='small' variant='outlined'>
+        <InputLabel id='temperature-label' shrink>
+          Harorat
         </InputLabel>
         <Select
-          size='small'
+          labelId='temperature-label'
           value={temperateValue}
-          fullWidth
-          label='Harorati'
           onChange={e => setTemperateValue(e.target.value)}
+          input={<OutlinedInput notched label='Harorat' />}
           displayEmpty
+          renderValue={selected => {
+            if (selected === '') {
+              return <span style={{ color: '#aaa' }}>{newState.label}</span>
+            }
+
+            const selectedOption = temperateOptions.find(option => option.value === selected)
+            return selectedOption?.label ?? ''
+          }}
         >
           {[newState, ...temperateOptions.slice(1, 4)].map(option => (
             <MenuItem key={option.value} value={option.value}>

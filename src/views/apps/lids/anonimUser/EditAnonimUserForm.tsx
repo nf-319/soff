@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
-import { FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from '@mui/material'
+import {
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  TextField
+} from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -23,7 +32,7 @@ export default function EditAnonimUserForm({ department, item, onClose, laed }: 
   const dispatch = useAppDispatch()
   const { loading } = useAppSelector(state => state.leads)
   const queryClient = useQueryClient()
-  const [temperateValue, setTemperateValue] = useState(item.temperature)
+  const [temperateValue, setTemperateValue] = useState(item.temperature || '')
   const [stateValue, setStateValue] = useState(item.status)
 
   const validationSchema = Yup.object({
@@ -129,17 +138,24 @@ export default function EditAnonimUserForm({ department, item, onClose, laed }: 
         </Select>
       </FormControl>
 
-      <FormControl fullWidth>
-        <InputLabel size='small'>
-          Harorati
+      <FormControl fullWidth size="small" variant="outlined">
+        <InputLabel id="temperature-label" shrink>
+          Harorat
         </InputLabel>
         <Select
-          size='small'
+          labelId="temperature-label"
           value={temperateValue}
-          fullWidth
-          label='Harorati'
           onChange={e => setTemperateValue(e.target.value)}
+          input={<OutlinedInput notched label="Harorat" />}
           displayEmpty
+          renderValue={selected => {
+            if (selected === '') {
+              return <span style={{ color: '#aaa' }}>{newState.label}</span>
+            }
+
+            const selectedOption = temperateOptions.find(option => option.value === selected)
+            return selectedOption?.label ?? ''
+          }}
         >
           {[newState, ...temperateOptions.slice(1, 4)].map(option => (
             <MenuItem key={option.value} value={option.value}>
