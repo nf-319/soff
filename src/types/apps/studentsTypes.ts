@@ -130,7 +130,8 @@ export interface StudentDetailType {
 
 export interface StudentsQueryParamsTypes {
   search?: string
-  school?:string,
+  school?: string,
+  is_overpaid?:string,
   start_date?: string,
   end_date?:string,
   limit?: string
