@@ -409,8 +409,8 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   }
 
   return (
-    <DragDropContext onDragEnd={is_amocrm ? onDragEndAmo : onDragEnd}>
-      <Droppable droppableId='section-list' direction='horizontal' type='SECTION'>
+    <DragDropContext  onDragEnd={is_amocrm ? onDragEndAmo : onDragEnd}>
+      <Droppable droppableId='section-list' direction='horizontal'  type='SECTION'>
         {provided => (
           <div
             ref={provided.innerRef}
@@ -427,7 +427,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
           >
             {(!is_amocrm && displayData?.results.length) || (is_amocrm && amoLeadData?.length) ? (
               (is_amocrm ? amoLeadData : displayData?.results)?.map((section: any, sectionIndex: any) => (
-                <Draggable key={section.id} draggableId={`section-${section.id}`} index={sectionIndex}>
+                <Draggable  key={section.id} draggableId={`section-${section.id}`} index={sectionIndex}>
                   {(sectionProvided, sectionSnapshot) => (
                     <Box
                       ref={sectionProvided.innerRef}
@@ -468,7 +468,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                                   gap: 5,
                                   background: settings.mode == 'dark' ? '#282A42' : 'white',
                                   borderRadius: 10,
-                                  fontSize: 25
+                                  fontSize: isMobile ? 20 : 25
                                 }}
                               >
                                 {section.name}
@@ -478,24 +478,29 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                                 </Tooltip>
                               </div>
 
-                              <Box display={'flex'}>
-                                <Tooltip title={`${section.name}dagi barcha lidlarga SMS yuborish`}>
-                                  <IconButton sx={{ cursor: 'pointer' }} onClick={() => handleAccessModal(section)}>
-                                    <MessageIcon sx={{ fontSize: 20, color: 'orange' }} />
-                                  </IconButton>
-                                </Tooltip>
+                              <Box display={'flex'} flexDirection={isMobile?'column':'row'} alignItems={'start'}>
+                                <Box>
+                                  <Tooltip title={`${section.name}dagi barcha lidlarga SMS yuborish`}>
+                                    <IconButton sx={{ cursor: 'pointer' }} onClick={() => handleAccessModal(section)}>
+                                      <MessageIcon sx={{ fontSize: 20, color: 'orange' }} />
+                                    </IconButton>
+                                  </Tooltip>
 
-                                {!is_amocrm && (
-                                  <IconButton
-                                    sx={{ cursor: 'pointer' }}
-                                    onClick={() => {
-                                      setOpen(true)
-                                      setEdit(section)
-                                    }}
-                                  >
-                                    <IconifyIcon icon='fluent:text-bullet-list-square-edit-20-filled' color='orange' />
-                                  </IconButton>
-                                )}
+                                  {!is_amocrm && (
+                                    <IconButton
+                                      sx={{ cursor: 'pointer' }}
+                                      onClick={() => {
+                                        setOpen(true)
+                                        setEdit(section)
+                                      }}
+                                    >
+                                      <IconifyIcon
+                                        icon='fluent:text-bullet-list-square-edit-20-filled'
+                                        color='orange'
+                                      />
+                                    </IconButton>
+                                  )}
+                                </Box>
 
                                 <IconButton
                                   sx={{ cursor: 'pointer' }}
