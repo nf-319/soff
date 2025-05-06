@@ -98,7 +98,9 @@ export default function ExportStudent({
   })
 
   useEffect(() => {
-    dispatch(fetchGroupChecklist({ branch: selectedBranch }))
+    if (selectedBranch) {
+      dispatch(fetchGroupChecklist({ branch: selectedBranch }))
+    }
   }, [selectedBranch])
 
   useEffect(() => {

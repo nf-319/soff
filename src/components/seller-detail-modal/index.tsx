@@ -4,22 +4,23 @@ import { ReposrtLeadsSellers } from '@/types/report'
 import {
   Box,
   Card,
-  CardContent,
+  CardContent, Chip,
   Dialog,
   DialogContent,
   DialogTitle,
   Grid,
   IconButton,
-  Skeleton,
+  Skeleton, Tooltip,
   Typography
 } from '@mui/material'
 import { ResponsivePie } from '@nivo/pie'
-import { UserIcon, X } from 'lucide-react'
+import { CalendarIcon, UserIcon, X } from 'lucide-react'
 import { EmptyContent } from '../empty-content'
 import { useGet } from '@/hooks/useApi'
 import { ResponsiveLine } from '@nivo/line'
 import { uzbekMonths } from '@/shared/constans'
 import CourseInterest from '@/pages/reports/lid-statements/pie-charts/course-interest'
+import { useEffect, useState } from 'react'
 
 const SellerDetailModal = ({
   sellerId,
@@ -35,6 +36,7 @@ const SellerDetailModal = ({
   const isDark = settings.mode == 'dark'
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
   const textColor = isDark ? '#ffffff' : '#333333'
+  const getUzbekMonthName = (monthNumber: number) => uzbekMonths[monthNumber]
 
   const currentDate = new Date()
   const currentMonth = currentDate.getMonth()
@@ -68,9 +70,27 @@ const SellerDetailModal = ({
   return (
     <Dialog maxWidth='md' fullWidth onClose={() => setSellerId(null)} open={!!sellerId}>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant='h5' fontWeight={700}>
-          Sotuvchi malumotlari
-        </Typography>
+        <Box display='flex' alignItems='center' gap={3}>
+          <Typography variant='h5' fontWeight={700}>
+            Sotuvchi malumotlari
+          </Typography>
+
+          <Tooltip title='Joriy oy'>
+            <Chip
+              icon={<CalendarIcon size={20} />}
+              label={getUzbekMonthName(currentMonth)}
+              variant='outlined'
+              color='primary'
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
+            />
+          </Tooltip>
+        </Box>
 
         <IconButton onClick={() => setSellerId(null)}>
           <X />
@@ -96,6 +116,7 @@ const SellerDetailModal = ({
             <Typography variant='body1' sx={{ fontWeight: '600' }}>
               {selectedSeller?.first_name}
             </Typography>
+
             <Typography variant='subtitle1' sx={{ fontSize: '12px' }}>
               {selectedSeller?.phone}
             </Typography>
@@ -132,7 +153,7 @@ const SellerDetailModal = ({
                   reverse: false,
                   clamp: true
                 }}
-                yFormat=' >-.0f'
+                yFormat={value => `${value}%`}
                 curve='monotoneX'
                 enableArea={false}
                 areaBaselineValue={0}
@@ -246,7 +267,19 @@ const SellerDetailModal = ({
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} sm={12} md={12}>
+              <Grid item xs={6} sm={6} md={6}>
+                <Card style={{ backgroundColor: '#f9f9f9', boxShadow: 'none', border: '1px solid lightgray' }}>
+                  <CardContent>
+                    <Typography variant='subtitle2' color='textSecondary'>
+                      Sotuvlar soni
+                    </Typography>
+                    <Typography variant='h5' className='fw-bold mt-2'>
+                      {sellerData?.enrolled_leads}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={6} sm={6} md={6}>
                 <Card style={{ backgroundColor: '#f9f9f9', boxShadow: 'none', border: '1px solid lightgray' }}>
                   <CardContent>
                     <Typography variant='subtitle2' color='textSecondary'>

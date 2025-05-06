@@ -370,12 +370,13 @@ export const AttendanceTable = ({
                     }
 
                     const currentDate = student.attendance?.find((el: any) => el.date === hour.date)
-
+                    
                     if (
                       student.attendance?.some((el: any) => el.date === hour.date) &&
                       student.attendance?.find((el: any) => el.date === hour.date && !hour.weekend?.date)
                     ) {
                       const attendanceRecord = student.attendance.find((el: any) => el.date === hour.date)
+                      
                       return (
                         <td
                           key={`attendance-${student.id}-${hour.date}`}
@@ -394,6 +395,7 @@ export const AttendanceTable = ({
                             currentDate={currentDate}
                             opened_id={opened_id}
                             setOpenedId={setOpenedId}
+                            updated_at={attendanceRecord.updated_at}
                             defaultValue={attendanceRecord.is_available}
                             groupId={query?.id}
                             userId={student.id}
