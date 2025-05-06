@@ -1,6 +1,4 @@
 import { useSettings } from '@/@core/hooks/useSettings'
-import { useGetLeadsSellerDetail } from '@/shared/query-hooks/report-leads/reportLeads'
-import { ReposrtLeadsSellers } from '@/types/report'
 import {
   Box,
   Card,
@@ -13,14 +11,12 @@ import {
   Skeleton, Tooltip,
   Typography
 } from '@mui/material'
-import { ResponsivePie } from '@nivo/pie'
 import { CalendarIcon, UserIcon, X } from 'lucide-react'
 import { EmptyContent } from '../empty-content'
 import { useGet } from '@/hooks/useApi'
 import { ResponsiveLine } from '@nivo/line'
 import { uzbekMonths } from '@/shared/constans'
 import CourseInterest from '@/pages/reports/lid-statements/pie-charts/course-interest'
-import { useEffect, useState } from 'react'
 
 const SellerDetailModal = ({
   sellerId,
