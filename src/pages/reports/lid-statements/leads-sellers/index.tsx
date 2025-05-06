@@ -9,16 +9,18 @@ import { useGetLeadsSellers } from '@/shared/query-hooks/report-leads/reportLead
 import { ReposrtLeadsSellers } from '@/types/report';
 import { uzbekLocaleText } from '@/views/apps/StudentsPoints/constants';
 import { useRouter } from 'next/router';
+import { useLeadsStore } from '@/store/apps/reports/leadsStore';
 
 const LeadsSellers = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const { branch } = router.query;
   const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
-
+ 
   const { data = [], isLoading } = useGetLeadsSellers(branchParam);
   const [sellerId, setSellerId] = useState<number | null>(null);
   const [selectedSeller, setSelectedSeller] = useState<ReposrtLeadsSellers | null>(null);
+  const setLeadsSellers = useLeadsStore((state:any) => state.setLeadsSellers);
 
   const columns = [
     {
@@ -88,6 +90,10 @@ const LeadsSellers = () => {
       }
     }
   }, [sellerId, data]);
+
+  useEffect(() => {
+    if (data.length) setLeadsSellers(data);
+  }, [data]);
 
   if (isLoading || !branchParam) {
     return <Box>Loading...</Box>;

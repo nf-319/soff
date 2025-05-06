@@ -74,6 +74,7 @@ export const useGetReportLeadsList = (params?: {
   branch?: string
   temperature?: string
   status?: string
+  admin?:string
 }) =>
   useQuery({
     queryKey: [QueryKeys.ReportLeadsList, params],

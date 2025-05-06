@@ -56,7 +56,7 @@ const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (st
                           <Typography>
                             Konversatsiya:{' '}
                             <Typography component='span' sx={{ fontWeight: 600, color: '#1976d2' }}>
-                              {item?.conversion_rate}
+                              {item?.conversion_rate}%
                             </Typography>
                           </Typography>
                         </CardContent>
