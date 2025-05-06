@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material'
 import { useContext, useEffect, useState } from 'react'
 import { DateRangePicker, SelectPicker } from 'rsuite'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -43,6 +43,12 @@ export default function HeadingFilter() {
   const { t } = useTranslation()
   const [date, setDate] = useState<[Date, Date] | null>()
   const [activeBranch, setActiveBranch] = useState<any>(user?.active_branch)
+
+  const selectedYear = Number(allNumbersParams.date_year.split('-')[0])
+
+  const branchOptions = user?.branches
+    ? [...user.branches.map(el => ({ label: el.name, value: el.id })), { label: t('Barcha filiallar'), value: '' }]
+    : []
 
   const monthItems2 = [
     'Yanvar',
@@ -228,106 +234,66 @@ export default function HeadingFilter() {
       }}
     >
       {' '}
-      <SelectPicker
-        onChange={handleChangeBranch}
-        size='md'
-        data={
-          user?.branches
-            ? [
-                ...user?.branches?.map(el => ({ label: el.name, value: el.id })),
-                { label: t('Barcha filiallar'), value: '' }
-              ]
-            : []
-        }
-        style={{ width: isMobile ? 'auto' : 180 }}
-        searchable={false}
-        placeholder={t('Filialni tanlang')}
-        value={activeBranch}
-        renderMenuItem={(label, item) => {
-          const [isHovered, setIsHovered] = useState(false)
-
-          return (
-            <div
-              key={item.value}
-              style={{
-                padding: '10px',
-                backgroundColor: isHovered ? '#e0e0e0' : item.index % 2 === 0 ? '#f0f0f0' : '#ffffff',
-                color: '#333',
-                fontSize: '14px',
-                cursor: 'pointer',
-                transition: 'background-color 0.3s'
-              }}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              {label}
-            </div>
-          )
-        }}
-      />
-      <SelectPicker
-        onChange={v => handleYearDate(v, 'y')}
-        size='md'
-        data={yearItems}
-        style={{ width: isMobile ? 'auto' : 180 }}
-        value={Number(allNumbersParams.date_year.split('-')[0])}
-        searchable={false}
-        cleanable={false}
-        placeholder={t('Yilni tanlang')}
-        menuStyle={{ maxHeight: 300, overflowY: 'auto' }}
-        renderMenuItem={(label, item) => {
-          const [isHovered, setIsHovered] = useState(false)
-
-          return (
-            <div
-              key={item.value}
-              style={{
-                padding: '10px',
-                backgroundColor: isHovered ? '#e0e0e0' : item.index % 2 === 0 ? '#f0f0f0' : '#ffffff',
-                color: '#333',
-                fontSize: '14px',
-                cursor: 'pointer',
-                transition: 'background-color 0.3s'
-              }}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              {label}
-            </div>
-          )
-        }}
-      />
-      <SelectPicker
-        onChange={v => handleYearDate(v, 'm')}
-        size='md'
-        data={monthItems2}
-        style={{ width: isMobile ? 'auto' : 180 }}
-        menuStyle={{ maxHeight: 300, overflowY: 'auto' }}
-        value={allNumbersParams.date_month}
-        searchable={false}
-        placeholder={t('Oyni tanlang')}
-        renderMenuItem={(label, item) => {
-          const [isHovered, setIsHovered] = useState(false)
-
-          return (
-            <div
-              key={item.value}
-              style={{
-                padding: '10px',
-                backgroundColor: isHovered ? '#e0e0e0' : item.index % 2 === 0 ? '#f0f0f0' : '#ffffff',
-                color: '#333',
-                fontSize: '14px',
-                cursor: 'pointer',
-                transition: 'background-color 0.3s'
-              }}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              {label}
-            </div>
-          )
-        }}
-      />
+      <FormControl size='medium' sx={{ minWidth: isMobile ? 'auto' : 180 }}>
+        <InputLabel>{t('Filialni tanlang')}</InputLabel>
+        <Select
+          size='small'
+          value={activeBranch}
+          onChange={e => handleChangeBranch(e.target.value)}
+          displayEmpty
+          label={t('Filialni tanlang')}
+          renderValue={selected => {
+            const found = branchOptions.find(item => item.value === selected)
+            return found ? found.label : t('Filialni tanlang')
+          }}
+        >
+          {branchOptions.map((item, index) => (
+            <MenuItem key={item.value} value={item.value}>
+              {item.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl size='medium' sx={{ minWidth: isMobile ? 'auto' : 180 }}>
+        <InputLabel>{t('Yilni tanlang')}</InputLabel>
+        <Select
+          size='small'
+          value={selectedYear}
+          onChange={e => handleYearDate(e.target.value, 'y')}
+          displayEmpty
+          label={t('Yilni tanlang')}
+          renderValue={selected => {
+            const found = yearItems.find(item => item.value === selected)
+            return found ? found.label : t('Yilni tanlang')
+          }}
+        >
+          {yearItems.map((item, index) => (
+            <MenuItem key={item.value} value={item.value}>
+              {item.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl size='medium' sx={{ minWidth: isMobile ? 'auto' : 180 }}>
+        <InputLabel>{t('Oyni tanlang')}</InputLabel>
+        <Select
+          size='small'
+          value={allNumbersParams.date_month}
+          onChange={e => handleYearDate(e.target.value, 'm')}
+          displayEmpty
+          label={t('Oyni tanlang')}
+          renderValue={selected => {
+            const found = monthItems2.find(item => item.value === selected)
+            return found ? found.label : t('Oyni tanlang')
+          }}
+        >
+          {monthItems2.map((item, index) => (
+            <MenuItem key={item.value} value={item.value}>
+              {item.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <DateRangePicker
         showOneCalendar
         placement='bottomEnd'

@@ -21,6 +21,8 @@ import {
 import { ErrorMessage, Field, Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import { Check, LockKeyhole, Square, X, MessageSquare, Calendar } from 'lucide-react'
+import dayjs from 'dayjs'
+import { getFormatDate } from '@/shared/utils/getFormatDate'
 
 type Props = {
   currentDate: any
@@ -30,6 +32,7 @@ type Props = {
   date?: any
   opened_id: any
   setOpenedId: any
+  updated_at?: string
   isDayOff?: boolean
   isEndOfMonth?: boolean
 }
@@ -41,6 +44,7 @@ export const UserViewItem: FC<Props> = ({
   userId,
   date,
   opened_id,
+  updated_at,
   setOpenedId,
   isDayOff = false,
   isEndOfMonth = false
@@ -192,7 +196,7 @@ export const UserViewItem: FC<Props> = ({
               p: '4px'
             }}
           >
-            <Tooltip title='Kelmadi' placement='top'>
+            <Tooltip title={'Kelmadi'} placement='top'>
               <IconButton
                 onClick={() => handleClick(false)}
                 sx={{
@@ -205,7 +209,7 @@ export const UserViewItem: FC<Props> = ({
               </IconButton>
             </Tooltip>
 
-            <Tooltip title='Keldi' placement='top'>
+            <Tooltip title={'Keldi'} placement='top'>
               <IconButton
                 onClick={() => handleClick(true)}
                 sx={{
@@ -236,7 +240,7 @@ export const UserViewItem: FC<Props> = ({
         {!open && (
           <Box>
             {value === true ? (
-              <Tooltip title='Keldi' placement='top'>
+              <Tooltip title={getFormatDate(String(updated_at)) || 'Keldi'} placement='top'>
                 <IconButton
                   onClick={() => setOpenedId(`${userId}-${date}`)}
                   sx={{
@@ -252,7 +256,7 @@ export const UserViewItem: FC<Props> = ({
               <Tooltip
                 open={openTooltip}
                 onClose={() => setOpenTooltip(false)}
-                title={descriptionText || ''}
+                title={`${descriptionText} - ${getFormatDate(String(updated_at))}` || 'Kelmadi'}
                 placement='top'
                 TransitionComponent={Fade}
                 TransitionProps={{ timeout: 600 }}
@@ -294,6 +298,7 @@ export const UserViewItem: FC<Props> = ({
           maxWidth='xs'
           fullWidth
           open={description === false}
+          onClose={onClose}
           PaperProps={{
             sx: {
               borderRadius: '12px',

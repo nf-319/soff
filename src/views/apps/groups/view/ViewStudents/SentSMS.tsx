@@ -97,7 +97,7 @@ const SentSMS: FC<Props> = ({
                 setParentId(e.target.value)
               }}
             >
-              {sms_list.map((el: any) => (
+              {sms_list?.result?.map((el: any) => (
                 <MenuItem key={el.id} value={el.id} sx={{ wordBreak: 'break-word' }}>
                   <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>{el.description}</span>
                 </MenuItem>
@@ -120,7 +120,7 @@ const SentSMS: FC<Props> = ({
                   formik.setFieldValue('message', e.target.value)
                 }}
               >
-                {smschild_list.map((el: any, index: number) => (
+                {smschild_list?.result?.map((el: any, index: number) => (
                   <MenuItem key={index} value={el.description} sx={{ wordBreak: 'break-word' }}>
                     <span style={{ maxWidth: '250px', wordBreak: 'break-word', fontSize: '10px' }}>
                       {el.description}

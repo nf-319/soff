@@ -19,6 +19,7 @@ import Delete from './Delete'
 import UserViewStudentsList from '../ViewStudents/UserViewStudentsList'
 import OnlineLessonModal from './OnlineLessonModal'
 import { useAuth } from 'src/hooks/useAuth'
+import { useMediaQuery } from '@mui/material'
 
 const UserViewLeft = () => {
   const { studentsQueryParams, isGettingStudents, groupData } = useAppSelector(state => state.groupDetails)
@@ -26,6 +27,7 @@ const UserViewLeft = () => {
   const { t } = useTranslation()
   const { query } = useRouter()
   const { user } = useAuth()
+  const isMobile = useMediaQuery('(max-width: 540px)')
 
   const queryString = useMemo(() => {
     return new URLSearchParams(studentsQueryParams).toString()
@@ -35,21 +37,22 @@ const UserViewLeft = () => {
     dispatch(getStudents({ id: query.id, queryString }))
   }, [queryString])
 
-
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <GroupDetails />
       </Grid>
 
-      {(user?.currentRole === 'teacher' ? groupData?.show_students : true) && (
+      {(user?.currentRole === 'teacher' ? groupData?.show_students : true) && !isMobile && (
         <Grid item xs={12}>
           <CardContent sx={{ p: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '10px' }}>
               {['new', 'active', 'archive', 'frozen'].map(el => (
                 <div key={el} style={{ display: 'flex', alignItems: 'center', gap: '3px', cursor: 'pointer' }}>
                   <Status
-                    color={el == 'active' ? 'success' : el == 'new' ? 'warning' : el == 'frozen' ? 'secondary' : 'error'}
+                    color={
+                      el == 'active' ? 'success' : el == 'new' ? 'warning' : el == 'frozen' ? 'secondary' : 'error'
+                    }
                   />{' '}
                   {el == 'active' ? t('aktiv') : el == 'new' ? t('sinov') : el == 'frozen' ? t('frozen') : t('arxiv')}
                 </div>
@@ -68,16 +71,18 @@ const UserViewLeft = () => {
                     />
                   }
                   sx={{ fontSize: '10px', marginLeft: 'auto' }}
-                  size="small"
+                  size='small'
                   color={studentsQueryParams.status === 'archive' ? 'primary' : 'error'}
-                  variant="text"
+                  variant='text'
                   onClick={() => {
                     if (studentsQueryParams.status === 'archive') {
                       dispatch(studentsUpdateParams({ status: 'active,new' }))
                     } else dispatch(studentsUpdateParams({ status: 'archive' }))
                   }}
                 >
-                  {studentsQueryParams.status === 'archive' ? t('Arxivni yopish') : t('Arxivdagi o\'quvchilarni ko\'rish')}
+                  {studentsQueryParams.status === 'archive'
+                    ? t('Arxivni yopish')
+                    : t("Arxivdagi o'quvchilarni ko'rish")}
                 </Button>
               </Box>
             )}

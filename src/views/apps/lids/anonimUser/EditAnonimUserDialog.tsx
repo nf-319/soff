@@ -46,7 +46,7 @@ export const EditAnonimDialogDialog: FC<Props> = ({ department, onClose, lead, o
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ minWidth: '320px' }}>
+      <DialogContent sx={{ minWidth: '400px' }}>
         <EditAnonimUserForm
           onClose={() => {
             setOpen(null)

@@ -20,11 +20,10 @@ import StudentPaymentEditForm from './StudentPaymentEdit'
 import { LoadingButton } from '@mui/lab'
 import usePayment from 'src/hooks/usePayment'
 
-
 export const handleCheckPrint = async (id: number | string) => {
   try {
     const response = await api.get(`common/generate-check/${id}/`, {
-      responseType: 'blob',
+      responseType: 'blob'
     })
 
     const blobUrl = URL.createObjectURL(response.data)
@@ -39,30 +38,6 @@ export const handleCheckPrint = async (id: number | string) => {
     }
   } catch (error) {
     console.error('Print error:', error)
-  }
-}
-
-export const handleCheckDownload = async (id: number | string) => {
-  try {
-    const response = await api.get(`common/generate-check/${id}/`, {
-      responseType: 'blob',
-    })
-
-    const blob = new Blob([response.data], { type: 'application/pdf' })
-    const blobUrl = URL.createObjectURL(blob)
-
-    const downloadLink = document.createElement('a')
-    downloadLink.href = blobUrl
-    downloadLink.download = `check-${id}.pdf`
-
-    document.body.appendChild(downloadLink)
-    downloadLink.click()
-
-    document.body.removeChild(downloadLink)
-    URL.revokeObjectURL(blobUrl)
-
-  } catch (error) {
-    console.error('Download error:', error)
   }
 }
 
@@ -99,7 +74,7 @@ const UserView = ({ tab, student }: any) => {
     },
     {
       headerName: t('Turi'),
-      width: 130,
+      width: 100,
       field: 'condition',
       renderCell: params => (
         <Tooltip title={params.value == 'debt' ? 'Qarzdorlik' : params.value == 'refund' ? 'Qaytarilgan' : "To'landi"}>
@@ -134,7 +109,21 @@ const UserView = ({ tab, student }: any) => {
       )
     },
     {
-      width: 130,
+      width: 120,
+      headerName: t('Qaytarilgan Summa'),
+      field: 'refund_amount',
+      renderCell: params => (
+        <Tooltip title={`${formatCurrency(params?.value)} UZS`}>
+          <span>
+            {Number(params.value) <= 0
+              ? `${formatCurrency(Number(params.value) * -1)} UZS`
+              : `${formatCurrency(params.value) || 0} UZS`}
+          </span>
+        </Tooltip>
+      )
+    },
+    {
+      width: 120,
       headerName: t('Bonus'),
       field: 'bonus',
       renderCell: params => (
@@ -148,7 +137,7 @@ const UserView = ({ tab, student }: any) => {
       )
     },
     {
-      width: 140,
+      width: 120,
       headerName: t('Guruh'),
       field: 'group_name',
       renderCell: params => (
@@ -202,7 +191,7 @@ const UserView = ({ tab, student }: any) => {
           ) : loading === params.row.id ? (
             <IconifyIcon icon={'la:spinner'} fontSize={20} />
           ) : isMobile ? (
-            <IconifyIcon onClick={() => handleCheckDownload(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
+            <IconifyIcon onClick={() => handleDownload(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
           ) : (
             <IconifyIcon onClick={() => getReceipt(params.row.id)} icon={`ph:receipt-light`} fontSize={20} />
           )}
@@ -219,6 +208,33 @@ const UserView = ({ tab, student }: any) => {
       console.log(err)
     }
     setLoading(null)
+  }
+
+  const handleDownload = async (id: number | string) => {
+    setLoading(true)
+
+    try {
+      const response = await api.get(`common/generate-check/${id}/`, {
+        responseType: 'blob'
+      })
+
+      const blob = new Blob([response.data], { type: 'application/pdf' }) // MIME type explicitly
+      const blobUrl = URL.createObjectURL(blob)
+
+      const downloadLink = document.createElement('a')
+      downloadLink.href = blobUrl
+      downloadLink.download = `check-${id}.pdf`
+
+      document.body.appendChild(downloadLink)
+      downloadLink.click()
+
+      document.body.removeChild(downloadLink)
+      URL.revokeObjectURL(blobUrl)
+    } catch (error) {
+      console.error('Download error:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const onHandleDelete = async () => {
@@ -243,7 +259,7 @@ const UserView = ({ tab, student }: any) => {
 
   useEffect(() => {
     if (studentData?.id) {
-      void getGroups()
+      getGroups()
     }
   }, [studentData?.id])
 
@@ -251,7 +267,7 @@ const UserView = ({ tab, student }: any) => {
 
   useEffect(() => {
     if (!user?.role?.some((role: string) => ['ceo', 'admin', 'watcher', 'marketolog'].includes(role))) {
-      void router.push('/')
+      router.push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
       return
     }

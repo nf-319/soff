@@ -1,4 +1,6 @@
 //@ts-nocheck
+'use client'
+
 import { IconButton, Menu } from '@mui/material'
 import { MouseEvent, useEffect, useState } from 'react'
 import IconifyIcon from '../../../components/icon'
@@ -29,7 +31,7 @@ const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }
   const dispatch = useAppDispatch()
   const [isDeleting, setDeleting] = useState(false)
   const queryClient = useQueryClient()
-    const [openEditModal, setOpenEditModal] = useState<'create'|'edit'|null>(null)
+  const [openEditModal, setOpenEditModal] = useState<'create'|'edit'|null>(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
   const [suspendDialogOpen2, setSuspendDialogOpen2] = useState<boolean>(false)
@@ -186,7 +188,7 @@ const RowOptions = ({ groups, id }: { groups: GroupType[]; id: number | string }
         open={suspendDialogOpen2}
         setOpen={setSuspendDialogOpen2}
       />
-      <GroupCreateEditDrawer open={openEditModal} setOpen={setOpenEditModal}/>
+      <GroupCreateEditDrawer open={openEditModal} setOpen={setOpenEditModal} />
     </>
   )
 }

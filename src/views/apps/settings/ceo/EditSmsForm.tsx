@@ -6,12 +6,12 @@ import * as Yup from 'yup'
 import { editSms, fetchSmsList, fetchSmsListQuery, setOpenEditSms } from 'src/store/apps/settings'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import LoadingButton from '@mui/lab/LoadingButton'
-import { SmsItemType } from 'src/types/apps/settings'
+import { SMSItemResult, SmsItemType } from 'src/types/apps/settings'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
 
 type Props = {
-  initialValues: SmsItemType
+  initialValues: SMSItemResult
 }
 
 export default function EditSmsform({ initialValues }: Props) {
@@ -88,7 +88,7 @@ export default function EditSmsform({ initialValues }: Props) {
             id='demo-simple-select-outlined'
             labelId='demo-simple-select-outlined-label'
           >
-            {sms_list.map(item => (
+            {sms_list.result.map(item => (
               <MenuItem value={item.id}>{item.description}</MenuItem>
             ))}
           </Select>
@@ -111,7 +111,6 @@ export default function EditSmsform({ initialValues }: Props) {
       </FormControl>
 
       <LoadingButton loading={loading} type='submit' variant='contained' fullWidth>
-        {' '}
         {t('Saqlash')}
       </LoadingButton>
     </form>

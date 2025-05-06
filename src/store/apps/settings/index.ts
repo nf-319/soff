@@ -2,7 +2,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import api from 'src/@core/utils/api'
 import ceoConfigs from 'src/configs/ceo'
-import { RoomType, SettingsState, SmsItemType } from 'src/types/apps/settings'
+import { RoomType, SettingsState } from 'src/types/apps/settings'
 
 export const fetchSmsListQuery = createAsyncThunk('settings/fetchSmsListQuery', async (queryString?: number) => {
   return (await api.get(`common/sms-form/list/?parent_id=${queryString || ''}`)).data
@@ -173,8 +173,8 @@ const initialState: SettingsState = {
   openSms: null,
   logins:null,
   is_childpending: false,
-  sms_list: [],
-  smschild_list: [],
+  sms_list: { access: false, result: [] },
+  smschild_list: { access: false, result: [] },
   openCreateSms: false,
   openCreateSmsCategory: false,
   openEditSms: null,
@@ -277,22 +277,20 @@ export const settingsSlice = createSlice({
       })
       .addCase(fetchSmsList.fulfilled, (state, action) => {
         state.is_pending = false
-        state.sms_list = action.payload.sort((a: SmsItemType, b: SmsItemType) => a.id - b.id)
+        state.sms_list = action.payload
       })
       .addCase(fetchSmsListQuery.pending, state => {
         state.is_childpending = true
       })
       .addCase(fetchSmsListQuery.fulfilled, (state, action) => {
         state.is_childpending = false
-        state.smschild_list = action.payload.sort((a: SmsItemType, b: SmsItemType) => a.id - b.id)
+        state.smschild_list = action.payload
       })
       .addCase(createSms.fulfilled, (state, action) => {
-        state.sms_list.push(action.payload)
+        state.sms_list === action.payload
       })
       .addCase(editSms.fulfilled, (state, action) => {
-        state.sms_list = [...state.sms_list.filter(el => el.id !== action.payload.id), action.payload].sort(
-          (a: SmsItemType, b: SmsItemType) => a.id - b.id
-        )
+        state.sms_list = action.payload
       })
       .addCase(fetchCoursesList.pending, state => {
         state.is_pending = true

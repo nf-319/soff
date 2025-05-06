@@ -28,7 +28,7 @@ export const getStudents = createAsyncThunk(
 )
 export const getAttendance = createAsyncThunk(
   'getAttendance/getAttendance',
-  async ({ date, group, queryString }: { date: string; group: string | string[] | undefined; queryString?: string }) => {
+  async ({ date, group, queryString }: { date: string; group: string | string[] | undefined; queryString: string }) => {
     const resp = await api.get(`common/attendance-list/${date}-01/group/${group}/?` + queryString)
     return resp.data
   }

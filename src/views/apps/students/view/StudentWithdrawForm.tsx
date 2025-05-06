@@ -1,26 +1,23 @@
 import { useEffect, useState } from 'react'
 import Dialog from '@mui/material/Dialog'
 import Button from '@mui/material/Button'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
-import TextField from '@mui/material/TextField'
-import InputLabel from '@mui/material/InputLabel'
 import DialogTitle from '@mui/material/DialogTitle'
-import FormControl from '@mui/material/FormControl'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import { useTranslation } from 'react-i18next'
-import { FormHelperText } from '@mui/material'
-import LoadingButton from '@mui/lab/LoadingButton'
-import { today } from '../../../../components/card-statistics/kanban-item'
+import { Box, Card, TextField, Typography } from '@mui/material'
 import { useAppDispatch, useAppSelector } from 'src/store'
+import usePayment from 'src/hooks/usePayment'
+import { BanknoteIcon, Calendar, User } from 'lucide-react'
+import { useGet, usePost } from '@/hooks/useApi'
+import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import usePayment from 'src/hooks/usePayment'
-import Router, { useRouter } from 'next/router'
-import { fetchStudentDetail, fetchStudentGroups, fetchStudentPayment } from 'src/store/apps/students'
-import AmountInput, { convertToNegative } from '../../../../components/amount-input'
-import IconifyIcon from '../../../../components/icon'
+import toast from 'react-hot-toast'
+import { LoadingButton } from '@mui/lab'
+import { fetchStudentPayment } from '@/store/apps/students'
+import { formatCurrency } from '@/@core/utils/format-currency'
+import AmountInput, { revereAmount } from '@/components/amount-input'
 
 type Props = {
   openEdit: any
@@ -28,67 +25,17 @@ type Props = {
 }
 
 export default function StudentWithDrawForm({ openEdit, setOpenEdit }: Props) {
-  const [loading, setLoading] = useState<boolean>(false)
-
   const { t } = useTranslation()
-  const { studentData } = useAppSelector(state => state.students)
-  const userData: any = { ...studentData }
-  const { getPaymentMethod, paymentMethods, createPayment } = usePayment()
   const { query } = useRouter()
-  const dispatch = useAppDispatch()
-
-  const validationSchema = Yup.object({
-    payment_type: Yup.string().required('Tanlash majburiy'),
-    group: Yup.string().required('Tanlash majburiy'),
-    amount: Yup.string().required('Tanlash majburiy'),
-    description: Yup.string(),
-    payment_date: Yup.string().required('Tanlash majburiy')
+  const { getPaymentMethod } = usePayment()
+  const [selectedPayment, setSelectedPayment] = useState<any>(null)
+  const { data } = useGet(`common/student-payment/list/${query.student}/?condition=payment`, {
+    options: { enabled: !!openEdit }
   })
-
-  const initialValues = {
-    payment_type: '',
-    group: ``,
-    amount: '',
-    description: '',
-    payment_date: today
-  }
-
-  const formik: any = useFormik({
-    initialValues,
-    validationSchema,
-    onSubmit: async values => {
-      setLoading(true)
-      const data = {
-        ...values,
-        student: query?.student,
-        amount: convertToNegative(values.amount)
-      }
-
-      try {
-        await createPayment(data)
-        setLoading(false)
-        setOpenEdit(null)
-        formik.resetForm()
-        await dispatch(fetchStudentDetail(userData.id))
-        await dispatch(fetchStudentPayment(userData.id))
-        await dispatch(fetchStudentGroups(query.student))
-      } catch (err: any) {
-        // showResponseError(err.response.data, setError)
-        setLoading(false)
-      }
-    }
-  })
-
-  const { errors, values, handleSubmit, handleBlur, touched, handleChange } = formik
 
   const handleEditClose = () => {
     setOpenEdit(null)
-    formik.resetForm()
   }
-
-  useEffect(() => {
-    formik.setFieldValue('group', studentData ? `${studentData.groups?.[0]?.group_data?.id}` : '')
-  }, [studentData])
 
   useEffect(() => {
     if (openEdit === 'withdraw') {
@@ -106,132 +53,190 @@ export default function StudentWithDrawForm({ openEdit, setOpenEdit }: Props) {
         aria-describedby='user-view-edit-description'
       >
         <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
-          {t('Pulni yechib olish')}
+          {t("O'quvchi to'lovlari")}
         </DialogTitle>
         <DialogContent>
-          <form
-            onSubmit={handleSubmit}
-            style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: '10px' }}
-            id='edifsdt-employee-pay'
-          >
-            <FormControl fullWidth>
-              <InputLabel
-                size='small'
-                id='user-view-language-label'
-                error={!!errors.payment_type && touched.payment_type}
-              >
-                {t("To'lov usulini tanlang")}
-              </InputLabel>
-              <Select
-                size='small'
-                label={t("To'lov usulini tanlang")}
-                id='user-view-language'
-                labelId='user-view-language-label'
-                name='payment_type'
-                value={values.payment_type}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              >
-                {paymentMethods.map((branch: any) => (
-                  <MenuItem key={branch.id} value={branch.id}>
-                    {branch.name}
-                  </MenuItem>
-                ))}
-                <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router.push('/settings/ceo/all-settings')}>
-                  {t('Yangi yaratish')}
-                  <IconifyIcon icon={'ion:add-sharp'} />
-                </MenuItem>
-              </Select>
-              {!!errors.payment_type && touched.payment_type && (
-                <FormHelperText error>{errors.payment_type}</FormHelperText>
-              )}
-            </FormControl>
+          {data?.map((item: any, index: number) => (
+            <Card
+              onClick={() => {
+                setSelectedPayment(item)
+              }}
+              key={index}
+              sx={{
+                mb: 3,
+                p: 2,
+                borderRadius: 1,
+                boxShadow: 'none',
+                border: '1px solid #e0e0e0',
+                transition: '0.3s',
+                '&:hover': {
+                  borderColor: '#1976d2',
+                  boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                  cursor: 'pointer'
+                }
+              }}
+            >
+              {/* <Box display='flex' alignItems='center' gap={2} mb={2}>
+                <Box
+                  sx={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: '50%',
+                    backgroundColor: '#eee',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 0 8px rgba(0, 0, 0, 0.05)'
+                  }}
+                >
+                  <User size={24} />
+                </Box>
+                <Typography fontWeight={600} fontSize={18}>
+                  {item?.student_name}
+                </Typography>
+              </Box> */}
 
-            <FormControl fullWidth>
-              <InputLabel size='small' id='user-view-language-label' error={!!errors.group && !!touched.group}>
-                {t('Qaysi guruh uchun?')}
-              </InputLabel>
-              <Select
-                size='small'
-                label={t('Qaysi guruh uchun?')}
-                id='user-view-language'
-                labelId='user-view-language-label'
-                name='group'
-                error={!!errors.group && !!touched.group}
-                value={values.group}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              >
-                {userData?.groups?.map((branch: any) => (
-                  <MenuItem key={branch.id} value={branch.group_data.id}>
-                    {branch.group_data.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {!!errors.group && touched.group && <FormHelperText error>{!!errors.group}</FormHelperText>}
-            </FormControl>
+              <Box display='flex' justifyContent='space-between' alignItems='center' mb={1}>
+                <Box display='flex' alignItems='center' gap={1}>
+                  <BanknoteIcon size={18} />
+                  <Typography variant='body2' color='text.secondary'>
+                    To'lov miqdori
+                  </Typography>
+                </Box>
+                <Typography fontWeight={600} color={item?.amount >= 0 ? 'green' : 'red'}>
+                  {formatCurrency(item?.amount)} so'm
+                </Typography>
+              </Box>
 
-            <FormControl fullWidth>
-              <AmountInput
-                label={t('Summa')}
-                size='small'
-                name='amount'
-                defaultValue={''}
-                error={!!errors.amount && touched.amount}
-                value={values.amount}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              {!!errors.amount && touched.amount && <FormHelperText error>{errors.amount}</FormHelperText>}
-            </FormControl>
+              <Box display='flex' justifyContent='space-between' alignItems='center' mb={1}>
+                <Box display='flex' alignItems='center' gap={1}>
+                  <Calendar size={16} />
+                  <Typography variant='body2' color='text.secondary'>
+                    To'lov sanasi
+                  </Typography>
+                </Box>
+                <Typography fontWeight={500}>{item?.payment_date}</Typography>
+              </Box>
 
-            <FormControl fullWidth>
-              <TextField
-                rows={4}
-                multiline
-                label={t('Izoh')}
-                name='description'
-                defaultValue={''}
-                error={!!errors.description && touched.description}
-                value={values.description}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              {!!errors.description && touched.description && (
-                <FormHelperText error>{errors.description}</FormHelperText>
-              )}
-            </FormControl>
-
-            <FormControl sx={{ width: '100%' }}>
-              <input
-                type='date'
-                style={{
-                  borderRadius: '8px',
-                  padding: '10px',
-                  outline: 'none',
-                  border: '1px solid gray',
-                  marginTop: '10px'
-                }}
-                name='payment_date'
-                value={values.payment_date}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              {!!errors.payment_date && touched.payment_date && (
-                <FormHelperText error>{errors.payment_date}</FormHelperText>
-              )}
-            </FormControl>
-
-            <DialogActions sx={{ justifyContent: 'center' }}>
-              <LoadingButton loading={loading} type='submit' variant='contained' sx={{ mr: 1 }}>
-                {t('Saqlash')}
-              </LoadingButton>
-              <Button variant='outlined' type='button' color='secondary' onClick={handleEditClose}>
-                {t('Bekor qilish')}
-              </Button>
-            </DialogActions>
-          </form>
+              <Box display='flex' justifyContent='space-between' alignItems='center'>
+                <Box display='flex' alignItems='center' gap={1}>
+                  <User size={18} />
+                  <Typography variant='body2' color='text.secondary'>
+                    Admin
+                  </Typography>
+                </Box>
+                <Typography fontWeight={500}>{item?.admin}</Typography>
+              </Box>
+            </Card>
+          ))}
         </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditClose} fullWidth variant='contained'>
+            Yopish
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <ReturnCashModal
+        handleClose={handleEditClose}
+        paymentData={selectedPayment}
+        setPaymentData={setSelectedPayment}
+      />
+    </div>
+  )
+}
+
+const ReturnCashModal = ({
+  paymentData,
+  setPaymentData,
+  handleClose
+}: {
+  handleClose: () => void
+  paymentData: any
+  setPaymentData: (status: any) => void
+}) => {
+  const { query } = useRouter()
+  const { mutate, isPending } = usePost()
+  const dispatch = useAppDispatch()
+  const validationSchema = Yup.object({
+    amount: Yup.number().typeError('Faqat raqam kiriting').required('Pul miqdori majburiy'),
+    description: Yup.string().nullable()
+  })
+
+
+  const formik = useFormik({
+    initialValues: {
+      amount: '',
+      description: ''
+    },
+    validationSchema,
+    onSubmit: async values => {
+      mutate(
+        'system/refund-payment/',
+        {
+          ...values,
+          payment: paymentData.id
+        },
+        {
+          onSuccess: () => {
+            onClose()
+            handleClose()
+            dispatch(fetchStudentPayment(query.student))
+            toast.success('Pul qaytarish muvvafaqiyatli boldi')
+          },
+          onError: err => {
+            console.log(err)
+            formik.setErrors(err.response.data)
+          }
+        }
+      )
+    }
+  })
+
+  function onClose() {
+    setPaymentData(null)
+    formik.resetForm()
+  }
+
+  return (
+    <div>
+      <Dialog maxWidth='xs' fullWidth open={!!paymentData} onClose={onClose}>
+        <DialogTitle>Pul qaytarish</DialogTitle>
+        <form onSubmit={formik.handleSubmit}>
+          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <AmountInput
+              name='amount'
+              label='Pul miqdori'
+              value={formik.values.amount}
+              onChange={e => formik.setFieldValue('amount', revereAmount(e.target.value))}
+              onBlur={formik.handleBlur}
+              error={formik.touched.amount && Boolean(formik.errors.amount)}
+              helperText={formik.touched.amount && formik.errors.amount}
+            />
+            <Typography color={'red'} fontSize={12}>{`Maksimum  ${formatCurrency(
+              paymentData?.amount
+            )} so'm qaytarsa bo'ladi`}</Typography>
+            <TextField
+              fullWidth
+              name='description'
+              label='Izoh'
+              multiline
+              rows={3}
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.description && Boolean(formik.errors.description)}
+              helperText={formik.touched.description && formik.errors.description}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={onClose} color='secondary'>
+              Bekor qilish
+            </Button>
+            <LoadingButton loading={isPending} type='submit' variant='contained' color='primary'>
+              Saqlash
+            </LoadingButton>
+          </DialogActions>
+        </form>
       </Dialog>
     </div>
   )

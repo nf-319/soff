@@ -17,7 +17,6 @@ import CardStatsVertical from '@components/card-statistics/card-stats-vertical'
 
 const DashboardStats = () => {
   const { statsData } = useAppSelector(state => state.dashboard)
-
   const dispatch = useAppDispatch()
   const { isMobile } = useResponsive()
   const { push } = useRouter()
@@ -33,37 +32,43 @@ const DashboardStats = () => {
     void fetchData()
   }, [user?.active_branch, refetch])
 
-  function click(link) {
-    if (link === 'debtors_amount') {
-      dispatch(updateStudentParams({ is_debtor: true, last_payment: '' }))
-      return push('/students')
-    } else if (link === 'active_debts_count') {
-      dispatch(updateStudentParams({ is_debtor: true, last_payment: '' }))
-      return push('/students')
+  function click(link: string) {
+    const newParams: { [key: string]: string } = {}
+
+    if (link === 'debtors_amount' || link === 'active_debts_count') {
+      newParams.is_debtor = 'true'
     } else if (link === 'last_payment') {
-      dispatch(updateStudentParams({ is_debtor: '', last_payment: true }))
-      return push('/students')
+      newParams.last_payment = 'true'
     } else if (link === 'group_status') {
-      dispatch(updateStudentParams({ group_status: 'new' }))
-      return push('/students')
+      newParams.group_status = 'new'
     } else if (link === 'active_students') {
-      dispatch(updateStudentParams({ group_status: 'active' }))
-      return push('/students')
+      newParams.group_status = 'active'
     } else if (link === 'not_activated') {
-      dispatch(updateStudentParams({ group_status: 'not_activated' }))
-      return push('/students')
+      newParams.group_status = 'not_activated'
+    } else {
+      void push(link)
+      return
     }
 
-    void push(link)
+    dispatch(updateStudentParams(newParams))
+
+    void push(
+      {
+        pathname: '/students',
+        query: newParams
+      },
+      undefined,
+      { shallow: true }
+    )
   }
+
 
   const tooltip = {
     active_groups: 'Faol guruhlar soni.',
     active_students: "Ayni vaqtda faol o'quvchilar soni",
     active_debts_count: `Umumiy qarzdor o'quvchilar soni : ${stats?.debtor_users} ta, arxivdagi o'quvchilar soni : ${stats?.active_debts_count} ta (1 ta o'quvchi 2 va undan ortiq guruhda o'qishi mumkin)`,
     active_debts_amount: `Umumiy o'quvchilar qarzdorligi : ${formatCurrency(stats?.debtors_amount) + " so'm,"}
-      Arxivdagi o'quvchilar qarzdorligi : ${formatCurrency(stats?.archive_debts_amount) + " so'm"}`
-    ,
+      Arxivdagi o'quvchilar qarzdorligi : ${formatCurrency(stats?.archive_debts_amount) + " so'm"}`,
     leads_count: "Hozirda faol bo'lgan va ishlov berilishi kerak bo'lgan lidlar ro'yxati.",
     not_activated_students: "Sinov darsiga kelib ketgan o'quvchilar soni",
     payment_approaching: "To'lov qilishiga 7 kundan kam qolgan o'quvchilar soni",

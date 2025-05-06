@@ -18,7 +18,7 @@ const GuestGuard = (props: GuestGuardProps) => {
       return
     }
 
-    if (window.localStorage.getItem('userData')) {
+    if (window.localStorage.getItem('userData') && window.localStorage.getItem('accessToken') ) {
       void router.push('/')
     }
   }, [router.route])

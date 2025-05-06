@@ -16,9 +16,10 @@ type Props = {
   setOpen: Dispatch<SetStateAction<MenuOpenType>>
   leadId: string
   onClose?: boolean
+  defaultId?: any
 }
 
-export const AddGroup: FC<Props> = ({ open, leadId, onClose, setOpen }) => {
+export const AddGroup: FC<Props> = ({ defaultId, open, leadId, onClose, setOpen }) => {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [loading, setLoading] = useState<boolean>(false)
@@ -45,12 +46,13 @@ export const AddGroup: FC<Props> = ({ open, leadId, onClose, setOpen }) => {
               dispatch(setSectionId(null))
             }
             queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
+            queryClient.invalidateQueries({ queryKey: ['amocrm/pipelines/?with_steps=true'] })
+            queryClient.invalidateQueries({ queryKey: [`amocrm/leads/?pipeline_id=${defaultId}`] })
             setOpen(null)
           }}
           groups={data && data}
           loading={loading}
           setLoading={setLoading}
-          is_amocrm={false}
         />
       </DialogContent>
     </Dialog>

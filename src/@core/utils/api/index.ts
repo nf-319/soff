@@ -10,7 +10,7 @@ api.interceptors.request.use(
       ? localStorage.getItem(authConfig.storageTokenKeyName)
       : null
 
-    let baseURL = ''
+    let baseURL: string
 
     if (typeof window !== 'undefined') {
       const subdomain = window.location.hostname.split('.')

@@ -17,10 +17,10 @@ import Badge from '@mui/material/Badge'
 import { getFormatTimestamp } from '@utils/getFormatTimestamp'
 import { NotificationContent, StyledMenu, StyledMenuItem } from './NotificationDropdown.style'
 import { useNotificationsNotRead } from '@hooks/useNotification'
-import { toast } from 'sonner'
 import Image from 'next/image'
 import { useAppSelector } from '@/store'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 type Props = {
   settings: Settings
@@ -247,7 +247,6 @@ const NotificationDropdown = (props: Props) => {
     }
 
     const handleError = (error: any) => {
-      console.error('WebSocket error:', error)
       wsConnectedRef.current = false
     }
 

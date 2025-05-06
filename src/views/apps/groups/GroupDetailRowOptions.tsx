@@ -60,8 +60,7 @@ export type ModalTypes = 'group' | 'withdraw' | 'payment' | 'sms' | 'delete' | '
 export default function GroupDetailRowOptions({ id }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const { push, query } = useRouter()
-  const { students, studentsQueryParams, queryParams, openLeadModal } =
-    useAppSelector(state => state.groupDetails)
+  const { students, studentsQueryParams, queryParams, openLeadModal } = useAppSelector(state => state.groupDetails)
   const [openEdit, setOpenEdit] = useState<ModalTypes | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const { t } = useTranslation()
@@ -102,29 +101,29 @@ export default function GroupDetailRowOptions({ id }: Props) {
   }
 
   const handleLeft = async () => {
-      try {
-        await api.delete(`common/group-student-delete/${student?.id}/`)
-        toast.success("O'quvchi guruhdan chetlatildi", { position: 'top-center' })
-        setLoading(false)
-        const queryString = new URLSearchParams(studentsQueryParams).toString()
-        const queryStringAttendance = new URLSearchParams(queryParams).toString()
-        await dispatch(getStudents({ id: query.id, queryString: queryString }))
-        dispatch(setGettingAttendance(true))
-        if (query.month && query?.id) {
-          await dispatch(
-            getAttendance({
-              date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query.month)}`,
-              group: query?.id,
-              queryString: queryStringAttendance
-            })
-          )
-        }
-        dispatch(setGettingAttendance(false))
-      } catch (err: any) {
-        console.error(err)
-        toast.error(err.response.data.msg)
-        setLoading(false)
+    try {
+      await api.delete(`common/group-student-delete/${student?.id}/`)
+      toast.success("O'quvchi guruhdan chetlatildi", { position: 'top-center' })
+      setLoading(false)
+      const queryString = new URLSearchParams(studentsQueryParams).toString()
+      const queryStringAttendance = new URLSearchParams(queryParams).toString()
+      await dispatch(getStudents({ id: query.id, queryString: queryString }))
+      dispatch(setGettingAttendance(true))
+      if (query.month && query?.id) {
+        await dispatch(
+          getAttendance({
+            date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query.month)}`,
+            group: query?.id,
+            queryString: queryStringAttendance
+          })
+        )
       }
+      dispatch(setGettingAttendance(false))
+    } catch (err: any) {
+      console.error(err)
+      toast.error(err.response.data.msg)
+      setLoading(false)
+    }
     setOpenLeft(false)
   }
 
@@ -215,7 +214,7 @@ export default function GroupDetailRowOptions({ id }: Props) {
           </Box>
         </DialogContent>
       </Dialog>
-      <Dialog open={openLeadModal} onClose={() => (dispatch(setOpenLeadModal(null)), handleClose('none'))}>
+      <Dialog open={openLeadModal == id} onClose={() => (dispatch(setOpenLeadModal(null)), handleClose('none'))}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography sx={{ fontSize: '20px', textAlign: 'center' }}>{t("Lidlar bo'limga qo'shish")}</Typography>
           <IconifyIcon

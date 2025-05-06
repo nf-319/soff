@@ -52,6 +52,7 @@ export interface CreateStudentDto extends StudentItemType {
   password?: string | null
   contract_amount?:number,
   school?: string,
+  source?:string,
   parent_first_name?: string,
   parent_phone?:string
   group?: number | string
@@ -129,7 +130,8 @@ export interface StudentDetailType {
 
 export interface StudentsQueryParamsTypes {
   search?: string
-  school?:string,
+  school?: string,
+  is_overpaid?:string,
   start_date?: string,
   end_date?:string,
   limit?: string

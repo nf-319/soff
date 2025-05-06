@@ -18,8 +18,8 @@ import QrCodeModal from '../../components/qrCode-Modal'
 import { AuthContext } from 'src/context/AuthContext'
 import DraggableIcon from 'src/pages/soffBotIcon'
 import { useRouter } from 'next/router'
-import AppBarWarningVertical from 'src/components/AppBarWarningVertical'
 import { APP_BAR_ACCESS } from '@/shared/config'
+import AppBarWarning from '@components/AppBarWarning'
 
 const VerticalLayoutWrapper = styled(Box)({
   height: '100%',
@@ -103,7 +103,7 @@ const VerticalLayout = (props: LayoutProps) => {
           className='layout-content-wrapper'
           sx={{ ...(contentHeightFixed && { maxHeight: '100vh' }) }}
         >
-          {showWarning && <AppBarWarningVertical setShowWarning={setShowWarning} />}
+          {showWarning && <AppBarWarning setShowWarning={setShowWarning} />}
 
           {!auth?.user?.payment_page && (
             <AppBar

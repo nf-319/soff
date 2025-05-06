@@ -2,11 +2,12 @@
 
 import type React from 'react'
 import type { Dispatch } from 'react'
-import { useMemo, useCallback, useState, useEffect } from 'react'
+import { useMemo, useCallback, useEffect, useRef } from 'react'
 import { Box, IconButton, Tooltip, Typography, useMediaQuery } from '@mui/material'
 import { CalendarCheck, Edit } from 'lucide-react'
 import { UserViewItem } from './UserViewItem'
 import { EmptyContent } from 'src/components/empty-content'
+import dayjs from 'dayjs'
 
 interface Student {
   id: string | number
@@ -51,6 +52,20 @@ export const AttendanceTable = ({
   const displayDays = useMemo(() => {
     return days?.length > 0 ? days : Array(7).fill({ date: 'placeholder' })
   }, [days])
+
+  const today = dayjs().format('YYYY-MM-DD')
+  const focusRef = useRef<HTMLTableCellElement>(null)
+
+  useEffect(() => {
+    if (focusRef.current) {
+      focusRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      focusRef.current.style.backgroundColor = '#e0f7fa'
+    }
+  }, [])
+
+  const students = useMemo(() => {
+    return attendance?.students || []
+  }, [attendance])
 
   const tableStyles: React.CSSProperties = useMemo(
     () => ({
@@ -244,43 +259,48 @@ export const AttendanceTable = ({
             <td style={stickyHeaderStyles}>
               <Typography fontWeight={600}>{t("O'quvchilar")}</Typography>
             </td>
-            {displayDays.map((hour: any, index) => (
-              <th
-                key={hour.date || `placeholder-day-${index}`}
-                style={
-                  {
-                    ...dayHeaderStyles,
-                    cursor: hour.date !== 'placeholder' ? 'pointer' : 'default'
-                  } as React.CSSProperties
-                }
-                onClick={() => hour.date !== 'placeholder' && handleDayClick(hour.date)}
-              >
-                {hour.date !== 'placeholder' ? (
-                  <Box
-                    style={
-                      {
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '4px'
-                      } as React.CSSProperties
-                    }
-                  >
-                    <Typography fontWeight={600} style={{ fontSize: '16px' } as React.CSSProperties}>
-                      {`${hour.date.split('-')[2]}`}
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Box style={{ height: '24px' } as React.CSSProperties}></Box>
-                )}
-              </th>
-            ))}
+            {displayDays.map((hour: any, index) => {
+              const isToday = dayjs(hour?.date).format('YYYY-MM-DD') === today
+
+              return (
+                <th
+                  ref={isToday && !focusRef.current ? focusRef : null}
+                  key={hour.date || `placeholder-day-${index}`}
+                  style={
+                    {
+                      ...dayHeaderStyles,
+                      cursor: hour.date !== 'placeholder' ? 'pointer' : 'default'
+                    } as React.CSSProperties
+                  }
+                  onClick={() => hour.date !== 'placeholder' && handleDayClick(hour.date)}
+                >
+                  {hour.date !== 'placeholder' ? (
+                    <Box
+                      style={
+                        {
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '4px'
+                        } as React.CSSProperties
+                      }
+                    >
+                      <Typography fontWeight={600} style={{ fontSize: '16px' } as React.CSSProperties}>
+                        {`${hour.date.split('-')[2]}`}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Box style={{ height: '24px' } as React.CSSProperties}></Box>
+                  )}
+                </th>
+              )
+            })}
           </tr>
         </thead>
 
         <tbody>
-          {attendance?.students?.length
-            ? attendance?.students?.map((student: Student, studentIndex: number) => (
+          {students.length
+            ? students.map((student: Student, studentIndex: number) => (
                 <tr
                   key={student.id || `placeholder-student-${studentIndex}`}
                   style={
@@ -350,12 +370,13 @@ export const AttendanceTable = ({
                     }
 
                     const currentDate = student.attendance?.find((el: any) => el.date === hour.date)
-
+                    
                     if (
                       student.attendance?.some((el: any) => el.date === hour.date) &&
                       student.attendance?.find((el: any) => el.date === hour.date && !hour.weekend?.date)
                     ) {
                       const attendanceRecord = student.attendance.find((el: any) => el.date === hour.date)
+                      
                       return (
                         <td
                           key={`attendance-${student.id}-${hour.date}`}
@@ -374,6 +395,7 @@ export const AttendanceTable = ({
                             currentDate={currentDate}
                             opened_id={opened_id}
                             setOpenedId={setOpenedId}
+                            updated_at={attendanceRecord.updated_at}
                             defaultValue={attendanceRecord.is_available}
                             groupId={query?.id}
                             userId={student.id}

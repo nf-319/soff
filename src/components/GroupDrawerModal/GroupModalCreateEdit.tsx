@@ -45,7 +45,7 @@ type Props = {
 }
 
 export function GroupCreateEditDrawer({ open, setOpen }: Props) {
-  const { isOpenAddGroup, groupData, queryParams, isOpenEdit, formParams, initialValues } = useAppSelector(
+  const { groupData, queryParams, isOpenEdit, formParams, initialValues } = useAppSelector(
     state => state.groups
   )
   const dispatch = useAppDispatch()
@@ -146,7 +146,7 @@ export function GroupCreateEditDrawer({ open, setOpen }: Props) {
 
         if (response.meta.requestStatus === 'rejected') {
           formik.setErrors(response.payload)
-          toast.error(response.payload.msg || response.payload.end_date)
+          toast.error(response.payload.msg)
         } else {
           dispatch(updateParams({ is_recovery: false }))
           toast.success(t("O'zgrishlar muvafaqqiyati saqlandi"))
@@ -485,7 +485,7 @@ export function GroupCreateEditDrawer({ open, setOpen }: Props) {
                 </FormHelperText>
               </FormControl>
 
-              {open == 'edit' && (
+              {isOpenEdit || open !== 'create' && (
                 <FormControl sx={{ width: '100%' }}>
                   <TextField
                     size='small'
@@ -495,10 +495,8 @@ export function GroupCreateEditDrawer({ open, setOpen }: Props) {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.end_date}
+                    InputLabelProps={{ shrink: true }}
                     error={!!formik.errors.end_date && formik.touched.end_date}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
                   />
                   <FormHelperText error={!!formik.errors.end_date && formik.touched.end_date}>
                     {!!formik.errors.end_date && formik.touched.end_date && formik.errors.end_date}

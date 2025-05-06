@@ -1,7 +1,16 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
-import { FormControl, FormHelperText, InputLabel, TextField } from '@mui/material'
+import {
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  TextField
+} from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -9,6 +18,8 @@ import { editDepartmentStudent, updateDepartmentStudent } from 'src/store/apps/l
 import { reversePhone } from '../../../../components/phone-input/format-phone-number'
 import PhoneInput from '../../../../components/phone-input'
 import { useQueryClient } from '@tanstack/react-query'
+import { states, temperateOptions } from '@/pages/reports/lid-statements/leads-list'
+import { lidStatusOption } from '@/shared/constans/lid-statements'
 
 type Props = {
   item: any
@@ -22,11 +33,15 @@ export default function EditAnonimUserForm({ department, item, onClose, laed }: 
   const dispatch = useAppDispatch()
   const { loading } = useAppSelector(state => state.leads)
   const queryClient = useQueryClient()
+  const [temperateValue, setTemperateValue] = useState(item.temperature || '')
+  const [stateValue, setStateValue] = useState(item.status)
 
   const validationSchema = Yup.object({
     first_name: Yup.string().required('Ism kiriting'),
     phone: Yup.string().required('Telefon raqam kiriting')
   })
+
+  console.log(item)
 
   const initialValues: {
     first_name: string
@@ -42,7 +57,7 @@ export default function EditAnonimUserForm({ department, item, onClose, laed }: 
     onSubmit: async values => {
       try {
         const resp = await dispatch(
-          editDepartmentStudent({ id: item.id, ...values, phone: reversePhone(values.phone) })
+          editDepartmentStudent({ id: item.id, ...values, temperate: temperateValue, status: stateValue, phone: reversePhone(values.phone) })
         )
 
         if (resp.meta.requestStatus === 'rejected') {
@@ -66,6 +81,16 @@ export default function EditAnonimUserForm({ department, item, onClose, laed }: 
       formik.resetForm()
     }
   }, [])
+
+  const filteredOptions = (() => {
+    if (stateValue === 'new') {
+      return lidStatusOption
+    }
+
+    return lidStatusOption?.filter((o: any) => o.value !== 'new' && o.value !== '')
+  })()
+
+  const newState = { value: '', label: '----' }
 
   return (
     <form
@@ -101,6 +126,52 @@ export default function EditAnonimUserForm({ department, item, onClose, laed }: 
           value={values.phone}
         />
         {!!errors.phone && touched.phone && <FormHelperText error>{formik.errors.phone}</FormHelperText>}
+      </FormControl>
+
+      <FormControl fullWidth>
+        <InputLabel size='small'>Holat</InputLabel>
+        <Select
+          label='Holat'
+          placeholder='Holatni tanlang'
+          size='small'
+          fullWidth
+          value={stateValue}
+          onChange={e => setStateValue(e.target.value as string)}
+          displayEmpty
+        >
+          {filteredOptions.map(option => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <FormControl fullWidth size="small" variant="outlined">
+        <InputLabel id="temperature-label" shrink>
+          Harorat
+        </InputLabel>
+        <Select
+          labelId="temperature-label"
+          value={temperateValue}
+          onChange={e => setTemperateValue(e.target.value)}
+          input={<OutlinedInput notched label="Harorat" />}
+          displayEmpty
+          renderValue={selected => {
+            if (selected === '') {
+              return <span style={{ color: '#aaa' }}>{newState.label}</span>
+            }
+
+            const selectedOption = temperateOptions.find(option => option.value === selected)
+            return selectedOption?.label ?? ''
+          }}
+        >
+          {[newState, ...temperateOptions.slice(1, 4)].map(option => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
       </FormControl>
 
       <LoadingButton loading={loading} type='submit' variant='outlined'>

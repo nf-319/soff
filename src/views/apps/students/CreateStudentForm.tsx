@@ -38,19 +38,21 @@ import { TeacherAvatar, VisuallyHiddenInput } from '../mentors/AddMentorsModal'
 import { useQueryClient } from '@tanstack/react-query'
 import { Add, Remove } from '@mui/icons-material'
 import { fetchSchoolsList } from 'src/store/apps/settings'
+import { useGet } from '@/hooks/useApi'
 
 export default function CreateStudentForm() {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
-  const { groups } = useAppSelector(state => state.students)
+  const { groups, openEdit } = useAppSelector(state => state.students)
   const { schools } = useAppSelector(state => state.settings)
   const [image, setImage] = useState<any>(null)
   const profilePhoto: any = useRef(null)
   const [selected, setSelected] = useState<any[]>([])
-
+  const { data: sourceData } = useGet('leads/statistic/', { options: { enabled: openEdit === 'create' } })
   const toggleSelection = (item: any) => {
     setSelected(prev => (prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]))
   }
+
   const { isMobile } = useResponsive()
   const [isGroup, setIsGroup] = useState<boolean>(false)
 
@@ -71,6 +73,7 @@ export default function CreateStudentForm() {
     parent_first_name: Yup.string().nullable(),
     gender: Yup.string().required('Jinsini tanlang'),
     password: Yup.string(),
+    source: Yup.string().nullable(),
     is_discount: Yup.boolean(),
     discount_amount: Yup.number().when('is_discount', {
       is: true,
@@ -89,6 +92,7 @@ export default function CreateStudentForm() {
     contract_amount: 0,
     birth_date: today,
     gender: 'male',
+    source: '',
     start_at: today,
     is_discount: false,
     discount_amount: 0
@@ -155,6 +159,7 @@ export default function CreateStudentForm() {
     }, 500),
     []
   )
+
   return (
     <form
       onSubmit={formik.handleSubmit}
@@ -264,6 +269,29 @@ export default function CreateStudentForm() {
           onBlur={handleBlur}
         />
         <FormHelperText error={true}>{errors.password}</FormHelperText>
+      </FormControl>
+      <FormControl fullWidth>
+        <InputLabel size='small' id='user-view-language-label'>
+          {t('Manba')}
+        </InputLabel>
+
+        <Select
+          size='small'
+          error={!!errors.source && touched.source}
+          label={t('Guruhlar')}
+          id='user-view-language'
+          labelId='user-view-language-label'
+          name='source'
+          onChange={handleChange}
+          value={values.source || ''}
+          sx={{ mb: 3, maxWidth: isMobile ? 320 : 'auto' }}
+        >
+          {sourceData?.result?.map((source: any) => (
+            <MenuItem key={source.id} value={Number(source.id)} sx={{ width: '500px' }}>
+              {source.name}
+            </MenuItem>
+          ))}
+        </Select>
       </FormControl>
 
       <FormControl sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>

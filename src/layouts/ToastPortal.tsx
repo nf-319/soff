@@ -1,3 +1,5 @@
+'use client'
+
 import { createPortal } from 'react-dom';
 import { Toaster as RHTToaster } from 'react-hot-toast';
 import { Toaster as SonnerToaster } from 'sonner';
