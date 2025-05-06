@@ -1,4 +1,4 @@
-name: CI and Deploy to Server
+name: CI/CD Pipeline
 
 on:
   push:
@@ -13,50 +13,65 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js (local runner)
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 'v20.12.2'
+          node-version: '20.12.2'
+          cache: 'npm'
 
-      - name: Install dependencies (local runner)
-        run: npm install
+      - name: Install dependencies
+        run: npm ci
 
-      - name: create env file
+      - name: Create environment files
         run: |
-          touch .env
-          echo "${{ secrets.TEST_ENV_CONTENT }}" >> .env
-          touch .env
-          echo "${{ secrets.PROD_ENV_CONTENT }}" >> .env
+          echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
 
-      - name: Deploy to development server (for test branch)
-        if: github.ref == 'refs/heads/test'
-        uses: appleboy/ssh-action@v0.1.2
+      - name: Deploy with zero-downtime (test branch)
+        uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.TEST_SERVER_IP }}
           username: root
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
-            if [ ! -d "$HOME/.nvm" ]; then
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
-              source ~/.nvm/nvm.sh
-            else
-              source ~/.nvm/nvm.sh
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            if ! command -v nvm &> /dev/null; then
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+              export NVM_DIR="$HOME/.nvm"
+              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             fi
+
+            nvm install 20.10.0
             nvm use 20.10.0
 
-            mkdir -p frontend/prod-subdomain-soffcrm-uz-3132/${{ secrets.REPO_NAME }}
-            cd frontend/prod-subdomain-soffcrm-uz-3132/${{ secrets.REPO_NAME }}
+            APP_DIR="frontend/test-subdomain-soffcrm-uz-3132"
+            mkdir -p $APP_DIR
+            cd $APP_DIR
+
             if [ ! -d ".git" ]; then
-                git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
+              git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
             else
-                git stash
-                git pull origin test
+              git fetch origin test
+              git reset --hard origin/test
             fi
 
             echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
 
-            npm install
+            npm ci
             npm run build
 
-            pm2 startOrReload ecosystem.config.js --only test-subdomain-soffcrm-uz-3132
+            if pm2 list | grep -q "test-subdomain-soffcrm-uz-3132"; then
+              pm2 start ecosystem.config.js --only test-subdomain-soffcrm-uz-3132-new --update-env
+
+              sleep 5
+
+              pm2 delete test-subdomain-soffcrm-uz-3132
+
+              pm2 start ecosystem.config.js --only test-subdomain-soffcrm-uz-3132 --update-env
+              pm2 delete test-subdomain-soffcrm-uz-3132-new
+            else
+              pm2 start ecosystem.config.js --only test-subdomain-soffcrm-uz-3132
+            fi
+
             pm2 save
