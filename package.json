@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 192.168.1.19",
+    "dev": "next dev -H 192.168.1.36",
     "build": "next build",
     "start": "next start -p 3132",
     "lint": "echo Lint tekshiruvi o‘chirildi",
