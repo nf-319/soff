@@ -48,7 +48,7 @@ const YearlyTrend = () => {
       data: fillMissingMonths(data ?? [], 'new_count'),
     },
     {
-      id: 'Roʻyxatdan oʻtgan',
+      id: 'Sotuvlar soni',
       color: 'hsl(120, 70%, 50%)',
       data: fillMissingMonths(data ?? [], 'enrolled_count'),
     },
@@ -178,7 +178,7 @@ const YearlyTrend = () => {
     >
       <Box display='flex' gap={3} sx={{ px: 6, py: 4 }}>
         <Typography color="black" fontSize={20} fontWeight={700}>
-          Yillik yetakchi trendi
+          Yil kesimida lidlar soni
         </Typography>
 
         <Tooltip title="Bu yillik savdo haqida ma'lumot">

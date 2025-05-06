@@ -39,7 +39,12 @@ const LeadsSellers = () => {
     {
       field: 'worked_lead_count',
       headerName: t('Lidlar soni'),
-      width:250,
+      width: 150,
+    },
+    {
+      field: 'enrolled_leads',
+      headerName: 'Sotuvlar soni',
+      width:150,
     },
     {
       field: 'lost_leads',
