@@ -37,6 +37,7 @@ import { Ellipsis } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { LeadKanbanItem } from '@/entities/lids/LeadKanbanItem'
 import { states, temperateOptions } from '@/pages/reports/lid-statements/leads-list'
+import { lidStatusOption } from '@/shared/constans/lid-statements'
 
 type Props = {
   source?: any
@@ -261,7 +262,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
           onChange={e => setStateValue(e.target.value as string)}
           displayEmpty
         >
-          {states.slice(1, 7).map(option => (
+          {lidStatusOption.map(option => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>

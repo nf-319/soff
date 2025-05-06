@@ -53,6 +53,7 @@ import { getFormatPhone } from '@/shared/utils'
 import { PhoneLink } from '@components/PhoneLink'
 import { QueryKeys } from '@/shared/query-hooks/queryKeys'
 import { lidStatusOption } from '@/shared/constans/lid-statements'
+import { getFormatDate } from '@/shared/utils/getFormatDate'
 
 interface LidsDragonModalProps {
   openModal: boolean
@@ -227,40 +228,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
   const lidTemperature = async (temperature: string) => {
     try {
       const requestPrams = { temperature }
-      const allQueries = queryClient.getQueryCache().findAll()
-      const matchedQuery = allQueries.find(q =>
-        Array.isArray(q.queryKey) &&
-        q.queryKey[0] === 'leads/departments/leads/' &&
-        q.queryKey[1] === 'departments-leads' &&
-        q.queryKey[2] === true &&
-        typeof q.queryKey[3] === 'number'
-      )
-
-      if (!matchedQuery) {
-        toast.error("Mos keladigan query topilmadi")
-        return
-      }
-
-      const key = matchedQuery.queryKey as [string, string, boolean, number]
-
-      queryClient.setQueryData(key, (oldData: any) => {
-        if (!oldData || !Array.isArray(oldData.results)) return oldData
-
-        return {
-          ...oldData,
-          results: oldData.results.map((department: any) => {
-            if (!Array.isArray(department.leads)) return department
-
-            return {
-              ...department,
-              leads: department.leads.map((lead: any) =>
-                lead.id === selectedLead?.id ? { ...lead, temperature } : lead
-              )
-            }
-          })
-        }
-      })
-
+      void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
       mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams)
       setSelectedLead((prev: any) => ({
         ...prev,
@@ -278,39 +246,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
     try {
       const requestPrams = { status }
 
-      const allQueries = queryClient.getQueryCache().findAll()
-      const matchedQuery = allQueries.find(q =>
-        Array.isArray(q.queryKey) &&
-        q.queryKey[0] === 'leads/departments/leads/' &&
-        q.queryKey[1] === 'departments-leads' &&
-        q.queryKey[2] === true &&
-        typeof q.queryKey[3] === 'number'
-      )
-
-      if (!matchedQuery) {
-        toast.error("Mos keladigan query topilmadi")
-        return
-      }
-
-      const key = matchedQuery.queryKey as [string, string, boolean, number]
-
-      queryClient.setQueryData(key, (oldData: any) => {
-        if (!oldData || !Array.isArray(oldData.results)) return oldData
-
-        return {
-          ...oldData,
-          results: oldData.results.map((department: any) => {
-            if (!Array.isArray(department.leads)) return department
-
-            return {
-              ...department,
-              leads: department.leads.map((lead: any) =>
-                lead.id === selectedLead?.id ? { ...lead, status } : lead
-              ),
-            }
-          }),
-        }
-      })
+      void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
 
       mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams, {
         onSuccess: () => {
@@ -747,7 +683,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
                         </Box>
                         <Box display='flex' alignItems='center'>
                           <div className='text-primary me-3'>{<Clock />}</div>
-                          <Typography fontSize={15}>{item?.created_at}</Typography>
+                          <Typography fontSize={15}>{getFormatDate(item?.created_at ?? '')}</Typography>
                         </Box>
                       </Box>
                     ))}

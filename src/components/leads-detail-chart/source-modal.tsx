@@ -26,8 +26,8 @@ const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (st
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Box flexDirection='column' sx={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: '200px' }}>
-            <Card sx={{ p: 4, width: '100%', border: '1px solid #e0e0e0e0' }}>
+          <Box flexDirection='column' sx={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Card sx={{ p: 4, width: '100%', border: '1px solid #e0e0e0e0', boxShadow: 'none' }}>
               <Typography variant='h5' pb={3}>
                 Manba ma'lumotlari
               </Typography>
@@ -56,7 +56,7 @@ const ReportLeadsSourceModal = ({ open, setOpen }: { open: boolean; setOpen: (st
                           <Typography>
                             Konversatsiya:{' '}
                             <Typography component='span' sx={{ fontWeight: 600, color: '#1976d2' }}>
-                              {item?.conversion_rate}%
+                              {item?.conversion_rate} %
                             </Typography>
                           </Typography>
                         </CardContent>

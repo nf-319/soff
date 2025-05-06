@@ -30,7 +30,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.TEST_SERVER_IP }}
-          username: root
+          username: crmroot
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
             export NVM_DIR="$HOME/.nvm"

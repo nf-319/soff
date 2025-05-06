@@ -75,7 +75,7 @@ const LidsReportsCard = () => {
       icon: ArrowRightLeft,
       title: 'Jami konversiyalar',
       process: data?.conversion_progress || 0,
-      count: data?.conversion || 0,
+      count: `${data?.conversion || 0} %`,
       trendDirection: getProcess(data?.conversion_progress),
       trendColor: '#fff',
       hidden: true,
