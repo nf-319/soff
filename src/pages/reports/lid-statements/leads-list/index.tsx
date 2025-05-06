@@ -10,7 +10,8 @@ import { LidsDragonModal } from '@/views/apps/lids/LidsDragonModal'
 import { uzbekLocaleText } from '@/views/apps/StudentsPoints/constants'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useLeadsStore } from '@/store/apps/reports/leadsStore'
+import { useQueryClient } from '@tanstack/react-query'
+import { QueryKeys } from '@/shared/query-hooks/queryKeys'
 
 export const temperateOptions = [
   { value: '', label: 'Barcha haroratlar' },
@@ -33,7 +34,6 @@ const LeadsList = () => {
   const { t } = useTranslation()
   const router = useRouter()
   const { branch } = router.query
-  const leadsSellers = useLeadsStore((state: any) => state.leadsSellers)
   const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
@@ -42,6 +42,9 @@ const LeadsList = () => {
   const [openModal, setOpenModal] = useState(false)
   const [temperateValue, setTemperateValue] = useState('')
   const [stateValue, setStateValue] = useState('')
+  const queryClient = useQueryClient()
+  const leadsSellers:any = queryClient.getQueryData([QueryKeys.ReportsLeadsSellers])
+
   const [adminValue, setAdminValue] = useState('')
   const tableRef = useRef<HTMLDivElement | null>(null)
   const { data, isLoading } = useGetReportLeadsList({
