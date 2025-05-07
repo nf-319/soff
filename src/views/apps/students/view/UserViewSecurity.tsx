@@ -57,6 +57,7 @@ const UserViewSecurity = () => {
   const school_type = localStorage.getItem('school_type')
   const { getBranches } = useBranches()
   const [changeStatusLoader, setChangeStatusLoader] = useState(false)
+  const [active, setActive] = useState(false)
 
   const handleEditClickOpen = (value: ModalTypes) => {
     if (value === 'payment') {
@@ -127,11 +128,14 @@ const UserViewSecurity = () => {
     }
   }, [query?.student])
 
+  const archivedGroups = studentGroups?.filter((item: any) => item.status == 'archive')
+  const unArchivedGroups = studentGroups?.filter((item: any) => item.status !== 'archive')
+
   return (
     <Box className='demo-space-y'>
       {studentGroups && studentGroups.length > 0 ? (
         <div className='row w-100 row-gap-3'>
-          {studentGroups.map((group: any) => (
+          {(!active ? unArchivedGroups : archivedGroups).map((group: any) => (
             <div className='col-12 col-md-6 position-relative'>
               <Typography
                 id='fade-button'
@@ -431,7 +435,22 @@ const UserViewSecurity = () => {
       ) : (
         <EmptyContent />
       )}
-
+      <Button
+        startIcon={
+          <IconifyIcon style={{ fontSize: '12px' }} icon={`icon-park-outline:to-${active ? 'top' : 'bottom'}`} />
+        }
+        sx={{ fontSize: '10px', marginLeft: 'auto', display: 'flex', justifyContent: 'end' }}
+        size='small'
+        color={active ? 'primary' : 'error'}
+        variant='text'
+        onClick={() => {
+          if (!active) {
+            setActive(true)
+          } else setActive(false)
+        }}
+      >
+        {active ? t('Arxivni yopish') : t("Arxivdagi guruhlarni ko'rish")}
+      </Button>
       <iframe src='' id='printFrame' style={{ height: 0 }}></iframe>
 
       <StudentPaymentEditForm openEdit={edit} setOpenEdit={setEdit} />
