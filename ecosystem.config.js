@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "test-subdomain-soffcrm-uz-3131",
-      script: "node_modules/next/dist/bin/next",
+      script: "npm",
       args: "start",
       instances: "max",
       exec_mode: "cluster",
@@ -18,7 +18,7 @@ module.exports = {
     },
     {
       name: "test-subdomain-soffcrm-uz-3131-new",
-      script: "node_modules/next/dist/bin/next",
+      script: "npm",
       args: "start",
       instances: "max",
       exec_mode: "cluster",
@@ -34,7 +34,7 @@ module.exports = {
     },
     {
       name: "prod-subdomain-soffcrm-uz-3132",
-      script: "node_modules/next/dist/bin/next",
+      script: "npm",
       args: "start",
       instances: "max",
       exec_mode: "cluster",

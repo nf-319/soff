@@ -34,6 +34,7 @@ jobs:
           tar -czf deploy.tar.gz \
             .next/ \
             public/ \
+            node_modules/ \
             package.json \
             package-lock.json \
             ecosystem.config.js \
@@ -88,6 +89,12 @@ jobs:
 
             cd $NEW_DEPLOY_DIR
             echo "Current folder: $(pwd)"
+
+            if [ ! -f "node_modules/next/dist/bin/next" ]; then
+              echo "ERROR: Next.js executable not found!"
+              ls -la node_modules/next/dist/bin/ || echo "Directory doesn't exist"
+              exit 1
+            fi
 
             set -x
 
