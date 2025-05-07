@@ -33,7 +33,7 @@ export type customTableProps = {
   render?: (source: string) => any | undefined
 }
 
-export default function GroupsPage () {
+export default function GroupsPage() {
   const { t } = useTranslation()
   const { push } = useRouter()
   const dispatch = useAppDispatch()
