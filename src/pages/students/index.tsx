@@ -234,16 +234,17 @@ export default function StudentsPage() {
   }, [])
 
   const handleEditClickOpen = (value: ModalTypes) => {
+    setOpenModalEdit(value)
     setOpenEdit(value)
   }
 
   const handleEditClose = () => {
+    setOpenModalEdit(null)
     setOpenEdit(null)
   }
 
   const handleModalOpen = () => {
     if (companyInfo.access) {
-      setAccessModal(false)
       void getSMSTemps()
       handleEditClickOpen('sms')
     } else {
