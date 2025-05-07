@@ -17,7 +17,7 @@ const LegendItem = styled(Box)(({ theme }) => ({
   maxWidth: '100%',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
+  whiteSpace: 'nowrap'
 }))
 
 type Props = {
@@ -32,7 +32,7 @@ const CourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
   const isActive = data.some(item => item.count > 0)
 
   const aggregatedData = data.reduce((acc, item) => {
-    const existing = acc.find((entry) => entry.name === item.name)
+    const existing = acc.find(entry => entry.name === item.name)
     if (existing) {
       existing.count += item.count
     } else {
@@ -44,18 +44,18 @@ const CourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
   const courseInterestData = (() => {
     const nameCounts: Record<string, number> = {}
 
-    return (isActive ? aggregatedData : coursesEmpty).map((item) => {
+    return (isActive ? aggregatedData : coursesEmpty).map(item => {
       nameCounts[item.name] = (nameCounts[item.name] || 0) + 1
 
-      const label = nameCounts[item.name] === 1
-        ? item.name
-        : `${item.name}-${nameCounts[item.name]}`
+      const label = nameCounts[item.name] === 1 ? item.name : `${item.name}-${nameCounts[item.name]}`
 
       return {
         id: item.name,
         label,
         value: item.count,
-        color: `hsl(${((Object.keys(nameCounts).indexOf(item.name) * 360) / Object.keys(nameCounts).length) % 360}, 50%, 60%)`
+        color: `hsl(${
+          ((Object.keys(nameCounts).indexOf(item.name) * 360) / Object.keys(nameCounts).length) % 360
+        }, 50%, 60%)`
       }
     })
   })()
@@ -87,7 +87,7 @@ const CourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
             Kurslar
           </Typography>
 
-          <Tooltip title='Bu kurslar haqida malumot'>
+          <Tooltip title='Leadlarni kurslarga taqsimoti'>
             <CircleHelp style={{ cursor: 'pointer', color: '#9e9e9e', marginTop: 'auto', marginBottom: 'auto' }} />
           </Tooltip>
         </Box>

@@ -1,59 +1,62 @@
-'use client';
+'use client'
 
-import { Box, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { DataGrid } from '@mui/x-data-grid';
-import SellerDetailModal from '@/components/seller-detail-modal';
-import { useGetLeadsSellers } from '@/shared/query-hooks/report-leads/reportLeads';
-import { ReposrtLeadsSellers } from '@/types/report';
-import { uzbekLocaleText } from '@/views/apps/StudentsPoints/constants';
-import { useRouter } from 'next/router';
-import { useLeadsStore } from '@/store/apps/reports/leadsStore';
+import { Box, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { DataGrid } from '@mui/x-data-grid'
+import SellerDetailModal from '@/components/seller-detail-modal'
+import { useGetLeadsSellers } from '@/shared/query-hooks/report-leads/reportLeads'
+import { ReposrtLeadsSellers } from '@/types/report'
+import { uzbekLocaleText } from '@/views/apps/StudentsPoints/constants'
+import { useRouter } from 'next/router'
 
 const LeadsSellers = () => {
-  const { t } = useTranslation();
-  const router = useRouter();
-  const { branch } = router.query;
-  const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
- 
-  const { data = [], isLoading } = useGetLeadsSellers(branchParam);
-  const [sellerId, setSellerId] = useState<number | null>(null);
-  const [selectedSeller, setSelectedSeller] = useState<ReposrtLeadsSellers | null>(null);
-  const setLeadsSellers = useLeadsStore((state:any) => state.setLeadsSellers);
+  const { t } = useTranslation()
+  const router = useRouter()
+  const { branch } = router.query
+  const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined
+
+  const { data = [], isLoading } = useGetLeadsSellers(branchParam)
+  const [sellerId, setSellerId] = useState<number | null>(null)
+  const [selectedSeller, setSelectedSeller] = useState<ReposrtLeadsSellers | null>(null)
 
   const columns = [
     {
       field: 'id',
       headerName: t('ID'),
-      width: 70,
+      width: 70
     },
     {
       field: 'first_name',
       headerName: t('ism'),
-      width:150,
+      width: 150
     },
     {
       field: 'phone',
       headerName: t('Telefon raqam'),
-      width:250,
+      width: 250
     },
     {
       field: 'worked_lead_count',
       headerName: t('Lidlar soni'),
-      width:250,
+      width: 150
+    },
+    {
+      field: 'enrolled_leads',
+      headerName: 'Sotuvlar soni',
+      width: 150
     },
     {
       field: 'lost_leads',
       headerName: t('Yoqotilgan lidlar soni'),
-      width:250,
+      width: 250
     },
     {
       field: 'conversion_rate',
       headerName: 'Konversiya stavkasi',
       width: 250,
       renderCell: (params: any) => {
-        const value = Number(params.value);
+        const value = Number(params.value)
 
         return (
           <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -78,25 +81,23 @@ const LeadsSellers = () => {
             </Box>
           </Box>
         )
-      },
-    },
-  ];
+      }
+    }
+  ]
 
   useEffect(() => {
     if (sellerId) {
-      const found = data.find((seller) => seller.id === sellerId);
+      const found = data.find(seller => seller.id === sellerId)
       if (found) {
-        setSelectedSeller(found);
+        setSelectedSeller(found)
       }
     }
-  }, [sellerId, data]);
+  }, [sellerId, data])
 
-  useEffect(() => {
-    if (data.length) setLeadsSellers(data);
-  }, [data]);
+
 
   if (isLoading || !branchParam) {
-    return <Box>Loading...</Box>;
+    return <Box>Loading...</Box>
   }
 
   return (
@@ -112,8 +113,8 @@ const LeadsSellers = () => {
           '& .MuiDataGrid-root': {
             overflow: 'hidden',
             borderRadius: 1,
-            border: '1px solid #e0e0e0',
-          },
+            border: '1px solid #e0e0e0'
+          }
         }}
       >
         <DataGrid
@@ -122,35 +123,31 @@ const LeadsSellers = () => {
           columns={columns}
           loading={isLoading}
           disableSelectionOnClick
-          getRowId={(row) => row.id}
+          getRowId={row => row.id}
           localeText={uzbekLocaleText}
           hideFooter
-          onRowClick={(params) => setSellerId(params.row.id)}
+          onRowClick={params => setSellerId(params.row.id)}
           sx={{
             '.MuiDataGrid-row': {
               cursor: 'pointer',
               transition: 'background-color 0.3s',
               '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                backgroundColor: 'rgba(0, 0, 0, 0.04)'
               },
               '&.Mui-selected': {
-                backgroundColor: 'transparent !important',
+                backgroundColor: 'transparent !important'
               },
               '&.Mui-selected:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04) !important',
-              },
-            },
+                backgroundColor: 'rgba(0, 0, 0, 0.04) !important'
+              }
+            }
           }}
         />
       </Box>
 
-      <SellerDetailModal
-        selectedSeller={selectedSeller}
-        sellerId={sellerId}
-        setSellerId={setSellerId}
-      />
+      <SellerDetailModal selectedSeller={selectedSeller} sellerId={sellerId} setSellerId={setSellerId} />
     </Box>
-  );
-};
+  )
+}
 
-export default LeadsSellers;
+export default LeadsSellers

@@ -53,6 +53,7 @@ import { getFormatPhone } from '@/shared/utils'
 import { PhoneLink } from '@components/PhoneLink'
 import { QueryKeys } from '@/shared/query-hooks/queryKeys'
 import { lidStatusOption } from '@/shared/constans/lid-statements'
+import { getFormatDate } from '@/shared/utils/getFormatDate'
 
 interface LidsDragonModalProps {
   openModal: boolean
@@ -106,10 +107,9 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
   })()
 
   const GETSTATUS = {
-    'enrolled': "Sotuv bo'ldi",
-    'test_period': 'Sinov darsida'
+    enrolled: "Sotuv bo'ldi",
+    test_period: 'Sinov darsida'
   }
-
 
   return label === 'Telefon raqami' ? (
     <PhoneLink phone={value} style={{ textDecoration: 'none', height: '100%' }}>
@@ -137,7 +137,9 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
       <div style={{ flex: 1 }}>
         <p className='mb-1'>{label}</p>
         <div className='mb-0 font-weight-bold text-dark'>
-          {currentValue === "test_period" || currentValue === "enrolled" ? <p>{GETSTATUS[currentValue]}</p> : isEditable ? (
+          {currentValue === 'test_period' || currentValue === 'enrolled' ? (
+            <p>{GETSTATUS[currentValue]}</p>
+          ) : isEditable ? (
             <FormControl fullWidth>
               <Select
                 size='small'
@@ -227,101 +229,36 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
   const lidTemperature = async (temperature: string) => {
     try {
       const requestPrams = { temperature }
-      const allQueries = queryClient.getQueryCache().findAll()
-      const matchedQuery = allQueries.find(q =>
-        Array.isArray(q.queryKey) &&
-        q.queryKey[0] === 'leads/departments/leads/' &&
-        q.queryKey[1] === 'departments-leads' &&
-        q.queryKey[2] === true &&
-        typeof q.queryKey[3] === 'number'
-      )
-
-      if (!matchedQuery) {
-        toast.error("Mos keladigan query topilmadi")
-        return
-      }
-
-      const key = matchedQuery.queryKey as [string, string, boolean, number]
-
-      queryClient.setQueryData(key, (oldData: any) => {
-        if (!oldData || !Array.isArray(oldData.results)) return oldData
-
-        return {
-          ...oldData,
-          results: oldData.results.map((department: any) => {
-            if (!Array.isArray(department.leads)) return department
-
-            return {
-              ...department,
-              leads: department.leads.map((lead: any) =>
-                lead.id === selectedLead?.id ? { ...lead, temperature } : lead
-              )
-            }
-          })
+      mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams, {
+        onSuccess: () => {
+          void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
+          setSelectedLead((prev: any) => ({
+            ...prev,
+            temperature: temperature
+          }))
+          toast.success("Muvofiqiyatli o'zgardi")
         }
       })
-
-      mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams)
-      setSelectedLead((prev: any) => ({
-        ...prev,
-        temperature: temperature
-      }))
-      toast.success("Muvofiqiyatli o'zgardi")
     } catch (error: any) {
       console.error(error)
       toast.error(error.msg || "Nimadur xatolik, iltimos CRM bilan bo'glaning")
     }
   }
 
-
   const lidStatus = async (status: string) => {
     try {
       const requestPrams = { status }
 
-      const allQueries = queryClient.getQueryCache().findAll()
-      const matchedQuery = allQueries.find(q =>
-        Array.isArray(q.queryKey) &&
-        q.queryKey[0] === 'leads/departments/leads/' &&
-        q.queryKey[1] === 'departments-leads' &&
-        q.queryKey[2] === true &&
-        typeof q.queryKey[3] === 'number'
-      )
-
-      if (!matchedQuery) {
-        toast.error("Mos keladigan query topilmadi")
-        return
-      }
-
-      const key = matchedQuery.queryKey as [string, string, boolean, number]
-
-      queryClient.setQueryData(key, (oldData: any) => {
-        if (!oldData || !Array.isArray(oldData.results)) return oldData
-
-        return {
-          ...oldData,
-          results: oldData.results.map((department: any) => {
-            if (!Array.isArray(department.leads)) return department
-
-            return {
-              ...department,
-              leads: department.leads.map((lead: any) =>
-                lead.id === selectedLead?.id ? { ...lead, status } : lead
-              ),
-            }
-          }),
-        }
-      })
-
       mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams, {
         onSuccess: () => {
+          void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
           queryClient.invalidateQueries({ queryKey: ['leads/sales-funnel/', 'leads/sales-funnel'] })
           queryClient.invalidateQueries({ queryKey: [QueryKeys.ReportLeadsList] })
 
           setSelectedLead((prev: any) => ({ ...prev, status }))
-        },
+          toast.success("Muvofiqiyatli o'zgardi")
+        }
       })
-
-      toast.success("Muvofiqiyatli o'zgardi")
     } catch (error: any) {
       console.error(error)
       toast.error(error.msg || "Nimadur xatolik, iltimos CRM bilan bo'glaning")
@@ -357,7 +294,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
         void handleGetUserDetails(value, selectedLead?.id)
       }
     }
-  }, [selectedLead?.id, openModal])
+  }, [openModal, query.is_amocrm])
 
   const newState = { value: null, label: '----' }
 
@@ -747,7 +684,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
                         </Box>
                         <Box display='flex' alignItems='center'>
                           <div className='text-primary me-3'>{<Clock />}</div>
-                          <Typography fontSize={15}>{item?.created_at}</Typography>
+                          <Typography fontSize={15}>{getFormatDate(item?.created_at ?? '')}</Typography>
                         </Box>
                       </Box>
                     ))}

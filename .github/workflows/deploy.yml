@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Next.js Frontend Deployment
 
 on:
   push:
@@ -26,52 +26,142 @@ jobs:
         run: |
           echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
 
-      - name: Deploy with zero-downtime (test branch)
+      - name: Build application
+        run: npm run build
+
+      - name: Prepare deployment package
+        run: |
+          # Faqat kerakli fayllarnigina zip qilish
+          tar -czf deploy.tar.gz \
+            .next/ \
+            public/ \
+            package.json \
+            package-lock.json \
+            ecosystem.config.js \
+            .env
+
+      - name: Deploy to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.TEST_SERVER_IP }}
+          username: crmroot
+          password: ${{ secrets.TEST_SERVER_PASSWORD }}
+          source: "deploy.tar.gz"
+          target: "/tmp"
+
+      - name: Execute deployment
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.TEST_SERVER_IP }}
-          username: root
+          username: crmroot
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
+            # Source NVM first to ensure PM2 is available
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-            if ! command -v nvm &> /dev/null; then
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-              export NVM_DIR="$HOME/.nvm"
-              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            fi
+            # Now pm2 should be available
+            PM2_COMMAND="pm2"
 
-            nvm install 20.10.0
-            nvm use 20.10.0
+            # Check if PM2 is available
+            which $PM2_COMMAND || {
+              echo "PM2 not found, trying to find it..."
+              # Try to find pm2 manually
+              POSSIBLE_PM2=$(find $HOME/.nvm -name pm2 -type f | head -n 1)
+              if [ -n "$POSSIBLE_PM2" ]; then
+                PM2_COMMAND="$POSSIBLE_PM2"
+                echo "Found PM2 at: $PM2_COMMAND"
+              else
+                echo "ERROR: PM2 not found. Please install it with: npm install -g pm2"
+                exit 1
+              fi
+            }
 
-            APP_DIR="frontend/test-subdomain-soffcrm-uz-3132"
-            mkdir -p $APP_DIR
-            cd $APP_DIR
+            TIMESTAMP=$(date +%s)
+            APP_NAME="test-subdomain-soffcrm-uz-3132"
+            BASE_DIR="/home/crmroot/frontend/test-soffcrm"
+            DEPLOY_DIR="${BASE_DIR}/${APP_NAME}"
+            NEW_DEPLOY_DIR="${BASE_DIR}/${APP_NAME}-${TIMESTAMP}"
 
-            if [ ! -d ".git" ]; then
-              git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
+            echo "Deployment boshlandi: $(date)"
+            echo "Yangi deploy papkasi: $NEW_DEPLOY_DIR"
+
+            mkdir -p $NEW_DEPLOY_DIR
+
+            echo "Build fayllarini extract qilish..."
+            tar -xzf /tmp/deploy.tar.gz -C $NEW_DEPLOY_DIR
+
+            cd $NEW_DEPLOY_DIR
+            echo "Hozirgi papka: $(pwd)"
+
+            set -x
+
+            if $PM2_COMMAND list | grep -q "$APP_NAME"; then
+              echo "Mavjud ilova topildi: $APP_NAME"
+
+              echo "Yangi versiyani ishga tushirish..."
+              $PM2_COMMAND start ecosystem.config.js --only "$APP_NAME-new" || true
+
+              sleep 10
+
+              if curl -s http://localhost:3100/api/health > /dev/null || curl -s http://localhost:3100 > /dev/null; then
+                echo "Yangi versiya ishlayotgan ko'rinadi"
+
+                echo "Eski versiyani o'chirish..."
+                $PM2_COMMAND delete "$APP_NAME" || true
+
+                echo "Asosiy versiyani ishga tushirish..."
+                $PM2_COMMAND start ecosystem.config.js --only "$APP_NAME" || true
+
+                echo "Vaqtinchalik versiyani o'chirish..."
+                $PM2_COMMAND delete "$APP_NAME-new" || true
+
+                $PM2_COMMAND save || true
+
+                if [ -L "$DEPLOY_DIR" ]; then
+                  echo "Mavjud symbolic link o'chirilmoqda..."
+                  rm -f "$DEPLOY_DIR"
+                elif [ -d "$DEPLOY_DIR" ]; then
+                  echo "Mavjud papka zaxira nusxasi olinmoqda..."
+                  mv "$DEPLOY_DIR" "${DEPLOY_DIR}-old-$(date +%s)" || true
+                fi
+
+                echo "Yangi symbolic link yaratilmoqda..."
+                ln -sf "$NEW_DEPLOY_DIR" "$DEPLOY_DIR"
+
+                echo "Eski versiyalarni tozalash..."
+                cd $BASE_DIR
+                ls -dt "${APP_NAME}-"* | grep -v "$(basename $NEW_DEPLOY_DIR)" | tail -n +3 | xargs -r rm -rf
+
+                echo "Deployment muvaffaqiyatli tugadi!"
+              else
+                echo "XATO: Yangi versiya ishlamayapti!"
+
+                $PM2_COMMAND delete "$APP_NAME-new" || true
+
+                rm -rf "$NEW_DEPLOY_DIR"
+
+                echo "Oldingi versiyaga qaytildi."
+              fi
             else
-              git fetch origin test
-              git reset --hard origin/test
+              echo "Birinchi marta deploy qilish..."
+
+              $PM2_COMMAND start ecosystem.config.js --only "$APP_NAME" || true
+              $PM2_COMMAND save || true
+
+              if [ -L "$DEPLOY_DIR" ]; then
+                rm -f "$DEPLOY_DIR"
+              elif [ -d "$DEPLOY_DIR" ]; then
+                mv "$DEPLOY_DIR" "${DEPLOY_DIR}-old-$(date +%s)" || true
+              fi
+
+              ln -sf "$NEW_DEPLOY_DIR" "$DEPLOY_DIR"
+
+              echo "Birinchi deployment muvaffaqiyatli tugadi!"
             fi
 
-            echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
+            echo "PM2 jarayonlari:"
+            $PM2_COMMAND list
 
-            npm ci
-            npm run build
-
-            if pm2 list | grep -q "test-subdomain-soffcrm-uz-3132"; then
-              pm2 start ecosystem.config.js --only test-subdomain-soffcrm-uz-3132-new --update-env
-
-              sleep 5
-
-              pm2 delete test-subdomain-soffcrm-uz-3132
-
-              pm2 start ecosystem.config.js --only test-subdomain-soffcrm-uz-3132 --update-env
-              pm2 delete test-subdomain-soffcrm-uz-3132-new
-            else
-              pm2 start ecosystem.config.js --only test-subdomain-soffcrm-uz-3132
-            fi
-
-            pm2 save
+            echo "Frontend papkasidagi fayllar:"
+            ls -la $BASE_DIR

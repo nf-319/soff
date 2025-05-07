@@ -95,13 +95,15 @@ const StudentsFilter = () => {
       updatedParams = { debt_date: value ? `${value}` : '' }
     } else if (key === 'amount') {
       if (value === 'is_debtor') {
-        updatedParams = { is_debtor: true, last_payment: '', not_in_debt: '' }
+        updatedParams = { is_debtor: true, last_payment: '', not_in_debt: '', is_overpaid: '' }
       } else if (value === 'not_in_debt') {
-        updatedParams = { is_debtor: '', last_payment: '', not_in_debt: true }
+        updatedParams = { is_debtor: '', last_payment: '', not_in_debt: true, is_overpaid: '' }
       } else if (value === 'last_payment') {
-        updatedParams = { last_payment: true, is_debtor: '', not_in_debt: '' }
+        updatedParams = { last_payment: true, is_debtor: '', not_in_debt: '', is_overpaid: '' }
+      } else if (value === 'is_overpaid') {
+        updatedParams = { last_payment: '', is_debtor: '', not_in_debt: '', is_overpaid: true }
       } else if (value === 'all') {
-        updatedParams = { is_debtor: '', last_payment: '', not_in_debt: '' }
+        updatedParams = { is_debtor: '', last_payment: '', not_in_debt: '', is_overpaid: '' }
       }
     } else if (value === '') {
       updatedParams = { [key]: null }
@@ -144,17 +146,17 @@ const StudentsFilter = () => {
       } = router.query
 
       const newParams = {
-        search: (q || ''),
-        status: (status || ''),
-        course: (course || ''),
-        school: (school || ''),
-        group_status: (group_status || ''),
-        group: (group || ''),
-        teacher: (teacher || ''),
-        is_debtor: (is_debtor || ''),
-        last_payment: (last_payment || ''),
-        not_in_debt: (not_in_debt || ''),
-        debt_date: (debt_date || '')
+        search: q || '',
+        status: status || '',
+        course: course || '',
+        school: school || '',
+        group_status: group_status || '',
+        group: group || '',
+        teacher: teacher || '',
+        is_debtor: is_debtor || '',
+        last_payment: last_payment || '',
+        not_in_debt: not_in_debt || '',
+        debt_date: debt_date || ''
       }
 
       if (JSON.stringify(newParams) !== JSON.stringify(queryParams)) {
@@ -213,15 +215,17 @@ const StudentsFilter = () => {
     }
   }, [activeFilter, getCourses, dispatch])
 
-  const groupOptions = groups?.map((item: any) => ({
-    label: item?.name,
-    value: item?.id
-  })) || []
+  const groupOptions =
+    groups?.map((item: any) => ({
+      label: item?.name,
+      value: item?.id
+    })) || []
 
-  const teacherOptions = teachers?.map((item: any) => ({
-    label: item?.first_name,
-    value: item?.id
-  })) || []
+  const teacherOptions =
+    teachers?.map((item: any) => ({
+      label: item?.first_name,
+      value: item?.id
+    })) || []
 
   return (
     <Box display='flex' flexDirection={{ xs: 'column', md: 'row' }} gap={2} width='100%'>
@@ -324,6 +328,8 @@ const StudentsFilter = () => {
               ? 'not_in_debt'
               : queryParams.last_payment
               ? 'last_payment'
+              : queryParams.is_overpaid
+              ? 'is_overpaid'
               : ''
           }
           id='payment-status-select'
@@ -334,8 +340,7 @@ const StudentsFilter = () => {
           <MenuItem value='last_payment'>{t("To'lov vaqti yaqinlashgan")}</MenuItem>
           <MenuItem value='is_debtor'>{t('Qarzdor')}</MenuItem>
           <MenuItem value='not_in_debt'>{t("Qarzdor bo'lmagan")}</MenuItem>
-          <MenuItem value='not_in_debt'>{t("Ortiqcha to'lov")}</MenuItem>
-
+          <MenuItem value='is_overpaid'>{t("Ortiqcha to'lov")}</MenuItem>
         </Select>
       </FormControl>
 

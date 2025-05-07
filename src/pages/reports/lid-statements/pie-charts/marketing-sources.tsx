@@ -52,7 +52,7 @@ const MarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {
           <Typography color='black' fontSize={20} fontWeight={700}>
             Marketing manbasi
           </Typography>
-          <Tooltip title='Bu market haqida malumot'>
+          <Tooltip title="Manbalar ko'rsatgichlari">
             <CircleHelp style={{ cursor: 'pointer', color: '#9e9e9e', marginTop: 'auto', marginBottom: 'auto' }} />
           </Tooltip>
         </Box>

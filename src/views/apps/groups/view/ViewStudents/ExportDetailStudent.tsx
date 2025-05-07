@@ -71,7 +71,6 @@ export default function ExportDetailStudent({
           group_student: id,
           ...discountConfig
         })
-        console.log(response.status)
 
         if (response.status == 200) {
           toast.success(t("O'quvchi boshqa guruhga ko'chirildi") as string)
