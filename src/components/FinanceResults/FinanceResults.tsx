@@ -217,7 +217,7 @@ export const FinanceResults: FC = () => {
               sx={{
                 position: 'relative',
                 height: 160,
-                borderRadius: 2,
+                borderRadius: 1,
                 overflow: 'hidden',
                 backgroundColor: 'rgba(0,0,0,0.03)',
                 mt: 1
@@ -229,7 +229,6 @@ export const FinanceResults: FC = () => {
                 sx={{
                   height: '100%',
                   '& .MuiLinearProgress-bar': {
-                    borderRadius: 1,
                     transition: 'transform 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
                     backgroundColor: getPercentageColor()
                   }
@@ -308,8 +307,6 @@ export const FinanceResults: FC = () => {
               boxShadow: 2,
               background: `linear-gradient(145deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
               color: 'white',
-              transition: 'transform 0.3s ease',
-              '&:hover': { transform: 'translateY(-5px)' }
             }}
           >
             <CardContent>
@@ -333,8 +330,6 @@ export const FinanceResults: FC = () => {
               boxShadow: 2,
               background: `linear-gradient(145deg, ${theme.palette.warning.main}, ${theme.palette.warning.dark})`,
               color: 'white',
-              transition: 'transform 0.3s ease',
-              '&:hover': { transform: 'translateY(-5px)' }
             }}
           >
             <CardContent>
@@ -357,8 +352,6 @@ export const FinanceResults: FC = () => {
               boxShadow: 2,
               background: `linear-gradient(145deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
               color: 'white',
-              transition: 'transform 0.3s ease',
-              '&:hover': { transform: 'translateY(-5px)' }
             }}
           >
             <CardContent>
