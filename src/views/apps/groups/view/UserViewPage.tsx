@@ -69,6 +69,7 @@ const UserView = () => {
     }
   }, [])
 
+  
   return (
     <Box display='flex' flexDirection='column' gap={4}>
       <Box mb={isMobile ? 3 : 0} display={isMobile ? 'block' : 'flex'} justifyContent='end' gap={isMobile ? 3 : 5}>
