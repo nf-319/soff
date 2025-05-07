@@ -22,6 +22,7 @@ import { toast } from 'react-hot-toast'
 import IconifyIcon from '../icon'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { updateParams } from '../../store/apps/c-panel'
+import { useGet, usePatch } from '@/hooks/useApi'
 
 export interface CompanyType {
   id: number
@@ -49,33 +50,33 @@ export interface QueryParams {
 
 export default function CompanyList() {
   const { t } = useTranslation()
-  const [data, setData] = useState<CompanyDataType | null>(null)
   const [centerId, setCenterId] = useState<number | null>(null)
-  const [isLoading, setLoading] = useState(false)
   const { queryParams } = useAppSelector(state => state.cPanelSlice)
   const dispatch = useAppDispatch()
-
-  const queryString = new URLSearchParams({ ...queryParams } as Record<string, string>).toString()
-
-  async function getData(queryString: string = '') {
-    setLoading(true)
-    try {
-      const resp = await api.get(`owner/list/client/?` + queryString)
-      setData(resp.data)
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred while fetching data')
-    }
-    setLoading(false)
-  }
+  const { mutate: updateClientStatus, isPending } = usePatch()
+  const {
+    data: clienList,
+    refetch,
+    isLoading
+  } = useGet<CompanyDataType | null>('owner/list/client/', {
+    params: { ...queryParams }
+  })
 
   const suspendCompany = async (item: any, id: any) => {
     setCenterId(item.id)
-    try {
-      await api.patch(`owner/client/${item.id}/`, { is_active: id })
-      await getData()
-    } catch (err: any) {
-      console.log(err?.response?.data)
-    }
+    updateClientStatus(
+      `owner/client/${item.id}/`,
+      { is_active: id },
+      {
+        onSuccess: async () => {
+          await api.patch(`owner/client/${item.id}/`, { is_active: id })
+          refetch()
+        },
+        onError: err => {
+          console.log(err?.response?.data)
+        }
+      }
+    )
     setCenterId(null)
   }
 
@@ -134,7 +135,7 @@ export default function CompanyList() {
       title: t('Status'),
       dataIndex: 'id',
       render: (status: any) => {
-        const find = data?.results.find(el => el.id === status)
+        const find = clienList?.results.find(el => el.id === status)
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {centerId === find?.id ? (
@@ -159,76 +160,27 @@ export default function CompanyList() {
     push(`/c-panel/company/${id}`)
   }
 
-  useEffect(() => {
-    getData(queryString)
-  }, [])
-
   const handlePagination = async (page: number) => {
-    const queryString = new URLSearchParams({ ...queryParams, page: String(page) }).toString()
     dispatch(updateParams((prevState: any) => ({ ...prevState, page: String(page) })))
-    await getData(queryString)
   }
 
   const handleSearch = async (value: string) => {
-    const queryString = new URLSearchParams({ ...queryParams, search: value, page: '1' }).toString()
     dispatch(updateParams({ search: value, page: queryParams.page }))
-    await getData(queryString)
   }
 
   async function handleFilter(key: string, value: string | number | null) {
     if (key === 'amount') {
       if (value === 'debtor') {
-        const queryString = new URLSearchParams({
-          ...queryParams,
-          debtor: 'true',
-          paid: '',
-          payment_status_nearly: '',
-          page: '1'
-        }).toString()
-        await getData(queryString)
-        dispatch(updateParams({ debtor: 'true', payment_status_nearly: '', page: '1' }))
+        dispatch(updateParams({ debtor: 'true', payment_status_nearly: '', paid: '', page: '1' }))
       } else if (value === 'payment_status_nearly') {
-        const queryString = new URLSearchParams({
-          ...queryParams,
-          payment_status_nearly: 'true',
-          paid: '',
-          debtor: '',
-          page: '1'
-        }).toString()
-        await getData(queryString)
-        dispatch(updateParams({ payment_status_nearly: 'true', debtor: '', page: '1' }))
+        dispatch(updateParams({ payment_status_nearly: 'true', debtor: '', paid: '', page: '1' }))
       } else if (value === 'paid') {
-        const queryString = new URLSearchParams({
-          ...queryParams,
-          paid: 'true',
-          payment_status_nearly: '',
-          debtor: '',
-          page: '1'
-        }).toString()
-        await getData(queryString)
         dispatch(updateParams({ paid: 'true', payment_status_nearly: '', debtor: '', page: '1' }))
       } else if (value === 'all') {
-        const queryString = new URLSearchParams({
-          ...queryParams,
-          debtor: '',
-          paid: '',
-          payment_status_nearly: '',
-          page: '1'
-        }).toString()
-        await getData(queryString)
-        dispatch(updateParams({ debtor: '',paid:'', payment_status_nearly: '', page: '1' }))
+        dispatch(updateParams({ debtor: '', paid: '', payment_status_nearly: '', page: '1' }))
       }
       return
     }
-
-    if (key === 'status') {
-      const queryString = new URLSearchParams({ status: String(value) }).toString()
-      await getData(queryString)
-    } else {
-      const queryString = new URLSearchParams({ ...queryParams, [key]: String(value) }).toString()
-      await getData(queryString)
-    }
-    dispatch(updateParams({ [key]: value }))
   }
 
   return (
@@ -289,7 +241,7 @@ export default function CompanyList() {
               <MenuItem value={'paid'}>{t("To'lov qilgan")}</MenuItem>
             </Select>
           </FormControl>
-          <Chip label={data?.count} variant='outlined' color='success' />
+          <Chip label={clienList?.count} variant='outlined' color='success' />
         </Box>
         <Button onClick={() => Router.push('/c-panel/company/create')} sx={{ marginLeft: 'auto' }} variant='contained'>
           {t('Yaratish')}
@@ -299,13 +251,13 @@ export default function CompanyList() {
         <DataTable
           loading={isLoading}
           columns={column}
-          data={data?.results || []}
+          data={clienList?.results || []}
           rowClick={(id: number) => rowClick(id)}
         />
-        {data && data?.count > 50 && !isLoading && (
+        {clienList && clienList?.count > 50 && !isLoading && (
           <Pagination
             defaultPage={Number(queryParams?.page) || 1}
-            count={Math.ceil(data?.count / 50)}
+            count={Math.ceil(clienList?.count / 50)}
             variant='outlined'
             shape='rounded'
             onChange={(e: any, page) => handlePagination(page)}
