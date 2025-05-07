@@ -84,6 +84,9 @@ export default function EditDetails() {
                         value={formik.values.name}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
                     />
                     <FormHelperText error={!!formik.errors.name && !!formik.touched.name}>{!!formik.errors.name && !!formik.touched.name && formik.errors.name}</FormHelperText>
                 </FormControl>
@@ -96,11 +99,14 @@ export default function EditDetails() {
                         value={formik.values.reference_name}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
                     />
                     <FormHelperText error={!!formik.errors.reference_name && !!formik.touched.reference_name}>{!!formik.errors.reference_name && !!formik.touched.reference_name && formik.errors.reference_name}</FormHelperText>
                 </FormControl>
                 <FormControl fullWidth>
-                    <InputLabel error={!!formik.errors.reference_phone && !!formik.touched.reference_phone} htmlFor="login-input">{t('Masul shaxs raqami')}</InputLabel>
+                    <InputLabel shrink error={!!formik.errors.reference_phone && !!formik.touched.reference_phone} htmlFor="login-input">{t('Masul shaxs raqami')}</InputLabel>
                     <PhoneInput
                         name="reference_phone"
                         label={t('Masul shaxs raqami')}
