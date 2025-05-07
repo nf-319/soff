@@ -1,25 +1,26 @@
-"use client"
+'use client'
 
 import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
-import { useRouter } from "next/router"
-import { Box, Button, Paper, Tabs, Tab, Typography } from "@mui/material"
-import { Archive, ArrowLeftRight, ArrowUp, CircleAlert } from 'lucide-react'
-import api from "src/@core/utils/api"
-import getMontName, { getMontNumber } from "src/@core/utils/gwt-month-name"
-import { toast } from "react-hot-toast"
-import { useAppDispatch, useAppSelector } from "src/store"
-import { getAttendance, getDays, setGettingAttendance, updateParams } from "src/store/apps/groupDetails"
-import { useSettings } from "src/@core/hooks/useSettings"
-import { useTranslation } from "react-i18next"
-import { DateChangeDialog } from "./DateChangeDialog"
-import { TopicEditDialog } from "./TopicEditDialog"
-import { TopicAddDialog } from "./TopicAddDialog"
-import { AttendanceTable } from "./AttendenceTable"
-import { AttendanceTableSkeleton } from "./AttendanceTableSkeleton"
+import { useRouter } from 'next/router'
+import { Box, Button, Paper, Tabs, Tab, Typography } from '@mui/material'
+import { Archive, ArrowLeftRight, ArrowUp, CircleAlert, Download } from 'lucide-react'
+import api from 'src/@core/utils/api'
+import getMontName, { getMontNumber } from 'src/@core/utils/gwt-month-name'
+import { toast } from 'react-hot-toast'
+import { useAppDispatch, useAppSelector } from 'src/store'
+import { getAttendance, getDays, setGettingAttendance, updateParams } from 'src/store/apps/groupDetails'
+import { useSettings } from 'src/@core/hooks/useSettings'
+import { useTranslation } from 'react-i18next'
+import { DateChangeDialog } from './DateChangeDialog'
+import { TopicEditDialog } from './TopicEditDialog'
+import { TopicAddDialog } from './TopicAddDialog'
+import { AttendanceTable } from './AttendenceTable'
+import { AttendanceTableSkeleton } from './AttendanceTableSkeleton'
+import { useMutation } from '@tanstack/react-query'
 
 const UserViewSecurity = () => {
   const { queryParams, attendance, isGettingAttendance, days, groupData, month_list } = useAppSelector(
-    (state) => state.groupDetails,
+    state => state.groupDetails
   )
   const dispatch = useAppDispatch()
   const [changeDateLoader, setChangeDateLoader] = useState(false)
@@ -30,19 +31,41 @@ const UserViewSecurity = () => {
   const { pathname, query, push } = useRouter()
   const { settings } = useSettings()
   const [opened_id, setOpenedId] = useState<any>(null)
-  const [topic, setTopic] = useState<any>("")
+  const [topic, setTopic] = useState<any>('')
   const [updateTopic, setUpdateTopic] = useState(false)
   const [topicId, setTopicId] = useState<number | null>(null)
   const { t } = useTranslation()
   const queryString = new URLSearchParams(queryParams).toString()
   const [currentMonth, setCurrentMonth] = useState(0)
   const [loading, setLoading] = useState(false)
-  const isDark = settings.mode === "dark"
+  const isDark = settings.mode === 'dark'
   const initialized = useRef(false)
 
   const [topicAddOpen, setTopicAddOpen] = useState(false)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
 
+  const useExportAttendance = () => {
+    return useMutation({
+      mutationFn: async (gp: number) => {
+        const response = await api.get(`common/attendance/export/${gp}`, {
+          responseType: 'blob' // necessary if you're downloading a file
+        })
+
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', `attendance_report_${gp}.xlsx`)
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+      }
+    })
+  }
+  const { mutate: exportAttendance } = useExportAttendance()
+
+  const handleGetExcel = () => {
+    exportAttendance(Number(query.id))
+  }
   const isDatePast = (dateString: string): boolean => {
     if (!dateString) return false
     const inputDate = new Date(dateString)
@@ -72,7 +95,7 @@ const UserViewSecurity = () => {
       await api.post(`common/group/lesson/transfer/`, {
         group: query.id,
         old_date: selectedOldDate,
-        new_date: selectedNewDate ? new Date(selectedNewDate).toISOString().split("T")[0] : "",
+        new_date: selectedNewDate ? new Date(selectedNewDate).toISOString().split('T')[0] : ''
       })
 
       toast.success("Dars kuni o'zgartirildi")
@@ -85,19 +108,19 @@ const UserViewSecurity = () => {
         getAttendance({
           date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
           group: query?.id,
-          queryString: queryString,
-        }),
+          queryString: queryString
+        })
       )
 
       dispatch(
         getDays({
           date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
-          group: query?.id,
-        }),
+          group: query?.id
+        })
       )
     } catch (err: any) {
       console.error(err)
-      toast.error(t(err.response?.data?.new_date) || "Xatolik")
+      toast.error(t(err.response?.data?.new_date) || 'Xatolik')
     }
     setChangeDateLoader(false)
   }
@@ -106,7 +129,7 @@ const UserViewSecurity = () => {
     setChangeTopicLoader(true)
     try {
       await api.patch(`common/topic/update/${topicId}`, {
-        topic: newTopic,
+        topic: newTopic
       })
 
       toast.success("Dars nomi o'zgartirildi")
@@ -116,19 +139,19 @@ const UserViewSecurity = () => {
         getAttendance({
           date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
           group: query?.id,
-          queryString: queryString,
-        }),
+          queryString: queryString
+        })
       )
 
       dispatch(
         getDays({
           date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
-          group: query?.id,
-        }),
+          group: query?.id
+        })
       )
     } catch (err) {
       console.error(err)
-      toast.error("Xatolik")
+      toast.error('Xatolik')
     }
     setChangeTopicLoader(false)
   }
@@ -146,13 +169,13 @@ const UserViewSecurity = () => {
       month: string
       year: string
     } = {
-      month: date.date.split("-")[1],
-      year: date.date.split("-")[0],
+      month: date.date.split('-')[1],
+      year: date.date.split('-')[0]
     }
 
     await push({
       pathname,
-      query: { ...query, month: getMontName(Number(value.month)), year: value.year, id: query?.id },
+      query: { ...query, month: getMontName(Number(value.month)), year: value.year, id: query?.id }
     })
 
     dispatch(setGettingAttendance(true))
@@ -173,15 +196,15 @@ const UserViewSecurity = () => {
       getAttendance({
         date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
         group: query?.id,
-        queryString: queryString,
-      }),
+        queryString: queryString
+      })
     )
 
     dispatch(
       getDays({
         date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
-        group: query?.id,
-      }),
+        group: query?.id
+      })
     )
   }
 
@@ -193,43 +216,41 @@ const UserViewSecurity = () => {
 
   useEffect(() => {
     if (!initialized.current && month_list.length > 0) {
-      initialized.current = true;
+      initialized.current = true
 
-      let targetIndex = -1;
+      let targetIndex = -1
       if (query?.month) {
-        targetIndex = month_list.findIndex(
-          item => getMontName(Number(item.date.split("-")[1])) === query.month
-        );
+        targetIndex = month_list.findIndex(item => getMontName(Number(item.date.split('-')[1])) === query.month)
       }
 
       if (targetIndex === -1) {
-        targetIndex = month_list.length - 1;
+        targetIndex = month_list.length - 1
       }
 
-      setCurrentMonth(targetIndex);
+      setCurrentMonth(targetIndex)
 
       if (!isGettingAttendance) {
-        dispatch(setGettingAttendance(true));
+        dispatch(setGettingAttendance(true))
 
-        const year = query?.year || new Date().getFullYear();
-        const month = query?.month
-          ? getMontNumber(query?.month)
-          : month_list[targetIndex].date.split("-")[1];
+        const year = query?.year || new Date().getFullYear()
+        const month = query?.month ? getMontNumber(query?.month) : month_list[targetIndex].date.split('-')[1]
 
         dispatch(getDays({ date: `${year}-${month}`, group: query?.id }))
           .then(() => {
-            return dispatch(getAttendance({
-              date: `${year}-${month}`,
-              group: query?.id,
-              queryString
-            }));
+            return dispatch(
+              getAttendance({
+                date: `${year}-${month}`,
+                group: query?.id,
+                queryString
+              })
+            )
           })
           .finally(() => {
-            dispatch(setGettingAttendance(false));
-          });
+            dispatch(setGettingAttendance(false))
+          })
       }
     }
-  }, [month_list, query?.month, query?.id]);
+  }, [month_list, query?.month, query?.id])
 
   useEffect(() => {
     if (!initialized.current && month_list.length > 0) {
@@ -237,7 +258,7 @@ const UserViewSecurity = () => {
 
       const initializeData = async () => {
         if (query?.month) {
-          const index = month_list.findIndex((item) => getMontName(Number(item.date.split("-")[1])) === query.month)
+          const index = month_list.findIndex(item => getMontName(Number(item.date.split('-')[1])) === query.month)
           if (index !== -1) {
             setCurrentMonth(index)
             dispatch(setGettingAttendance(true))
@@ -246,8 +267,8 @@ const UserViewSecurity = () => {
               getAttendance({
                 date: `${query?.year || new Date().getFullYear()}-${getMontNumber(query?.month)}`,
                 group: query?.id,
-                queryString: queryString,
-              }),
+                queryString: queryString
+              })
             )
             dispatch(setGettingAttendance(false))
           } else if (month_list.length > 0) {
@@ -267,17 +288,17 @@ const UserViewSecurity = () => {
   useEffect(() => {
     const fetchAttendance = async () => {
       if (query?.month && query?.id && !isGettingAttendance) {
-        dispatch(setGettingAttendance(true));
+        dispatch(setGettingAttendance(true))
         try {
-          await dispatch(getAttendance({ date: attendanceDate, group: query?.id, queryString }));
+          await dispatch(getAttendance({ date: attendanceDate, group: query?.id, queryString }))
         } finally {
-          dispatch(setGettingAttendance(false));
+          dispatch(setGettingAttendance(false))
         }
       }
-    };
+    }
 
-    void fetchAttendance();
-  }, [queryParams.status]);
+    void fetchAttendance()
+  }, [queryParams.status])
 
   return (
     <Paper
@@ -290,15 +311,21 @@ const UserViewSecurity = () => {
       }}
     >
       <Box style={{ marginBottom: '16px' }}>
-        <Typography
-          variant='h6'
-          style={{
-            fontWeight: 600,
-            marginBottom: '16px'
-          }}
-        >
-          Davomat
-        </Typography>
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+          <Typography
+            variant='h6'
+            style={{
+              fontWeight: 600,
+              marginBottom: '16px'
+            }}
+          >
+            Davomat
+          </Typography>
+
+          <Button onClick={handleGetExcel} startIcon={<Download />} color='success' variant='outlined'>
+            Excel
+          </Button>
+        </Box>
 
         <Tabs
           value={currentMonth}
@@ -464,4 +491,3 @@ const UserViewSecurity = () => {
 }
 
 export default UserViewSecurity
-
