@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Optimized Next.js Deployment
 
 on:
   push:
@@ -26,52 +26,76 @@ jobs:
         run: |
           echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
 
-      - name: Deploy with zero-downtime (test branch)
+      - name: Build application
+        run: npm run build
+
+      - name: Prepare deployment package
+        run: |
+          # Faqat kerakli fayllarnigina zip qilish
+          tar -czf deploy.tar.gz \
+            .next/ \
+            public/ \
+            package.json \
+            package-lock.json \
+            ecosystem.config.js \
+            .env
+
+      - name: Deploy to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.TEST_SERVER_IP }}
+          username: crmroot
+          password: ${{ secrets.TEST_SERVER_PASSWORD }}
+          source: "deploy.tar.gz"
+          target: "/tmp"
+
+      - name: Execute deployment
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.TEST_SERVER_IP }}
           username: crmroot
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            TIMESTAMP=$(date +%s)
+            APP_NAME="test-subdomain-soffcrm-uz-3132"
+            BASE_DIR="/home/crmroot/frontend"
+            DEPLOY_DIR="${BASE_DIR}/${APP_NAME}"
+            NEW_DEPLOY_DIR="${DEPLOY_DIR}-${TIMESTAMP}"
 
-            if ! command -v nvm &> /dev/null; then
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-              export NVM_DIR="$HOME/.nvm"
-              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            fi
+            mkdir -p $NEW_DEPLOY_DIR
 
-            nvm install 20.10.0
-            nvm use 20.10.0
+            tar -xzf /tmp/deploy.tar.gz -C $NEW_DEPLOY_DIR
 
-            APP_DIR="frontend/test-subdomain-soffcrm-uz-3132"
-            mkdir -p $APP_DIR
-            cd $APP_DIR
+            cd $NEW_DEPLOY_DIR
 
-            if [ ! -d ".git" ]; then
-              git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
-            else
-              git fetch origin test
-              git reset --hard origin/test
-            fi
-
-            echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
-
-            npm ci
-            npm run build
-
-            if pm2 list | grep -q "test-subdomain-soffcrm-uz-3132"; then
-              pm2 start ecosystem.config.js --only test-subdomain-soffcrm-uz-3132-new --update-env
+            if pm2 list | grep -q "$APP_NAME"; then
+              pm2 start ecosystem.config.js --only "$APP_NAME-new"
 
               sleep 5
+              if curl -s http://localhost:3000/api/health | grep -q "ok"; then
+                pm2 delete "$APP_NAME"
+                pm2 start ecosystem.config.js --only "$APP_NAME"
+                pm2 delete "$APP_NAME-new"
+                pm2 save
 
-              pm2 delete test-subdomain-soffcrm-uz-3132
+                rm -rf $DEPLOY_DIR
+                ln -s $NEW_DEPLOY_DIR $DEPLOY_DIR
 
-              pm2 start ecosystem.config.js --only test-subdomain-soffcrm-uz-3132 --update-env
-              pm2 delete test-subdomain-soffcrm-uz-3132-new
+                cd $BASE_DIR
+                ls -dt "$APP_NAME-"* | tail -n +4 | xargs -r rm -rf
+
+                echo "Deployment completed successfully!"
+              else
+                pm2 delete "$APP_NAME-new"
+                rm -rf $NEW_DEPLOY_DIR
+                echo "Deployment failed! New version is not working properly."
+              fi
             else
-              pm2 start ecosystem.config.js --only test-subdomain-soffcrm-uz-3132
-            fi
+              pm2 start ecosystem.config.js --only "$APP_NAME"
+              pm2 save
 
-            pm2 save
+              rm -rf $DEPLOY_DIR
+              ln -s $NEW_DEPLOY_DIR $DEPLOY_DIR
+
+              echo "First deployment completed successfully!"
+            fi
