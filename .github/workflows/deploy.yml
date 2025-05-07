@@ -56,7 +56,8 @@ jobs:
           username: crmroot
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
-            PM2_COMMAND="/home/crmroot/.nvm/versions/node/v20.10.0/bin/pm2"
+            # Use the system-wide PM2 command instead of a specific path
+            PM2_COMMAND="pm2"
 
             TIMESTAMP=$(date +%s)
             APP_NAME="test-subdomain-soffcrm-uz-3132"
