@@ -76,7 +76,7 @@ export function StudentReportFilter() {
           ))}
         </Select>
       </FormControl>
-      <FormControl fullWidth>
+      {/* <FormControl fullWidth>
         <DateRangePicker
           showOneCalendar
           placement='bottom'
@@ -102,7 +102,7 @@ export function StudentReportFilter() {
           size='md'
           value={date}
         />
-      </FormControl>
+      </FormControl> */}
     </Box>
   )
 }

@@ -2,7 +2,7 @@ import { ComingSoon } from '@/components/ComingSoon'
 import { TrendCard } from '@/components/TrendCard'
 import { DashboardCard } from '@/pages/reports/lid-statements/card'
 import { Box } from '@mui/material'
-import { ArrowRightLeft, Award, Megaphone, TriangleAlert, User } from 'lucide-react'
+import { ArrowRightLeft, Award, BookOpen, Clock, Megaphone, Percent, TriangleAlert, User, Users } from 'lucide-react'
 
 export function StudentsStatsCard() {
   const getFillColor = (process?: number): string => {
@@ -34,45 +34,45 @@ export function StudentsStatsCard() {
   const cards: DashboardCard[] = [
     {
       id: 'new',
-      icon: User,
-      title: 'Yangi lidlar',
+      icon: Users,
+      title: "Jami o'quvchilari",
       process: data?.new_leads_progress || 0,
       count: data?.new_leads || 0,
       trendDirection: getProcess(data?.new_leads_progress),
       trendColor: '#fff',
       hidden: false,
       pillColor: getFillColor(data?.new_leads_progress),
-      iconColor: 'black'
+      iconColor: '#0096c7'
     },
     {
-      icon: ArrowRightLeft,
-      title: 'Jami konversiyalar',
+      icon: BookOpen,
+      title: "2 va undan ortiq kursda o'qiyotkanlar",
       process: data?.conversion_progress || 0,
       count: data?.conversion || 0,
       trendDirection: getProcess(data?.conversion_progress),
       trendColor: '#fff',
       hidden: true,
       pillColor: getFillColor(data?.conversion_progress),
-      iconColor: '#29bf12'
+      iconColor: '#0096c7'
     },
     {
       id: 'rejected',
-      icon: TriangleAlert,
-      title: "Yo'qotilgan lidlar",
+      icon: Clock,
+      title: "Umumiy davomat",
       process: data?.lost_leads_progress || 0,
       count: data?.lost_leads || 0,
       trendDirection: getProcess(data?.lost_leads_progress),
       trendColor: '#fff',
       hidden: false,
       pillColor: getFillColor(data?.lost_leads_progress),
-      iconColor: '#ef233c'
+      iconColor: '#029b49'
     },
     {
       id: 'source',
-      icon: Megaphone,
-      title: 'Eng yaxshi marketing manbasi',
+      icon: Award,
+      title: "O'rtacha baho",
       process: data?.top_lead_source_progress || 0,
-      count: `${data?.top_lead_source}: ${data?.top_lead_source_count}` || 0,
+      count: `${data?.top_lead_source_count}` || 0,
       trendDirection: getProcess(data?.top_lead_source_progress),
       trendColor: '#fff',
       hidden: false,
@@ -81,7 +81,7 @@ export function StudentsStatsCard() {
     },
     {
       id: data?.best_seller?.id,
-      icon: Award,
+      icon: Percent,
       title: `${data?.best_seller?.first_name} - eng yaxshi sotuvchi`,
       process: data?.best_seller_progress || 0,
       count: `${data?.best_seller?.first_name}: ${data?.best_seller_leads_count || 0}`,
@@ -89,7 +89,7 @@ export function StudentsStatsCard() {
       hidden: false,
       trendDirection: getProcess(data?.best_seller_leads_count),
       pillColor: getFillColor(data?.best_seller_progress),
-      iconColor: '#029b49'
+      iconColor: '#7209b7'
     }
   ]
   return (
