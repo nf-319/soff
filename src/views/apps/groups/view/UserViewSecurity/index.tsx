@@ -47,14 +47,14 @@ const UserViewSecurity = () => {
   const useExportAttendance = () => {
     return useMutation({
       mutationFn: async (gp: number) => {
-        const response = await api.get(`common/attendance/export/${gp}`, {
-          responseType: 'blob' // necessary if you're downloading a file
-        })
+        const response = await api.get(`common/attendance/export/${gp}`)
 
-        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const downloadUrl = response.data?.download_url
+        if (!downloadUrl) throw new Error('Download URL not found')
+
         const link = document.createElement('a')
-        link.href = url
-        link.setAttribute('download', `attendance_report_${gp}.xlsx`)
+        link.href = downloadUrl.startsWith('http') ? downloadUrl : `https://${downloadUrl}`
+        link.setAttribute('download', '')
         document.body.appendChild(link)
         link.click()
         link.remove()
