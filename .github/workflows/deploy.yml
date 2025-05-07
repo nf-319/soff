@@ -56,8 +56,26 @@ jobs:
           username: crmroot
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
-            # Use the system-wide PM2 command instead of a specific path
+            # Source NVM first to ensure PM2 is available
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            # Now pm2 should be available
             PM2_COMMAND="pm2"
+
+            # Check if PM2 is available
+            which $PM2_COMMAND || {
+              echo "PM2 not found, trying to find it..."
+              # Try to find pm2 manually
+              POSSIBLE_PM2=$(find $HOME/.nvm -name pm2 -type f | head -n 1)
+              if [ -n "$POSSIBLE_PM2" ]; then
+                PM2_COMMAND="$POSSIBLE_PM2"
+                echo "Found PM2 at: $PM2_COMMAND"
+              else
+                echo "ERROR: PM2 not found. Please install it with: npm install -g pm2"
+                exit 1
+              fi
+            }
 
             TIMESTAMP=$(date +%s)
             APP_NAME="test-subdomain-soffcrm-uz-3132"
