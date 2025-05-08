@@ -18,7 +18,8 @@ import {
   Fade,
   Select,
   MenuItem,
-  CircularProgress, Checkbox
+  CircularProgress,
+  Checkbox
 } from '@mui/material'
 import { useGetListClient, usePostNotification } from './api/notification'
 import { Editor } from 'src/components/Editor'
@@ -37,6 +38,29 @@ const receiverRoles = [
   { label: 'Kasser', value: 'cacher' }
 ]
 
+const HtmlConstanta = `<div style="margin: 20px auto; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; font-family: 'Segoe UI', sans-serif; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);">
+  
+  <!-- Header -->
+  <div style="background-color: #00A34F; padding: 16px 24px; color: #ffffff; display: flex; align-items: center; gap: 12px;">
+    <h2 style="margin: 0; font-size: 20px;">📢 O‘quv Markazlari Uchun Yangilik</h2>
+  </div>
+  
+  <!-- Body -->
+  <div style="padding: 24px; color: #111827; font-size: 16px; line-height: 1.6; text-align: center;">
+  <img 
+    src="/images/icons/soffcrm.png" 
+    alt="SoffCRM Logo" 
+    style="height: 90px; border-radius: 6px; padding: 4px; object-fit: contain; margin-bottom: 16px;"
+  />
+  <p style="margin-top: 0;">Assalomu alaykum hurmatli o‘quv markazi vakillari,</p>
+  <p>Dars jadvalida hech qanday o‘zgarish bo‘lmagan. Darslar 13-maydan belgilangan tartibda davom etadi. Iltimos, barcha talabalarga bu haqda xabar bering.</p>
+  <p>Agar savollar bo‘lsa, tizim orqali bog‘lanishingiz mumkin.</p>
+</div>
+
+
+</div>
+
+`
 
 const CreateNotification: FC = () => {
   const router = useRouter()
@@ -53,9 +77,13 @@ const CreateNotification: FC = () => {
   const [selectedTenant, setSelectedTenant] = useState<any>(null)
 
   const { mutate, isPending } = usePostNotification()
-  const { data: clientsData, isLoading, refetch } = useGetListClient({
+  const {
+    data: clientsData,
+    isLoading,
+    refetch
+  } = useGetListClient({
     search: debouncedSearch,
-    page: 1,
+    page: 1
   })
 
   useEffect(() => {
@@ -64,10 +92,11 @@ const CreateNotification: FC = () => {
     }
   }, [debouncedSearch, open, refetch])
 
-  const tenantOptions = clientsData?.results?.map((client: any) => ({
-    label: client.name,
-    value: client.id
-  })) || []
+  const tenantOptions =
+    clientsData?.results?.map((client: any) => ({
+      label: client.name,
+      value: client.id
+    })) || []
 
   const handleDropdownOpen = () => {
     setOpen(true)
@@ -92,7 +121,7 @@ const CreateNotification: FC = () => {
       {
         title,
         body: content,
-        receivers: receivers.map((item) => item.toUpperCase()),
+        receivers: receivers.map(item => item.toUpperCase()),
         tenant: tenant || undefined
       },
       {
@@ -101,7 +130,7 @@ const CreateNotification: FC = () => {
           toast.success('Muvofaqiyatli yuborildi!')
           await queryClient.refetchQueries({ queryKey: ['all-notification'] })
           await router.push('/c-panel/notifications')
-        },
+        }
       }
     )
   }
@@ -134,16 +163,16 @@ const CreateNotification: FC = () => {
       <FormControl fullWidth sx={{ mb: 3 }}>
         <InputLabel id='receivers-label'>Qabul qiluvchilar</InputLabel>
         <Select
-          label="Qabul qiluvchilar"
+          label='Qabul qiluvchilar'
           multiple
           value={receivers}
           onChange={e => setReceivers(e.target.value as string[])}
-          renderValue={(selected) => (
+          renderValue={selected => (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {selected.map((value) => (
+              {selected.map(value => (
                 <Chip
                   key={value}
-                  onMouseDown={(e) => e.stopPropagation()}
+                  onMouseDown={e => e.stopPropagation()}
                   label={receiverRoles.find(r => r.value === value)?.label || value}
                   onDelete={() => {
                     setReceivers(prev => prev.filter(item => item !== value))
@@ -154,10 +183,10 @@ const CreateNotification: FC = () => {
             </Box>
           )}
           MenuProps={{
-            disableAutoFocusItem: true,
+            disableAutoFocusItem: true
           }}
         >
-          {receiverRoles.map((role) => (
+          {receiverRoles.map(role => (
             <MenuItem key={role.value} value={role.value}>
               <Checkbox checked={receivers.indexOf(role.value) > -1} />
               <ListItemText primary={role.label} />
@@ -212,8 +241,8 @@ const CreateNotification: FC = () => {
       </FormControl>
 
       <Editor
-        value={content}
-        initialValue='<h1>Yangi xabarnoma</h1>'
+        // value={content}
+        initialValue={HtmlConstanta}
         onChange={(val: string) => setContent(val)}
         isDisabled={false}
       />
