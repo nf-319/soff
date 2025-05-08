@@ -131,10 +131,10 @@ const Navigation = (t: any): HorizontalNavItemsType => {
           title: 'Lidlar Hisoboti',
           path: '/reports/lid-statements'
         },
-        {
-          title: "O'quvchilar Hisoboti",
-          path: '/reports/students-reports'
-        },
+        // {
+        //   title: "O'quvchilar Hisoboti",
+        //   path: '/reports/students-reports'
+        // },
         {
           title: t('Davomatlar'),
           path: '/reports/attendances'
@@ -257,10 +257,10 @@ const Navigation = (t: any): HorizontalNavItemsType => {
           title: 'Lidlar Hisoboti',
           path: '/reports/lid-statements'
         },
-        {
-          title: "O'quvchilar Hisoboti",
-          path: '/reports/students-reports'
-        },
+        // {
+        //   title: "O'quvchilar Hisoboti",
+        //   path: '/reports/students-reports'
+        // },
         {
           title: t('Davomatlar'),
           path: '/reports/attendances'
