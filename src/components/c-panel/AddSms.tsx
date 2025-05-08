@@ -26,7 +26,7 @@ type Props = {
 }
 
 const createSmsPaket = async (data: any) => {
-  console.log(data)
+
 
   await api.post(`owner/sms-provider/connect/`, data).then(res => {
     return res
