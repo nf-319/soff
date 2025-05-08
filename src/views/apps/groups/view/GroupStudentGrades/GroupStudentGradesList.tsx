@@ -1,7 +1,5 @@
 'use client'
 
-import type React from 'react'
-
 import { Box, Button, Card, Chip, Tab, Tabs, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import IconifyIcon from 'src/components/icon'
@@ -17,10 +15,7 @@ import SubLoader from 'src/views/apps/loaders/SubLoader'
 import dayjs from 'dayjs'
 import { ListItem } from './ListItem'
 import { useGet } from 'src/hooks/useApi'
-import ExcelGrades from '@/components/excelButton/ExcelGrades'
-import useResponsive from '@/@core/hooks/useResponsive'
 import { VscodeIconsFileTypeExcel2 } from '@/components/excelButton/ExcelIcon'
-import Link from 'next/link'
 import api from '@/@core/utils/api'
 import { LoadingButton } from '@mui/lab'
 
@@ -28,7 +23,6 @@ const GroupStudentGrades = () => {
   const { gradeQueryParams, isGettingGrades, days, month_list } = useAppSelector(state => state.groupDetails)
   const dispatch = useAppDispatch()
   const currentDate = dayjs().format('YYYY-MM-DD')
-  const { isMobile } = useResponsive()
   const { pathname, query, push } = useRouter()
   const { settings } = useSettings()
   const isDark = settings.mode === 'dark'
@@ -105,7 +99,7 @@ const GroupStudentGrades = () => {
   ) : (
     <Box className='demo-space-y'>
       <Card sx={{ padding: 5 }}>
-        <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
           <Typography
             variant='h6'
             style={{
@@ -125,37 +119,8 @@ const GroupStudentGrades = () => {
           >
             Excel
           </LoadingButton>
-          {/* <ExcelGrades size='small' width={isMobile ? '100%' : 'auto'} url={`common/ratings/export/${query.id}`} /> */}
         </Box>
 
-        {/* <ul
-          className='hide-scrollbar'
-          style={{
-            display: 'flex',
-            listStyle: 'none',
-            margin: 0,
-            padding: 0,
-            gap: '15px',
-            marginBottom: 12,
-            overflow: 'auto'
-          }}
-        >
-          {month_list.map(item => (
-            <li
-              key={item.date}
-              onClick={() => handleClick(item)}
-              style={{
-                borderBottom:
-                  query?.month === getMontName(Number(item.date.split('-')[1]))
-                    ? '2px solid #c3cccc'
-                    : '2px solid transparent',
-                cursor: 'pointer'
-              }}
-            >
-              {item.month}
-            </li>
-          ))}
-        </ul> */}
         <Tabs
           value={value}
           onChange={handleChange}
@@ -245,7 +210,7 @@ const GroupStudentGrades = () => {
                                 fontWeight: 500,
                                 color: isDark ? '#fff' : '#000',
                                 width: '100%',
-                                minWidth: 100, 
+                                minWidth: 100,
                                 whiteSpace: 'normal',
                                 wordBreak: 'break-word',
                                 fontSize: 14
@@ -393,4 +358,5 @@ const GroupStudentGrades = () => {
   )
 }
 
+GroupStudentGrades.display = 'GroupStudentGrades'
 export default GroupStudentGrades
