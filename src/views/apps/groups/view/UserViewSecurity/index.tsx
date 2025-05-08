@@ -17,6 +17,7 @@ import { TopicAddDialog } from './TopicAddDialog'
 import { AttendanceTable } from './AttendenceTable'
 import { AttendanceTableSkeleton } from './AttendanceTableSkeleton'
 import { useMutation } from '@tanstack/react-query'
+import { VscodeIconsFileTypeExcel2 } from '@/components/excelButton/ExcelIcon'
 
 const UserViewSecurity = () => {
   const { queryParams, attendance, isGettingAttendance, days, groupData, month_list } = useAppSelector(
@@ -322,7 +323,7 @@ const UserViewSecurity = () => {
             Davomat
           </Typography>
 
-          <Button onClick={handleGetExcel} startIcon={<Download />} color='success' variant='outlined'>
+          <Button onClick={handleGetExcel} startIcon={<VscodeIconsFileTypeExcel2 />} color='success' variant='outlined'>
             Excel
           </Button>
         </Box>

@@ -94,7 +94,7 @@ export const AttendanceTable = ({
     [isDark]
   )
 
-  const dayHeaderStyles: React.CSSProperties = {
+   const dayHeaderStyles: React.CSSProperties = {
     textAlign: 'center',
     width: '60px',
     minWidth: '60px',
