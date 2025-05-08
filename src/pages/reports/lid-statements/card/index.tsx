@@ -10,7 +10,7 @@ import { TrendCard } from '@components/TrendCard';
 import { useRouter } from 'next/router';
 import { ComingSoon } from '@components/ComingSoon';
 
-type DashboardCard = {
+export type DashboardCard = {
   title: string;
   id?: string | number;
   count: string | number;
