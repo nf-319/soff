@@ -12,6 +12,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useQueryClient } from '@tanstack/react-query'
 import { QueryKeys } from '@/shared/query-hooks/queryKeys'
+import DataGridWrapper from '@/components/table/dataGridTable'
 
 export const temperateOptions = [
   { value: '', label: 'Barcha haroratlar' },
@@ -43,7 +44,7 @@ const LeadsList = () => {
   const [temperateValue, setTemperateValue] = useState('')
   const [stateValue, setStateValue] = useState('')
   const queryClient = useQueryClient()
-  const leadsSellers:any = queryClient.getQueryData([QueryKeys.ReportsLeadsSellers])
+  const leadsSellers: any = queryClient.getQueryData([QueryKeys.ReportsLeadsSellers])
 
   const [adminValue, setAdminValue] = useState('')
   const tableRef = useRef<HTMLDivElement | null>(null)
@@ -245,34 +246,18 @@ const LeadsList = () => {
           }
         }}
       >
-        <DataGrid
-          autoHeight
+        <DataGridWrapper
           rows={data?.results || []}
           columns={columns}
-          loading={isLoading}
           getRowId={row => row.id}
-          localeText={uzbekLocaleText}
-          hideFooter
+          loading={isLoading}
           disableSelectionOnClick
+          localeText={uzbekLocaleText}
           onRowClick={params => {
             setSelectedLead(params.row)
             setOpenModal(true)
           }}
-          sx={{
-            '.MuiDataGrid-row': {
-              cursor: 'pointer',
-              transition: 'background-color 0.3s',
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04)'
-              },
-              '&.Mui-selected': {
-                backgroundColor: 'transparent !important'
-              },
-              '&.Mui-selected:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04) !important'
-              }
-            }
-          }}
+          hideFooter
         />
       </Box>
 
