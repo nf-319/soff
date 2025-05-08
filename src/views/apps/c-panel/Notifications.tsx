@@ -72,6 +72,7 @@ export const Notifications = () => {
                   height: '100%',
                   borderRadius: '16px',
                   minHeight: 220,
+                  padding:5,
                   transition: 'box-shadow 0.3s',
                   '&:hover': {
                     boxShadow: 3
