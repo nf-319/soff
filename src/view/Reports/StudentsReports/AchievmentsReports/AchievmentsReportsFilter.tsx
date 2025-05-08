@@ -85,14 +85,14 @@ export function AchievmentReportsFilter() {
           <FormControl sx={{ minWidth: 180 }} fullWidth>
             <DatePicker
               format='MM/dd/yyyy'
-              views={['day', 'month', 'year']}
+              views={['day']}
               onChange={handleChange}
               label='Sana'
               value={date}
             />
           </FormControl>
         </Box>
-        <Button startIcon={<Download />} variant='contained'>
+        <Button startIcon={<Download size={20}/>} variant='contained'>
           Excel
         </Button>
       </Box>
