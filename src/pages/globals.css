@@ -1,3 +1,7 @@
+:root {
+  brand: #666CFF;
+}
+
 html,
 body {
   min-height: 100%;

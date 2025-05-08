@@ -91,6 +91,8 @@
     "@types/react-redux": "7.1.24",
     "@typescript-eslint/eslint-plugin": "5.41.0",
     "@typescript-eslint/parser": "5.41.0",
+    "autoprefixer": "^10.4.21",
+    "classnames": "^2.5.1",
     "eslint": "8.26.0",
     "eslint-config-next": "13.0.0",
     "eslint-config-prettier": "8.5.0",
@@ -102,6 +104,9 @@
     "patch-package": "8.0.0",
     "prettier": "2.7.1",
     "react-hot-loader": "^4.13.1",
+    "sass": "^1.87.0",
+    "scss": "^0.2.4",
+    "typed-scss-modules": "^8.1.1",
     "typescript": "^5.6.3"
   }
 }
