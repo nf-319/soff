@@ -3,7 +3,6 @@
 import { Box, Button, MenuItem, Select, Typography, Chip, CircularProgress } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { DataGrid } from '@mui/x-data-grid'
 import { useGetReportLeadsList } from '@/shared/query-hooks/report-leads/reportLeads'
 import { ReportsLeadsListItemType } from '@/types/report'
 import { LidsDragonModal } from '@/views/apps/lids/LidsDragonModal'
@@ -12,7 +11,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useQueryClient } from '@tanstack/react-query'
 import { QueryKeys } from '@/shared/query-hooks/queryKeys'
-import DataGridWrapper from '@/components/table/dataGridTable'
+import { DataGridTable } from '@components/table/DataGridTable'
 
 export const temperateOptions = [
   { value: '', label: 'Barcha haroratlar' },
@@ -246,7 +245,7 @@ const LeadsList = () => {
           }
         }}
       >
-        <DataGridWrapper
+        <DataGridTable
           rows={data?.results || []}
           columns={columns}
           getRowId={row => row.id}

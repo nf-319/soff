@@ -2,7 +2,7 @@ import React from 'react'
 import { DataGrid, GridColDef, GridLocaleText, GridRowParams } from '@mui/x-data-grid'
 import { Box, Typography, CircularProgress } from '@mui/material'
 
-type DataGridWrapperProps<T> = {
+type Props<T> = {
   rows: T[]
   columns: GridColDef[]
   loading?: boolean
@@ -15,7 +15,7 @@ type DataGridWrapperProps<T> = {
   [key: string]: any
 }
 
-function DataGridWrapper<T>({
+function DataGridTable<T>({
   rows = [],
   columns = [],
   loading = false,
@@ -26,7 +26,7 @@ function DataGridWrapper<T>({
   emptyText = "Ma'lumot topilmadi",
   sx = {},
   ...restProps
-}: DataGridWrapperProps<T>) {
+}: Props<T>) {
   return (
     <Box sx={{ width: '100%', position: 'relative' }}>
       <DataGrid
@@ -78,4 +78,6 @@ function DataGridWrapper<T>({
   )
 }
 
-export default DataGridWrapper
+DataGridTable.display = 'DataGridTable'
+export { DataGridTable }
+
