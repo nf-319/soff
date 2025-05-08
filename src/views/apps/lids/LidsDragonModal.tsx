@@ -1,23 +1,24 @@
+"use client"
+
+import type React from "react"
+import { useEffect, useState } from "react"
+import { Box, Typography } from "@mui/material"
 import {
-  Box,
   Button,
   Checkbox,
   Chip,
   Dialog,
   DialogContent,
   DialogTitle,
-  FormControl,
-  FormControlLabel,
   FormGroup,
-  Select,
   Skeleton,
   Tab,
   Tabs,
-  Typography
-} from '@mui/material'
+  FormControlLabel,
+} from "@mui/material"
 import {
   Bell,
-  ChartPie,
+  PieChartIcon as ChartPie,
   Clock,
   Info,
   MessageSquare,
@@ -25,35 +26,32 @@ import {
   PlusIcon,
   ThermometerSnowflake,
   User,
-  UserIcon
-} from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import { EmptyContent } from '@components/empty-content'
-import IconifyIcon from '../../../components/icon'
-import api from 'src/@core/utils/api'
-import { formatDate } from 'src/@core/utils/format'
-import AddNoteAnonimUser from './anonimUser/AddNoteAnonimUser'
-import { useTranslation } from 'react-i18next'
-import SendSmsAnonimUserForm from './anonimUser/SendSmsAnonimUserForm'
-import { useAppDispatch, useAppSelector } from 'src/store'
-import { Add, HelpOutline, QuestionAnswerOutlined } from '@mui/icons-material'
-import useResponsive from 'src/@core/hooks/useResponsive'
-import { useSettings } from 'src/@core/hooks/useSettings'
-import AddToGroupForm from './anonimUser/AddToGroupForm'
-import { fetchGroupChecklist } from 'src/store/apps/groups'
-import { usePatch } from '@/hooks/useApi'
-import { useRouter } from 'next/router'
-import { AccessDeniedModal } from '@components/AccessDeniedModal'
-import MenuItem from '@mui/material/MenuItem'
-import { useAuth } from '@hooks/useAuth'
-import { states, temperateOptions } from '@/pages/reports/lid-statements/leads-list'
-import toast from 'react-hot-toast'
-import { useQueryClient } from '@tanstack/react-query'
-import { getFormatPhone } from '@/shared/utils'
-import { PhoneLink } from '@components/PhoneLink'
-import { QueryKeys } from '@/shared/query-hooks/queryKeys'
-import { lidStatusOption } from '@/shared/constans/lid-statements'
-import { getFormatDate } from '@/shared/utils/getFormatDate'
+  UserIcon,
+} from "lucide-react"
+import { EmptyContent } from "@components/empty-content"
+import IconifyIcon from "../../../components/icon"
+import api from "src/@core/utils/api"
+import { formatDate } from "src/@core/utils/format"
+import AddNoteAnonimUser from "./anonimUser/AddNoteAnonimUser"
+import { useTranslation } from "react-i18next"
+import SendSmsAnonimUserForm from "./anonimUser/SendSmsAnonimUserForm"
+import { useAppDispatch, useAppSelector } from "src/store"
+import { Add, HelpOutline, QuestionAnswerOutlined } from "@mui/icons-material"
+import useResponsive from "src/@core/hooks/useResponsive"
+import { useSettings } from "src/@core/hooks/useSettings"
+import AddToGroupForm from "./anonimUser/AddToGroupForm"
+import { fetchGroupChecklist } from "src/store/apps/groups"
+import { usePatch } from "@/hooks/useApi"
+import { useRouter } from "next/router"
+import { AccessDeniedModal } from "@components/AccessDeniedModal"
+import toast from "react-hot-toast"
+import { useQueryClient } from "@tanstack/react-query"
+import { QueryKeys } from "@/shared/query-hooks/queryKeys"
+import { lidStatusOption } from "@/shared/constans/lid-statements"
+import { getFormatDate } from "@/shared/utils/getFormatDate"
+import InfoItem from '@/views/apps/lids/InfoCard'
+import { temperateOptions } from './constants'
+import { ReminderBox } from '@/views/apps/lids/ui/Reminder'
 
 interface LidsDragonModalProps {
   openModal: boolean
@@ -68,113 +66,15 @@ interface LidsDragonModalProps {
   }
 }
 
-type InfoItemProps = {
-  icon: React.ReactNode
-  label: string
-  value: string
-  canEdit?: boolean
-  onValueChange?: (newValue: string) => void
-  option?: any
-}
-
-const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false, onValueChange, option }) => {
-  const { settings } = useSettings()
-  const [currentValue, setCurrentValue] = useState<string>(value)
-  const { user } = useAuth()
-  const permissions = ['admin', 'ceo']
-  const hasEditPermission = permissions?.includes(user?.currentRole as string) || false
-  const isEditable = canEdit && hasEditPermission
-
-  const handleStateChange = (newState: string) => {
-    setCurrentValue(newState)
-    if (onValueChange) {
-      onValueChange(newState)
-    }
-  }
-
-  useEffect(() => {
-    setCurrentValue(value)
-  }, [value, label, canEdit])
-
-  const filteredOptions = (() => {
-    if (label !== 'Holat') return option
-
-    if (value === 'new') {
-      return option
-    }
-
-    return option?.filter((o: any) => o.value !== 'new')
-  })()
-
-  const GETSTATUS = {
-    enrolled: "Sotuv bo'ldi",
-    test_period: 'Sinov darsida'
-  }
-
-  return label === 'Telefon raqami' ? (
-    <PhoneLink phone={value} style={{ textDecoration: 'none', height: '100%' }}>
-      <div
-        className={`d-flex align-items-center p-3 ${
-          settings.mode == 'dark' ? 'bg-#282A42' : 'bg-light'
-        } rounded-3 shadow-sm hover:bg-secondary transition-all duration-200`}
-        style={{ cursor: 'pointer', border: '1px solid #e0e0e0', height: '100%' }}
-      >
-        <div className='text-primary me-3'>{icon}</div>
-        <div>
-          <p className={`mb-1 ${settings.mode == 'dark' ? 'text-ligt' : 'text-muted'}`}>{label}</p>
-          <p className={`mb-0 font-weight-bold ${settings.mode == 'dark' ? 'text-ligt' : 'text-dark'}`}>
-            {getFormatPhone(value ?? '')}
-          </p>
-        </div>
-      </div>
-    </PhoneLink>
-  ) : (
-    <div
-      className='d-flex align-items-center p-3 bg-light rounded-3 shadow-sm hover:bg-secondary transition-all duration-200'
-      style={{ cursor: 'pointer', border: '1px solid #e0e0e0', height: '100%' }}
-    >
-      <div className='text-primary me-3'>{icon}</div>
-      <div style={{ flex: 1 }}>
-        <p className='mb-1'>{label}</p>
-        <div className='mb-0 font-weight-bold text-dark'>
-          {currentValue === 'test_period' || currentValue === 'enrolled' ? (
-            <p>{GETSTATUS[currentValue]}</p>
-          ) : isEditable ? (
-            <FormControl fullWidth>
-              <Select
-                size='small'
-                fullWidth
-                value={currentValue}
-                displayEmpty
-                onChange={e => handleStateChange(e.target.value as string)}
-              >
-                {filteredOptions?.map((option: any) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          ) : (
-            <p>{currentValue}</p>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export default InfoItem
-
 export function LidsDragonModal({ selectedLead: initialLead, openModal, handleClose }: LidsDragonModalProps) {
   const { query } = useRouter()
-  const [value, setValue] = useState<'lead-user-description' | 'anonim-user' | 'sms-history' | 'history'>(
-    query.is_amocrm ? 'lead-user-description' : 'anonim-user'
+  const [value, setValue] = useState<"lead-user-description" | "anonim-user" | "sms-history" | "history">(
+    query.is_amocrm ? "lead-user-description" : "anonim-user",
   )
   const [leadDetail, setLeadDetail] = useState<any>(null)
-  const { sms_list } = useAppSelector(state => state.settings)
-  const { groupChecklist } = useAppSelector(state => state.groups)
-  const { companyInfo } = useAppSelector(state => state.user)
+  const { sms_list } = useAppSelector((state) => state.settings)
+  const { groupChecklist } = useAppSelector((state) => state.groups)
+  const { companyInfo } = useAppSelector((state) => state.user)
   const [smsModal, setSmsModalOpen] = useState(false)
   const [accessModal, setAccessModal] = useState<boolean>(false)
   const [addGroupModal, setAddGroupModal] = useState(false)
@@ -197,10 +97,10 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
     try {
       await api
         .get(`leads/${value}/${initialLead?.id}/`)
-        .then(res => {
+        .then((res) => {
           setLeadDetail(res.data)
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err)
         })
       setDetailLoading(false)
@@ -214,10 +114,10 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
     try {
       await api
         .get(`amocrm/lead/notes/${initialLead?.id}/`)
-        .then(res => {
+        .then((res) => {
           setLeadDetail(res.data)
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err)
         })
       setDetailLoading(false)
@@ -231,13 +131,13 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
       const requestPrams = { temperature }
       mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams, {
         onSuccess: () => {
-          void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
+          void queryClient.invalidateQueries({ queryKey: ["leads/departments/leads/", "departments-leads"] })
           setSelectedLead((prev: any) => ({
             ...prev,
-            temperature: temperature
+            temperature: temperature,
           }))
           toast.success("Muvofiqiyatli o'zgardi")
-        }
+        },
       })
     } catch (error: any) {
       console.error(error)
@@ -251,13 +151,13 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
 
       mutate(`leads/anonim-user/update/${selectedLead?.id}/`, requestPrams, {
         onSuccess: () => {
-          void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
-          queryClient.invalidateQueries({ queryKey: ['leads/sales-funnel/', 'leads/sales-funnel'] })
+          void queryClient.invalidateQueries({ queryKey: ["leads/departments/leads/", "departments-leads"] })
+          queryClient.invalidateQueries({ queryKey: ["leads/sales-funnel/", "leads/sales-funnel"] })
           queryClient.invalidateQueries({ queryKey: [QueryKeys.ReportLeadsList] })
 
           setSelectedLead((prev: any) => ({ ...prev, status }))
           toast.success("Muvofiqiyatli o'zgardi")
-        }
+        },
       })
     } catch (error: any) {
       console.error(error)
@@ -267,7 +167,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
 
   const handleChange = async (
     event: React.SyntheticEvent,
-    newValue: 'lead-user-description' | 'anonim-user' | 'sms-history'
+    newValue: "lead-user-description" | "anonim-user" | "sms-history",
   ) => {
     if (query.is_amocrm) {
       void handleGetAmoUserDetails(newValue, selectedLead?.id)
@@ -287,7 +187,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
 
   useEffect(() => {
     if (openModal) {
-      dispatch(fetchGroupChecklist(''))
+      dispatch(fetchGroupChecklist(""))
       if (query.is_amocrm) {
         void handleGetAmoUserDetails(value, selectedLead?.id)
       } else {
@@ -295,8 +195,6 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
       }
     }
   }, [openModal, query.is_amocrm])
-
-  const newState = { value: null, label: '----' }
 
   return (
     <Dialog
@@ -345,7 +243,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
               label='Harorat'
               value={selectedLead?.temperature}
               canEdit={true}
-              option={[newState, ...temperateOptions.slice(1, 4)]}
+              options={temperateOptions}
               onValueChange={newValue => lidTemperature(newValue)}
             />
           </div>
@@ -356,7 +254,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
               label='Holat'
               value={selectedLead?.status || 'new'}
               canEdit={true}
-              option={lidStatusOption}
+              options={lidStatusOption}
               onValueChange={newValue => lidStatus(newValue)}
             />
           </div>
@@ -465,6 +363,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
                 ) : (
                   leadDetail?.map((item: any) => (
                     <Box
+                      key={item.id}
                       className='shadow-sm p-3'
                       display='flex'
                       flexDirection='column'
@@ -522,7 +421,11 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
                   </>
                 ) : (
                   <>
-                    <Box margin={4}>
+                    {leadDetail?.map((item: any) => (
+                      <ReminderBox item={item} />
+                    ))}
+
+                    <Box marginY={4}>
                       <Button
                         variant='contained'
                         onClick={() => setNodeModal(true)}
@@ -533,44 +436,6 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
                         Yangi Eslatma
                       </Button>
                     </Box>
-                    {leadDetail?.map((item: any) => (
-                      <Box
-                        className='shadow-sm p-3'
-                        display='flex'
-                        flexDirection='column'
-                        gap={2}
-                        sx={{ background: settings.mode == 'dark' ? '#282A42' : 'white', borderRadius: 1 }}
-                        margin={4}
-                        padding={3}
-                      >
-                        <Box display='flex' alignItems='center' justifyContent='space-between'>
-                          {item?.admin && (
-                            <Box display='flex' alignItems='center'>
-                              <div className='text-primary me-3'>{<User />}</div>
-                              <Typography>{item?.admin}</Typography>
-                            </Box>
-                          )}
-                          {item?.created_at && (
-                            <Box display='flex' alignItems='center'>
-                              <div className='text-primary me-3'>{<Clock />}</div>
-                              <Typography>{item?.created_at}</Typography>
-                            </Box>
-                          )}
-                        </Box>
-                        {item?.text && (
-                          <Box display='flex' alignItems='center'>
-                            <div className='text-primary me-3'>{<Bell />}</div>
-                            <Typography>{item?.text}</Typography>
-                          </Box>
-                        )}
-                        {item?.body && (
-                          <Box display='flex' alignItems='center'>
-                            <div className='text-primary me-3'>{<Bell />}</div>
-                            <Typography>{item?.body}</Typography>
-                          </Box>
-                        )}
-                      </Box>
-                    ))}
                   </>
                 )}
               </div>
@@ -615,6 +480,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
                     </Box>
                     {leadDetail?.map((item: any) => (
                       <Box
+                        key={item.id}
                         className='shadow-sm p-3'
                         display='flex'
                         flexDirection='column'
@@ -652,6 +518,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
                   <>
                     {leadDetail?.map((item: any) => (
                       <Box
+                        key={item.id}
                         className='shadow-sm p-3'
                         display='flex'
                         flexDirection='column'

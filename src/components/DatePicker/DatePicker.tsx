@@ -1,6 +1,7 @@
 'use client'
 
 import { DatePicker as MuiDatePicker, DatePickerProps } from '@mui/x-date-pickers/DatePicker'
+import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { IconButton, InputAdornment, TextFieldProps } from '@mui/material'
@@ -15,10 +16,12 @@ type Props = {
   views?: DatePickerProps<Date>['views']
   format?: string
   disableFuture?: boolean
+  disablePast?: boolean
   size?: TextFieldProps['size']
   fullWidth?: boolean
   placeholder?: string
   shrinkLabel?: boolean
+  showTimeSelect?: boolean
 }
 
 export const DatePicker: FC<Props> = ({
@@ -28,10 +31,12 @@ export const DatePicker: FC<Props> = ({
   views = ['month', 'year'],
   format = 'MM/yyyy',
   disableFuture = false,
+  disablePast = false,
   size = 'small',
   fullWidth = false,
   placeholder,
-  shrinkLabel = true
+  shrinkLabel = true,
+  showTimeSelect = false
 }) => {
   const [internalDate, setInternalDate] = useState<Date | null>(value)
 
@@ -50,45 +55,62 @@ export const DatePicker: FC<Props> = ({
     onChange(null)
   }
 
+  const inputProps = {
+    fullWidth,
+    size,
+    placeholder,
+    InputLabelProps: {
+      shrink: shrinkLabel,
+      sx: {
+        display: 'block',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        maxWidth: '100%'
+      },
+      title: label
+    },
+    InputProps: internalDate
+      ? {
+          endAdornment: (
+            <InputAdornment position='end' sx={{ marginRight: '-12px' }}>
+              <IconButton size='small' onClick={clearDate} sx={{ padding: '6px' }}>
+                <ClearIcon fontSize='medium' />
+              </IconButton>
+            </InputAdornment>
+          )
+        }
+      : {}
+  }
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <MuiDatePicker
-        label={label}
-        value={internalDate}
-        onChange={handleChange}
-        views={views}
-        format={format}
-        disableFuture={disableFuture}
-        slotProps={{
-          textField: {
-            fullWidth,
-            size,
-            placeholder,
-            InputLabelProps: {
-              shrink: shrinkLabel,
-              sx: {
-                display: 'block',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                maxWidth: '100%'
-              },
-              title: label
-            },
-            InputProps: internalDate
-              ? {
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <IconButton size='small' onClick={clearDate}>
-                        <ClearIcon fontSize='small' />
-                      </IconButton>
-                    </InputAdornment>
-                  )
-                }
-              : {}
-          }
-        }}
-      />
+      {showTimeSelect ? (
+        <MuiDateTimePicker
+          label={label}
+          value={internalDate}
+          onChange={handleChange}
+          format={format}
+          disableFuture={disableFuture}
+          disablePast={disablePast}
+          slotProps={{
+            textField: inputProps
+          }}
+        />
+      ) : (
+        <MuiDatePicker
+          label={label}
+          value={internalDate}
+          onChange={handleChange}
+          views={views}
+          format={format}
+          disableFuture={disableFuture}
+          disablePast={disablePast}
+          slotProps={{
+            textField: inputProps
+          }}
+        />
+      )}
     </LocalizationProvider>
   )
 }
