@@ -3,12 +3,12 @@
 import { Box, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { DataGrid } from '@mui/x-data-grid'
 import SellerDetailModal from '@/components/seller-detail-modal'
 import { useGetLeadsSellers } from '@/shared/query-hooks/report-leads/reportLeads'
 import { ReposrtLeadsSellers } from '@/types/report'
 import { uzbekLocaleText } from '@/views/apps/StudentsPoints/constants'
 import { useRouter } from 'next/router'
+import { DataGridTable } from '@components/table/DataGridTable'
 
 const LeadsSellers = () => {
   const { t } = useTranslation()
@@ -94,8 +94,6 @@ const LeadsSellers = () => {
     }
   }, [sellerId, data])
 
-
-
   if (isLoading || !branchParam) {
     return <Box>Loading...</Box>
   }
@@ -117,31 +115,13 @@ const LeadsSellers = () => {
           }
         }}
       >
-        <DataGrid
-          autoHeight
+        <DataGridTable
           rows={data}
           columns={columns}
           loading={isLoading}
-          disableSelectionOnClick
-          getRowId={row => row.id}
           localeText={uzbekLocaleText}
+          onRowClick={(params:any) => setSellerId(params.row.id)}
           hideFooter
-          onRowClick={params => setSellerId(params.row.id)}
-          sx={{
-            '.MuiDataGrid-row': {
-              cursor: 'pointer',
-              transition: 'background-color 0.3s',
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04)'
-              },
-              '&.Mui-selected': {
-                backgroundColor: 'transparent !important'
-              },
-              '&.Mui-selected:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04) !important'
-              }
-            }
-          }}
         />
       </Box>
 
