@@ -59,7 +59,7 @@ const GroupStudentGrades = () => {
     borderBottom: `1px solid ${isDark ? '#444' : '#e0e0e0'}`,
     borderRight: `1px solid ${isDark ? '#444' : '#e0e0e0'}`
   }
-  
+
   const handleChange = async (event: any, newValue: any) => {
     setValue(newValue)
     const selectedItem = month_list[newValue]
@@ -239,8 +239,21 @@ const GroupStudentGrades = () => {
                             borderRight: `1px solid ${settings.mode == 'dark' ? '#444' : '#c3cccc'}`
                           }}
                         >
-                          <Box display='flex' alignItems='center' justifyContent={'space-between'} gap={3}>
-                            <Typography>{student.first_name}</Typography>
+                          <Box display='flex' alignItems='center' justifyContent={'space-between'}>
+                            <Typography
+                              sx={{
+                                fontWeight: 500,
+                                color: isDark ? '#fff' : '#000',
+                                width: '100%',
+                                minWidth: 100, 
+                                whiteSpace: 'normal',
+                                wordBreak: 'break-word',
+                                fontSize: 14
+                              }}
+                            >
+                              {student.first_name}
+                            </Typography>
+
                             <Chip
                               color='error'
                               size='small'
