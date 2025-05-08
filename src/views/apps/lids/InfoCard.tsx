@@ -98,9 +98,6 @@ const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, canEdit = false
               onChange={handleValueChange}
               displayEmpty
               sx={{
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "transparent",
-                },
                 "&:hover .MuiOutlinedInput-notchedOutline": {
                   borderColor: "divider",
                 },

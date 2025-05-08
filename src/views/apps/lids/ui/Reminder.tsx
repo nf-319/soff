@@ -228,7 +228,7 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, onEdit, onDelete }
             <DatePicker
               label="Eslatish vaqti"
               views={['day']}
-              format='dd/MM/yyyy HH:mm'
+              format='dd/MM/yyyy'
               disablePast={true}
               showTimeSelect={true}
               value={reminderDate}
@@ -250,9 +250,9 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, onEdit, onDelete }
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setEditDialogOpen(false)}>Bekor qilish</Button>
           <Button onClick={handleEditSave} color='primary' variant='contained'>
-            Save
+            Saqlash
           </Button>
         </DialogActions>
       </Dialog>
