@@ -1,12 +1,19 @@
-name: Next.js Frontend Deployment
+name: Next.js Frontend CI/CD with Approval
 
 on:
   push:
     branches:
       - test
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy to server'
+        required: true
+        type: boolean
+        default: false
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -39,6 +46,24 @@ jobs:
             package-lock.json \
             ecosystem.config.js \
             .env
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: deploy.tar.gz
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.deploy == 'true'
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
 
       - name: Deploy to server
         uses: appleboy/scp-action@master
