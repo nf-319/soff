@@ -40,12 +40,10 @@ const receiverRoles = [
 
 const HtmlConstanta = `<div style="margin: 20px auto; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; font-family: 'Segoe UI', sans-serif; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);">
   
-  <!-- Header -->
   <div style="background-color: #00A34F; padding: 16px 24px; color: #ffffff; display: flex; align-items: center; gap: 12px;">
     <h2 style="margin: 0; font-size: 20px;">📢 O‘quv Markazlari Uchun Yangilik</h2>
   </div>
   
-  <!-- Body -->
   <div style="padding: 24px; color: #111827; font-size: 16px; line-height: 1.6; text-align: center;">
   <img 
     src="/images/icons/soffcrm.png" 
@@ -65,7 +63,7 @@ const HtmlConstanta = `<div style="margin: 20px auto; background: #f9fafb; borde
 const CreateNotification: FC = () => {
   const router = useRouter()
   const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
+  const [content, setContent] = useState(HtmlConstanta)
   const [receivers, setReceivers] = useState<string[]>([])
   const [tenant, setTenant] = useState<number | ''>('')
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
@@ -241,8 +239,8 @@ const CreateNotification: FC = () => {
       </FormControl>
 
       <Editor
-        // value={content}
-        initialValue={HtmlConstanta}
+        value={content}
+        // initialValue={HtmlConstanta}
         onChange={(val: string) => setContent(val)}
         isDisabled={false}
       />
