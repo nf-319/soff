@@ -7,7 +7,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { IconButton, InputAdornment, TextFieldProps, Box, Stack } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import { isValid, set } from 'date-fns'
-import { FC, useState, useMemo } from 'react'
+import { FC, useState, useMemo, useEffect } from 'react'
 
 type Props = {
   label: string
@@ -39,18 +39,31 @@ export const DatePicker: FC<Props> = ({
   showTimeSelect = false
 }) => {
   const [internalDate, setInternalDate] = useState<Date | null>(value)
+  const [hasTimeSet, setHasTimeSet] = useState<boolean>(false)
 
   const dateFormat = useMemo(() => {
     if (format) return format
-    return showTimeSelect ? 'dd/MM/yyyy' : 'MM/yyyy'
+    return showTimeSelect ? 'dd/MM/yyyy HH:mm' : 'MM/yyyy'
   }, [format, showTimeSelect])
+
+  useEffect(() => {
+    setInternalDate(value)
+    if (value) {
+      const hours = value.getHours()
+      const minutes = value.getMinutes()
+      setHasTimeSet(hours !== 0 || minutes !== 0)
+    } else {
+      setHasTimeSet(false)
+    }
+  }, [value])
 
   const handleDateChange = (date: Date | null) => {
     if (!date || !isValid(date)) {
       setInternalDate(null)
       onChange(null)
+      setHasTimeSet(false)
     } else {
-      if (internalDate && showTimeSelect) {
+      if (internalDate && showTimeSelect && hasTimeSet) {
         const newDate = set(date, {
           hours: internalDate.getHours(),
           minutes: internalDate.getMinutes()
@@ -58,8 +71,12 @@ export const DatePicker: FC<Props> = ({
         setInternalDate(newDate)
         onChange(newDate)
       } else {
-        setInternalDate(date)
-        onChange(date)
+        const newDate = set(date, {
+          hours: 0,
+          minutes: 0
+        })
+        setInternalDate(newDate)
+        onChange(newDate)
       }
     }
   }
@@ -74,15 +91,23 @@ export const DatePicker: FC<Props> = ({
       })
       setInternalDate(newDateTime)
       onChange(newDateTime)
+      setHasTimeSet(true)
     } else {
-      setInternalDate(time)
-      onChange(time)
+      const today = new Date()
+      const newDateTime = set(today, {
+        hours: time.getHours(),
+        minutes: time.getMinutes()
+      })
+      setInternalDate(newDateTime)
+      onChange(newDateTime)
+      setHasTimeSet(true)
     }
   }
 
   const clearDate = () => {
     setInternalDate(null)
     onChange(null)
+    setHasTimeSet(false)
   }
 
   const commonInputProps = {
@@ -112,6 +137,11 @@ export const DatePicker: FC<Props> = ({
       : {}
   }
 
+  const timePickerValue = useMemo(() => {
+    if (internalDate && hasTimeSet) return internalDate
+    return null
+  }, [internalDate, hasTimeSet])
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       {showTimeSelect ? (
@@ -121,7 +151,7 @@ export const DatePicker: FC<Props> = ({
               label={label}
               value={internalDate}
               onChange={handleDateChange}
-              views={['day', 'month', 'year']}
+              views={views}
               format={dateFormat}
               disableFuture={disableFuture}
               disablePast={disablePast}
@@ -136,10 +166,10 @@ export const DatePicker: FC<Props> = ({
           <Box sx={{ width: '120px' }}>
             <MobileTimePicker
               label='Vaqt'
-              value={internalDate}
+              value={timePickerValue}
               onChange={handleTimeChange}
               ampm={false}
-              disabled={true}
+              disabled={!internalDate}
               closeOnSelect={true}
               disableFuture={disableFuture}
               disablePast={disablePast}

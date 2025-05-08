@@ -229,8 +229,8 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, onEdit, onDelete }
               label="Eslatish vaqti"
               views={['day']}
               format='dd/MM/yyyy'
-              disablePast={true}
-              showTimeSelect={true}
+              disablePast
+              showTimeSelect
               value={reminderDate}
               onChange={(newValue) => setReminderDate(newValue)}
             />
