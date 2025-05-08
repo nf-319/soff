@@ -2,22 +2,10 @@
 
 import { FC, useState, useRef, useEffect } from 'react'
 import parse from 'html-react-parser'
-import { Bell, BellRing, Check, CheckCheck, ChevronDown, ChevronUp, Clock } from 'lucide-react'
-import Divider from '@mui/material/Divider'
-import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import {
-  NotificationContainer,
-  NotificationHeader,
-  HeaderContent,
   Content,
-  Title,
-  ActionFooter,
-  ActionButton,
-  ExpandButton,
-  Timestamp
 } from './Notification.styles'
-import { getFormatTimestamp } from '@utils/getFormatTimestamp'
 
 const stripHtml = (html: string): string => {
   const tempDiv = document.createElement('div')
@@ -39,16 +27,10 @@ export type NotificationProps = {
 }
 
 export const Notification: FC<NotificationProps> = ({
-  title,
   content,
-  hiddenIsRead,
-  created_at,
-  isRead,
   truncate = false,
   displayAsText = false,
-  sx = {},
   compact = false,
-  onClick
 }) => {
   const [expanded, setExpanded] = useState(!truncate)
   const [contentOverflows, setContentOverflows] = useState(false)

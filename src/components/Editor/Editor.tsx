@@ -8,7 +8,7 @@ export type EditorProps = {
   isShowMaxLimit?: boolean
   maxLimit?: number
   isDisabled?: boolean
-  value?: string
+  value: string
   initialValue?: string
   onBeforeAdd?: IAllProps['onBeforeAddUndo']
   onChange: (content: string) => void
