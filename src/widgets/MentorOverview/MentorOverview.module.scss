@@ -1,5 +1,57 @@
 .prent {
-    &__list {
-       color: rebeccapurple;
+  &__list {
+    color: rebeccapurple;
+  }
+}
+
+.mentor_overview {
+  &__card {
+    border: var(--border);
+    &-content {
+      &-titleWrap {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        // align-items: center;
+        &-titleBox {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          &-title {
+            padding: 10px 0;
+          }
+          &-editor {
+          }
+        }
+        &-avatar {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 100%;
+          align-self: center;
+          margin-top: 10px;
+        }
+      }
+      &-body {
+        margin-top: 15px;
+        display: flex;
+        align-items: start;
+        flex-direction: column;
+        gap: 10px;
+        border-bottom: 1px solid hsl(0, 0%, 50%, 0.2);
+        padding: 10px 0;
+        &-item {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+        }
+      }
+      &-contactbox {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
     }
+  }
 }
