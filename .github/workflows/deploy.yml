@@ -1,12 +1,19 @@
-name: Next.js Frontend Deployment
+name: Next.js Frontend CI/CD with Approval
 
 on:
   push:
     branches:
       - test
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy to server'
+        required: true
+        type: boolean
+        default: false
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,14 +38,32 @@ jobs:
 
       - name: Prepare deployment package
         run: |
-          # Faqat kerakli fayllarnigina zip qilish
           tar -czf deploy.tar.gz \
             .next/ \
             public/ \
+            node_modules/ \
             package.json \
             package-lock.json \
             ecosystem.config.js \
             .env
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifact
+          path: deploy.tar.gz
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.deploy == 'true'
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: build-artifact
 
       - name: Deploy to server
         uses: appleboy/scp-action@master
@@ -56,17 +81,13 @@ jobs:
           username: crmroot
           password: ${{ secrets.TEST_SERVER_PASSWORD }}
           script: |
-            # Source NVM first to ensure PM2 is available
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-            # Now pm2 should be available
             PM2_COMMAND="pm2"
 
-            # Check if PM2 is available
             which $PM2_COMMAND || {
               echo "PM2 not found, trying to find it..."
-              # Try to find pm2 manually
               POSSIBLE_PM2=$(find $HOME/.nvm -name pm2 -type f | head -n 1)
               if [ -n "$POSSIBLE_PM2" ]; then
                 PM2_COMMAND="$POSSIBLE_PM2"
@@ -78,73 +99,79 @@ jobs:
             }
 
             TIMESTAMP=$(date +%s)
-            APP_NAME="test-subdomain-soffcrm-uz-3132"
+            APP_NAME="test-subdomain-soffcrm-uz-3131"
             BASE_DIR="/home/crmroot/frontend/test-soffcrm"
             DEPLOY_DIR="${BASE_DIR}/${APP_NAME}"
             NEW_DEPLOY_DIR="${BASE_DIR}/${APP_NAME}-${TIMESTAMP}"
 
-            echo "Deployment boshlandi: $(date)"
-            echo "Yangi deploy papkasi: $NEW_DEPLOY_DIR"
+            echo "Start Deployment: $(date)"
+            echo "New deploy folder: $NEW_DEPLOY_DIR"
 
             mkdir -p $NEW_DEPLOY_DIR
 
-            echo "Build fayllarini extract qilish..."
+            echo "Extract Build files..."
             tar -xzf /tmp/deploy.tar.gz -C $NEW_DEPLOY_DIR
 
             cd $NEW_DEPLOY_DIR
-            echo "Hozirgi papka: $(pwd)"
+            echo "Current folder: $(pwd)"
+
+            if [ ! -f "node_modules/next/dist/bin/next" ]; then
+              echo "ERROR: Next.js executable not found!"
+              ls -la node_modules/next/dist/bin/ || echo "Directory doesn't exist"
+              exit 1
+            fi
 
             set -x
 
             if $PM2_COMMAND list | grep -q "$APP_NAME"; then
-              echo "Mavjud ilova topildi: $APP_NAME"
+              echo "Available app found: $APP_NAME"
 
-              echo "Yangi versiyani ishga tushirish..."
+              echo "Launch new version..."
               $PM2_COMMAND start ecosystem.config.js --only "$APP_NAME-new" || true
 
               sleep 10
 
-              if curl -s http://localhost:3100/api/health > /dev/null || curl -s http://localhost:3100 > /dev/null; then
-                echo "Yangi versiya ishlayotgan ko'rinadi"
+              if curl -s http://localhost:3130/api/health > /dev/null || curl -s http://localhost:3130 > /dev/null; then
+                echo "Looks like a new version is running"
 
-                echo "Eski versiyani o'chirish..."
+                echo "Delete old version..."
                 $PM2_COMMAND delete "$APP_NAME" || true
 
-                echo "Asosiy versiyani ishga tushirish..."
+                echo "Launch base version..."
                 $PM2_COMMAND start ecosystem.config.js --only "$APP_NAME" || true
 
-                echo "Vaqtinchalik versiyani o'chirish..."
+                echo "Delete Temporary Version..."
                 $PM2_COMMAND delete "$APP_NAME-new" || true
 
                 $PM2_COMMAND save || true
 
                 if [ -L "$DEPLOY_DIR" ]; then
-                  echo "Mavjud symbolic link o'chirilmoqda..."
+                  echo "Deleting existing symbolic link..."
                   rm -f "$DEPLOY_DIR"
                 elif [ -d "$DEPLOY_DIR" ]; then
-                  echo "Mavjud papka zaxira nusxasi olinmoqda..."
+                  echo "Backing up an existing folder..."
                   mv "$DEPLOY_DIR" "${DEPLOY_DIR}-old-$(date +%s)" || true
                 fi
 
-                echo "Yangi symbolic link yaratilmoqda..."
+                echo "Creating new symbolic link..."
                 ln -sf "$NEW_DEPLOY_DIR" "$DEPLOY_DIR"
 
-                echo "Eski versiyalarni tozalash..."
+                echo "Clear old versions..."
                 cd $BASE_DIR
                 ls -dt "${APP_NAME}-"* | grep -v "$(basename $NEW_DEPLOY_DIR)" | tail -n +3 | xargs -r rm -rf
 
-                echo "Deployment muvaffaqiyatli tugadi!"
+                echo "The deployment was successful!"
               else
-                echo "XATO: Yangi versiya ishlamayapti!"
+                echo "ERROR: New version unavailable!"
 
                 $PM2_COMMAND delete "$APP_NAME-new" || true
 
                 rm -rf "$NEW_DEPLOY_DIR"
 
-                echo "Oldingi versiyaga qaytildi."
+                echo "Back to previous version."
               fi
             else
-              echo "Birinchi marta deploy qilish..."
+              echo "First deployment..."
 
               $PM2_COMMAND start ecosystem.config.js --only "$APP_NAME" || true
               $PM2_COMMAND save || true
@@ -157,11 +184,11 @@ jobs:
 
               ln -sf "$NEW_DEPLOY_DIR" "$DEPLOY_DIR"
 
-              echo "Birinchi deployment muvaffaqiyatli tugadi!"
+              echo "The first deployment was successful!"
             fi
 
-            echo "PM2 jarayonlari:"
+            echo "PM2 processes:"
             $PM2_COMMAND list
 
-            echo "Frontend papkasidagi fayllar:"
+            echo "Frontend Folder Files:"
             ls -la $BASE_DIR

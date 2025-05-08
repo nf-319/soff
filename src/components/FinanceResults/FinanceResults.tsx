@@ -20,6 +20,7 @@ import {
 import { formatCurrency } from '@utils/format-currency'
 import { useGetFinance } from '@/shared/query-hooks'
 import { DateRange, Refresh, TrendingUp, TrendingDown, Assessment } from '@mui/icons-material'
+import { useAuth } from '@hooks/useAuth'
 
 const monthMap: Record<number, string> = {
   1: 'Yanvar',
@@ -40,17 +41,22 @@ export const FinanceResults: FC = () => {
   const theme = useTheme()
   const now = new Date()
   const currentYear = now.getFullYear()
+  const { user } = useAuth()
   const currentMonth = now.getMonth() + 1
 
   const [selectedYear, setSelectedYear] = useState(currentYear)
+  const [selectedBranch, setSelectedBranch] = useState(user?.active_branch ?? "")
   const [selectedMonth, setSelectedMonth] = useState(currentMonth)
-
-  const { data, isLoading, isError, refetch } = useGetFinance(selectedYear, selectedMonth)
+  const { data, isLoading, isError, refetch } = useGetFinance(selectedYear, selectedMonth, selectedBranch)
 
   const availableYears = Array.from({ length: 5 }, (_, i) => currentYear - i)
 
   const handleYearChange = (event: any) => {
     setSelectedYear(event.target.value)
+  }
+
+  const handleBranchChange = (event: any) => {
+    setSelectedBranch(event.target.value)
   }
 
   const handleMonthChange = (event: any) => {
@@ -108,7 +114,8 @@ export const FinanceResults: FC = () => {
     percentage = 0,
     done_amount,
     debts_amount,
-    future_amount,
+    pending_amount,
+    out_of_limit_amount,
     planned_amount,
   } = data
 
@@ -140,6 +147,19 @@ export const FinanceResults: FC = () => {
 
         <Box sx={{ p: { xs: 1, sm: 2 }, '&:last-child': { pb: { xs: 1, sm: 2 } } }}>
           <Grid container spacing={2} alignItems='center'>
+            <Grid item xs={12} sm='auto'>
+              <FormControl fullWidth size='small' sx={{ minWidth: 100 }}>
+                <InputLabel>Filial</InputLabel>
+                <Select value={selectedBranch} label='Filial' onChange={handleBranchChange}>
+                  {user?.branches?.map(branch => (
+                    <MenuItem key={branch.id} value={branch.id}>
+                      {branch.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
             <Grid item xs={12} sm='auto'>
               <FormControl fullWidth size='small' sx={{ minWidth: 100 }}>
                 <InputLabel>Yil</InputLabel>
@@ -197,7 +217,7 @@ export const FinanceResults: FC = () => {
               sx={{
                 position: 'relative',
                 height: 160,
-                borderRadius: 2,
+                borderRadius: 1,
                 overflow: 'hidden',
                 backgroundColor: 'rgba(0,0,0,0.03)',
                 mt: 1
@@ -205,7 +225,7 @@ export const FinanceResults: FC = () => {
             >
               <LinearProgress
                 variant='determinate'
-                value={percentage}
+                value={Math.min(percentage, 100)}
                 sx={{
                   height: '100%',
                   '& .MuiLinearProgress-bar': {
@@ -256,8 +276,14 @@ export const FinanceResults: FC = () => {
                     {formatCurrency(debts_amount)} so'm
                   </Typography>
                   <Chip
-                    label={`${(100 - parseFloat(percentage.toFixed(1))).toFixed(1)}%`}
-                    color={(100 - percentage) >= 70 ? 'error' : (100 - percentage) >= 40 ? 'warning' : 'success'}
+                    label={`${(percentage > 100 ? 0 : 100 - parseFloat(percentage.toFixed(1))).toFixed(1)}%`}
+                    color={
+                      (percentage > 100 ? 0 : 100 - percentage) >= 70
+                        ? 'error'
+                        : (percentage > 100 ? 0 : 100 - percentage) >= 40
+                        ? 'warning'
+                        : 'success'
+                    }
                     size='small'
                     sx={{
                       mt: 1,
@@ -281,8 +307,6 @@ export const FinanceResults: FC = () => {
               boxShadow: 2,
               background: `linear-gradient(145deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
               color: 'white',
-              transition: 'transform 0.3s ease',
-              '&:hover': { transform: 'translateY(-5px)' }
             }}
           >
             <CardContent>
@@ -306,19 +330,17 @@ export const FinanceResults: FC = () => {
               boxShadow: 2,
               background: `linear-gradient(145deg, ${theme.palette.warning.main}, ${theme.palette.warning.dark})`,
               color: 'white',
-              transition: 'transform 0.3s ease',
-              '&:hover': { transform: 'translateY(-5px)' }
             }}
           >
             <CardContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant='subtitle1' fontWeight='medium' sx={{ color: '#fff' }} >
+                <Typography variant='subtitle1' fontWeight='medium' sx={{ color: '#fff' }}>
                   Qarzdorlik summasi
                 </Typography>
                 <TrendingDown sx={{ opacity: 0.8 }} />
               </Box>
-              <Typography variant='h5' fontWeight='bold' sx={{ color: '#fff' }} >
-                {formatCurrency(debts_amount || 0)} so'm
+              <Typography variant='h5' fontWeight='bold' sx={{ color: '#fff' }}>
+                {formatCurrency(pending_amount || 0)} so'm
               </Typography>
             </CardContent>
           </Card>
@@ -330,19 +352,17 @@ export const FinanceResults: FC = () => {
               boxShadow: 2,
               background: `linear-gradient(145deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
               color: 'white',
-              transition: 'transform 0.3s ease',
-              '&:hover': { transform: 'translateY(-5px)' }
             }}
           >
             <CardContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant='subtitle1' fontWeight='medium' sx={{ color: '#fff' }} >
+                <Typography variant='subtitle1' fontWeight='medium' sx={{ color: '#fff' }}>
                   Ortiqcha to'lovlar
                 </Typography>
                 <TrendingUp sx={{ opacity: 0.8 }} />
               </Box>
-              <Typography variant='h5' fontWeight='bold' sx={{ color: '#fff' }} >
-                {formatCurrency(future_amount || 0)} so'm
+              <Typography variant='h5' fontWeight='bold' sx={{ color: '#fff' }}>
+                {formatCurrency(out_of_limit_amount || 0)} so'm
               </Typography>
             </CardContent>
           </Card>

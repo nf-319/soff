@@ -240,7 +240,7 @@ export const UserViewItem: FC<Props> = ({
         {!open && (
           <Box>
             {value === true ? (
-              <Tooltip title={getFormatDate(String(updated_at)) || 'Keldi'} placement='top'>
+              <Tooltip title={getFormatDate(String(updated_at), 'dd MMMM yyyy', true) || 'Keldi'} placement='top'>
                 <IconButton
                   onClick={() => setOpenedId(`${userId}-${date}`)}
                   sx={{

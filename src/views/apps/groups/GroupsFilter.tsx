@@ -43,7 +43,6 @@ export const GroupsFilter = () => {
   const [searchTerm, setSearchTerm] = useState(query.search || '')
   const search = useDebounce(searchTerm, 400)
 
-  const day = new Date().getDay()
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
 
@@ -108,14 +107,6 @@ export const GroupsFilter = () => {
     label: item.first_name,
     value: item.id
   }))
-
-  useEffect(() => {
-    if(day % 2 === 0) {
-      dispatch(updateParams({ day_of_week: 'tuesday,thursday,saturday' }))
-    } else {
-      dispatch(updateParams({ day_of_week: 'monday,wednesday,friday' }))
-    }
-  }, [day])
 
   if (isMobile) {
     return (
@@ -185,6 +176,7 @@ export const GroupsFilter = () => {
               labelId='demo-simple-select-outlined-label'
               value={queryParams.course || ''}
               onChange={handleChangeCourse}
+              displayEmpty
             >
               <MenuItem value=''>
                 <b>{t('Barchasi')}</b>

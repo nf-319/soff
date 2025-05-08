@@ -86,12 +86,12 @@ const HorizontalLayout = (props: LayoutProps) => {
   const formattedUserData = JSON.parse(userData as string)
 
   useEffect(() => {
-    if (!APP_BAR_ACCESS.includes(subdomain) && formattedUserData.payment_days >= 0) {
+    if (!APP_BAR_ACCESS.includes(subdomain) && user?.currentRole !== 'student' && formattedUserData.payment_days >= 0) {
       setShowWarning(true)
     } else {
       setShowWarning(false)
     }
-  }, [window.location.pathname])
+  }, [window.location.pathname, user?.currentRole])
 
   let userAppBarStyle = {}
 

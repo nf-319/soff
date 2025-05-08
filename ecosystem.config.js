@@ -4,8 +4,8 @@ module.exports = {
       name: "test-subdomain-soffcrm-uz-3131",
       script: "node_modules/next/dist/bin/next",
       args: "start",
-      instances: "max",
-      exec_mode: "cluster",
+      instances: 1,
+      exec_mode: "fork",
       env: {
         NODE_ENV: "production",
         PORT: 3131
@@ -20,8 +20,8 @@ module.exports = {
       name: "test-subdomain-soffcrm-uz-3131-new",
       script: "node_modules/next/dist/bin/next",
       args: "start",
-      instances: "max",
-      exec_mode: "cluster",
+      instances: 1,
+      exec_mode: "fork",
       env: {
         NODE_ENV: "production",
         PORT: 3130
@@ -36,8 +36,8 @@ module.exports = {
       name: "prod-subdomain-soffcrm-uz-3132",
       script: "node_modules/next/dist/bin/next",
       args: "start",
-      instances: "max",
-      exec_mode: "cluster",
+      instances: 1,
+      exec_mode: "fork",
       env: {
         NODE_ENV: "production",
         PORT: 3132
