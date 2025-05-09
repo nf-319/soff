@@ -3,7 +3,6 @@ import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import {
   FormControl,
-  FormControlLabel,
   FormHelperText,
   InputLabel,
   MenuItem,
@@ -14,11 +13,11 @@ import {
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import { editDepartmentStudent, updateDepartmentStudent } from 'src/store/apps/leads'
-import { reversePhone } from '../../../../components/phone-input/format-phone-number'
-import PhoneInput from '../../../../components/phone-input'
+import { editDepartmentStudent } from 'src/store/apps/leads'
+import { reversePhone } from '@components/phone-input/format-phone-number'
+import PhoneInput from '@components/phone-input'
 import { useQueryClient } from '@tanstack/react-query'
-import { states, temperateOptions } from '@/pages/reports/lid-statements/leads-list'
+import { LEAD_STATEMENTS_TEMPERATURE } from '@modules/LeadsStatement'
 import { lidStatusOption } from '@/shared/constans/lid-statements'
 
 type Props = {
@@ -28,7 +27,7 @@ type Props = {
   laed?: boolean
 }
 
-export default function EditAnonimUserForm({ department, item, onClose, laed }: Props) {
+export default function EditAnonimUserForm({ item, onClose, laed }: Props) {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const { loading } = useAppSelector(state => state.leads)
@@ -162,11 +161,11 @@ export default function EditAnonimUserForm({ department, item, onClose, laed }: 
               return <span style={{ color: '#aaa' }}>{newState.label}</span>
             }
 
-            const selectedOption = temperateOptions.find(option => option.value === selected)
+            const selectedOption = LEAD_STATEMENTS_TEMPERATURE.find(option => option.value === selected)
             return selectedOption?.label ?? ''
           }}
         >
-          {[newState, ...temperateOptions.slice(1, 4)].map(option => (
+          {[newState, ...LEAD_STATEMENTS_TEMPERATURE.slice(1, 4)].map(option => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>

@@ -1,20 +1,14 @@
 import { Card, Tooltip, Typography } from '@mui/material'
-import { useSettings } from 'src/@core/hooks/useSettings'
 import { ResponsiveBar } from '@nivo/bar'
 import { ReportLeadsSourceType } from '@/types/report'
-import { EmptyContent } from '@/components/empty-content'
+import { EmptyContent } from '@components/empty-content'
 import { truncateLabel } from '@/shared/utils'
 import { CircleHelp } from 'lucide-react'
 import { Box } from '@mui/system'
 import { marketingSourceEmpty } from '@/shared/constans'
 import { ComingSoon } from '@components/ComingSoon'
 
-const MarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {
-  const { settings } = useSettings()
-  const isDark = settings.mode === 'dark'
-  const textColor = isDark ? '#ffffff' : '#333333'
-  const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-
+export const LeadsStatementsMarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {
   const isActive = data && data.length > 0 && data.some(item => item.count > 0)
 
   const marketingSourcesData = data.map(item => ({
@@ -52,6 +46,7 @@ const MarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {
           <Typography color='black' fontSize={20} fontWeight={700}>
             Marketing manbasi
           </Typography>
+
           <Tooltip title="Manbalar ko'rsatgichlari">
             <CircleHelp style={{ cursor: 'pointer', color: '#9e9e9e', marginTop: 'auto', marginBottom: 'auto' }} />
           </Tooltip>
@@ -102,42 +97,42 @@ const MarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {
               axis: {
                 domain: {
                   line: {
-                    stroke: textColor,
+                    stroke: '#181818',
                     strokeWidth: 1
                   }
                 },
                 ticks: {
                   line: {
-                    stroke: textColor,
+                    stroke: '#181818',
                     strokeWidth: 1
                   },
                   text: {
-                    fill: textColor,
+                    fill: '#181818',
                     fontSize: 11
                   }
                 },
                 legend: {
                   text: {
-                    fill: textColor,
+                    fill: '#181818',
                     fontSize: 12
                   }
                 }
               },
               grid: {
                 line: {
-                  stroke: gridColor,
+                  stroke: 'rgba(0, 0, 0, 0.1)',
                   strokeWidth: 1
                 }
               },
               legends: {
                 text: {
-                  fill: textColor
+                  fill: '#181818'
                 }
               },
               tooltip: {
                 container: {
-                  background: isDark ? '#1e1e1e' : '#ffffff',
-                  color: textColor
+                  background: '#181818',
+                  color: '#181818'
                 }
               }
             }}
@@ -150,4 +145,4 @@ const MarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {
   )
 }
 
-export default MarketingSources
+LeadsStatementsMarketingSources.displayName = 'LeadsStatementsMarketingSources'

@@ -1,4 +1,4 @@
-import { StudentPayments } from '@/view/Reports/StudentPayment'
+import { StudentPayments } from '@modules/Reports/StudentPayment'
 
 const StudentPaymentsPage = () => <StudentPayments />
 

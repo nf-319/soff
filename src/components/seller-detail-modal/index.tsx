@@ -16,7 +16,7 @@ import { EmptyContent } from '../empty-content'
 import { useGet } from '@/hooks/useApi'
 import { ResponsiveLine } from '@nivo/line'
 import { uzbekMonths } from '@/shared/constans'
-import CourseInterest from '@/pages/reports/lid-statements/pie-charts/course-interest'
+import { LeadsStatementCourseInterest } from '@modules/LeadsStatement'
 
 const SellerDetailModal = ({
   sellerId,
@@ -234,7 +234,8 @@ const SellerDetailModal = ({
               />
             )}
           </Card>
-          <CourseInterest sx={{ height: 300 }} data={sellerData?.course_distribution || []} />
+
+          <LeadsStatementCourseInterest sx={{ height: 300 }} data={sellerData?.course_distribution || []} />
         </Box>
         <Box mt={5}>
           <Card>
@@ -251,36 +252,42 @@ const SellerDetailModal = ({
                   </CardContent>
                 </Card>
               </Grid>
+
               <Grid item xs={12} sm={6} md={6}>
                 <Card style={{ backgroundColor: '#f9f9f9', boxShadow: 'none', border: '1px solid lightgray' }}>
                   <CardContent>
                     <Typography variant='subtitle2' color='textSecondary'>
                       Lidlar soni
                     </Typography>
+
                     <Typography variant='h5' className='fw-bold mt-2'>
                       {sellerData?.total_worked_leads}
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
+
               <Grid item xs={6} sm={6} md={6}>
                 <Card style={{ backgroundColor: '#f9f9f9', boxShadow: 'none', border: '1px solid lightgray' }}>
                   <CardContent>
                     <Typography variant='subtitle2' color='textSecondary'>
                       Sotuvlar soni
                     </Typography>
+
                     <Typography variant='h5' className='fw-bold mt-2'>
                       {sellerData?.enrolled_leads}
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
+
               <Grid item xs={6} sm={6} md={6}>
                 <Card style={{ backgroundColor: '#f9f9f9', boxShadow: 'none', border: '1px solid lightgray' }}>
                   <CardContent>
                     <Typography variant='subtitle2' color='textSecondary'>
                       Yo'qotilgan lidlar
                     </Typography>
+
                     <Typography variant='h5' className='fw-bold mt-2'>
                       {sellerData?.lost_leads}
                     </Typography>

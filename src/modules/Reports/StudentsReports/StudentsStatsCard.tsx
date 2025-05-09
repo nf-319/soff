@@ -1,6 +1,6 @@
 import { ComingSoon } from '@/components/ComingSoon'
 import { TrendCard } from '@/components/TrendCard'
-import { DashboardCard } from '@/pages/reports/lid-statements/card'
+import { LeadsStatementCardType } from '@modules/LeadsStatement'
 import { Box } from '@mui/material'
 import { ArrowRightLeft, Award, BookOpen, Clock, Megaphone, Percent, TriangleAlert, User, Users } from 'lucide-react'
 
@@ -31,7 +31,7 @@ export function StudentsStatsCard() {
     best_seller_progress: 15
   }
 
-  const cards: DashboardCard[] = [
+  const cards: LeadsStatementCardType[] = [
     {
       id: 'new',
       icon: Users,

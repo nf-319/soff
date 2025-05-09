@@ -1,11 +1,11 @@
-import { AchievmentReports } from '@/view/Reports/StudentsReports/AchievmentsReports'
-import { AttenDanceReports } from '@/view/Reports/StudentsReports/AttendanceReports/AttendanceReports'
-import { StudentReportFilter } from '@/view/Reports/StudentsReports/StudentReportsFilter'
-import { StudentsStatsCard } from '@/view/Reports/StudentsReports/StudentsStatsCard'
-import { WidthDrawnStudents } from '@/view/Reports/StudentsReports/WidthDrawnStudents'
+import { AchievmentReports } from '@modules/Reports/StudentsReports/AchievmentsReports'
+import { AttenDanceReports } from '@modules/Reports/StudentsReports/AttendanceReports/AttendanceReports'
+import { StudentReportFilter } from '@modules/Reports/StudentsReports/StudentReportsFilter'
+import { StudentsStatsCard } from '@modules/Reports/StudentsReports/StudentsStatsCard'
+import { WidthDrawnStudents } from '@modules/Reports/StudentsReports/WidthDrawnStudents'
 import { Box, Tab, Tabs, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 const StudentReportsPage = () => {
   const params = new URLSearchParams(window.location.search)

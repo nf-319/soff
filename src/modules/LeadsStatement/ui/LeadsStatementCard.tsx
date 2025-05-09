@@ -1,29 +1,19 @@
+'use client'
+
 import { Box, Skeleton } from '@mui/material';
 import { ArrowRightLeft, Megaphone, TriangleAlert, User, LucideIcon, Award } from 'lucide-react'
 import { useGetReportLeads } from '@/shared/query-hooks/report-leads/reportLeads';
 import { useState } from 'react';
-import LeadsDashboardCardModal from '@/components/leads-detail-chart';
-import ReportLeadsSourceModal from '@/components/leads-detail-chart/source-modal';
-import SellerDetailModal from '@/components/seller-detail-modal';
+import LeadsDashboardCardModal from '@components/leads-detail-chart';
+import ReportLeadsSourceModal from '@components/leads-detail-chart/source-modal';
+import SellerDetailModal from '@components/seller-detail-modal';
 import useResponsive from '@/@core/hooks/useResponsive';
 import { TrendCard } from '@components/TrendCard';
 import { useRouter } from 'next/router';
 import { ComingSoon } from '@components/ComingSoon';
+import { type LeadsStatementCardType } from '../model/types'
 
-export type DashboardCard = {
-  title: string;
-  id?: string | number;
-  count: string | number;
-  icon: LucideIcon;
-  iconColor?: string;
-  hidden: boolean;
-  process?: string | number;
-  trendDirection?: 'up' | 'down';
-  trendColor?: string;
-  pillColor?: string;
-};
-
-const LidsReportsCard = () => {
+export const LeadsStatementCard = () => {
   const router = useRouter();
   const { branch } = router.query;
   const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
@@ -58,7 +48,7 @@ const LidsReportsCard = () => {
     }
   };
 
-  const cards: DashboardCard[] = [
+  const cards: LeadsStatementCardType[] = [
     {
       id: 'new',
       icon: User,
@@ -176,11 +166,14 @@ const LidsReportsCard = () => {
           )}
         </Box>
       ))}
+
       <LeadsDashboardCardModal setOpen={setModalContent} id={modalContent} />
+
       <ReportLeadsSourceModal open={sourceModal} setOpen={setSourceModal} />
+
       <SellerDetailModal selectedSeller={selectedSeller} sellerId={sellerId} setSellerId={setSellerId} />
     </Box>
   );
 };
 
-export default LidsReportsCard;
+LeadsStatementCard.displayName = 'LeadsStatementCard'

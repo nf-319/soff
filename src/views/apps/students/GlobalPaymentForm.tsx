@@ -301,7 +301,7 @@ export default function GlobalPaymentForm() {
             <FormControl fullWidth>
               {/* <InputLabel
                 size='small'
-                id='user-view-language-label'
+                id='user-modules-language-label'
                 error={!!payform.errors.debt_amount && Boolean(payform.touched.debt_amount)}
               >
                 {t("Qarzdorlik summasi")}

@@ -71,7 +71,7 @@ const CardStatisticsSales = () => {
         action={
           <OptionsMenu
             options={['Refresh', 'Share', 'Update']}
-            iconButtonProps={{ size: 'small', className: 'card-more-options', sx: { color: 'text.secondary' } }}
+            iconButtonProps={{ size: 'small', className: 'LidStatementCards-more-options', sx: { color: 'text.secondary' } }}
           />
         }
         subheader={

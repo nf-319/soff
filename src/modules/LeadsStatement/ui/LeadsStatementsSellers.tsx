@@ -1,16 +1,16 @@
 'use client'
 
-import { Box, Typography } from '@mui/material'
+import { Box, CircularProgress, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import SellerDetailModal from '@/components/seller-detail-modal'
+import SellerDetailModal from '@components/seller-detail-modal'
 import { useGetLeadsSellers } from '@/shared/query-hooks/report-leads/reportLeads'
 import { ReposrtLeadsSellers } from '@/types/report'
 import { uzbekLocaleText } from '@/views/apps/StudentsPoints/constants'
 import { useRouter } from 'next/router'
 import { DataGridTable } from '@components/table/DataGridTable'
 
-const LeadsSellers = () => {
+export const LeadsStatementsSellers = () => {
   const { t } = useTranslation()
   const router = useRouter()
   const { branch } = router.query
@@ -88,6 +88,7 @@ const LeadsSellers = () => {
   useEffect(() => {
     if (sellerId) {
       const found = data.find(seller => seller.id === sellerId)
+
       if (found) {
         setSelectedSeller(found)
       }
@@ -95,7 +96,7 @@ const LeadsSellers = () => {
   }, [sellerId, data])
 
   if (isLoading || !branchParam) {
-    return <Box>Loading...</Box>
+    return <CircularProgress />
   }
 
   return (
@@ -130,4 +131,4 @@ const LeadsSellers = () => {
   )
 }
 
-export default LeadsSellers
+LeadsStatementsSellers.displayName = 'LeadsStatementsSellers'

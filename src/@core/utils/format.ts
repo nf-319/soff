@@ -47,7 +47,7 @@ export const formatDateToMonthShort = (value: Date | string, toTimeForCurrentDay
   return new Intl.DateTimeFormat('en-US', formatting).format(new Date(value))
 }
 
-// ? The following functions are taken from https://codesandbox.io/s/ovvwzkzry9?file=/utils.js for formatting credit card details
+// ? The following functions are taken from https://codesandbox.io/s/ovvwzkzry9?file=/utils.js for formatting credit LidStatementCards details
 // Get only numbers from the input value
 const clearNumber = (value = '') => {
   return value.replace(/\D+/g, '')
@@ -81,7 +81,7 @@ export const formatCreditCardNumber = (value: string, Payment: PaymentTypes) => 
   return nextValue.trim()
 }
 
-// Format expiration date in any credit card
+// Format expiration date in any credit LidStatementCards
 export const formatExpirationDate = (value: string) => {
   const finalValue = value
     .replace(/^([1-9]\/|[2-9])$/g, '0$1/') // 3 > 03/
@@ -96,7 +96,7 @@ export const formatExpirationDate = (value: string) => {
   return finalValue
 }
 
-// Format CVC in any credit card
+// Format CVC in any credit LidStatementCards
 export const formatCVC = (value: string, cardNumber: string, Payment: PaymentTypes) => {
   const clearValue = clearNumber(value)
   const issuer = Payment.fns.cardType(cardNumber)
