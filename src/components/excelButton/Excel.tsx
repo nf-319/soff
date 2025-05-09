@@ -13,11 +13,13 @@ interface ExcelProps {
   onClick?: VoidFunction
   baseURL?: string
   args?: any
+  notBlank?: boolean
 }
 
 export default function Excel({
   queryString = '',
   tooltip = '',
+  notBlank = false,
   variant = 'outlined',
   color = 'success',
   onClick,
@@ -26,6 +28,7 @@ export default function Excel({
   url,
   ...args
 }: ExcelProps) {
+
   const { t } = useTranslation()
   const subdomain = location.hostname.split('.')
   const staticBaseURL =
@@ -37,9 +40,9 @@ export default function Excel({
 
   return (
     <Link
-      href={baseURL || staticBaseURL  + `${url}?` + queryString}
+      href={baseURL || staticBaseURL + `${url}?` + queryString}
       download
-      target={'_blank'}
+      target={notBlank ? '_parent' : '_blank'}
       style={{
         width: '100%'
       }}

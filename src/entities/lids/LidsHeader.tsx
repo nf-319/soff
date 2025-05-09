@@ -5,7 +5,6 @@ import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import useDebounce from 'src/hooks/useDebounce'
 import { useAppDispatch } from 'src/store'
@@ -139,10 +138,6 @@ export const LidsHeader = () => {
             {t("Bo'lim yaratish")}
           </Button>
         )}
-
-        <Box>
-          <VideoHeader item={videoUrls.leads} />
-        </Box>
       </Box>
     </Box>
   )
