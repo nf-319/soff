@@ -422,7 +422,11 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
                 ) : (
                   <>
                     {leadDetail?.map((item: any) => (
-                      <ReminderBox item={item} />
+                      <ReminderBox
+                        item={item}
+                        userId={selectedLead?.id}
+                        refetch={() => handleGetUserDetails('lead-user-description', selectedLead?.id)}
+                      />
                     ))}
 
                     <Box marginY={4}>
