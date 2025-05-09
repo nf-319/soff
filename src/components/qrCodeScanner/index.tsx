@@ -40,7 +40,7 @@ export default function QRCodeScanner() {
       if (res.status === 200) {
         if (res.data.type == 'employee') {
           if (res.data.is_enter == true) {
-            
+
             toast.success(`${res.data.first_name} ish joyiga yetib keldi`, { position: 'top-right' })
           } else {
             toast.error(`${res.data.first_name} ish joyidan chiqip ketdi`, { position: 'top-right' })
@@ -59,7 +59,7 @@ export default function QRCodeScanner() {
         setResponseData(res.data)
       }
 
-      if (pathname.includes('groups/view/security')) {
+      if (pathname.includes('groups/modules/security')) {
         const response = await api.get(
           `common/attendance-list/${router.query?.year || new Date().getFullYear()}-${getMontNumber(
             router.query?.month

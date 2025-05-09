@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { FormControl, FormHelperText, TextField } from '@mui/material'
@@ -8,6 +8,7 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import api from 'src/@core/utils/api'
 import { toast } from 'react-hot-toast'
+import { DatePicker } from '@components/DatePicker'
 
 type Props = {
   user: any
@@ -17,6 +18,7 @@ type Props = {
 export default function AddNoteAnonimUser({ user, closeModal }: Props) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState<any>(false)
+  const [reminderDate, setReminderDate] = useState<Date | null>(null);
 
   const validationSchema = Yup.object({
     body: Yup.string().required('Eslatma matnni kiriting')
@@ -32,7 +34,8 @@ export default function AddNoteAnonimUser({ user, closeModal }: Props) {
       try {
         await api.post(`leads/lead-user-description/${user}/`, {
           anonim_user: user,
-          body: values.body
+          body: values.body,
+          date: reminderDate,
         })
         setLoading(false)
         closeModal()
@@ -56,6 +59,18 @@ export default function AddNoteAnonimUser({ user, closeModal }: Props) {
       style={{ padding: '5px 0', width: '100%', display: 'flex', flexDirection: 'column', gap: '15px' }}
     >
       <FormControl fullWidth>
+        <DatePicker
+          label="Eslatish vaqti"
+          views={['day']}
+          format='dd/MM/yyyy'
+          disablePast
+          showTimeSelect
+          value={reminderDate}
+          onChange={(newValue) => setReminderDate(newValue)}
+        />
+      </FormControl>
+
+      <FormControl fullWidth>
         <TextField
           label={t('Eslatma')}
           multiline
@@ -72,7 +87,7 @@ export default function AddNoteAnonimUser({ user, closeModal }: Props) {
         )}
       </FormControl>
 
-      <LoadingButton loading={loading} type='submit' variant='outlined'>
+      <LoadingButton loading={loading} type='submit' variant='contained'>
         {t('Yaratish')}
       </LoadingButton>
     </form>

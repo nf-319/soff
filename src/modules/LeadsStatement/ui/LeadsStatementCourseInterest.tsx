@@ -1,8 +1,8 @@
-import { EmptyContent } from '@/components/empty-content'
+import { EmptyContent } from '@components/empty-content'
 import { ReportLeadsCourseType } from '@/types/report'
 import { Card, Box, Typography, Grid, styled, SxProps, Tooltip } from '@mui/material'
 import { ResponsivePie } from '@nivo/pie'
-import { useSettings } from 'src/@core/hooks/useSettings'
+import { useSettings } from '@/@core/hooks/useSettings'
 import { FC } from 'react'
 import { ComingSoon } from '@components/ComingSoon'
 import { CircleHelp } from 'lucide-react'
@@ -26,9 +26,7 @@ type Props = {
   sx?: SxProps
 }
 
-const CourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
-  const { settings } = useSettings()
-  const isDark = settings.mode === 'dark'
+export const LeadsStatementCourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
   const isActive = data.some(item => item.count > 0)
 
   const aggregatedData = data.reduce((acc, item) => {
@@ -145,7 +143,7 @@ const CourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
                 theme={{
                   tooltip: {
                     container: {
-                      background: isDark ? '#1e1e1e' : '#ffffff',
+                      background: '#ffffff',
                       color: '#181818'
                     }
                   }
@@ -178,4 +176,4 @@ const CourseInterest: FC<Props> = ({ data, isCard = false, sx }) => {
   )
 }
 
-export default CourseInterest
+LeadsStatementCourseInterest.displayName = 'LeadsStatementCourseInterest'

@@ -40,7 +40,7 @@ const steps = [
   },
   {
     title: 'Deal Usage',
-    icon: 'mdi:credit-card-outline',
+    icon: 'mdi:credit-LidStatementCards-outline',
     subtitle: 'Limitations & Offers'
   },
   {

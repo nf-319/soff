@@ -133,7 +133,7 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
   }, [openEdit])
 
   console.log(openEdit);
-  
+
 
   return (
     <div>
@@ -180,7 +180,7 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
               {/* <FormControl fullWidth>
                 <InputLabel
                   size='small'
-                  id='user-view-language-label'
+                  id='user-modules-language-label'
                   error={!!errors.payment_type && touched.payment_type}
                 >
                   {t("To'lov usulini tanlang")}
@@ -188,8 +188,8 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
                 <Select
                   size='small'
                   label={t("To'lov usulini tanlang")}
-                  id='user-view-language'
-                  labelId='user-view-language-label'
+                  id='user-modules-language'
+                  labelId='user-modules-language-label'
                   name='payment_type'
                   value={values.payment_type}
                   onChange={handleChange}

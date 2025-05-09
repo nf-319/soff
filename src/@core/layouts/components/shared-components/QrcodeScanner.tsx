@@ -368,7 +368,7 @@ export const QrcodeScanner = ({ onScan }: QrcodeScannerProps) => {
                   position: "relative"
                 }}
               >
-                {/* Camera view */}
+                {/* Camera modules */}
                 <Box
                   sx={{
                     transform: `scale(${zoom})`,

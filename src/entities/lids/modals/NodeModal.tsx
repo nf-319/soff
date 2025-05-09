@@ -19,9 +19,9 @@ export const LeadNoteModal: FC<Props> = ({ open, setOpen, onClose, leadId }) => 
   const dispatch = useAppDispatch()
 
   return (
-    <Dialog open={open === 'note'} onClose={() => setOpen(null)}>
+    <Dialog open={open === 'note'} maxWidth='md' onClose={() => setOpen(null)}>
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography>{t('Yangi eslatma')}</Typography>
+        <Typography variant="h6">{t('Yangi eslatma')}</Typography>
 
         <IconButton onClick={() => setOpen(null)}>
           <IconifyIcon icon={'material-symbols:close'} />

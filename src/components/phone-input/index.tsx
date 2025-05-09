@@ -2,7 +2,6 @@ import { ChangeEvent, useState } from "react"
 import { formatPhoneNumber } from "./format-phone-number"
 import { OutlinedInput, OutlinedInputProps } from "@mui/material"
 
-
 export default function PhoneInput({ name = "phone", ...props }: OutlinedInputProps) {
     const [value, setValue] = useState<string>(props.value ? formatPhoneNumber(props.value) : '')
 

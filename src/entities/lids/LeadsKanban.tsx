@@ -90,6 +90,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const { companyInfo } = useAppSelector(item => item.user)
 
   const [mergedSteps, setMergedSteps] = useState<any[] | null>(null)
+
   const { data: amoLeadDataChild, isLoading: amoLeadDataChildLoding } = useGet(
     `amocrm/leads/?pipeline_id=${defaultId}`,
     { options: { enabled: !!router.query.is_amocrm } }
@@ -129,8 +130,10 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
       }
     )
   }
+
   const apiParams = {
-    is_active: is_active ?? true
+    is_active: is_active ?? true,
+    parent: null
   }
 
   if (id || defaultId) {
@@ -408,8 +411,8 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   }
 
   return (
-    <DragDropContext  onDragEnd={is_amocrm ? onDragEndAmo : onDragEnd}>
-      <Droppable droppableId='section-list' direction='horizontal'  type='SECTION'>
+    <DragDropContext onDragEnd={is_amocrm ? onDragEndAmo : onDragEnd}>
+      <Droppable droppableId='section-list' direction='horizontal' type='SECTION'>
         {provided => (
           <div
             ref={provided.innerRef}
@@ -417,25 +420,25 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
             className='kanban'
             style={{
               display: 'flex',
+              flexWrap: 'nowrap',
+              alignItems: 'flex-start',
+              gap: 20,
               overflow: 'auto',
-              flexDirection: 'row',
-              alignItems: 'start',
               height: '100%',
-              gap: 20
+              width: '100%',
             }}
           >
             {(!is_amocrm && displayData?.results.length) || (is_amocrm && amoLeadData?.length) ? (
               (is_amocrm ? amoLeadData : displayData?.results)?.map((section: any, sectionIndex: any) => (
-                <Draggable  key={section.id} draggableId={`section-${section.id}`} index={sectionIndex}>
+                <Draggable key={section.id} draggableId={`section-${section.id}`} index={sectionIndex}>
                   {(sectionProvided, sectionSnapshot) => (
                     <Box
                       ref={sectionProvided.innerRef}
                       {...sectionProvided.draggableProps}
                       sx={{
                         ...sectionProvided.draggableProps.style,
+                        flexShrink: 0,
                         opacity: sectionSnapshot.isDragging ? 0.8 : 1,
-                        border: '1px solid #e0e0e0e0',
-                        borderRadius: 10,
                         width: { xs: 300, sm: 400, md: 450 }
                       }}
                     >
@@ -443,21 +446,22 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                         {leadsProvided => (
                           <Box
                             {...leadsProvided.droppableProps}
+                            {...sectionProvided.dragHandleProps}
                             className='kanban__section'
                             ref={leadsProvided.innerRef}
                             style={{
-                              width: isMobile ? '100%' : 'auto',
+                              width: '100%',
                               minWidth: 300,
+                              border: '1px solid #e0e0e0e0',
+                              borderRadius: 10,
                               padding: 20,
-                              background: settings.mode == 'dark' ? '#282A42' : 'white',
-                              borderRadius: 10
+                              background: 'white'
                             }}
                           >
                             <Box
                               display='flex'
                               alignItems='start'
                               justifyContent='space-between'
-                              {...sectionProvided.dragHandleProps}
                               sx={{ cursor: 'grab' }}
                             >
                               <Box
@@ -470,38 +474,38 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                                   fontSize: isMobile ? 18 : 25
                                 }}
                               >
-                                <Typography sx={{ fontSize: { xs: 18, md: 25 } }}>
-                                {section.name}
-                                </Typography>
+                                <Typography sx={{ fontSize: { xs: 18, md: 25 } }}>{section.name}</Typography>
 
                                 <Tooltip title='Lidlar soni'>
                                   <Chip color='primary' variant='outlined' label={section?.leads?.length} />
                                 </Tooltip>
                               </Box>
 
-                              <Box display={'flex'} flexDirection={isMobile?'column':'row'} alignItems={'start'}>
-                                <Box>
-                                  <Tooltip title={`${section.name}dagi barcha lidlarga SMS yuborish`}>
-                                    <IconButton sx={{ cursor: 'pointer' }} onClick={() => handleAccessModal(section)}>
-                                      <MessageIcon sx={{ fontSize: 20, color: 'orange' }} />
-                                    </IconButton>
-                                  </Tooltip>
+                              <Box
+                                display='grid'
+                                gridTemplateColumns={{
+                                  xs: 'repeat(2, minmax(0, 1fr))',
+                                  md: 'repeat(3, minmax(0, 1fr))'
+                                }}
+                                alignItems='start'
+                              >
+                                <Tooltip title={`${section.name}dagi barcha lidlarga SMS yuborish`}>
+                                  <IconButton sx={{ cursor: 'pointer' }} onClick={() => handleAccessModal(section)}>
+                                    <MessageIcon sx={{ fontSize: 20, color: 'orange' }} />
+                                  </IconButton>
+                                </Tooltip>
 
-                                  {!is_amocrm && (
-                                    <IconButton
-                                      sx={{ cursor: 'pointer' }}
-                                      onClick={() => {
-                                        setOpen(true)
-                                        setEdit(section)
-                                      }}
-                                    >
-                                      <IconifyIcon
-                                        icon='fluent:text-bullet-list-square-edit-20-filled'
-                                        color='orange'
-                                      />
-                                    </IconButton>
-                                  )}
-                                </Box>
+                                {!is_amocrm && (
+                                  <IconButton
+                                    sx={{ cursor: 'pointer' }}
+                                    onClick={() => {
+                                      setOpen(true)
+                                      setEdit(section)
+                                    }}
+                                  >
+                                    <IconifyIcon icon='fluent:text-bullet-list-square-edit-20-filled' color='orange' />
+                                  </IconButton>
+                                )}
 
                                 <IconButton
                                   sx={{ cursor: 'pointer' }}

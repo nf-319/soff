@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import {
-  Box,
   FormControl,
   FormHelperText,
   IconButton,
@@ -36,7 +35,7 @@ import { useAuth } from 'src/hooks/useAuth'
 import { Ellipsis } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { LeadKanbanItem } from '@/entities/lids/LeadKanbanItem'
-import { states, temperateOptions } from '@/pages/reports/lid-statements/leads-list'
+import { LEAD_STATEMENTS_TEMPERATURE } from '@modules/LeadsStatement'
 import { lidStatusOption } from '@/shared/constans/lid-statements'
 
 type Props = {
@@ -285,11 +284,11 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
               return <span style={{ color: '#aaa' }}>{newState.label}</span>
             }
 
-            const selectedOption = temperateOptions.find(option => option.value === selected)
+            const selectedOption = LEAD_STATEMENTS_TEMPERATURE.find(option => option.value === selected)
             return selectedOption?.label ?? ''
           }}
         >
-          {[newState, ...temperateOptions.slice(1, 4)].map(option => (
+          {[newState, ...LEAD_STATEMENTS_TEMPERATURE.slice(1, 4)].map(option => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>

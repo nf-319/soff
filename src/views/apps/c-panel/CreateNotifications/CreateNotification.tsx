@@ -18,7 +18,8 @@ import {
   Fade,
   Select,
   MenuItem,
-  CircularProgress, Checkbox
+  CircularProgress,
+  Checkbox
 } from '@mui/material'
 import { useGetListClient, usePostNotification } from './api/notification'
 import { Editor } from 'src/components/Editor'
@@ -28,20 +29,12 @@ import { toast } from 'react-hot-toast'
 import { useQueryClient } from '@tanstack/react-query'
 import Chip from '@components/mui/chip'
 import ListItemText from '@mui/material/ListItemText'
-
-const receiverRoles = [
-  { label: 'Admin', value: 'admin' },
-  { label: 'CEO', value: 'ceo' },
-  { label: 'O‘qituvchi', value: 'teacher' },
-  { label: 'Talaba', value: 'student' },
-  { label: 'Kasser', value: 'cacher' }
-]
-
+import { NOTIFICATIONS_HTML_TEMPLATE, receiverRoles } from '@/views/apps/c-panel/CreateNotifications/constants'
 
 const CreateNotification: FC = () => {
   const router = useRouter()
   const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
+  const [content, setContent] = useState(NOTIFICATIONS_HTML_TEMPLATE)
   const [receivers, setReceivers] = useState<string[]>([])
   const [tenant, setTenant] = useState<number | ''>('')
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
@@ -53,9 +46,13 @@ const CreateNotification: FC = () => {
   const [selectedTenant, setSelectedTenant] = useState<any>(null)
 
   const { mutate, isPending } = usePostNotification()
-  const { data: clientsData, isLoading, refetch } = useGetListClient({
+  const {
+    data: clientsData,
+    isLoading,
+    refetch
+  } = useGetListClient({
     search: debouncedSearch,
-    page: 1,
+    page: 1
   })
 
   useEffect(() => {
@@ -64,10 +61,11 @@ const CreateNotification: FC = () => {
     }
   }, [debouncedSearch, open, refetch])
 
-  const tenantOptions = clientsData?.results?.map((client: any) => ({
-    label: client.name,
-    value: client.id
-  })) || []
+  const tenantOptions =
+    clientsData?.results?.map((client: any) => ({
+      label: client.name,
+      value: client.id
+    })) || []
 
   const handleDropdownOpen = () => {
     setOpen(true)
@@ -92,7 +90,7 @@ const CreateNotification: FC = () => {
       {
         title,
         body: content,
-        receivers: receivers.map((item) => item.toUpperCase()),
+        receivers: receivers.map(item => item.toUpperCase()),
         tenant: tenant || undefined
       },
       {
@@ -101,7 +99,7 @@ const CreateNotification: FC = () => {
           toast.success('Muvofaqiyatli yuborildi!')
           await queryClient.refetchQueries({ queryKey: ['all-notification'] })
           await router.push('/c-panel/notifications')
-        },
+        }
       }
     )
   }
@@ -134,16 +132,16 @@ const CreateNotification: FC = () => {
       <FormControl fullWidth sx={{ mb: 3 }}>
         <InputLabel id='receivers-label'>Qabul qiluvchilar</InputLabel>
         <Select
-          label="Qabul qiluvchilar"
+          label='Qabul qiluvchilar'
           multiple
           value={receivers}
           onChange={e => setReceivers(e.target.value as string[])}
-          renderValue={(selected) => (
+          renderValue={selected => (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {selected.map((value) => (
+              {selected.map(value => (
                 <Chip
                   key={value}
-                  onMouseDown={(e) => e.stopPropagation()}
+                  onMouseDown={e => e.stopPropagation()}
                   label={receiverRoles.find(r => r.value === value)?.label || value}
                   onDelete={() => {
                     setReceivers(prev => prev.filter(item => item !== value))
@@ -154,10 +152,10 @@ const CreateNotification: FC = () => {
             </Box>
           )}
           MenuProps={{
-            disableAutoFocusItem: true,
+            disableAutoFocusItem: true
           }}
         >
-          {receiverRoles.map((role) => (
+          {receiverRoles.map(role => (
             <MenuItem key={role.value} value={role.value}>
               <Checkbox checked={receivers.indexOf(role.value) > -1} />
               <ListItemText primary={role.label} />
@@ -213,7 +211,6 @@ const CreateNotification: FC = () => {
 
       <Editor
         value={content}
-        initialValue='<h1>Yangi xabarnoma</h1>'
         onChange={(val: string) => setContent(val)}
         isDisabled={false}
       />

@@ -187,7 +187,7 @@ const InvoiceListTable = ({ invoiceData }: Props) => {
               onClick={handleClick}
               aria-expanded={open ? 'true' : undefined}
               endIcon={<Icon icon='mdi:chevron-down' />}
-              aria-controls={open ? 'user-view-overview-export' : undefined}
+              aria-controls={open ? 'user-modules-overview-export' : undefined}
             >
               Export
             </Button>
