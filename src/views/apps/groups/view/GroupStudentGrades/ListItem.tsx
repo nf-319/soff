@@ -6,6 +6,7 @@ import Tooltip from '@mui/material/Tooltip'
 import IconifyIcon from 'src/components/icon'
 import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
+import { LockKeyhole } from 'lucide-react'
 
 type Props = {
   currentDate: any
@@ -53,7 +54,7 @@ export const ListItem: FC<Props> = ({ defaultValue, userId, date, setOpenedId, r
           onError: (error: any) => {
             const errorMessage =
               error?.response?.data?.msg || error?.message || 'Xatolik yuz berdi. Iltimos, qayta urinib ko‘ring.'
-
+            setValue('-')
             toast.error(errorMessage)
           }
         }
@@ -157,7 +158,7 @@ export const ListItem: FC<Props> = ({ defaultValue, userId, date, setOpenedId, r
       ) : (
         <Tooltip title="Yopiq baho (o'zgartirib bo'lmaydi)" arrow>
           <span>
-            <IconifyIcon icon={'material-symbols:lock-outline'} fontSize={18} color='#9e9e9e' />
+          <LockKeyhole style={{ color: '#9e9e9e', width: '20px', height: '20px' }} />
           </span>
         </Tooltip>
       )}

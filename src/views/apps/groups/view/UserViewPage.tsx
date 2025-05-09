@@ -73,7 +73,6 @@ const UserView = () => {
   return (
     <Box display='flex' flexDirection='column' gap={4}>
       <Box mb={isMobile ? 3 : 0} display={isMobile ? 'block' : 'flex'} justifyContent='end' gap={isMobile ? 3 : 5}>
-        <ExcelGrades width={isMobile ? '100%' : 'auto'} url={`common/ratings/export/${router.query.id}`} />
 
         {!isMobile && <VideoHeader item={videoUrls.group} />}
       </Box>

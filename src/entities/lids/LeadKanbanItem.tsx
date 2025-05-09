@@ -103,10 +103,11 @@ export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead,
               <User width={20} height={20} color='#666CFF' />
             </Box>
 
-            <Box width='100%' sx={{ textAlign: 'start' }}>
-              <Typography sx={{ whiteSpace: 'nowrap', fontWeight: 600 }}>
+            <Box width="auto" sx={{ textAlign: 'start' }}>
+              <Typography sx={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', wordBreak: 'break-word' }}>
                 {lead?.first_name}
               </Typography>
+
               <Typography fontSize={12}>{lead?.phone}</Typography>
             </Box>
           </Box>

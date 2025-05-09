@@ -1,21 +1,18 @@
 import { Box, Card, Tooltip, Typography, Skeleton } from '@mui/material'
-import { useSettings } from 'src/@core/hooks/useSettings';
 import { ResponsiveFunnel } from '@nivo/funnel';
-import { useGet } from '@/hooks/useApi';
-import { EmptyContent } from '@/components/empty-content';
+import { useGet } from '@hooks/useApi';
+import { EmptyContent } from '@components/empty-content';
 import { useRouter } from 'next/router';
 import { CircleHelp } from 'lucide-react';
 import { funnelsEmpty } from '@/shared/constans'
 import { ComingSoon } from '@components/ComingSoon'
+import { LEADS_SELLES_FUNNEL_MAP } from '../config/constants'
+import { LeadsStatementFunnelSkeleton } from './LeadsStatementFunnelSkeleton'
 
-const SalesFunnel = () => {
-  const { settings } = useSettings();
+export const LeadsStatementSalesFunnel = () => {
   const router = useRouter();
   const { branch } = router.query;
   const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
-
-  const isDark = settings.mode === 'dark';
-  const textColor = isDark ? '#ffffff' : '#333333';
 
   const { data, isLoading } = useGet('leads/sales-funnel/', {
     params: { branch: branchParam },
@@ -25,54 +22,16 @@ const SalesFunnel = () => {
 
   const isActive = data ? Object.values(data).some(value => (value as number) > 0) : false
 
-  const labelMap: { [key: string]: string } = {
-    all_leads: 'Barcha lidlar',
-    connected_leads: "Bog'lanilganlar",
-    test_period: 'Sinov darsidagilar',
-    enrolled_leads: 'Sotuv bo\'lganlar',
-  };
-
   const updatedFunnelData = data
     ? Object.entries(isActive ? data : funnelsEmpty).map(([key, value]) => ({
-      id: labelMap[key],
+      id: LEADS_SELLES_FUNNEL_MAP[key],
       value: Number(value),
-      label: labelMap[key],
+      label: LEADS_SELLES_FUNNEL_MAP[key],
     }))
     : [];
 
-  const FunnelSkeleton = () => (
-    <Card
-      sx={{
-        height: { xs: '100%', sm: 500 },
-        width: '100%',
-        boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-    >
-      <Box display='flex' gap={3} sx={{ px: 6, py: 4 }}>
-        <Skeleton variant="text" width={180} height={32} />
-        <Skeleton variant="circular" width={24} height={24} sx={{ mt: 'auto', mb: 'auto' }} />
-      </Box>
-      <Box sx={{ flexGrow: 1, width: '100%', px: 4, pb: 4, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-          <Skeleton variant="rectangular" width="90%" height={60} sx={{ mb: 2, borderRadius: 1 }} />
-        </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-          <Skeleton variant="rectangular" width="80%" height={60} sx={{ mb: 2, borderRadius: 1 }} />
-        </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-          <Skeleton variant="rectangular" width="70%" height={60} sx={{ mb: 2, borderRadius: 1 }} />
-        </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-          <Skeleton variant="rectangular" width="60%" height={60} sx={{ borderRadius: 1 }} />
-        </Box>
-      </Box>
-    </Card>
-  );
-
   if (isLoading || !branchParam) {
-    return <FunnelSkeleton />;
+    return <LeadsStatementFunnelSkeleton />;
   }
 
   return (
@@ -106,7 +65,7 @@ const SalesFunnel = () => {
               valueFormat='>-.0f'
               colors={{ scheme: 'nivo' }}
               borderWidth={20}
-              labelColor={textColor}
+              labelColor='#333333'
               beforeSeparatorLength={100}
               beforeSeparatorOffset={20}
               afterSeparatorLength={100}
@@ -121,13 +80,13 @@ const SalesFunnel = () => {
                   text: {
                     fontSize: 14,
                     fontWeight: 'bold',
-                    fill: textColor
+                    fill: '#333333'
                   }
                 },
                 tooltip: {
                   container: {
-                    background: isDark ? '#1e1e1e' : '#ffffff',
-                    color: textColor,
+                    background: '#ffffff',
+                    color: '#333333',
                     fontSize: 12,
                     borderRadius: 4,
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
@@ -143,4 +102,4 @@ const SalesFunnel = () => {
   )
 };
 
-export default SalesFunnel;
+LeadsStatementSalesFunnel.displayName = 'LeadsStatementSalesFunnel'

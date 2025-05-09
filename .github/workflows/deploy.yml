@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Next.js Frontend Deployment
 
 on:
   push:
@@ -26,7 +26,30 @@ jobs:
         run: |
           echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
 
-      - name: Deploy with zero-downtime (test branch)
+      - name: Build application
+        run: npm run build
+
+      - name: Prepare deployment package
+        run: |
+          tar -czf deploy.tar.gz \
+            .next/ \
+            public/ \
+            node_modules/ \
+            package.json \
+            package-lock.json \
+            ecosystem.config.js \
+            .env
+
+      - name: Deploy to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.TEST_SERVER_IP }}
+          username: crmroot
+          password: ${{ secrets.TEST_SERVER_PASSWORD }}
+          source: "deploy.tar.gz"
+          target: "/tmp"
+
+      - name: Execute deployment
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.TEST_SERVER_IP }}
@@ -36,42 +59,111 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-            if ! command -v nvm &> /dev/null; then
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-              export NVM_DIR="$HOME/.nvm"
-              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            PM2_COMMAND="pm2"
+
+            which $PM2_COMMAND || {
+              echo "PM2 not found, trying to find it..."
+              POSSIBLE_PM2=$(find $HOME/.nvm -name pm2 -type f | head -n 1)
+              if [ -n "$POSSIBLE_PM2" ]; then
+                PM2_COMMAND="$POSSIBLE_PM2"
+                echo "Found PM2 at: $PM2_COMMAND"
+              else
+                echo "ERROR: PM2 not found. Please install it with: npm install -g pm2"
+                exit 1
+              fi
+            }
+
+            TIMESTAMP=$(date +%s)
+            APP_NAME="test-subdomain-soffcrm-uz-3131"
+            BASE_DIR="/home/crmroot/frontend/test-soffcrm"
+            DEPLOY_DIR="${BASE_DIR}/${APP_NAME}"
+            NEW_DEPLOY_DIR="${BASE_DIR}/${APP_NAME}-${TIMESTAMP}"
+
+            echo "Start Deployment: $(date)"
+            echo "New deploy folder: $NEW_DEPLOY_DIR"
+
+            mkdir -p $NEW_DEPLOY_DIR
+
+            echo "Extract Build files..."
+            tar -xzf /tmp/deploy.tar.gz -C $NEW_DEPLOY_DIR
+
+            cd $NEW_DEPLOY_DIR
+            echo "Current folder: $(pwd)"
+
+            if [ ! -f "node_modules/next/dist/bin/next" ]; then
+              echo "ERROR: Next.js executable not found!"
+              ls -la node_modules/next/dist/bin/ || echo "Directory doesn't exist"
+              exit 1
             fi
 
-            nvm install 20.10.0
-            nvm use 20.10.0
+            set -x
 
-            APP_DIR="frontend/test-subdomain-soffcrm-uz-3132"
-            mkdir -p $APP_DIR
-            cd $APP_DIR
+            if $PM2_COMMAND list | grep -q "$APP_NAME"; then
+              echo "Available app found: $APP_NAME"
 
-            if [ ! -d ".git" ]; then
-              git clone --branch test https://Soff-Hub:${{ secrets.TOKEN_GITHUB }}@github.com/Soff-Hub/${{ secrets.REPO_NAME }}.git .
+              echo "Launch new version..."
+              $PM2_COMMAND start ecosystem.config.js --only "$APP_NAME-new" || true
+
+              sleep 10
+
+              if curl -s http://localhost:3130/api/health > /dev/null || curl -s http://localhost:3130 > /dev/null; then
+                echo "Looks like a new version is running"
+
+                echo "Delete old version..."
+                $PM2_COMMAND delete "$APP_NAME" || true
+
+                echo "Launch base version..."
+                $PM2_COMMAND start ecosystem.config.js --only "$APP_NAME" || true
+
+                echo "Delete Temporary Version..."
+                $PM2_COMMAND delete "$APP_NAME-new" || true
+
+                $PM2_COMMAND save || true
+
+                if [ -L "$DEPLOY_DIR" ]; then
+                  echo "Deleting existing symbolic link..."
+                  rm -f "$DEPLOY_DIR"
+                elif [ -d "$DEPLOY_DIR" ]; then
+                  echo "Backing up an existing folder..."
+                  mv "$DEPLOY_DIR" "${DEPLOY_DIR}-old-$(date +%s)" || true
+                fi
+
+                echo "Creating new symbolic link..."
+                ln -sf "$NEW_DEPLOY_DIR" "$DEPLOY_DIR"
+
+                echo "Clear old versions..."
+                cd $BASE_DIR
+                ls -dt "${APP_NAME}-"* | grep -v "$(basename $NEW_DEPLOY_DIR)" | tail -n +3 | xargs -r rm -rf
+
+                echo "The deployment was successful!"
+              else
+                echo "ERROR: New version unavailable!"
+
+                $PM2_COMMAND delete "$APP_NAME-new" || true
+
+                rm -rf "$NEW_DEPLOY_DIR"
+
+                echo "Back to previous version."
+              fi
             else
-              git fetch origin test
-              git reset --hard origin/test
+              echo "First deployment..."
+
+              $PM2_COMMAND start ecosystem.config.js --only "$APP_NAME" || true
+              $PM2_COMMAND save || true
+
+              if [ -L "$DEPLOY_DIR" ]; then
+                rm -f "$DEPLOY_DIR"
+              elif [ -d "$DEPLOY_DIR" ]; then
+                mv "$DEPLOY_DIR" "${DEPLOY_DIR}-old-$(date +%s)" || true
+              fi
+
+              ln -sf "$NEW_DEPLOY_DIR" "$DEPLOY_DIR"
+
+              echo "The first deployment was successful!"
             fi
 
-            echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
+            echo "PM2 processes:"
+            $PM2_COMMAND list
 
-            npm ci
-            npm run build
-
-            if pm2 list | grep -q "test-subdomain-soffcrm-uz-3132"; then
-              pm2 start ecosystem.config.js --only test-subdomain-soffcrm-uz-3132-new --update-env
-
-              sleep 5
-
-              pm2 delete test-subdomain-soffcrm-uz-3132
-
-              pm2 start ecosystem.config.js --only test-subdomain-soffcrm-uz-3132 --update-env
-              pm2 delete test-subdomain-soffcrm-uz-3132-new
-            else
-              pm2 start ecosystem.config.js --only test-subdomain-soffcrm-uz-3132
-            fi
-
-            pm2 save
+            echo "Frontend Folder Files:"
+            ls -la $BASE_DIR

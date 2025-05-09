@@ -17,7 +17,7 @@ export default function ExcelGrades({
   queryString = '',
   variant = 'outlined',
   color = 'success',
-  width = 370,
+  width = 'auto',
   size = 'small',
   url,
   ...args
@@ -44,7 +44,7 @@ export default function ExcelGrades({
   return (
     <LoadingButton
       sx={{ width: width }}
-      size="medium"
+      size={size}
       loading={loading}
       onClick={handleDownload}
       startIcon={!loading && <VscodeIconsFileTypeExcel2 />}

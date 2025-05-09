@@ -1,31 +1,25 @@
-import { Card, Tooltip, Typography, Skeleton } from '@mui/material'
-import { useSettings } from 'src/@core/hooks/useSettings';
+import { Card, Tooltip, Typography, Box } from '@mui/material'
 import { ResponsiveLine } from '@nivo/line';
 import useResponsive from '@/@core/hooks/useResponsive';
-import { EmptyContent } from '@/components/empty-content';
+import { EmptyContent } from '@components/empty-content';
 import { uzbekMonths } from '@/shared/constans';
 import { useRouter } from 'next/router';
 import { useGet } from '@hooks/useApi';
 import { Endpoints } from '@api/endpoints';
 import { ReportLeadsYearlyStats } from '@/types/report';
-import { Box } from '@mui/system'
 import { CircleHelp } from 'lucide-react'
+import { LeadsStatementYearlyTrendSkeleton } from './LeadsStatementYearlyTrendSkeleton'
 
-const YearlyTrend = () => {
-  const { settings } = useSettings();
+export const LeadsStatementYearlyTrend = () => {
   const router = useRouter();
   const { branch } = router.query;
+  const { isMobile } = useResponsive()
   const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
 
   const { data, isLoading } = useGet<ReportLeadsYearlyStats[]>(Endpoints.LeadsYearlyStats, {
     params: { branch: branchParam },
     options: { enabled: !!branchParam },
   });
-
-  const isDark = settings.mode === 'dark';
-  const textColor = isDark ? '#ffffff' : '#333333';
-  const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-  const { isMobile } = useResponsive();
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
@@ -59,113 +53,8 @@ const YearlyTrend = () => {
     },
   ];
 
-  const ChartSkeleton = () => (
-    <Card
-      sx={{
-        width: '100%',
-        height: { xs: '100%', sm: 400, md: 500 },
-        p: 2
-      }}
-    >
-      <Box display='flex' gap={3} sx={{ px: 6, py: 4 }}>
-        <Skeleton variant="text" width={200} height={32} />
-        <Skeleton variant="circular" width={24} height={24} sx={{ mt: 'auto', mb: 'auto' }} />
-      </Box>
-
-      <Box sx={{ height: 'calc(100% - 80px)', width: '100%', position: 'relative', pt: 2, px: 3 }}>
-        <Box sx={{ position: 'absolute', left: 16, top: 10, bottom: 40, width: 40, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <Skeleton variant="text" width={25} height={20} />
-          <Skeleton variant="text" width={25} height={20} />
-          <Skeleton variant="text" width={25} height={20} />
-          <Skeleton variant="text" width={25} height={20} />
-        </Box>
-
-        <Box sx={{ position: 'absolute', left: 60, right: 20, bottom: 10, display: 'flex', justifyContent: 'space-between' }}>
-          {Array(6).fill(0).map((_, index) => (
-            <Skeleton key={index} variant="text" width={40} height={20} />
-          ))}
-        </Box>
-
-        <Box sx={{ position: 'absolute', left: 60, right: 20, top: 10, bottom: 40 }}>
-          <Skeleton
-            variant="rectangular"
-            sx={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: '30%',
-              height: 3,
-              borderRadius: 4,
-              transform: 'none',
-              '&::after': {
-                animation: 'none'
-              }
-            }}
-          />
-
-          <Skeleton
-            variant="rectangular"
-            sx={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: '60%',
-              height: 3,
-              borderRadius: 4,
-              transform: 'none',
-              '&::after': {
-                animation: 'none'
-              }
-            }}
-          />
-
-          <Skeleton
-            variant="rectangular"
-            sx={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: '75%',
-              height: 3,
-              borderRadius: 4,
-              transform: 'none',
-              '&::after': {
-                animation: 'none'
-              }
-            }}
-          />
-
-          {Array(6).fill(0).map((_, index) => (
-            <Box key={index} sx={{ position: 'absolute', left: `${index * 20}%`, transform: 'translateX(-50%)' }}>
-              <Skeleton variant="circular" width={10} height={10} sx={{ position: 'absolute', top: '30%', transform: 'translate(-50%, -50%)' }} />
-              <Skeleton variant="circular" width={10} height={10} sx={{ position: 'absolute', top: '60%', transform: 'translate(-50%, -50%)' }} />
-              <Skeleton variant="circular" width={10} height={10} sx={{ position: 'absolute', top: '75%', transform: 'translate(-50%, -50%)' }} />
-            </Box>
-          ))}
-        </Box>
-
-        <Box sx={{
-          position: 'absolute',
-          right: isMobile ? '50%' : 20,
-          bottom: isMobile ? 10 : '50%',
-          transform: isMobile ? 'translateX(50%)' : 'translateY(50%)',
-          display: 'flex',
-          flexDirection: isMobile ? 'row' : 'column',
-          gap: 2
-        }}>
-          {Array(3).fill(0).map((_, index) => (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Skeleton variant="circular" width={12} height={12} />
-              <Skeleton variant="text" width={80} height={20} />
-            </Box>
-          ))}
-        </Box>
-      </Box>
-    </Card>
-  );
-
   if (isLoading || !branchParam) {
-    return <ChartSkeleton />;
+    return <LeadsStatementYearlyTrendSkeleton />;
   }
 
   return (
@@ -264,41 +153,41 @@ const YearlyTrend = () => {
             axis: {
               domain: {
                 line: {
-                  stroke: textColor,
+                  stroke: '#333333',
                   strokeWidth: 1
                 }
               },
               ticks: {
                 line: {
-                  stroke: textColor,
+                  stroke: '#333333',
                   strokeWidth: 1
                 },
                 text: {
-                  fill: textColor
+                  fill: '#333333'
                 }
               },
               legend: {
                 text: {
-                  fill: textColor,
+                  fill: '#333333',
                   fontSize: 12
                 }
               }
             },
             grid: {
               line: {
-                stroke: gridColor,
+                stroke: 'rgba(0, 0, 0, 0.1)',
                 strokeWidth: 1
               }
             },
             legends: {
               text: {
-                fill: textColor
+                fill: '#333333'
               }
             },
             tooltip: {
               container: {
-                background: isDark ? '#1e1e1e' : '#ffffff',
-                color: textColor,
+                background: '#ffffff',
+                color: '#333333',
                 fontSize: 12,
                 borderRadius: 4,
                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
@@ -306,7 +195,7 @@ const YearlyTrend = () => {
             },
             crosshair: {
               line: {
-                stroke: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+                stroke: 'rgba(0, 0, 0, 0.5)',
                 strokeWidth: 1,
                 strokeOpacity: 0.75
               }
@@ -318,4 +207,4 @@ const YearlyTrend = () => {
   )
 };
 
-export default YearlyTrend;
+LeadsStatementYearlyTrend.displayName = 'LeadsStatementYearlyTrend'

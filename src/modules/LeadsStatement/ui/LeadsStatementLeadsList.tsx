@@ -1,9 +1,8 @@
 'use client'
 
-import { Box, Button, MenuItem, Select, Typography, Chip, CircularProgress } from '@mui/material'
+import { Box, Button, MenuItem, Select, Typography, Chip, CircularProgress, OutlinedInput } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { DataGrid } from '@mui/x-data-grid'
 import { useGetReportLeadsList } from '@/shared/query-hooks/report-leads/reportLeads'
 import { ReportsLeadsListItemType } from '@/types/report'
 import { LidsDragonModal } from '@/views/apps/lids/LidsDragonModal'
@@ -12,25 +11,15 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useQueryClient } from '@tanstack/react-query'
 import { QueryKeys } from '@/shared/query-hooks/queryKeys'
+import { DataGridTable } from '@components/table/DataGridTable'
+import {
+  LEAD_STATEMENTS_STATES,
+  LEAD_STATEMENTS_TEMPERATURE,
+  LEADS_STATE_MAP,
+  LEADS_TEMPERATURE_MAP
+} from '../config/constants'
 
-export const temperateOptions = [
-  { value: '', label: 'Barcha haroratlar' },
-  { value: 'hot', label: 'Issiq' },
-  { value: 'warm', label: 'Iliq' },
-  { value: 'cold', label: 'Sovuq' }
-]
-
-export const states = [
-  { value: '', label: 'Barcha holatlar' },
-  { value: 'new', label: 'Yangi' },
-  { value: 'connected', label: "Bog'lanilgan" },
-  { value: 'not_connected', label: "Bog'lanilmagan" },
-  { value: 'test_period', label: 'Sinov darsida' },
-  { value: 'enrolled', label: "Sotuv bo'ldi" },
-  { value: 'rejected', label: "Yo'qotilgan" }
-]
-
-const LeadsList = () => {
+export const LeadsStatementLeadsList = () => {
   const { t } = useTranslation()
   const router = useRouter()
   const { branch } = router.query
@@ -43,7 +32,7 @@ const LeadsList = () => {
   const [temperateValue, setTemperateValue] = useState('')
   const [stateValue, setStateValue] = useState('')
   const queryClient = useQueryClient()
-  const leadsSellers:any = queryClient.getQueryData([QueryKeys.ReportsLeadsSellers])
+  const leadsSellers: any = queryClient.getQueryData([QueryKeys.ReportsLeadsSellers])
 
   const [adminValue, setAdminValue] = useState('')
   const tableRef = useRef<HTMLDivElement | null>(null)
@@ -86,21 +75,6 @@ const LeadsList = () => {
     setPageSizeOffset(0)
   }
 
-  const statusMap: { [key: string]: { label: string; color: string } } = {
-    new: { label: 'Yangi', color: 'primary' },
-    connected: { label: "Bog'lanildi", color: 'success' },
-    not_connected: { label: "Bog'lanilmadi", color: 'error' },
-    test_period: { label: 'Sinov darsida', color: 'warning' },
-    enrolled: { label: "Sotuv bo'ldi", color: 'success' },
-    rejected: { label: "Yo'qotilgan", color: 'error' }
-  }
-
-  const temperatureMap: { [key: string]: { label: string; color: string } } = {
-    hot: { label: 'Issiq', color: 'success' },
-    col: { label: 'Sovuq', color: 'error' },
-    warm: { label: 'Iliq', color: 'warning' }
-  }
-
   const columns = [
     {
       field: 'index',
@@ -129,7 +103,7 @@ const LeadsList = () => {
       headerName: t('Status'),
       renderCell: (params: any) => {
         const status = params.value
-        const statusInfo = statusMap[status] || { label: status, color: 'default' }
+        const statusInfo = LEADS_STATE_MAP[status] || { label: status, color: 'default' }
         return (
           <Chip
             label={statusInfo.label}
@@ -145,7 +119,7 @@ const LeadsList = () => {
       width: 200,
       renderCell: (params: any) => {
         const status = params.value
-        const statusInfo = temperatureMap[status] || { label: status || 'Belgilanmagan', color: 'default' }
+        const statusInfo = LEADS_TEMPERATURE_MAP[status] || { label: status || 'Belgilanmagan', color: 'default' }
         return (
           <Chip
             label={statusInfo.label}
@@ -201,14 +175,20 @@ const LeadsList = () => {
         gap={3}
       >
         <Select size='small' fullWidth value={stateValue} onChange={e => setStateValue(e.target.value)} displayEmpty>
-          {states.map(option => (
+          {LEAD_STATEMENTS_STATES.map(option => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
           ))}
         </Select>
-        <Select size='small' fullWidth value={adminValue} onChange={e => setAdminValue(e.target.value)} displayEmpty>
-          <MenuItem value=''>Barcha holatlar</MenuItem>
+        <Select
+          size='small'
+          fullWidth
+          value={adminValue}
+          onChange={e => setAdminValue(e.target.value)}
+          displayEmpty
+        >
+          <MenuItem value=''>Barcha adminlar</MenuItem>
           {leadsSellers?.map((option: any) => (
             <MenuItem key={option.value} value={option.id}>
               {option.first_name}
@@ -223,7 +203,7 @@ const LeadsList = () => {
           onChange={e => setTemperateValue(e.target.value)}
           displayEmpty
         >
-          {temperateOptions.map(option => (
+          {LEAD_STATEMENTS_TEMPERATURE.map(option => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
@@ -245,34 +225,18 @@ const LeadsList = () => {
           }
         }}
       >
-        <DataGrid
-          autoHeight
+        <DataGridTable
           rows={data?.results || []}
           columns={columns}
-          loading={isLoading}
           getRowId={row => row.id}
-          localeText={uzbekLocaleText}
-          hideFooter
+          loading={isLoading}
           disableSelectionOnClick
+          localeText={uzbekLocaleText}
           onRowClick={params => {
             setSelectedLead(params.row)
             setOpenModal(true)
           }}
-          sx={{
-            '.MuiDataGrid-row': {
-              cursor: 'pointer',
-              transition: 'background-color 0.3s',
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04)'
-              },
-              '&.Mui-selected': {
-                backgroundColor: 'transparent !important'
-              },
-              '&.Mui-selected:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04) !important'
-              }
-            }
-          }}
+          hideFooter
         />
       </Box>
 
@@ -314,4 +278,4 @@ const LeadsList = () => {
   )
 }
 
-export default LeadsList
+LeadsStatementLeadsList.displayName = 'LeadsStatementLeadsList'
