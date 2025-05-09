@@ -90,6 +90,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const { companyInfo } = useAppSelector(item => item.user)
 
   const [mergedSteps, setMergedSteps] = useState<any[] | null>(null)
+
   const { data: amoLeadDataChild, isLoading: amoLeadDataChildLoding } = useGet(
     `amocrm/leads/?pipeline_id=${defaultId}`,
     { options: { enabled: !!router.query.is_amocrm } }
@@ -129,8 +130,10 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
       }
     )
   }
+
   const apiParams = {
-    is_active: is_active ?? true
+    is_active: is_active ?? true,
+    parent: null
   }
 
   if (id || defaultId) {
@@ -417,11 +420,12 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
             className='kanban'
             style={{
               display: 'flex',
+              flexWrap: 'nowrap',
+              alignItems: 'flex-start',
+              gap: 20,
               overflow: 'auto',
-              flexDirection: 'row',
-              alignItems: 'start',
               height: '100%',
-              gap: 20
+              width: '100%',
             }}
           >
             {(!is_amocrm && displayData?.results.length) || (is_amocrm && amoLeadData?.length) ? (
@@ -433,6 +437,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                       {...sectionProvided.draggableProps}
                       sx={{
                         ...sectionProvided.draggableProps.style,
+                        flexShrink: 0,
                         opacity: sectionSnapshot.isDragging ? 0.8 : 1,
                         width: { xs: 300, sm: 400, md: 450 }
                       }}
@@ -445,12 +450,12 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                             className='kanban__section'
                             ref={leadsProvided.innerRef}
                             style={{
-                              width: isMobile ? '100%' : 'auto',
+                              width: '100%',
                               minWidth: 300,
                               border: '1px solid #e0e0e0e0',
                               borderRadius: 10,
                               padding: 20,
-                              background: settings.mode == 'dark' ? '#282A42' : 'white'
+                              background: 'white'
                             }}
                           >
                             <Box
