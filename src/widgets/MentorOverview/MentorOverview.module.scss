@@ -1,56 +1,164 @@
-.prent {
-  &__list {
-    color: rebeccapurple;
-  }
-}
 
-.mentor_overview {
-  &__card {
-    border: var(--border);
-    &-content {
-      &-titleWrap {
-        display: flex;
-        width: 100%;
-        flex-direction: column;
-        // align-items: center;
-        &-titleBox {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+.mentor_overview{
+  display: flex;
+  gap: 30px;
+  &-profile{
+   &-card{
+     padding: 25px;
+     display: flex;
+     flex-direction: column;
+     gap: 10px;
+     background-color: white;
+     border-radius: 8px;
+     border:var(--border);
+     width: 450px;
 
-          &-title {
-            padding: 10px 0;
-          }
-          &-editor {
-          }
-        }
-        &-avatar {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          border-radius: 100%;
-          align-self: center;
-          margin-top: 10px;
-        }
+     &-header{
+       display: flex;
+       align-items: start;
+       justify-content: space-between;
+       &-title{
+         font-weight: 500;
+         font-size: 18px;
+         color: var(--black);
+       }
+       &-pencil{
+         color: var(--black);
+       }
+     }
+     &-info{
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       gap: 10px;
+
+       &-image{
+         width: 80px;
+         height: 80px;
+         border-radius: 50%;
+         background-color: lightgray;
+       }
+
+       &-teacher {
+         font-weight: 600;
+         font-size: 18px;
+         color: var(--black);
+       }
+     }
+     &-details{
+       padding-bottom: 10px;
+       border-bottom: var(--border);
+       display: flex;
+       flex-direction: column;
+       gap: 10px;
+       &-detail{
+         display: flex;
+         align-items: center;
+         gap: 15px;
+         &-title{
+           font-weight: 400;
+           font-size: 15px;
+         }
+         &-value{
+           color: var(--black);
+           font-weight: 500;
+         }
+ 
+       }
+     }
+     &-contact{
+      &-title{
+        margin-bottom: 10px;
+        font-weight: 600;
+        font-size: 13px;
       }
-      &-body {
-        margin-top: 15px;
+      &-details{
         display: flex;
-        align-items: start;
-        flex-direction: column;
         gap: 10px;
-        border-bottom: 1px solid hsl(0, 0%, 50%, 0.2);
-        padding: 10px 0;
-        &-item {
-          display: flex;
-          align-items: center;
-          gap: 20px;
+        align-items: center;
+        &-phone{
+          color: var(--black);
         }
       }
-      &-contactbox {
-        display: flex;
-        align-items: center;
-        gap: 20px;
+     }
+   }
+ }
+  &-groups{
+    &-card{
+      padding: 25px;
+      background-color: white;
+      border-radius: 8px;
+      border:var(--border);
+      width: 100%;
+      &-title{
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--black);
+      }
+      &-info{
+        margin-top: 5px;
+        margin-bottom: 10px;
+        font-weight: 600;
+        font-size: 13px;
+      }
+      &-group{
+        &-current{
+          padding: 18px;
+          width: 100%;
+          border: 2px solid #A3F7BF;
+          border-radius: 10px;
+          &-header{
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            &-name{
+             color: var(--black);
+             font-weight: 600;
+             font-size: 16px;
+            }
+            &-course{
+              color: var(--black);
+              font-size: 12px;
+              font-weight: 600;
+              padding: 5px 10px ;
+              border-radius: 30px;
+              background-color: #A3F7BF;
+
+            }
+          }
+          &-details{
+            display: flex;
+            gap: 50px;
+            &-lesson{
+              display: flex;
+              gap: 10px;
+              align-items: center;
+              &-title{
+                color: var(--black);
+                font-size: 15px;
+              }
+            }
+            &-count{
+              border: var(--border);
+              text-align: center;
+              font-weight: 400;
+              color: var(--black);
+              font-size: 13px;
+              border-radius: 20px;
+            }
+          }
+        }
+      }
+      &-groups{
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 16px;
+      
+        .item {
+          background-color: #f0f0f0;
+          padding: 12px;
+        }
       }
     }
   }
