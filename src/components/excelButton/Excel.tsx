@@ -6,10 +6,12 @@ import { useTranslation } from 'react-i18next'
 interface ExcelProps {
   queryString?: string
   tooltip?: string
-  url: string
+  url?: string
   variant?: 'text' | 'outlined' | 'contained'
   color?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning'
   size?: 'small' | 'medium' | 'large'
+  onClick?: VoidFunction
+  baseURL?: string
   args?: any
 }
 
@@ -18,13 +20,15 @@ export default function Excel({
   tooltip = '',
   variant = 'outlined',
   color = 'success',
+  onClick,
   size = 'small',
+  baseURL,
   url,
   ...args
 }: ExcelProps) {
   const { t } = useTranslation()
   const subdomain = location.hostname.split('.')
-  const baseURL =
+  const staticBaseURL =
     process.env.NODE_ENV === 'development'
       ? `${process.env.NEXT_PUBLIC_TEST_BASE_URL}/v1/`
       : subdomain.length < 3
@@ -33,7 +37,7 @@ export default function Excel({
 
   return (
     <Link
-      href={baseURL + `${url}?` + queryString}
+      href={baseURL || staticBaseURL  + `${url}?` + queryString}
       download
       target={'_blank'}
       style={{
@@ -45,6 +49,7 @@ export default function Excel({
         startIcon={<VscodeIconsFileTypeExcel2 />}
         {...args}
         variant={variant}
+        onClick={onClick}
         color={color}
         size={'medium'}
       >
