@@ -2,7 +2,7 @@ import { ComingSoon } from '@/components/ComingSoon'
 import { TrendCard } from '@/components/TrendCard'
 import { LeadsStatementCardType } from '@modules/LeadsStatement'
 import { Box } from '@mui/material'
-import { ArrowRightLeft, Award, BookOpen, Clock, Megaphone, Percent, TriangleAlert, User, Users } from 'lucide-react'
+import { Award, BookOpen, Clock, Percent, Users } from 'lucide-react'
 
 export function StudentsStatsCard() {
   const getFillColor = (process?: number): string => {
