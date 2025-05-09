@@ -221,7 +221,7 @@ export default function FormsPage() {
           size='small'
           variant='contained'
           startIcon={<IconifyIcon icon={'ic:baseline-add'} />}
-          onClick={() => push(`/settings/forms/create`)}
+          onClick={() => push(`/settings/forms/new-create`)}
         >
           {t('Yangi')}
         </Button>

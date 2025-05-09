@@ -1,7 +1,7 @@
 export const formatPhoneNumber = (value: any) => {
   if (!value) return value
 
-  const phoneNumber = value.replace('+998', '').replace(/[^\d]/g, '')
+  const phoneNumber = value?.replace('+998', '').replace(/[^\d]/g, '')
   const phoneNumberLength = phoneNumber.length
 
   if (phoneNumberLength <= 2) return `(${phoneNumber}`
