@@ -216,7 +216,7 @@ const Lids = () => {
             </Button>
 
             <Box>
-              <Excel notBlank onClick={handleExportExcel} baseURL={exportExcel} />
+              <Excel onClick={handleExportExcel} baseURL={exportExcel} />
             </Box>
 
             {queryParams.is_active && (

@@ -23,14 +23,13 @@ export default function Excel({
   variant = 'outlined',
   color = 'success',
   onClick,
-  size = 'small',
+  size = 'medium',
   baseURL,
   url,
   ...args
 }: ExcelProps) {
-
   const { t } = useTranslation()
-  const subdomain = location.hostname.split('.')
+  const subdomain = typeof window !== 'undefined' ? location.hostname.split('.') : []
   const staticBaseURL =
     process.env.NODE_ENV === 'development'
       ? `${process.env.NEXT_PUBLIC_TEST_BASE_URL}/v1/`
@@ -38,15 +37,10 @@ export default function Excel({
       ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
       : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/`
 
+  const href = baseURL || (url ? `${staticBaseURL}${url}${queryString ? `?${queryString}` : ''}` : '#')
+
   return (
-    <Link
-      href={baseURL || staticBaseURL + `${url}?` + queryString}
-      download
-      target={notBlank ? '_parent' : '_blank'}
-      style={{
-        width: '100%'
-      }}
-    >
+    <Link href={href} download target={notBlank ? '' : '_blank'} style={{ width: '100%' }}>
       <Button
         fullWidth
         startIcon={<VscodeIconsFileTypeExcel2 />}
@@ -54,7 +48,7 @@ export default function Excel({
         variant={variant}
         onClick={onClick}
         color={color}
-        size={'medium'}
+        size={size}
       >
         <Tooltip title={t(tooltip)}>
           <span>Excel</span>
