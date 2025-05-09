@@ -7,6 +7,7 @@ import {
   Dialog,
   DialogContent,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -24,6 +25,7 @@ import useResponsive from 'src/@core/hooks/useResponsive'
 import api from 'src/@core/utils/api'
 import { AuthContext } from 'src/context/AuthContext'
 import { useAppSelector } from 'src/store'
+import { X } from 'lucide-react'
 
 type Props = {}
 
@@ -160,10 +162,8 @@ export default function CreateForm({}: Props) {
 
   return (
     <div>
-      <VideoHeader item={videoUrls.forms} />
-
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around' }}>
-        <Box sx={{ flex: 0.4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-around' }}>
+        <Box width={'100%'}>
           <Box sx={{ display: 'block', maxWidth: isMobile ? 350 : 400, mx: 'auto' }}>
             <Box
               sx={{
@@ -242,7 +242,9 @@ export default function CreateForm({}: Props) {
                   <button
                     style={{ margin: 0, border: 'unset', backgroundColor: 'unset', position: 'absolute', right: 0 }}
                   >
-                    <IconifyIcon icon={'line-md:remove'} onClick={() => deleteComponent(el.id)} />
+                    <IconButton onClick={() => deleteComponent(el.id)}>
+                      <X size={20} />
+                    </IconButton>{' '}
                   </button>
                 </Box>
               ))}
@@ -278,7 +280,7 @@ export default function CreateForm({}: Props) {
             </Box>
           </Box>
         </Box>
-        <Box sx={{ flex: 0.5 }}>
+        <Box width={'100%'}>
           <Box
             sx={{
               maxWidth: 500,
