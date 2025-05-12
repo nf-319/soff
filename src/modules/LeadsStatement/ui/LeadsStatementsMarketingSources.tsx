@@ -103,7 +103,7 @@ export const LeadsStatementsMarketingSources = ({ data }: { data: ReportLeadsSou
                 },
                 ticks: {
                   line: {
-                    stroke: '#181818',
+                    stroke: '#f8f8f8',
                     strokeWidth: 1
                   },
                   text: {
@@ -131,7 +131,7 @@ export const LeadsStatementsMarketingSources = ({ data }: { data: ReportLeadsSou
               },
               tooltip: {
                 container: {
-                  background: '#181818',
+                  background: '#ffffff',
                   color: '#181818'
                 }
               }
