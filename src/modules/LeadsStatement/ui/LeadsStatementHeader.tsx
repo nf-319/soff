@@ -77,7 +77,7 @@ export const LeadsStatementHeader = () => {
             </Box>
           </Tooltip>
 
-          <Tooltip title='Hozirda hisobot demo versiyada ishlamoqda'>
+          <Tooltip title='Hozirda hisobot test rejimda ishlamoqda'>
             <Box
               sx={{
                 display: 'flex',
