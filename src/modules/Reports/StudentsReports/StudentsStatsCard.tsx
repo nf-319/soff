@@ -112,8 +112,6 @@ export function StudentsStatsCard() {
                 iconColor={item.iconColor}
                 process={item.process}
                 trendDirection={item.trendDirection}
-                trendColor={item.trendColor}
-                pillColor={item.pillColor}
               />
             </ComingSoon>
           ) : (
@@ -126,8 +124,6 @@ export function StudentsStatsCard() {
               iconColor={item.iconColor}
               process={item.process}
               trendDirection={item.trendDirection}
-              trendColor={item.trendColor}
-              pillColor={item.pillColor}
             />
           )}
         </Box>

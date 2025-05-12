@@ -35,7 +35,7 @@ export const LeadsStatementSalesFunnel = () => {
   }
 
   return (
-    <ComingSoon active={isActive} text='Sotuv varonkasi uchun malumot yetarli emas' brightness='0.9' size='medium'>
+    <ComingSoon active={isActive} text='Sotuv varonkasi uchun malumot yetarli emas' brightness='0.9' size='medium' sx={{ height: '100%' }}>
       <Card
         sx={{
           height: { xs: '100%', sm: 500 },
