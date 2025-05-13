@@ -11,7 +11,7 @@ type Props = {
   type: 'chart' | 'table'
 }
 
-const ReportsChartModal = ({ open, type, setOpen, modalTitle, data }: Props) => {
+export const ReportsChartModal = ({ open, type, setOpen, modalTitle, data }: Props) => {
   const { isMobile } = useResponsive()
 
   return (
@@ -158,4 +158,3 @@ const ReportsChartModal = ({ open, type, setOpen, modalTitle, data }: Props) => 
   )
 }
 
-export default ReportsChartModal

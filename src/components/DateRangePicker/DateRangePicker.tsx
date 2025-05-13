@@ -1,15 +1,14 @@
-import React from 'react'
-import { DateRangePicker } from 'rsuite'
+import { DateRangePicker as DateRangeP } from 'rsuite'
 import { Box, Typography, FormHelperText } from '@mui/material'
 import { DateRange } from 'rsuite/esm/DateRangePicker'
+import { FC } from 'react'
 
-
-
-interface MuiStyleDateRangePickerProps {
+type Props = {
   label?: string
   value: DateRange | null
   onChange: (value: DateRange | null) => void
   error?: boolean
+  format?: string
   helperText?: string
   disabled?: boolean
   placeholder?: string
@@ -26,10 +25,11 @@ interface MuiStyleDateRangePickerProps {
     | 'rightEnd'
 }
 
-const MuiStyleDateRangePicker: React.FC<MuiStyleDateRangePickerProps> = ({
+export const DateRangePicker: FC<Props> = ({
   label = 'Date Range',
   value,
   onChange,
+  format = 'dd/MM/yyyy',
   error = false,
   placement = 'bottomStart',
   helperText = '',
@@ -39,7 +39,7 @@ const MuiStyleDateRangePicker: React.FC<MuiStyleDateRangePickerProps> = ({
 }) => {
   return (
     <Box width='100%'>
-      <DateRangePicker
+      <DateRangeP
         value={value}
         placement={placement}
         onChange={onChange}
@@ -47,7 +47,7 @@ const MuiStyleDateRangePicker: React.FC<MuiStyleDateRangePickerProps> = ({
         placeholder={placeholder}
         appearance='default'
         cleanable
-        format='yyyy-MM-dd'
+        format={format}
         isoWeek
         showOneCalendar
         style={{
@@ -64,5 +64,3 @@ const MuiStyleDateRangePicker: React.FC<MuiStyleDateRangePickerProps> = ({
     </Box>
   )
 }
-
-export default MuiStyleDateRangePicker

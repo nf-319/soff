@@ -8,9 +8,7 @@ import { useEffect, useState } from 'react'
 import { useAppSelector } from '@/store'
 import dayjs from 'dayjs'
 import { uzbekMonths } from '@/shared/constans'
-import MuiStyleDateRangePicker from '@/components/DateRangePicker'
-import { DateRange } from 'rsuite/esm/DateRangePicker'
-import { useSearchParams } from 'next/navigation'
+import { DateRangePicker } from '@/components/DateRangePicker'
 
 export const PaymentReport = () => {
   const now = dayjs()
@@ -102,7 +100,7 @@ export const PaymentReport = () => {
             </Select>
           </FormControl>
           <FormControl fullWidth>
-            <MuiStyleDateRangePicker
+            <DateRangePicker
               placement='bottomEnd'
               value={range as [Date, Date]}
               onChange={val => setRange(val ?? [null, null])}

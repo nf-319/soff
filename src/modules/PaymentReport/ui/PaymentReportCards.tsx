@@ -2,8 +2,8 @@ import { ComingSoon } from '@/components/ComingSoon'
 import { TrendCard } from '@/components/TrendCard'
 import { Box } from '@mui/material'
 import { statsCards, yearlyTrendData } from '../config/constansts'
-import ReportsChartModal from '@/components/ReportsChartModal'
 import { useState } from 'react'
+import { ReportsChartModal } from '@/components/ReportsChartModal'
 
 export function PaymentReportCards() {
   const [open, setOpen] = useState(false)
