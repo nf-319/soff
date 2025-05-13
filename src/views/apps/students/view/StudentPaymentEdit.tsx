@@ -12,16 +12,15 @@ import DialogActions from '@mui/material/DialogActions'
 import { useTranslation } from 'react-i18next'
 import { FormHelperText } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
-import { today } from '../../../../components/card-statistics/kanban-item'
+import { today } from '@components/card-statistics/kanban-item'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import usePayment from 'src/hooks/usePayment'
 import Router, { useRouter } from 'next/router'
-import { fetchStudentDetail, fetchStudentGroups, fetchStudentPayment } from 'src/store/apps/students'
+import { fetchStudentDetail, fetchStudentPayment } from 'src/store/apps/students'
 import AmountInput, { revereAmount } from '../../../../components/amount-input'
 import SubLoader from '../../loaders/SubLoader'
-import IconifyIcon from '../../../../components/icon'
 
 type Props = {
   openEdit: any
@@ -131,9 +130,6 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
       }, 1000)
     }
   }, [openEdit])
-
-  console.log(openEdit);
-
 
   return (
     <div>

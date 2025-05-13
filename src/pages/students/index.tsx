@@ -58,7 +58,7 @@ export default function StudentsPage() {
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
 
-  const { queryParams } = useAppSelector(state => state.students)
+  const { queryParams, openEdit } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const querySearch = new URLSearchParams(window.location.search).get('q')
   const { search, ...filteredParams } = queryParams
@@ -257,7 +257,19 @@ export default function StudentsPage() {
   }
 
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+    if (openEdit === 'create') {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [openEdit])
+
+  useEffect(() => {
+    void queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
   }, [user?.active_branch])
 
   return (
