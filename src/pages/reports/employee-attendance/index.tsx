@@ -55,6 +55,13 @@ const EmployeesAttendanceTable = () => {
     try {
       const response = await api.get(`${ceoConfigs.employee_attendances}?date=${selectedYear}-${selectedMonth}-01&export=true`)
       setExportFile(response.data.file_url)
+
+      const link = document.createElement('a')
+      link.href = response.data.file_url
+      link.setAttribute('download', '')
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
     } catch (error) {
       console.error(error)
     }
@@ -84,7 +91,7 @@ const EmployeesAttendanceTable = () => {
         <Typography variant='h5'>{t('Xodimlar Davomati')}</Typography>
 
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Excel onClick={handleExportFile} baseURL={exportFile} />
+          <Excel onClick={handleExportFile} useLink={false} />
           <FormControl sx={{ minWidth: 120 }}>
             <InputLabel id='year-select-label'>{t('Yilni tanlang')}</InputLabel>
             <Select
