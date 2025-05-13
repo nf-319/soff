@@ -58,7 +58,7 @@ export default function StudentsPage() {
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
 
-  const { queryParams } = useAppSelector(state => state.students)
+  const { queryParams, openEdit } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const querySearch = new URLSearchParams(window.location.search).get('q')
   const { search, ...filteredParams } = queryParams
@@ -257,7 +257,19 @@ export default function StudentsPage() {
   }
 
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+    if (openEdit === 'create') {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [openEdit])
+
+  useEffect(() => {
+    void queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
   }, [user?.active_branch])
 
   return (
@@ -298,9 +310,13 @@ export default function StudentsPage() {
           >
             <Chip label={`O'quvchilar soni: ${data?.count || 0} ta`} variant='outlined' color='primary' />
             <Chip
-              label={`Qazdorlik: ${formatCurrency(data?.total_debts) || 0}` + " so'm"}
+              label={
+                `${queryParams.is_overpaid ? "Ortiqcha to'lov : +" : 'Qazdorlik :'} ${
+                  formatCurrency(data?.total_debts) || 0
+                }` + " so'm"
+              }
               variant='outlined'
-              color='error'
+              color={queryParams.is_overpaid ? 'success' : 'error'}
             />
           </Box>
         </Box>

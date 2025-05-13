@@ -17,6 +17,11 @@ import { Formik, Form, Field } from 'formik'
 import * as Yup from 'yup'
 import api from '../../@core/utils/api'
 import toast from 'react-hot-toast'
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import dayjs from 'dayjs'
+import { DatePicker } from '../DatePicker'
 
 export function StudentsPaymentsModal({
   openModal,
@@ -48,14 +53,29 @@ export function StudentsPaymentsModal({
   })
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
-    const formattedValues = {
+    const formattedValues: any = {
       ...values,
       branches: values.branches.join(',')
     }
+
+    if (values.start_date) {
+      formattedValues.start_date = dayjs(values.start_date).format('YYYY-MM-DD')
+    }
+
+    if (values.end_date) {
+      formattedValues.end_date = dayjs(values.end_date).format('YYYY-MM-DD')
+    }
+    if (!values.start_date) {
+      delete formattedValues.start_date
+    }
+
+    if (!values.end_date) {
+      delete formattedValues.end_date
+    }
+
     await api
       .post(`owner/tenant/student-payments/delete/${id}`, formattedValues)
       .then(res => {
-        console.log(res)
         setOpenModal(false)
         toast.success("To'lov o'chirildi")
       })
@@ -65,12 +85,13 @@ export function StudentsPaymentsModal({
 
     setSubmitting(false)
   }
+
   return (
     <Dialog fullWidth onClose={() => setOpenModal(false)} open={openModal}>
       <DialogTitle>{t("O'quvchi to'lovlari")}</DialogTitle>
       <DialogContent>
         <Formik
-          initialValues={{ branches: [], is_payment: '' }}
+          initialValues={{ branches: [], is_payment: '', start_date: null, end_date: null }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
@@ -110,6 +131,27 @@ export function StudentsPaymentsModal({
                   <MenuItem value={'false'}>{t('Qarzdor')}</MenuItem>
                 </Select>
                 {touched.is_payment && errors.is_payment && <FormHelperText>{errors.is_payment}</FormHelperText>}
+              </FormControl>
+              <FormControl sx={{ mt: 3, display: 'flex', gap: 2 }} fullWidth>
+                <DatePicker
+                  format="dd/MM/yyyy"
+                  views={['day']}
+                  showTimeSelect
+                  label={t('Boshlanish sanasi')}
+                  value={values.start_date}
+                  onChange={value => handleChange({ target: { name: 'start_date', value } })}
+                />
+              </FormControl>
+
+              <FormControl sx={{ mt: 3, display: 'flex', gap: 2 }} fullWidth>
+                <DatePicker
+                  showTimeSelect
+                  views={['day']}
+                  format="dd/MM/yyyy"
+                  label={t('Tugash sanasi')}
+                  value={values.end_date}
+                  onChange={value => handleChange({ target: { name: 'end_date', value } })}
+                />
               </FormControl>
 
               <DialogActions sx={{ marginTop: 3 }}>

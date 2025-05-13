@@ -69,7 +69,6 @@ export type MenuOpenType =
 
 export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const { isMobile } = useResponsive()
-  const { settings } = useSettings()
   const dispatch = useAppDispatch()
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>(false)
