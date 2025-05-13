@@ -1,4 +1,4 @@
-import { Box } from '@mui/system'
+import { Box, SxProps } from '@mui/system'
 import { CSSProperties, FC, ReactNode } from 'react'
 import { Tooltip } from '@mui/material'
 
@@ -9,8 +9,9 @@ type Props = {
   isDemo?: boolean
   variant?: 'default' | 'compact' | 'large'
   titleSize?: 'small' | 'medium' | 'large'
-  sx?: CSSProperties
+  sx?: SxProps
   className?: string
+  childrenSx?: SxProps
 }
 
 export const WidgetHeader: FC<Props> = ({
@@ -21,6 +22,7 @@ export const WidgetHeader: FC<Props> = ({
   variant = 'default',
   titleSize = 'medium',
   sx = {},
+  childrenSx,
   className = ''
 }) => {
   const getPadding = () => {
@@ -52,6 +54,7 @@ export const WidgetHeader: FC<Props> = ({
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
+        flexDirection: { xs: 'column', md: 'row' }, 
         position: 'relative',
         ...getPadding(),
         ...sx
@@ -60,6 +63,7 @@ export const WidgetHeader: FC<Props> = ({
     >
       <Box
         sx={{
+          width: '100%',
           display: 'flex',
           alignItems: 'center',
           gap: '0.75rem'
@@ -76,7 +80,7 @@ export const WidgetHeader: FC<Props> = ({
         >
           {title}
           {isDemo && (
-            <Tooltip title="Hozirda hisobot test rejimda ishlamoqda" sx={{ width: '100%' }}>
+            <Tooltip title='Hozirda hisobot test rejimda ishlamoqda' sx={{ width: '100%' }}>
               <Box
                 sx={{
                   display: 'inline-flex',
@@ -112,7 +116,7 @@ export const WidgetHeader: FC<Props> = ({
           </Box>
         )}
       </Box>
-      {children && <Box>{children}</Box>}
+      {children && <Box sx={{ ...childrenSx }}>{children}</Box>}
     </Box>
   )
 }

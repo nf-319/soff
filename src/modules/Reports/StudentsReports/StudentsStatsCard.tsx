@@ -1,5 +1,6 @@
 import { ComingSoon } from '@/components/ComingSoon'
 import { TrendCard } from '@/components/TrendCard'
+import { getTrendDirection } from '@/shared/utils'
 import { LeadsStatementCardType } from '@modules/LeadsStatement'
 import { Box } from '@mui/material'
 import { Award, BookOpen, Clock, Percent, Users } from 'lucide-react'
@@ -9,10 +10,7 @@ export function StudentsStatsCard() {
     const results = (process || 0) > 0
     return results ? '#29bf12' : '#ef233c'
   }
-  const getProcess = (process?: number): 'up' | 'down' => {
-    const results = (process || 0) > 0
-    return results ? 'up' : 'down'
-  }
+
   const data = {
     new_leads: 25,
     new_leads_progress: 10,
@@ -38,7 +36,7 @@ export function StudentsStatsCard() {
       title: "Jami o'quvchilari",
       process: data?.new_leads_progress || 0,
       count: data?.new_leads || 0,
-      trendDirection: getProcess(data?.new_leads_progress),
+      trendDirection: getTrendDirection(data?.new_leads_progress),
       trendColor: '#fff',
       hidden: false,
       pillColor: getFillColor(data?.new_leads_progress),
@@ -49,7 +47,7 @@ export function StudentsStatsCard() {
       title: "2 va undan ortiq kursda o'qiyotkanlar",
       process: data?.conversion_progress || 0,
       count: data?.conversion || 0,
-      trendDirection: getProcess(data?.conversion_progress),
+      trendDirection: getTrendDirection(data?.conversion_progress),
       trendColor: '#fff',
       hidden: true,
       pillColor: getFillColor(data?.conversion_progress),
@@ -61,7 +59,7 @@ export function StudentsStatsCard() {
       title: "Umumiy davomat",
       process: data?.lost_leads_progress || 0,
       count: data?.lost_leads || 0,
-      trendDirection: getProcess(data?.lost_leads_progress),
+      trendDirection: getTrendDirection(data?.lost_leads_progress),
       trendColor: '#fff',
       hidden: false,
       pillColor: getFillColor(data?.lost_leads_progress),
@@ -73,7 +71,7 @@ export function StudentsStatsCard() {
       title: "O'rtacha baho",
       process: data?.top_lead_source_progress || 0,
       count: `${data?.top_lead_source_count}` || 0,
-      trendDirection: getProcess(data?.top_lead_source_progress),
+      trendDirection: getTrendDirection(data?.top_lead_source_progress),
       trendColor: '#fff',
       hidden: false,
       pillColor: getFillColor(data?.top_lead_source_progress),
@@ -87,7 +85,7 @@ export function StudentsStatsCard() {
       count: `${data?.best_seller?.first_name}: ${data?.best_seller_leads_count || 0}`,
       trendColor: '#fff',
       hidden: false,
-      trendDirection: getProcess(data?.best_seller_leads_count),
+      trendDirection: getTrendDirection(data?.best_seller_leads_count),
       pillColor: getFillColor(data?.best_seller_progress),
       iconColor: '#7209b7'
     }
