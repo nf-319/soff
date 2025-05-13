@@ -16,78 +16,95 @@ export default function PaymentsList() {
     const dispatch = useAppDispatch()
 
     const column: customTableDataProps[] = [
-        {
-            xs: 0.03,
-            title: "#",
-            dataIndex: 'index',
-        },
-        {
-            xs: 0.4,
-            title: t("Markaz"),
-            dataIndex: 'tenant_data',
-            render: (item: any) => <span>{item.name}</span>
-        },
-        {
-            xs: 0.4,
-            title: t("Tarif"),
-            dataIndex: 'tariff_data',
-            render: (item: any) => (<div>
-                <span style={{ color: "#22d3ee", marginRight: "5px" }}>{item.month_count} {t("oylik")}</span>
-                <span style={{ color: "#f59e0b", marginRight: "5px" }}>({formatCurrency(item.amount)} so'm)</span>
-                <span style={{ color: "#84cc16" }}>({item.min_count}-{item.max_count} {t("ta o'quvchi")})</span>
-            </div>)
-        },
-        {
-            xs: 0.3,
-            title: t("Summasi"),
-            dataIndex: 'amount',
-            render: (amount) => `${formatCurrency(amount)} so'm`
-        },
-        {
-            xs: 0.3,
-            title: t("Chek"),
-            dataIndex: 'receipt',
-            render: (chek) => <Link href={chek} target="_blank"><Button
-                component="label"
-                role={undefined}
-                size="small"
-                variant="outlined"
-                tabIndex={-1}
-                startIcon={<UserIcon icon={"material-symbols:download"} />}
+      {
+        xs: 0.03,
+        title: '#',
+        dataIndex: 'index'
+      },
+      {
+        xs: 0.4,
+        title: t('Markaz'),
+        dataIndex: 'tenant_data',
+        render: (item: any) => <span>{item.name}</span>
+      },
+      {
+        xs: 0.4,
+        title: t('Tarif'),
+        dataIndex: 'tariff_data',
+        render: (item: any) => (
+          <div>
+            <span style={{ color: '#22d3ee', marginRight: '5px' }}>
+              {item.month_count} {t('oylik')}
+            </span>
+            <span style={{ color: '#f59e0b', marginRight: '5px' }}>({formatCurrency(item.amount)} so'm)</span>
+            <span style={{ color: '#84cc16' }}>
+              ({item.min_count}-{item.max_count} {t("ta o'quvchi")})
+            </span>
+          </div>
+        )
+      },
+      {
+        xs: 0.3,
+        title: t('Summasi'),
+        dataIndex: 'amount',
+        render: amount => `${formatCurrency(amount)} so'm`
+      },
+      {
+        xs: 0.3,
+        title: t('Chek'),
+        dataIndex: 'receipt',
+        render: chek => (
+          <Link href={chek} target='_blank'>
+            <Button
+              component='label'
+              role={undefined}
+              size='small'
+              sx={{ fontSize: 10 }}
+              variant='outlined'
+              tabIndex={-1}
+              startIcon={<UserIcon style={{ fontSize: '16px' }} icon={'material-symbols:download'} />}
             >
-                {t("Chekni ko'rish")}
+              {t("Chekni ko'rish")}
             </Button>
-            </Link>
-        },
-        {
-            xs: 0.3,
-            title: t("Sana"),
-            dataIndex: 'date',
-            render: (date) => date
-        },
-        {
-            xs: 0.3,
-            title: t("Izoh"),
-            dataIndex: 'description'
-        },
-        {
-            xs: 0.3,
-            title: t("To'lov holati"),
-            dataIndex: 'status',
-            render: (status) => status == "moderation" ? <Chip label={t("Tasdiqlanmagan")} size="small" />
-                : status == "approved" ? <Chip color="success" label={t("Qabul qilindi")} size="small" />
-                    : <Chip color="error" label={t("Bekor qilindi")} size="small" />
-        },
-        {
-            xs: 0.1,
-            title: t(""),
-            dataIndex: 'id',
-            render: (id) => (
-                clientOwnPayments?.results.find(item => item.id == Number(id))?.status !== "approved" && <>
-                    <UserIcon onClick={() => dispatch(setOpenModal(id))} icon="lucide:edit" />
-                    <TransitionsModal id={id} />
-                </>)
-        },
+          </Link>
+        )
+      },
+      {
+        xs: 0.3,
+        title: t('Sana'),
+        dataIndex: 'date',
+        render: date => date
+      },
+      {
+        xs: 0.3,
+        title: t('Izoh'),
+        dataIndex: 'description'
+      },
+      {
+        xs: 0.3,
+        title: t("To'lov holati"),
+        dataIndex: 'status',
+        render: status =>
+          status == 'moderation' ? (
+            <Chip label={t('Tasdiqlanmagan')} size='small' />
+          ) : status == 'approved' ? (
+            <Chip color='success' label={t('Qabul qilindi')} size='small' />
+          ) : (
+            <Chip color='error' label={t('Bekor qilindi')} size='small' />
+          )
+      },
+      {
+        xs: 0.1,
+        title: t(''),
+        dataIndex: 'id',
+        render: id =>
+          clientOwnPayments?.results.find(item => item.id == Number(id))?.status !== 'approved' && (
+            <>
+              <UserIcon onClick={() => dispatch(setOpenModal(id))} icon='lucide:edit' />
+              <TransitionsModal id={id} />
+            </>
+          )
+      }
     ]
 
     const handlePagination = async (page: number) => {

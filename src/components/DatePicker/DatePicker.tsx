@@ -29,7 +29,7 @@ export const DatePicker: FC<Props> = ({
   value,
   onChange,
   views = ['month', 'year'],
-  format = 'dd/MM/yyyy HH:mm',
+  format,
   disableFuture = false,
   disablePast = false,
   size = 'small',

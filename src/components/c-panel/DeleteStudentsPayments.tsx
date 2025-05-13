@@ -133,22 +133,25 @@ export function StudentsPaymentsModal({
                 {touched.is_payment && errors.is_payment && <FormHelperText>{errors.is_payment}</FormHelperText>}
               </FormControl>
               <FormControl sx={{ mt: 3, display: 'flex', gap: 2 }} fullWidth>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <Box display={'flex'} gap={2}>
-                    <DatePicker
-                      views={['day']}
-                      label={t('Boshlanish sanasi')}
-                      value={values.start_date}
-                      onChange={value => handleChange({ target: { name: 'start_date', value } })}
-                    />
-                    <DatePicker
-                      views={['day']}
-                      label={t('Tugash sanasi')}
-                      value={values.end_date}
-                      onChange={value => handleChange({ target: { name: 'end_date', value } })}
-                    />
-                  </Box>
-                </LocalizationProvider>
+                <DatePicker
+                  format="dd/MM/yyyy"
+                  views={['day']}
+                  showTimeSelect
+                  label={t('Boshlanish sanasi')}
+                  value={values.start_date}
+                  onChange={value => handleChange({ target: { name: 'start_date', value } })}
+                />
+              </FormControl>
+
+              <FormControl sx={{ mt: 3, display: 'flex', gap: 2 }} fullWidth>
+                <DatePicker
+                  showTimeSelect
+                  views={['day']}
+                  format="dd/MM/yyyy"
+                  label={t('Tugash sanasi')}
+                  value={values.end_date}
+                  onChange={value => handleChange({ target: { name: 'end_date', value } })}
+                />
               </FormControl>
 
               <DialogActions sx={{ marginTop: 3 }}>
