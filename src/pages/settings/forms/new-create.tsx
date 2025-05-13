@@ -1,3 +1,4 @@
+import useResponsive from '@/@core/hooks/useResponsive'
 import PhoneInput from '@/components/phone-input'
 import { useGet } from '@/hooks/useApi'
 import { useAppSelector } from '@/store'
@@ -28,6 +29,7 @@ import { Image as ImageIcon, LaptopMinimal, Plus, PlusCircle, Smartphone, Trash,
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { useTranslation } from 'react-i18next'
 
 type FieldType = {
@@ -39,6 +41,7 @@ type FieldType = {
   variants?: string[]
   checkedVariants?: string[]
   question_variants?: any[]
+  is_required: boolean
 }
 
 const NewCreate = () => {
@@ -51,6 +54,7 @@ const NewCreate = () => {
   const [successText, setSuccessText] = useState<string>(
     "So'rovingiz muvaffaqiyatli yuborildi! Tez orada siz bilan bog'lanamiz."
   )
+  const { isMobile } = useResponsive()
   const [displayMode, setDisplayMode] = useState<'computer' | 'tablet' | 'phone'>('computer')
   const { companyInfo } = useAppSelector(state => state.user)
   const [bg_img, setBgImg] = useState<string | null>(null)
@@ -60,8 +64,8 @@ const NewCreate = () => {
   const { data: departments } = useGet(`leads/department/list/`)
   const { data: sources } = useGet('leads/source/')
   const [fields, setFields] = useState<FieldType[]>([
-    { type: 'input', label: 'Ism', name: 'Ism', value: '' },
-    { type: 'phone', label: 'Telefon', name: 'Telefon', value: '' }
+    { type: 'input', label: 'Ism', name: 'Ism', value: '', is_required: false },
+    { type: 'phone', label: 'Telefon', name: 'Telefon', value: '', is_required: false }
   ])
 
   const handleAddField = (type: FieldType['type']) => {
@@ -69,6 +73,7 @@ const NewCreate = () => {
       type,
       label: type === 'text' ? 'Yangi matn' : type === 'question' ? 'Yangi savol' : 'Yangi input',
       name: type === 'input' ? 'Yangi input' : type === 'text' ? 'Yangi Matn' : 'Yangi savol',
+      is_required: false,
       ...(type === 'question'
         ? {
             question: 'Yangi savol',
@@ -119,6 +124,16 @@ const NewCreate = () => {
     setFields(updated)
   }
 
+  const handleDragEnd = (result: any) => {
+    if (!result.destination) return
+
+    const items = Array.from(fields)
+    const [reorderedItem] = items.splice(result.source.index, 1)
+    items.splice(result.destination.index, 0, reorderedItem)
+
+    setFields(items)
+  }
+
   const removeVariant = (fieldIndex: number, variantIndex: number) => {
     const updated = [...fields]
     updated[fieldIndex].question_variants!.splice(variantIndex, 1)
@@ -132,9 +147,26 @@ const NewCreate = () => {
 
   return (
     <Card sx={{ boxShadow: 'none', border: '1px solid lightgray', padding: 5 }}>
-      <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+      <Box
+        display={'flex'}
+        flexDirection={{ xs: 'column', md: 'row' }}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
         <Typography variant='h5'>Forma yaratish</Typography>
-        <Card sx={{width:'100%',maxWidth:650, padding: 2, display: 'flex', justifyContent: 'center', gap: 2 }}>
+        <Card
+          sx={{
+            boxShadow: 'none',
+            border: '1px solid lightgray',
+            width: '100%',
+            maxWidth: 650,
+            padding: 2,
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            justifyContent: 'center',
+            gap: 2
+          }}
+        >
           <Button
             onClick={() => setDisplayMode('phone')}
             startIcon={<Smartphone size={20} />}
@@ -267,89 +299,116 @@ const NewCreate = () => {
                   {!fields.length ? (
                     <Typography textAlign={'center'}>Ma'lumot yo'q</Typography>
                   ) : (
-                    fields.map((field, index) => (
-                      <Accordion sx={{ marginY: 4 }} key={index}>
-                        <AccordionSummary
-                          expandIcon={<GridExpandMoreIcon />}
-                          sx={{ display: 'flex', justifyContent: 'space-between' }}
-                        >
-                          <Box display='flex' alignItems='center' justifyContent='space-between' width='100%'>
-                            <Typography>{field.name}</Typography>
-                            <IconButton
-                              onClick={e => {
-                                e.stopPropagation()
-                                removeField(index)
-                              }}
-                              color='error'
-                            >
-                              <Trash2 size={18} />
-                            </IconButton>
-                          </Box>
-                        </AccordionSummary>
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                      <Droppable droppableId='fields'>
+                        {provided => (
+                          <div {...provided.droppableProps} ref={provided.innerRef}>
+                            {fields.map((field, index) => (
+                              <Draggable key={index} draggableId={String(index)} index={index}>
+                                {provided => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                  >
+                                    <Accordion sx={{ marginY: 4 }}>
+                                      <AccordionSummary
+                                        expandIcon={<GridExpandMoreIcon />}
+                                        sx={{ display: 'flex', justifyContent: 'space-between' }}
+                                      >
+                                        <Box
+                                          display='flex'
+                                          alignItems='center'
+                                          justifyContent='space-between'
+                                          width='100%'
+                                        >
+                                          <Typography>{field.name}</Typography>
+                                          <IconButton
+                                            onClick={e => {
+                                              e.stopPropagation()
+                                              removeField(index)
+                                            }}
+                                            color='error'
+                                          >
+                                            <Trash2 size={18} />
+                                          </IconButton>
+                                        </Box>
+                                      </AccordionSummary>
 
-                        <AccordionDetails>
-                          {field.type === 'input' && (
-                            <TextField
-                              fullWidth
-                              label={'Label'}
-                              value={field.label}
-                              onChange={e => handleFieldChange(index, 'label', e.target.value)}
-                            />
-                          )}
-                          {field.type === 'phone' && (
-                            <TextField
-                              fullWidth
-                              label={'Label'}
-                              value={field.label}
-                              onChange={e => handleFieldChange(index, 'label', e.target.value)}
-                            />
-                          )}
+                                      <AccordionDetails>
+                                        {(field.type === 'input' || field.type === 'phone') && (
+                                          <TextField
+                                            fullWidth
+                                            label='Label'
+                                            value={field.label}
+                                            onChange={e => handleFieldChange(index, 'label', e.target.value)}
+                                          />
+                                        )}
+                                        <FormControlLabel
+                                          control={
+                                            <Checkbox
+                                              checked={field.is_required}
+                                              onChange={e => handleFieldChange(index, 'is_required', e.target.checked)}
+                                              color='primary'
+                                            />
+                                          }
+                                          label='Majburiy'
+                                          sx={{ mt: 2 }}
+                                        />
 
-                          {field.type === 'text' && (
-                            <TextField
-                              fullWidth
-                              multiline
-                              minRows={3}
-                              label={field.label}
-                              value={field.label}
-                              onChange={e => handleFieldChange(index, 'label', e.target.value)}
-                            />
-                          )}
+                                        {field.type === 'text' && (
+                                          <TextField
+                                            fullWidth
+                                            multiline
+                                            minRows={3}
+                                            label={field.label}
+                                            value={field.label}
+                                            onChange={e => handleFieldChange(index, 'label', e.target.value)}
+                                          />
+                                        )}
 
-                          {field.type === 'question' && (
-                            <Box>
-                              <TextField
-                                fullWidth
-                                label='Savol'
-                                value={field.question}
-                                onChange={e => handleFieldChange(index, 'question', e.target.value)}
-                                sx={{ mb: 2 }}
-                              />
-                              {field.question_variants?.map((variant, vIndex) => (
-                                <Box display='flex' alignItems='center' gap={1} mb={3} key={vIndex}>
-                                  <TextField
-                                    fullWidth
-                                    label={`Variant ${vIndex + 1}`}
-                                    value={variant.value}
-                                    onChange={e => handleVariantChange(index, vIndex, e.target.value)}
-                                  />
-                                  <IconButton onClick={() => removeVariant(index, vIndex)} color='error'>
-                                    <Trash2 size={18} />
-                                  </IconButton>
-                                </Box>
-                              ))}
-                              <Button
-                                onClick={() => addVariant(index)}
-                                size='small'
-                                startIcon={<PlusCircle size={14} />}
-                              >
-                                Variant qo‘shish
-                              </Button>
-                            </Box>
-                          )}
-                        </AccordionDetails>
-                      </Accordion>
-                    ))
+                                        {field.type === 'question' && (
+                                          <Box>
+                                            <TextField
+                                              fullWidth
+                                              label='Savol'
+                                              value={field.question}
+                                              onChange={e => handleFieldChange(index, 'question', e.target.value)}
+                                              sx={{ mb: 2 }}
+                                            />
+                                            {field.question_variants?.map((variant, vIndex) => (
+                                              <Box display='flex' alignItems='center' gap={1} mb={3} key={vIndex}>
+                                                <TextField
+                                                  fullWidth
+                                                  label={`Variant ${vIndex + 1}`}
+                                                  value={variant.value}
+                                                  onChange={e => handleVariantChange(index, vIndex, e.target.value)}
+                                                />
+                                                <IconButton onClick={() => removeVariant(index, vIndex)} color='error'>
+                                                  <Trash2 size={18} />
+                                                </IconButton>
+                                              </Box>
+                                            ))}
+                                            <Button
+                                              onClick={() => addVariant(index)}
+                                              size='small'
+                                              startIcon={<PlusCircle size={14} />}
+                                            >
+                                              Variant qo‘shish
+                                            </Button>
+                                          </Box>
+                                        )}
+                                      </AccordionDetails>
+                                    </Accordion>
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
                   )}
                 </AccordionDetails>
               </Accordion>
@@ -660,27 +719,15 @@ const NewCreate = () => {
                     height: 100
                   }}
                 >
-                  {logoImg ? (
-                    <Image
-                      priority={false}
-                      src={logoImg}
-                      alt='Yuklangan rasm'
-                      width={100}
-                      height={100}
-                      unoptimized
-                      style={{ objectFit: 'cover', borderRadius: '8px' }}
-                    />
-                  ) : (
-                    <Image
-                      priority={false}
-                      src={companyInfo.logo}
-                      alt='Yuklangan rasm'
-                      width={100}
-                      height={100}
-                      unoptimized
-                      style={{ objectFit: 'cover', borderRadius: '8px' }}
-                    />
-                  )}{' '}
+                  <Image
+                    priority={false}
+                    src={logoImg || companyInfo.logo}
+                    alt='Yuklangan rasm'
+                    width={100}
+                    height={100}
+                    unoptimized
+                    style={{ width: 'auto', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                  />
                 </Box>
                 <Typography color='black' fontWeight={600}>
                   Aloqa uchun kontakt
