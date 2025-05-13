@@ -1,5 +1,4 @@
 import { Button, Tooltip } from '@mui/material'
-import Link from 'next/link'
 import { VscodeIconsFileTypeExcel2 } from './ExcelIcon'
 import { useTranslation } from 'react-i18next'
 
@@ -14,6 +13,7 @@ interface ExcelProps {
   baseURL?: string
   args?: any
   notBlank?: boolean
+  useLink?: boolean
 }
 
 export default function Excel({
@@ -26,21 +26,16 @@ export default function Excel({
   size = 'medium',
   baseURL,
   url,
+  useLink = true,
   ...args
 }: ExcelProps) {
+
   const { t } = useTranslation()
-  const subdomain = typeof window !== 'undefined' ? location.hostname.split('.') : []
-  const staticBaseURL =
-    process.env.NODE_ENV === 'development'
-      ? `${process.env.NEXT_PUBLIC_TEST_BASE_URL}/v1/`
-      : subdomain.length < 3
-      ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-      : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/`
 
-  const href = baseURL || (url ? `${staticBaseURL}${url}${queryString ? `?${queryString}` : ''}` : '#')
+  const href = baseURL || (url ? `${url}${queryString ? `?${queryString}` : ''}` : '#')
 
-  return (
-    <Link href={href} download target={notBlank ? '' : '_blank'} style={{ width: '100%' }}>
+  const ButtonElement = (
+    <Tooltip title={t(tooltip)}>
       <Button
         fullWidth
         startIcon={<VscodeIconsFileTypeExcel2 />}
@@ -50,10 +45,18 @@ export default function Excel({
         color={color}
         size={size}
       >
-        <Tooltip title={t(tooltip)}>
-          <span>Excel</span>
-        </Tooltip>
+        Excel
       </Button>
-    </Link>
+    </Tooltip>
   )
+
+  if (useLink) {
+    return (
+      <a href={href} download target={notBlank ? '' : '_blank'} style={{ width: '100%', textDecoration: 'none' }}>
+        {ButtonElement}
+      </a>
+    )
+  }
+
+  return ButtonElement
 }

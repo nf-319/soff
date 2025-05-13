@@ -153,9 +153,17 @@ const Lids = () => {
   const handleExportExcel = async () => {
     try {
       const response = await api.get(Endpoints.LeadsExport, {
-        params: { is_active: Boolean(!is_active)},
+        params: { is_active: Boolean(!is_active) },
       })
-      setExportExcel(response.data.file_url)
+
+      const url = response.data.file_url
+
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', '')
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
     } catch (error) {
       console.error(error)
     }
@@ -216,7 +224,7 @@ const Lids = () => {
             </Button>
 
             <Box>
-              <Excel onClick={handleExportExcel} baseURL={exportExcel} />
+              <Excel onClick={handleExportExcel} useLink={false}/>
             </Box>
 
             {queryParams.is_active && (
