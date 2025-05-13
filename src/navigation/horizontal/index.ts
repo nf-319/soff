@@ -115,10 +115,10 @@ const Navigation = (t: any): HorizontalNavItemsType => {
       title: t('Hisobotlar'),
       icon: 'tabler:report',
       children: [
-        {
-          title: "To'lovlar hisoboti",
-          path: '/reports/payment'
-        },
+        // {
+        //   title: "To'lovlar hisoboti",
+        //   path: '/reports/payment'
+        // },
         {
           title: "O'quvchilar to'lovi",
           path: '/reports/student-payment'
