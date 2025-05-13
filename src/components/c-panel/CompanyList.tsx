@@ -23,6 +23,7 @@ import IconifyIcon from '../icon'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { updateParams } from '../../store/apps/c-panel'
 import { useGet, usePatch } from '@/hooks/useApi'
+import useResponsive from '@/@core/hooks/useResponsive'
 
 export interface CompanyType {
   id: number
@@ -53,6 +54,7 @@ export default function CompanyList() {
   const [centerId, setCenterId] = useState<number | null>(null)
   const { queryParams } = useAppSelector(state => state.cPanelSlice)
   const dispatch = useAppDispatch()
+  const { isMobile } = useResponsive()
   const { mutate: updateClientStatus, isPending } = usePatch()
   const {
     data: clienList,
@@ -185,8 +187,8 @@ export default function CompanyList() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex' }}>
-        <FormControl variant='outlined' size='small' sx={{ width: '300px' }}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+        <FormControl variant='outlined' size='small' sx={{ width: { xs: 'auto', md: '300px' } }} fullWidth>
           <InputLabel htmlFor='outlined-adornment-password'>{t('Qidirish')}</InputLabel>
           <OutlinedInput
             id='outlined-adornment-password'
@@ -202,8 +204,8 @@ export default function CompanyList() {
             label={t('Qidirish')}
           />
         </FormControl>
-        <Box display='flex' alignItems='center' gap={3} sx={{ width: '300px', ml: 3 }}>
-          <FormControl fullWidth>
+        <Box display='flex' alignItems='center' gap={3}>
+          <FormControl fullWidth sx={{ width: { xs: '100%', md: '300px' } }}>
             <InputLabel size='small' id='demo-simple-select-outlined-label'>
               {t("To'lov holati")}
             </InputLabel>
@@ -243,7 +245,12 @@ export default function CompanyList() {
           </FormControl>
           <Chip label={clienList?.count} variant='outlined' color='success' />
         </Box>
-        <Button onClick={() => Router.push('/c-panel/company/create')} sx={{ marginLeft: 'auto' }} variant='contained'>
+        <Button
+          fullWidth={isMobile}
+          onClick={() => Router.push('/c-panel/company/create')}
+          sx={{ marginLeft: 'auto' }}
+          variant='contained'
+        >
           {t('Yaratish')}
         </Button>
       </Box>
