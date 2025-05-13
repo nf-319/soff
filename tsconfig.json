@@ -24,6 +24,7 @@
       "@/*": ["src/*"],
       "@modules/*": ["src/modules/*"],
       "@components/*": ["src/components/*"],
+      "@shared/*": ["src/shared/*"],
       "@utils/*": ["src/@core/utils/*"],
       "@hooks/*": ["src/hooks/*"],
       "@services/*": ["src/services/*"],

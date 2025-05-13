@@ -30,6 +30,9 @@ import { LidsEditModal } from 'src/entities/lids/modals'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
+import Excel from '@components/excelButton/Excel'
+import api from '@utils/api'
+import { Endpoints } from '@api/endpoints'
 
 export type DepartmentsResultType = {
   id: number
@@ -62,6 +65,7 @@ const Lids = () => {
   const [selectedTab, setSelectedTab] = useState<number>(0)
   const [selectedAmoLeadTab, setSelectedAmoLeadTab] = useState<any>(null)
   const [selectedAmoData, setSelectedAmoData] = useState<AmoLeads | null>(null)
+  const [exportExcel, setExportExcel] = useState<string>('')
 
   const [currentData, setCurrentData] = useState<DepartmentsResultType | undefined>()
   const [openDialog, setOpenDialog] = useState<'edit' | 'recover' | null>(null)
@@ -146,6 +150,25 @@ const Lids = () => {
 
   const currentDepartmentId = currentData?.id ? String(currentData.id) : null
 
+  const handleExportExcel = async () => {
+    try {
+      const response = await api.get(Endpoints.LeadsExport, {
+        params: { is_active: Boolean(!is_active) },
+      })
+
+      const url = response.data.file_url
+
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', '')
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return (
     <div>
       <LidsHeader />
@@ -199,6 +222,10 @@ const Lids = () => {
               <b>{currentData?.name}</b>
               {t('ga yangi bo‘lim qo‘shish')}
             </Button>
+
+            <Box>
+              <Excel onClick={handleExportExcel} useLink={false}/>
+            </Box>
 
             {queryParams.is_active && (
               <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>

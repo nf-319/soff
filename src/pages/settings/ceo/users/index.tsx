@@ -40,7 +40,6 @@ export interface customTableProps {
 }
 
 export default function GroupsPage() {
-  // Hooks
   const { t } = useTranslation()
   const { getEmployeeById } = useEmployee()
   const { employees, is_pending, employees_count, queryParams, roles, openSms, employee_id } = useAppSelector(
@@ -48,8 +47,6 @@ export default function GroupsPage() {
   )
 
   const { data, refetch } = useGet(ceoConfigs.employee, { params: queryParams })
-
-  console.log(data)
 
   const { isMobile } = useResponsive()
 
@@ -59,7 +56,6 @@ export default function GroupsPage() {
   const { user } = useContext(AuthContext)
 
   const RowOptions = ({ id }: { id: number | string }) => {
-    // ** State
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
     const [smallLoading, setSmallLoading] = useState<boolean>(false)
@@ -86,7 +82,7 @@ export default function GroupsPage() {
       try {
         await api.delete(`${ceoConfigs.employee_delete}${id}/`)
         toast.success("Xodim muvaffaqiyatli o'chirildi")
-        refetch()
+        void refetch()
       } catch (err: any) {
         if (err?.response?.data) {
           toast.error(err?.response?.data?.msg)
@@ -127,6 +123,7 @@ export default function GroupsPage() {
         <IconButton size='small' onClick={handleRowOptionsClick}>
           <IconifyIcon icon='mdi:dots-vertical' />
         </IconButton>
+
         <Menu
           keepMounted
           anchorEl={anchorEl}
@@ -260,7 +257,7 @@ export default function GroupsPage() {
 
 
   const buttons = [
-    <Button key={''} onClick={() => handleFilter('')} variant={queryParams.role === '' ? 'contained' : 'outlined'}>
+    <Button onClick={() => handleFilter('')} variant={queryParams.role === '' ? 'contained' : 'outlined'}>
       {t('Barchasi')} - {totalCount||0}
     </Button>,
     data?.roles?.map((el:any) => (
@@ -296,13 +293,13 @@ export default function GroupsPage() {
 
   return (
     <div>
-      <VideoHeader item={videoUrls.employees} />
       <Box
         className='groups-page-header'
         sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0', width: '100%' }}
         py={2}
       >
         <Typography variant='h5'>{t('Xodimlar')}</Typography>
+
         <Button
           onClick={() => dispatch(setOpenCreateSms(true))}
           variant='contained'
@@ -317,30 +314,29 @@ export default function GroupsPage() {
         sx={{
           alignItems: isMobile ? 'start' : 'center',
           display: 'flex',
-          gap: '10px',
-          '& > *': {
-            m: 1
-          }
+          justifyContent: 'space-between',
+          gap: '10px'
         }}
       >
-        <ButtonGroup
-          size='small'
-          aria-label='Small button group'
-          sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}
-          orientation={isMobile ? 'vertical' : 'horizontal'}
-          fullWidth={isMobile}
-        >
-          {buttons}
-        </ButtonGroup>
-        <Link href='/settings/ceo/users/attandance-table'>
-          <Button variant='contained' size='medium'>
-            {t('Xodimlar Davomati')}
-          </Button>
-        </Link>
-        <FormControlLabel
-          control={<Switch checked={queryParams.status == 'archive'} onChange={handleChangeStatus} />}
-          label={t('Arxiv')}
-        />
+        <Box display='flex' alignItems='center' gap={3}>
+          <ButtonGroup
+            size='small'
+            sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}
+            orientation={isMobile ? 'vertical' : 'horizontal'}
+            fullWidth={isMobile}
+          >
+            {buttons}
+          </ButtonGroup>
+
+          <FormControlLabel
+            control={<Switch checked={queryParams.status == 'archive'} onChange={handleChangeStatus} />}
+            label={t('Arxiv')}
+          />
+        </Box>
+
+        <Button component={Link} href='/reports/employee-attendance' variant='outlined' size='small'>
+          {t('Xodimlar Davomati')}
+        </Button>
       </Box>
 
       <DataTable loading={is_pending} columns={columns} data={data?.results || []} />

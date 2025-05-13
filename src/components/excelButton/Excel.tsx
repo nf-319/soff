@@ -1,57 +1,62 @@
 import { Button, Tooltip } from '@mui/material'
-import Link from 'next/link'
 import { VscodeIconsFileTypeExcel2 } from './ExcelIcon'
 import { useTranslation } from 'react-i18next'
 
 interface ExcelProps {
   queryString?: string
   tooltip?: string
-  url: string
+  url?: string
   variant?: 'text' | 'outlined' | 'contained'
   color?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning'
   size?: 'small' | 'medium' | 'large'
+  onClick?: VoidFunction
+  baseURL?: string
   args?: any
+  notBlank?: boolean
+  useLink?: boolean
 }
 
 export default function Excel({
   queryString = '',
   tooltip = '',
+  notBlank = false,
   variant = 'outlined',
   color = 'success',
-  size = 'small',
+  onClick,
+  size = 'medium',
+  baseURL,
   url,
+  useLink = true,
   ...args
 }: ExcelProps) {
-  const { t } = useTranslation()
-  const subdomain = location.hostname.split('.')
-  const baseURL =
-    process.env.NODE_ENV === 'development'
-      ? `${process.env.NEXT_PUBLIC_TEST_BASE_URL}/v1/`
-      : subdomain.length < 3
-      ? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-      : `https://${subdomain[0]}.${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/`
 
-  return (
-    <Link
-      href={baseURL + `${url}?` + queryString}
-      download
-      target={'_blank'}
-      style={{
-        width: '100%'
-      }}
-    >
+  const { t } = useTranslation()
+
+  const href = baseURL || (url ? `${url}${queryString ? `?${queryString}` : ''}` : '#')
+
+  const ButtonElement = (
+    <Tooltip title={t(tooltip)}>
       <Button
         fullWidth
         startIcon={<VscodeIconsFileTypeExcel2 />}
         {...args}
         variant={variant}
+        onClick={onClick}
         color={color}
-        size={'medium'}
+        size={size}
       >
-        <Tooltip title={t(tooltip)}>
-          <span>Excel</span>
-        </Tooltip>
+        Excel
       </Button>
-    </Link>
+    </Tooltip>
   )
+
+  if (useLink) {
+    return (
+      <a href={href} download target={notBlank ? '' : '_blank'} style={{ width: '100%', textDecoration: 'none' }}>
+        {ButtonElement}
+      </a>
+    )
+  }
+
+  return ButtonElement
 }

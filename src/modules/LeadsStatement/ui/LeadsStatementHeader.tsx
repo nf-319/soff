@@ -4,7 +4,7 @@ import { Box, FormControl, InputLabel, MenuItem, Select, Tooltip, Typography } f
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ComingSoon } from '@components/ComingSoon'
-import { useGetBranches } from '@/shared/query-hooks/branches/branches'
+import { useGetBranches } from '@/shared/query-hooks'
 import { uzbekMonths } from '@/shared/constans'
 import { CalendarIcon, BeakerIcon } from 'lucide-react'
 import { useAuth } from '@hooks/useAuth'
@@ -77,7 +77,7 @@ export const LeadsStatementHeader = () => {
             </Box>
           </Tooltip>
 
-          <Tooltip title='Hozirda hisobot demo versiyada ishlamoqda'>
+          <Tooltip title='Hozirda hisobot test rejimda ishlamoqda'>
             <Box
               sx={{
                 display: 'flex',

@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Button, MenuItem, Select, Typography, Chip, CircularProgress, OutlinedInput } from '@mui/material'
+import { Box, Button, MenuItem, Select, Typography, Chip, CircularProgress } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGetReportLeadsList } from '@/shared/query-hooks/report-leads/reportLeads'
