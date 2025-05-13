@@ -61,7 +61,7 @@ jobs:
 
             APP_NAME="prod-subdomain-soffcrm-uz-3132"
             LOCK_FILE="/tmp/${APP_NAME}.lock"
-            PORT=3000
+            PORT=3129
             HEALTH_URL="http://localhost:${PORT}"
 
             if [ -f "$LOCK_FILE" ]; then
