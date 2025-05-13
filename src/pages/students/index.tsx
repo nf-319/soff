@@ -298,9 +298,13 @@ export default function StudentsPage() {
           >
             <Chip label={`O'quvchilar soni: ${data?.count || 0} ta`} variant='outlined' color='primary' />
             <Chip
-              label={`Qazdorlik: ${formatCurrency(data?.total_debts) || 0}` + " so'm"}
+              label={
+                `${queryParams.is_overpaid ? "Ortiqcha to'lov : +" : 'Qazdorlik :'} ${
+                  formatCurrency(data?.total_debts) || 0
+                }` + " so'm"
+              }
               variant='outlined'
-              color='error'
+              color={queryParams.is_overpaid ? 'success' : 'error'}
             />
           </Box>
         </Box>
