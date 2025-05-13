@@ -54,6 +54,7 @@ export const appUsersSlice = createSlice({
     params: {},
     allData: [],
     companyInfo: {
+      created_at:null,
       id: 1,
       extra_settings: {
         allow_debt_editing_on_payment: false
