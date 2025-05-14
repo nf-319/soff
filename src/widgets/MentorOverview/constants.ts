@@ -1,7 +1,5 @@
 import { BookCopy, Calendar, LucideIcon, MapPin, Users } from 'lucide-react'
 
-
-
 type MentorInfo = {
   title: string,
   icon: LucideIcon,
@@ -30,7 +28,7 @@ export const MentorInfo = [
   }
 ] satisfies MentorInfo[]
 
-type GroupsType = {
+type Groups = {
   name: string,
     course: string,
     lesson_time: string,
@@ -40,7 +38,7 @@ type GroupsType = {
     trial_students:number
 }
 
-export const groups = [
+export const Groups = [
   {
     name: 'Frontend-24',
     course: 'Web-Dasturlash',
@@ -77,7 +75,7 @@ export const groups = [
     active_students: 18,
     trial_students: 2
   }
-] satisfies GroupsType[]
+] satisfies Groups[]
 
 
 
@@ -101,3 +99,90 @@ export const ClassGroup  = [
     trial_students: 2
   }
 ] satisfies ClassGroup []
+
+type GroupTable = {
+  groupName:string
+  courseName:string
+  allStudents:number
+  teacherShare:number
+   }
+
+export const GroupTable  = [
+  {
+ groupName:"FrontEnd-25",
+ courseName:"Web dasturlash",
+ allStudents:24,
+ teacherShare:350000
+  },
+  {
+ groupName:"FrontEnd-26",
+ courseName:"Python",
+ allStudents:21,
+ teacherShare:320000
+  },
+  {
+ groupName:"FrontEnd-27",
+ courseName:"Flutter",
+ allStudents:26,
+ teacherShare:380000
+  }
+] satisfies GroupTable []
+
+
+type MonthlySalary = {
+  month:string
+  countLesson:number
+  bonus: number
+  penalty: number
+  avance:number
+  monthlySalary:number
+  status:string
+   }
+
+export const MonthlySalary  = [
+  {
+month:"Mart 2025",
+countLesson:49,
+bonus: 5000000,
+penalty: 2000000,
+avance:1000000,
+monthlySalary:45000000,
+status:"Tolangan"
+  },
+  {
+month:"Aprel 2025",
+countLesson:30,
+bonus: 5000000,
+penalty: 2000000,
+avance:1000000,
+monthlySalary:45000000,
+status:"Tolangan"
+  },
+  {
+month:"May 2025",
+countLesson:52,
+bonus: 5000000,
+penalty: 2000000,
+avance:1000000,
+monthlySalary:45000000,
+status:"Tolangan"
+  },
+  {
+month:"Iyun 2025",
+countLesson:45,
+bonus: 5000000,
+penalty: 2000000,
+avance:1000000,
+monthlySalary:45000000,
+status:"Tolangan"
+  },
+  {
+month:"Iyul 2025",
+countLesson:40,
+bonus: 5000000,
+penalty: 2000000,
+avance:1000000,
+monthlySalary:45000000,
+status:"Tolangan"
+  },
+] satisfies MonthlySalary []

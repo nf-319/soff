@@ -1,9 +1,13 @@
+'use client'
 import { MentorOverview } from '@/widgets/MentorOverview/MentorOverview'
+import { MentorTable } from '@/widgets/MentorTable/MentorTable'
 import { Box } from '@mui/system'
 
 const MentorProfile = () => (
   <Box>
-    <MentorOverview />
+    {/* <MentorOverview /> */}
+    <MentorTable />
+
   </Box>
 )
 

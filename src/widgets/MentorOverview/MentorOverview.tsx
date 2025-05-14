@@ -1,9 +1,10 @@
 import classnames from 'classnames/bind'
 import style from './MentorOverview.module.scss'
-import { Box, IconButton } from '@mui/material'
+import { Box, IconButton, Link } from '@mui/material'
 import { BookOpen, Calendar, MapPin, Pencil, Phone, Users } from 'lucide-react'
-import { groups, ClassGroup } from './constants'
+import { Groups, ClassGroup } from './constants'
 import { GroupCard } from './groupCard'
+// import Link from 'next/link'
 
 const cn = classnames.bind(style)
 
@@ -14,7 +15,6 @@ export const MentorOverview = () => {
     { icon: BookOpen, title: "O'qitayotgan kurslar soni", value: '4' },
     { icon: Users, title: 'Faol guruhlar soni', value: '3' }
   ]
-
 
 
   return (
@@ -60,7 +60,7 @@ export const MentorOverview = () => {
         ))}
         <div className={cn('mentor_overview-groups-card-info')}>Barcha guruhlar</div>
         <div className={cn('mentor_overview-groups-card-groups')}>
-          {groups.map(item => (
+          {Groups.map(item => (
             <GroupCard title={item.name} course={item.course} lesson_time={item.lesson_time} room={item.room} all_students={item.all_students} active_students={item.active_students} trial_students={item.trial_students} />
           ))}
         </div>

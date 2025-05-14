@@ -4,6 +4,7 @@
   @media (max-width: 1024px) {
     flex-direction: column;
   }
+
   &-profile {
     &-card {
       padding: 25px;
@@ -120,6 +121,15 @@
   }
 }
 
+.navigationMenu {
+  gap: 5px;
+  &-item {
+    border: var(--border);
+    padding-right: 10px;
+    text-decoration: none;
+    color: var(--black);
+  }
+}
 .GroupCard {
   padding: 18px;
   border: 2px solid #a3f7bf;
@@ -176,3 +186,5 @@
     }
   }
 }
+
+
