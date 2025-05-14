@@ -8,11 +8,13 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
-  FormHelperText, IconButton,
+  FormHelperText,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
-  TextField, Tooltip,
+  TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
 import { customTableProps } from 'src/pages/groups'
@@ -42,7 +44,7 @@ export default function FormsPage() {
   const [loading, setLoading] = useState<boolean>(false)
   const [data, setData] = useState<any[]>([])
   const [sourceData, setSourceData] = useState<any>([])
-  const [selectedForm, setSelectedForm] = useState<any>(null);
+  const [selectedForm, setSelectedForm] = useState<any>(null)
   const [updateOpen, setUpdateOpen] = useState<boolean>(false)
   const [addSource, setAddSource] = useState<boolean>(false)
 
@@ -106,9 +108,9 @@ export default function FormsPage() {
               size='medium'
               color='primary'
               onClick={() => {
-                const form = data.find(item => item.id === id);
-                setSelectedForm(form);
-                setUpdateOpen(true);
+                const form = data.find(item => item.id === id)
+                setSelectedForm(form)
+                setUpdateOpen(true)
               }}
             >
               <Edit color='blue' size={18} />
@@ -145,7 +147,7 @@ export default function FormsPage() {
   }
 
   const getForms = async () => {
-    const resp = await api.get('leads/application-form/list/')
+    const resp = await api.get('leads/form/list/')
     setData(resp.data)
   }
 

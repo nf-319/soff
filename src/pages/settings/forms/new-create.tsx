@@ -1,8 +1,11 @@
 import useResponsive from '@/@core/hooks/useResponsive'
+import api from '@/@core/utils/api'
+import { revereAmount } from '@/components/amount-input'
 import PhoneInput from '@/components/phone-input'
-import { useGet } from '@/hooks/useApi'
+import { useGet, usePost } from '@/hooks/useApi'
 import { useAppSelector } from '@/store'
 import { VisuallyHiddenInput } from '@/views/apps/mentors/AddMentorsModal'
+import { LoadingButton } from '@mui/lab'
 import {
   Accordion,
   AccordionDetails,
@@ -30,12 +33,13 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
+import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 
 type FieldType = {
   type: 'input' | 'text' | 'question' | 'phone'
   label: string
-  name: string
+  title: string
   value?: string
   question?: string
   variants?: string[]
@@ -49,7 +53,7 @@ const NewCreate = () => {
   const { t } = useTranslation()
   const [departmentValue, setDepartmentValue] = useState<number | null>(null)
   const [sourceValue, setSourceValue] = useState<number | null>(null)
-  const [formName, setFormName] = useState<string | null>(null)
+  const [formName, setFormName] = useState<string>('Aloqa uchun kontakt')
   const { push } = useRouter()
   const [successText, setSuccessText] = useState<string>(
     "So'rovingiz muvaffaqiyatli yuborildi! Tez orada siz bilan bog'lanamiz."
@@ -57,22 +61,53 @@ const NewCreate = () => {
   const { isMobile } = useResponsive()
   const [displayMode, setDisplayMode] = useState<'computer' | 'tablet' | 'phone'>('computer')
   const { companyInfo } = useAppSelector(state => state.user)
-  const [bg_img, setBgImg] = useState<string | null>(null)
-  const [logoImg, setLogoImg] = useState<string | null>(null)
+  const [bg_img, setBgImg] = useState<any | null>(null)
+  const [logoImg, setLogoImg] = useState<any | null>(null)
   const [bg_color, setBgColor] = useState<string>('#f9f9fb')
   const [sentButtonLabel, setSendButtonLabel] = useState<string>('Yuborish')
   const { data: departments } = useGet(`leads/department/list/`)
   const { data: sources } = useGet('leads/source/')
+  const [isLoading, setIsLoading] = useState(false)
   const [fields, setFields] = useState<FieldType[]>([
-    { type: 'input', label: 'Ism', name: 'Ism', value: '', is_required: false },
-    { type: 'phone', label: 'Telefon', name: 'Telefon', value: '', is_required: false }
+    { type: 'input', label: 'Ism', title: 'Ism', value: '', is_required: false },
+    { type: 'phone', label: 'Telefon', title: 'Telefon', value: '', is_required: false }
   ])
+
+  const handleCreateForm = async () => {
+    const formData = new FormData()
+
+    if (logoImg) formData.append('logo', logoImg)
+    if (bg_img) formData.append('background_image', bg_img)
+    if (formName) formData.append('title', formName)
+    if (departmentValue) formData.append('department', String(departmentValue))
+    if (sourceValue) formData.append('source', String(sourceValue))
+    formData.append('form_questions', JSON.stringify(fields))
+    const extraData = {
+      sent_button_label: sentButtonLabel,
+      success_text: successText
+    }
+
+    formData.append('extra_data', JSON.stringify(extraData))
+    
+    setIsLoading(true)
+    try {
+      await api.post('leads/form/create/', formData).then(res => {
+        push('/settings/forms')
+        toast.success('Forma yaratildi')
+      })
+    } catch (err: any) {
+      console.log(err)
+      toast.error(err.response.data.msg || "Ma'lumotlarni to'liq kiriting")
+    }
+
+    setIsLoading(false)
+  }
 
   const handleAddField = (type: FieldType['type']) => {
     const newField: FieldType = {
       type,
       label: type === 'text' ? 'Yangi matn' : type === 'question' ? 'Yangi savol' : 'Yangi input',
-      name: type === 'input' ? 'Yangi input' : type === 'text' ? 'Yangi Matn' : 'Yangi savol',
+      title: type === 'input' ? 'Yangi input' : type === 'text' ? 'Yangi Matn' : 'Yangi savol',
       is_required: false,
       ...(type === 'question'
         ? {
@@ -322,7 +357,7 @@ const NewCreate = () => {
                                           justifyContent='space-between'
                                           width='100%'
                                         >
-                                          <Typography>{field.name}</Typography>
+                                          <Typography>{field.title}</Typography>
                                           <IconButton
                                             onClick={e => {
                                               e.stopPropagation()
@@ -430,7 +465,9 @@ const NewCreate = () => {
                     onChange={e => setSuccessText(e.target.value)}
                   />
                 </FormControl>
-                <Button variant='contained'>Yaratish</Button>
+                <LoadingButton onClick={handleCreateForm} loading={isLoading} variant='contained'>
+                  Yaratish
+                </LoadingButton>
               </Box>
             </Box>
           ) : (
@@ -481,14 +518,14 @@ const NewCreate = () => {
                       </Typography>
                     </Card>
                     <Card
-                      onClick={() => setBgColor('#dadadd')}
+                      onClick={() => setBgColor('gradient1')}
                       sx={{
                         height: 100,
-                        border: `2px solid ${bg_color == '#dadadd' ? '#4361ee' : 'lightgray'}`,
+                        border: `2px solid ${bg_color === 'gradient1' ? '#4361ee' : 'lightgray'}`,
                         cursor: 'pointer',
                         width: '100%',
                         boxShadow: 'none',
-                        background: '#dadadd'
+                        background: 'linear-gradient(135deg, #a1c4fd, #c2e9fb)'
                       }}
                     >
                       <Typography
@@ -539,27 +576,15 @@ const NewCreate = () => {
                         justifyContent: 'center'
                       }}
                     >
-                      {bg_img ? (
-                        <Image
-                          priority={false}
-                          src={bg_img}
-                          alt='Yuklangan rasm'
-                          width={180}
-                          height={180}
-                          unoptimized
-                          style={{ objectFit: 'cover', borderRadius: '8px' }}
-                        />
-                      ) : (
-                        <Image
-                          priority={false}
-                          src={'/images/request-form-bg.webp'}
-                          alt='Yuklangan rasm'
-                          width={180}
-                          height={180}
-                          unoptimized
-                          style={{ objectFit: 'cover', borderRadius: '8px' }}
-                        />
-                      )}
+                      <Image
+                        priority={false}
+                        src={bg_img ? URL.createObjectURL(bg_img) : '/images/request-form-bg.webp'}
+                        alt='Yuklangan rasm'
+                        width={180}
+                        height={180}
+                        unoptimized
+                        style={{ objectFit: 'cover', borderRadius: '8px' }}
+                      />
                     </Card>
                     <Button
                       sx={{ maxWidth: 180 }}
@@ -575,7 +600,7 @@ const NewCreate = () => {
                       <VisuallyHiddenInput
                         type='file'
                         onChange={(e: any) => {
-                          setBgImg(URL.createObjectURL(e.target.files[0]))
+                          setBgImg(e.target.files[0])
                         }}
                       />
                     </Button>
@@ -619,27 +644,15 @@ const NewCreate = () => {
                         justifyContent: 'center'
                       }}
                     >
-                      {logoImg ? (
-                        <Image
-                          priority={false}
-                          src={logoImg}
-                          alt='Yuklangan rasm'
-                          width={180}
-                          height={180}
-                          unoptimized
-                          style={{ objectFit: 'cover', borderRadius: '8px' }}
-                        />
-                      ) : (
-                        <Image
-                          priority={false}
-                          src={companyInfo.logo}
-                          alt='Yuklangan rasm'
-                          width={180}
-                          height={180}
-                          unoptimized
-                          style={{ objectFit: 'cover', borderRadius: '8px' }}
-                        />
-                      )}
+                      <Image
+                        priority={false}
+                        src={logoImg ? URL.createObjectURL(logoImg) : companyInfo.logo}
+                        alt='Yuklangan rasm'
+                        width={180}
+                        height={180}
+                        unoptimized
+                        style={{ objectFit: 'cover', borderRadius: '8px' }}
+                      />
                     </Card>
                     <Button
                       sx={{ maxWidth: 180 }}
@@ -655,7 +668,7 @@ const NewCreate = () => {
                       <VisuallyHiddenInput
                         type='file'
                         onChange={(e: any) => {
-                          setLogoImg(URL.createObjectURL(e.target.files[0]))
+                          setLogoImg(e.target.files[0])
                         }}
                       />
                     </Button>
@@ -682,7 +695,7 @@ const NewCreate = () => {
           <Box display={'flex'} alignItems={'center'} justifyContent={'center'}>
             <Card
               sx={{
-                backgroundImage: `url(${bg_img || '/images/request-form-bg.webp'})`,
+                backgroundImage: `url(${bg_img ? URL.createObjectURL(bg_img) : '/images/request-form-bg.webp'})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
@@ -721,7 +734,7 @@ const NewCreate = () => {
                 >
                   <Image
                     priority={false}
-                    src={logoImg || companyInfo.logo}
+                    src={logoImg ? URL.createObjectURL(logoImg) : companyInfo.logo}
                     alt='Yuklangan rasm'
                     width={100}
                     height={100}
@@ -730,7 +743,7 @@ const NewCreate = () => {
                   />
                 </Box>
                 <Typography color='black' fontWeight={600}>
-                  Aloqa uchun kontakt
+                  {formName}
                 </Typography>
 
                 {fields.map((field, index) => (
@@ -758,7 +771,7 @@ const NewCreate = () => {
                           sx={{ background: 'white' }}
                           label={field.label}
                           value={field.value}
-                          onChange={val => handleFieldChange(index, 'value', val)}
+                          onChange={e => handleFieldChange(index, 'value', revereAmount(e.target.value))}
                         />
                       </>
                     )}

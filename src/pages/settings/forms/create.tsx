@@ -117,13 +117,13 @@ export default function CreateForm({}: Props) {
   const createForm = async () => {
     setLoading(true)
     try {
-      await api.post(`leads/forms/create/`, {
+      await api.post(`leads/form/create/`, {
         title: fields,
         department,
         success_text: successText,
         source: addSource,
         type: 'lead_form',
-        application_form_types: [...components]
+        form_questions: [...components]
       })
       push('/settings/forms')
       toast.success('Forma yaratildi')
