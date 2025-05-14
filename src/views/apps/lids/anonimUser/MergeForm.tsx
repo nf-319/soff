@@ -6,18 +6,16 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import {
-  fetchAmoCrmPipelines,
   fetchDepartmentList,
   setOpenItem,
-  updateAmoCrmStudent,
   updateDepartmentStudent
 } from 'src/store/apps/leads'
 import toast from 'react-hot-toast'
 import { useGet } from 'src/hooks/useApi'
-import { LeadsResult } from '../../../../entities/lids/LeadsKanban'
+import { LeadsResult } from '@/entities/lids/model/type'
 import { LeadsType } from 'src/entities/lids'
 import { useAuth } from 'src/hooks/useAuth'
-import { AmoLeads, DepartmentsResultType } from '../../../../pages/lids'
+import { AmoLeads, DepartmentsResultType } from '@/pages/lids'
 import { useRouter } from 'next/router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/@core/utils/api'
@@ -86,7 +84,7 @@ export default function MergeToDepartment({ defaultId, setOpen, open, currentId,
     },
     onSuccess: () => {
       setOpen(null)
-      
+
       void queryClient.invalidateQueries({ queryKey: ['amocrm/pipelines/?with_steps=true'] })
       void queryClient.invalidateQueries({ queryKey: [`amocrm/leads/?pipeline_id=${defaultId}`] })
     },

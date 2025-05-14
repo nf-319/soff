@@ -172,7 +172,12 @@ const UserView = ({ tab, student }: any) => {
     },
     {
       headerName: t('Qabul qildi'),
-      field: 'admin'
+      field: 'admin',
+      renderCell: params => (
+        <Tooltip title={params.value || ''}>
+          <span>{params.value}</span>
+        </Tooltip>
+      )
     },
     {
       headerName: t('Amallar'),

@@ -204,7 +204,7 @@ const AppBarContent = (props: Props) => {
           <UserDropdown settings={settings} />
         </Box>
       </Box>
-      {isMobile && user?.role.join(', ') !== 'student' && (
+      {isMobile && !window.location.hostname.split('.').includes('c-panel') && user?.role.join(', ') !== 'student' && (
         <Autocomplete
           sx={{ paddingY: 5 }}
           disablePortal

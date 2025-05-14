@@ -11,7 +11,7 @@ import {
   Typography
 } from '@mui/material'
 import { Dispatch, FC, SetStateAction, useState } from 'react'
-import { LeadsResult, MenuOpenType } from '../LeadsKanban'
+import { MenuOpenType } from '../model/type'
 import { useTranslation } from 'react-i18next'
 import Form from '../../../components/form'
 import { LoadingButton } from '@mui/lab'
@@ -22,8 +22,8 @@ import api from 'src/@core/utils/api'
 import { useRouter } from 'next/router'
 import { useQueryClient } from '@tanstack/react-query'
 import { Close } from '@mui/icons-material'
-import { setAddSource, setOpenLid, setSectionId } from '../../../store/apps/leads'
-import { useAppDispatch } from '../../../store'
+import { setAddSource, setOpenLid, setSectionId } from '@/store/apps/leads'
+import { useAppDispatch } from '@/store'
 
 type Props = {
   open: string | null

@@ -5,11 +5,9 @@ import { useTranslation } from 'react-i18next'
 import IconifyIcon from '../../../../components/icon'
 import EditAnonimUserForm from './EditAnonimUserForm'
 import { FC } from 'react'
-import { QueryObserverResult, RefetchOptions, useQueryClient } from '@tanstack/react-query'
-import { LeadsType } from 'src/entities/lids'
-import { LeadsResult } from '../../../../entities/lids/LeadsKanban'
-import { setAddSource, setOpenLid, setSectionId } from '../../../../store/apps/leads'
-import { useAppDispatch } from '../../../../store'
+import { useQueryClient } from '@tanstack/react-query'
+import { setAddSource, setOpenLid, setSectionId } from '@store/apps/leads'
+import { useAppDispatch } from '@/store'
 
 type Props = {
   open: any

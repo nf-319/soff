@@ -1,9 +1,9 @@
-name: Next.js Frontend Deployment
+name: Soffcrm Frontend Production Deployment
 
 on:
   push:
     branches:
-      - test
+      - main
 
 jobs:
   build-and-deploy:
@@ -24,7 +24,7 @@ jobs:
 
       - name: Create environment files
         run: |
-          echo "${{ secrets.TEST_ENV_CONTENT }}" > .env
+          echo "${{ secrets.PROD_ENV_CONTENT }}" > .env
 
       - name: Build application
         run: npm run build
@@ -43,21 +43,43 @@ jobs:
       - name: Deploy to server
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.TEST_SERVER_IP }}
+          host: ${{ secrets.PROD_SERVER_IP }}
           username: crmroot
-          password: ${{ secrets.TEST_SERVER_PASSWORD }}
+          password: ${{ secrets.PROD_SERVER_PASSWORD }}
           source: "deploy.tar.gz"
           target: "/tmp"
 
-      - name: Execute deployment
+      - name: Execute deployment with lock
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.TEST_SERVER_IP }}
+          host: ${{ secrets.PROD_SERVER_IP }}
           username: crmroot
-          password: ${{ secrets.TEST_SERVER_PASSWORD }}
+          password: ${{ secrets.PROD_SERVER_PASSWORD }}
           script: |
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            APP_NAME="prod-subdomain-soffcrm-uz-3132"
+            LOCK_FILE="/tmp/${APP_NAME}.lock"
+            PORT=3129
+            HEALTH_URL="http://localhost:${PORT}"
+
+            if [ -f "$LOCK_FILE" ]; then
+              PID=$(cat $LOCK_FILE)
+              if ps -p $PID > /dev/null; then
+                echo "ERROR: Another deployment is already running (PID: $PID). Exiting."
+                exit 1
+              else
+                echo "Found stale lock file. Removing it."
+                rm -f "$LOCK_FILE"
+              fi
+            fi
+
+            # Create lock file with current PID
+            echo $$ > "$LOCK_FILE"
+
+            # Setup cleanup on exit
+            trap 'rm -f "$LOCK_FILE"; echo "Removed lock file."' EXIT INT TERM
 
             PM2_COMMAND="pm2"
 
@@ -74,8 +96,7 @@ jobs:
             }
 
             TIMESTAMP=$(date +%s)
-            APP_NAME="test-subdomain-soffcrm-uz-3131"
-            BASE_DIR="/home/crmroot/frontend/test-soffcrm"
+            BASE_DIR="/home/crmroot/frontend/prod-soffcrm"
             DEPLOY_DIR="${BASE_DIR}/${APP_NAME}"
             NEW_DEPLOY_DIR="${BASE_DIR}/${APP_NAME}-${TIMESTAMP}"
 
@@ -106,7 +127,7 @@ jobs:
 
               sleep 10
 
-              if curl -s http://localhost:3130/api/health > /dev/null || curl -s http://localhost:3130 > /dev/null; then
+              if curl -s $HEALTH_URL/api/health > /dev/null || curl -s $HEALTH_URL > /dev/null; then
                 echo "Looks like a new version is running"
 
                 echo "Delete old version..."
@@ -167,3 +188,5 @@ jobs:
 
             echo "Frontend Folder Files:"
             ls -la $BASE_DIR
+
+            rm -f /tmp/deploy.tar.gz
