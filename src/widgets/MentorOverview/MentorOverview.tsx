@@ -1,70 +1,161 @@
-import classnames from 'classnames/bind'
-import style from './MentorOverview.module.scss'
-import { Box, IconButton, Link } from '@mui/material'
-import { BookOpen, Calendar, MapPin, Pencil, Phone, Users } from 'lucide-react'
-import { Groups, ClassGroup } from './constants'
-import { GroupCard } from './groupCard'
-// import Link from 'next/link'
-
-const cn = classnames.bind(style)
+import { Box, Skeleton, Typography } from '@mui/material'
+import { BookOpen, Calendar, MapPin, Phone, Users } from 'lucide-react'
+import { ClassGroup } from './config/constants'
+import { GroupCard } from '@components/GroupCard'
+import Image from 'next/image'
+import { useGetMentor } from './api/mentor'
+import { useAuth } from '@hooks/useAuth'
+import { getFormatDate } from '@shared/utils/getFormatDate'
+import Divider from '@mui/material/Divider'
+import { getFormatPhone } from '@shared/utils'
 
 export const MentorOverview = () => {
+  const { user } = useAuth()
+  const { data, isLoading } = useGetMentor(String(user?.id))
+
+  if(isLoading) {
+    return <Skeleton sx={{ width: { xs: '100%', md: '450px' }, height: '100%' }} />
+  }
+
   const profileDetails = [
-    { icon: Calendar, title: 'Royxatdan otkan sana', value: '12.05.2023' },
-    { icon: MapPin, title: 'Filial', value: 'Chilonzor filiali' },
-    { icon: BookOpen, title: "O'qitayotgan kurslar soni", value: '4' },
-    { icon: Users, title: 'Faol guruhlar soni', value: '3' }
+    { icon: Calendar, title: "Ro‘yxatdan o‘tgan sana", value: getFormatDate(String(data?.activated_at)) },
+    { icon: MapPin, title: 'Filial', value: data?.branches?.filter(branch => branch.exists).map(item => item.name).join(', ') },
+    { icon: BookOpen, title: "O'qitayotgan kurslar soni", value: Number(data?.lesson_amount ?? 0) },
+    { icon: Users, title: 'Faol guruhlar soni', value: Number(data?.active_groups ?? 0) }
   ]
 
-
   return (
-    <Box className={cn('mentor_overview')}>
-      <div className={cn('mentor_overview-profile-card')}>
-        <div className={cn('mentor_overview-profile-card-header')}>
-          <p className={cn('mentor_overview-profile-card-header-title')}>Mening ma'lumotlarim</p>
-          <IconButton>
-            <Pencil color='#09090B' className='mentor_overview-profile-card-pencil' size={15} />
-          </IconButton>
-        </div>
-        <div className={cn('mentor_overview-profile-card-info')}>
-          <div className={cn('mentor_overview-profile-card-info-image')}></div>
-          <p className={cn('mentor_overview-profile-card-info-teacher')}>Otabek Ibrohimov</p>
-        </div>
-        <div className={cn('mentor_overview-profile-card-details')}>
-          {profileDetails.map((item, index) => {
-            const Icon = item.icon
-            return (
-              <div key={index} className={cn('mentor_overview-profile-card-details-detail')}>
-                <Icon size={20} />
-                <div>
-                  <div className={cn('mentor_overview-profile-card-details-detail-title')}>{item.title}</div>
-                  <div className={cn('mentor_overview-profile-card-details-detail-value')}>{item.value}</div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-        <div className={cn('mentor_overview-profile-card-contact')}>
-          <div className={cn('mentor_overview-profile-card-contact-title')}>Kontakt</div>
-          <div className={cn('mentor_overview-profile-card-contact-details')}>
-            <Phone size={15} />
-            <div className={cn('mentor_overview-profile-card-contact-details-phone')}>+998 90 123 45 67</div>
-          </div>
-        </div>
-      </div>
-      <div className={cn('mentor_overview-groups-card')}>
-        <div className={cn('mentor_overview-groups-card-title')}>Guruhlar</div>
-        <div className={cn('mentor_overview-groups-card-info')}>Hozirgi/Keyingi daras</div>
-        {ClassGroup.map(item => (
-          <GroupCard title={item.name} course={item.course} lesson_time={item.lesson_time} room={item.room} all_students={item.all_students} active_students={item.active_students} trial_students={item.trial_students} />
-        ))}
-        <div className={cn('mentor_overview-groups-card-info')}>Barcha guruhlar</div>
-        <div className={cn('mentor_overview-groups-card-groups')}>
-          {Groups.map(item => (
-            <GroupCard title={item.name} course={item.course} lesson_time={item.lesson_time} room={item.room} all_students={item.all_students} active_students={item.active_students} trial_students={item.trial_students} />
+    <Box
+      sx={{
+        display: 'flex',
+        gap: '30px',
+        flexDirection: { xs: 'column', md: 'row' }
+      }}
+    >
+      <Box
+        sx={{
+          p: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          border: '1px solid #E0E0E0',
+          width: { xs: '100%', md: '450px' }
+        }}
+      >
+        <Typography variant='h6' color='#000'>Mening ma'lumotlarim</Typography>
+
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+          {data?.image ? (
+            <Image
+              src={data.image}
+              alt="Mentor Image"
+              width={80}
+              height={80}
+              style={{
+                borderRadius: '50%',
+                objectFit: 'cover',
+                backgroundColor: 'lightgray'
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: 80,
+                height: 80,
+                borderRadius: '50%',
+                backgroundColor: 'lightgray',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 32,
+                fontWeight: 'bold',
+                color: '#fff',
+                textTransform: 'uppercase'
+              }}
+            >
+              {data?.first_name?.[0] || ''}
+            </Box>
+          )}
+
+          <Typography sx={{ fontWeight: 600, fontSize: 18, color: '#000' }}>Otabek Ibrohimov</Typography>
+        </Box>
+
+        <Divider color="#e0e0e0" />
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+          }}
+        >
+          {profileDetails.map((item, index) => (
+            <Box key={`${index}-${item.title}`} sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <item.icon size={20} />
+
+              <Box display='flex' flexWrap='wrap' alignItems='center' justifyContent='start' gap={3}>
+                <Typography sx={{ fontSize: 16 }}>{item.title}:</Typography>
+                <Typography sx={{ fontWeight: 500, color: '#000' }}>{item.value}</Typography>
+              </Box>
+            </Box>
           ))}
-        </div>
-      </div>
+        </Box>
+
+        <Divider color="#e0e0e0" />
+
+        <Box>
+          <Typography sx={{ mb: '10px', fontSize: 16 }}>Kontakt</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Phone size={20} />
+            <Typography sx={{ color: '#000' }}>{getFormatPhone(data?.phone ?? '')}</Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      <Box
+        sx={{
+          p: '25px',
+          bgcolor: 'white',
+          borderRadius: '8px',
+          border: '1px solid #E0E0E0',
+          width: '100%'
+        }}
+      >
+        <Typography sx={{ fontSize: 18, fontWeight: 500, color: '#000' }}>Guruhlar</Typography>
+        <Typography sx={{ mt: '5px', mb: '10px', fontWeight: 600, fontSize: 12 }}>Hozirgi/Keyingi daras</Typography>
+        {ClassGroup.map(item => (
+          <GroupCard
+            key={`${item.name}-${item.all_students}`}
+            title={item.name}
+            all_students={item.all_students}
+            active_students={item.active_students}
+            trial_students={item.trial_students}
+            room={item.room}
+          />
+        ))}
+
+        <Typography sx={{ mt: '15px', mb: '10px', fontWeight: 600, fontSize: 12 }}>Barcha guruhlar</Typography>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(14.75rem, 7.159vw + 10.159rem, 18.75rem), 1fr))',
+            gap: '16px'
+          }}
+        >
+          {ClassGroup.map(item => (
+            <GroupCard
+              key={`${item.name}-${item.all_students}`}
+              title={item.name}
+              all_students={item.all_students}
+              active_students={item.active_students}
+              trial_students={item.trial_students}
+              room={item.room}
+            />
+          ))}
+        </Box>
+      </Box>
     </Box>
   )
 }

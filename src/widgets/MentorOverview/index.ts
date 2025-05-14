@@ -1,1 +1,1 @@
-import { MentorOverview } from './MentorOverview'
+export { MentorOverview } from './MentorOverview'

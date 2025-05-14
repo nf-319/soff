@@ -14,7 +14,7 @@ export const enum Endpoints {
   ReportLeadsSellers = 'leads/sellers/',
   ReportLeadsList = 'leads/list/',
   ReportLeadsChart = 'leads/separate-leads-chart/',
-  ReportLeadsSellerDetail = 'leads/course-distribution/',
   LeadsDescriptionDetail = 'leads/description/:id/',
   LeadsExport = 'leads/export/',
+  TeacherDetails = 'employee/teachers/:id'
 }

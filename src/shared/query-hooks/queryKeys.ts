@@ -12,4 +12,5 @@ export const enum QueryKeys {
   ReportsLeadsSellerDetail = 'leads-seller-detail',
   FinancialsIncomeOverview = 'financials_income_overview',
   LeadsDescriptionUpdate = 'leads-description-update',
+  TeacherDetail = 'teacher-detail',
 }
