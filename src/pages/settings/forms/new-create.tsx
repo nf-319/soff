@@ -752,9 +752,9 @@ const NewCreate = () => {
                       <TextField
                         sx={{
                           backgroundColor: 'white',
-                          borderRadius: '8px', // Fix border radius
+                          borderRadius: '8px', 
                           '& .MuiOutlinedInput-root': {
-                            borderRadius: '8px' // Apply to input root as well
+                            borderRadius: '8px'
                           }
                         }}
                         size='small'
@@ -779,7 +779,7 @@ const NewCreate = () => {
                       <TextField
                         sx={{
                           background: 'white',
-                          borderRadius: '8px', // Fix border radius
+                          borderRadius: '8px',
                           '& .MuiOutlinedInput-root': {
                             borderRadius: '8px'
                           }

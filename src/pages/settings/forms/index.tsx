@@ -167,7 +167,7 @@ export default function FormsPage() {
   async function onDelete() {
     setLoading(true)
     try {
-      await api.delete(`leads/application-form/destroy/${deleteId}`)
+      await api.delete(`leads/form/delete/${deleteId}/`)
       setOpen(null)
       setLoading(false)
       getForms()
