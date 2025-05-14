@@ -65,13 +65,13 @@ const Lids = () => {
   const [selectedTab, setSelectedTab] = useState<number>(0)
   const [selectedAmoLeadTab, setSelectedAmoLeadTab] = useState<any>(null)
   const [selectedAmoData, setSelectedAmoData] = useState<AmoLeads | null>(null)
-  const [exportExcel, setExportExcel] = useState<string>('')
 
   const [currentData, setCurrentData] = useState<DepartmentsResultType | undefined>()
   const [openDialog, setOpenDialog] = useState<'edit' | 'recover' | null>(null)
   const { isMobile } = useResponsive()
   const { user } = useAuth()
   const { t } = useTranslation()
+
   const {
     data: leadData,
     isLoading,
@@ -172,7 +172,7 @@ const Lids = () => {
   return (
     <div>
       <LidsHeader />
-      <Box display={isMobile ? '' : 'flex'} justifyContent='space-between' marginY={5} alignItems='center'>
+      <Box display={{ sx: '', md: 'flex' }} justifyContent='space-between' marginY={5} alignItems='center'>
         {isLoading || amoCrmLoading ? (
           <Skeleton variant='rectangular' sx={{ borderRadius: 1 }} width={150} height={50} />
         ) : is_amocrm ? (

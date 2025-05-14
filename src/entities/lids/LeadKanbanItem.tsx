@@ -9,11 +9,10 @@ import {
 } from 'lucide-react'
 import { Box, IconButton, Tooltip, Typography } from '@mui/material'
 import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd'
-import { FC, useState } from 'react'
-import { useSettings } from '../../@core/hooks/useSettings'
+import { FC, memo, useState } from 'react'
 import { LeadsMenu } from './Menu'
-import { MenuOpenType } from './LeadsKanban'
-import { LidsDragonModal } from '../../views/apps/lids/LidsDragonModal'
+import { MenuOpenType } from './model/type'
+import { LidsDragonModal } from '@/views/apps/lids/LidsDragonModal'
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
 import { useRouter } from 'next/router'
 import { useQuery } from '@tanstack/react-query'
@@ -30,15 +29,13 @@ type Props = {
   defaultId?: any
 }
 
-export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead, onClose }) => {
+export const LeadKanbanItem: FC<Props> = memo(({ defaultId, provided, snapshot, lead, onClose }) => {
   const [studentModalOpen, setStudentModalOpen] = useState<boolean>(false)
   const [selectedLead, setSelectedLead] = useState<any | null>(null)
   const [currentLead, setCurrentLead] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState<MenuOpenType>(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const { query } = useRouter()
-  const [leadId, setLeadId] = useState<number | null>(null)
-
 
   const handleMenuOpen = (event: any, lead: any) => {
     setStudentModalOpen(true)
@@ -48,6 +45,7 @@ export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead,
     const { data } = await api.get(`amocrm/leads/detail/${id}/`)
     return data
   }
+
   const { refetch } = useQuery({
     queryKey: ['lead', lead.id],
     queryFn: () => fetchLeadById(Number(lead.id)),
@@ -59,9 +57,8 @@ export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead,
     setAnchorEl(event.currentTarget)
   }
 
-  function handleGetAmoLeadDetail(id: number) {
+  const handleGetAmoLeadDetail = (id: number) => {
     if(query.is_amocrm) {
-      setLeadId(id)
       void refetch()
     }
   }
@@ -215,4 +212,4 @@ export const LeadKanbanItem: FC<Props> = ({ defaultId, provided, snapshot, lead,
       />
     </>
   )
-}
+})
