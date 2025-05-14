@@ -3,9 +3,9 @@ import { Dispatch, FC, SetStateAction } from 'react'
 import { useTranslation } from 'react-i18next'
 import IconifyIcon from '../../../components/icon'
 import AddNoteAnonimUser from 'src/views/apps/lids/anonimUser/AddNoteAnonimUser'
-import { MenuOpenType } from '../LeadsKanban'
-import { setAddSource, setOpenLid, setSectionId } from '../../../store/apps/leads'
-import { useAppDispatch } from '../../../store'
+import { MenuOpenType } from '../model/type'
+import { setAddSource, setOpenLid, setSectionId } from '@/store/apps/leads'
+import { useAppDispatch } from '@/store'
 
 type Props = {
   open: string | null

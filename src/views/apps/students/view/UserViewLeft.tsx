@@ -418,7 +418,8 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
-  const [isErrorText, setIsErrorText] = useState<null | string>(null)
+  const [errorText, setErrorText] = useState<null | string>(null)
+  const [allowed_sms_count,setAllowedSmsCount] = useState<number|null>(null)
   const [isActive, setIsActive] = useState(false)
   const { sms_list, smschild_list } = useAppSelector(state => state.settings)
   const [parent_id, setParentId] = useState<number | null>(null)
@@ -453,13 +454,15 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
       setLoading(false)
       setIsSuccess(true)
       formik.resetForm()
-      setIsErrorText(null)
+      setErrorText(null)
       setIsActive(false)
+      setAllowedSmsCount(null)
       await dispatch(userData?.id)
     } catch (err: any) {
       if (err.response.status) {
+        setAllowedSmsCount(err.response.data?.allowed_sms_count)
         const errorMsg = `${err.response.data?.msg} (Mavjud SMSlar ${err.response.data?.allowed_sms_count} ta)` || 'Nomaʼlum xatolik yuz berdi'
-        setIsErrorText(errorMsg)
+        setErrorText(errorMsg)
         setLoading(false)
         toast.error(errorMsg)
       } else {
@@ -491,7 +494,7 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
   return (
     <Dialog
       open={openEdit === 'sms'}
-      onClose={() => (handleEditClose(), formik.resetForm(), setIsErrorText(null), setIsActive(false))}
+      onClose={() => (handleEditClose(),setAllowedSmsCount(null), formik.resetForm(), setErrorText(null), setIsActive(false))}
       aria-labelledby='user-view-edit'
       sx={{ '& .MuiPaper-root': { width: '100%', maxWidth: 450, p: [1, 3] } }}
       aria-describedby='user-view-edit-description'
@@ -600,8 +603,8 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
                 {formik.errors.message}
               </FormHelperText>
             </FormControl>
-            <p style={{ color: 'red', padding: 3 }}>{isErrorText}</p>
-            {userData?.length && isErrorText && (
+            <p style={{ color: 'red', padding: 3 }}>{errorText}</p>
+            {userData?.length && errorText && (
               <div className='d-flex align-items-start'>
                 <Checkbox
                   checked={isActive}
@@ -620,15 +623,16 @@ export const SendSMSModal = ({ handleEditClose, openEdit, setOpenEdit, userData,
                   handleEditClose(),
                   formik.resetForm(),
                   setLoading(false),
-                  setIsErrorText(null),
+                  setErrorText(null),
                   setParentId(null),
-                  setIsActive(false)
+                  setIsActive(false),
+                  setAllowedSmsCount(null)
                 )}
               >
                 {t('Bekor qilish')}
               </Button>
               <LoadingButton loading={loading} type='submit' variant='contained' sx={{ mr: 1 }}>
-                {t('Yuborish')}
+                {allowed_sms_count? `${allowed_sms_count} ta sms yuborish`: t('Yuborish')}
               </LoadingButton>
             </DialogActions>
           </form>

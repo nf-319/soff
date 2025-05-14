@@ -99,7 +99,7 @@ export const LeadsStatementCard = () => {
     {
       id: data?.best_seller?.id,
       icon: Award,
-      title: `${data?.best_seller?.first_name} - eng yaxshi sotuvchi`,
+      title: `Eng yaxshi sotuvchi`,
       process: data?.best_seller_progress || 0,
       count: `${data?.best_seller?.first_name}: ${data?.best_seller_leads_count || 0}`,
       trendColor: '#fff',
@@ -133,23 +133,13 @@ export const LeadsStatementCard = () => {
     >
       {cards.map((item, index) => (
         <Box key={index} flex='1 1 calc(20% - 16px)' minWidth={150}>
-          {!item.process ? (
-            <ComingSoon brightness='0.9' sx={{ height: '100%' }} size='small' title={'Malumot yetarli emas'}>
-              <TrendCard
-                title={item.title}
-                id={item.id}
-                count={item.count}
-                icon={item.icon}
-                hiddenMoreButton={!item.hidden}
-                iconColor={item.iconColor}
-                process={item.process}
-                trendDirection={item.trendDirection}
-                trendColor={item.trendColor}
-                pillColor={item.pillColor}
-                onClick={() => handleOpenModal(item.id)}
-              />
-            </ComingSoon>
-          ) : (
+          <ComingSoon
+            active={Boolean(item.process)}
+            brightness='0.9'
+            sx={{ height: '100%' }}
+            size='small'
+            title={'Malumot yetarli emas'}
+          >
             <TrendCard
               title={item.title}
               id={item.id}
@@ -157,13 +147,12 @@ export const LeadsStatementCard = () => {
               icon={item.icon}
               hiddenMoreButton={!item.hidden}
               iconColor={item.iconColor}
+              tooltip={item.title}
               process={item.process}
               trendDirection={item.trendDirection}
-              trendColor={item.trendColor}
-              pillColor={item.pillColor}
               onClick={() => handleOpenModal(item.id)}
             />
-          )}
+          </ComingSoon>
         </Box>
       ))}
 
@@ -173,7 +162,7 @@ export const LeadsStatementCard = () => {
 
       <SellerDetailModal selectedSeller={selectedSeller} sellerId={sellerId} setSellerId={setSellerId} />
     </Box>
-  );
+  )
 };
 
 LeadsStatementCard.displayName = 'LeadsStatementCard'

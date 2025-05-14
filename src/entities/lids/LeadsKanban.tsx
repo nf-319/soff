@@ -4,7 +4,7 @@ import { Close, Delete, PersonAddAlt } from '@mui/icons-material'
 import {
   Box,
   Button,
-  Chip,
+  Chip, CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -14,14 +14,13 @@ import {
   Typography
 } from '@mui/material'
 import { useRouter } from 'next/router'
-import { useState, useEffect, FC } from 'react'
+import { useState, useEffect, FC, useMemo } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { useTranslation } from 'react-i18next'
 import MessageIcon from '@mui/icons-material/Message'
 import { useSelector } from 'react-redux'
 import { EmptyContent } from '@components/empty-content'
 import useResponsive from 'src/@core/hooks/useResponsive'
-import { useSettings } from 'src/@core/hooks/useSettings'
 import { useGet, usePatch, usePost } from 'src/hooks/useApi'
 import { RootState, useAppDispatch, useAppSelector } from 'src/store'
 import { setAddSource, setOpenLid, setSectionId } from 'src/store/apps/leads'
@@ -37,39 +36,15 @@ import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
 import { LeadKanbanItem } from './LeadKanbanItem'
 import { SendSMSModal } from '@/views/apps/students/view/UserViewLeft'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
-
-type LeadsChild = {
-  id: number
-  first_name: string
-  phone: string
-}
-
-export type LeadsResult = {
-  id: number
-  name: string
-  leads: LeadsChild[]
-}
+import { LeadsResult } from '@/entities/lids/model/type'
 
 type Props = {
   defaultId: number | undefined
   selectedData?: any
 }
 
-export type MenuOpenType =
-  | 'note'
-  | 'sms'
-  | 'merge-to-amo'
-  | 'merge-to'
-  | 'add-group'
-  | 'branch'
-  | 'edit'
-  | 'delete'
-  | 'recover'
-  | null
-
 export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
   const { isMobile } = useResponsive()
-  const { settings } = useSettings()
   const dispatch = useAppDispatch()
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>(false)
@@ -91,30 +66,38 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
 
   const [mergedSteps, setMergedSteps] = useState<any[] | null>(null)
 
-  const { data: amoLeadDataChild, isLoading: amoLeadDataChildLoding } = useGet(
+  const { data: amoLeadDataChild, isLoading: amLeadDataChildCoding } = useGet(
     `amocrm/leads/?pipeline_id=${defaultId}`,
-    { options: { enabled: !!router.query.is_amocrm } }
-  )
+    {
+      options: {
+        enabled: !!router.query.is_amocrm && !!defaultId,
+        staleTime: 30000,
+        refetchOnWindowFocus: false,
+      }
+    }
+  );
 
   useEffect(() => {
-    const mergedSteps = selectedData?.steps.map((step: any) => {
-      const matchingLeads = amoLeadDataChild?.filter((lead: any) => lead.status_id === step.id)
+    if (amoLeadDataChild && selectedData && !amLeadDataChildCoding) {
+      const mergedSteps = selectedData?.steps.map((step: any) => {
+        const matchingLeads = amoLeadDataChild?.filter((lead: any) => lead.status_id === step.id) || [];
 
-      const transformedLeads = matchingLeads?.map((lead: any) => ({
-        ...lead,
-        first_name: lead.name,
-        name: undefined
-      }))
+        const transformedLeads = matchingLeads?.map((lead: any) => ({
+          ...lead,
+          first_name: lead.name,
+          name: undefined
+        }));
 
-      return {
-        ...step,
-        leads: transformedLeads
-      }
-    })
-    if (mergedSteps) {
-      setMergedSteps(mergedSteps)
+        return {
+          ...step,
+          leads: transformedLeads
+        };
+      });
+
+      setMergedSteps(mergedSteps);
+      setLocalAmoLeadData(mergedSteps);
     }
-  }, [selectedData, amoLeadDataChild])
+  }, [selectedData, amoLeadDataChild, amLeadDataChildCoding]);
 
   const handleSubmit = (data: any) => {
     updateDepartmentMutation(
@@ -151,19 +134,23 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
     isLoading,
     refetch
   } = useGet<LeadsType<LeadsResult[]>>('leads/departments/leads/', {
-    options: { enabled: !router.query.is_amocrm },
+    options: {
+      enabled: !router.query.is_amocrm && !!apiParams,
+      staleTime: 30000,
+      refetchOnWindowFocus: false,
+    },
     params: apiParams,
     deps: ['departments-leads']
-  })
+  });
 
   const [localLeadData, setLocalLeadData] = useState<LeadsType<LeadsResult[]> | null>(null)
   const [localAmoLeadData, setLocalAmoLeadData] = useState<any | null>(null)
 
   useEffect(() => {
-    if (leadData) {
-      setLocalLeadData(leadData)
+    if (leadData && !loading) {
+      setLocalLeadData(leadData);
     }
-  }, [leadData])
+  }, [leadData, loading]);
 
   useEffect(() => {
     setLocalAmoLeadData(null)
@@ -173,13 +160,25 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
     mutationFn: (data: { leadId: number; departmentId: number }) => {
       return api.patch(`leads/anonim-user/update/${data.leadId}/`, {
         department: data.departmentId
-      })
+      });
     },
-
+    onMutate: (variables) => {
+      const previousData = queryClient.getQueryData(['leads/departments/leads/']);
+      return { previousData };
+    },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/'] })
+      toast.success("Lid muvaffaqiyatli yangilandi");
+      void queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/'] });
+    },
+    onError: (error, variables, context) => {
+      toast.error("Xatolik yuz berdi");
+      if (context?.previousData) {
+        queryClient.setQueryData(['leads/departments/leads/'], context.previousData);
+      }
+      setLocalLeadData(context?.previousData as LeadsType<LeadsResult[]>);
     }
-  })
+  });
+
   const updateAmoLeadMutation = useMutation({
     mutationFn: (data: { leadId: number; departmentId: number }) => {
       return api.patch(`amocrm/lead/update/${data.leadId}/`, {
@@ -251,75 +250,97 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
     dispatch(setSectionId(null))
   }
 
-  const onDragEnd = async (result: any) => {
-    if (!result.destination || !localLeadData) return
+  const handleSectionDragDrop = (source: any, destination: any) => {
+    if (!localLeadData) return;
 
-    const { source, destination, type } = result
+    const newResults = Array.from(localLeadData.results);
+    const [movedSection] = newResults.splice(source.index, 1);
+    newResults.splice(destination.index, 0, movedSection);
 
-    if (type === 'SECTION') {
-      const newResults = Array.from(localLeadData.results)
-      const [movedSection] = newResults.splice(source.index, 1)
-      newResults.splice(destination.index, 0, movedSection)
-      const newResultsOrdered = newResults.map((item, index) => ({
-        obj_id: item?.id,
-        order: index
-      }))
-      if (newResultsOrdered) {
-        handleSubmit(newResultsOrdered)
-      }
-      setLocalLeadData({
-        ...localLeadData,
-        results: newResults
-      })
+    const newResultsOrdered = newResults.map((item, index) => ({
+      obj_id: item?.id,
+      order: index
+    }));
 
-      updateDepartmentOrderMutation.mutate({
-        departmentId: movedSection.id,
-        order: destination.index
-      })
-
-      return
-    }
-
-    const sourceColIndex = localLeadData.results.findIndex(e => String(e.id) === source.droppableId)
-    const destinationColIndex = localLeadData.results.findIndex(e => String(e.id) === destination.droppableId)
-
-    if (sourceColIndex === -1 || destinationColIndex === -1) return
-
-    const sourceCol = localLeadData.results[sourceColIndex]
-    const destinationCol = localLeadData.results[destinationColIndex]
-
-    if (!sourceCol || !destinationCol) return
-
-    const newResults = JSON.parse(JSON.stringify(localLeadData.results))
-
-    if (sourceColIndex === destinationColIndex) {
-      const updatedLeads = [...newResults[sourceColIndex].leads]
-      const [movedLead] = updatedLeads.splice(source.index, 1)
-      updatedLeads.splice(destination.index, 0, movedLead)
-
-      newResults[sourceColIndex].leads = updatedLeads
-    } else {
-      const sourceLeads = [...newResults[sourceColIndex].leads]
-      const destinationLeads = [...newResults[destinationColIndex].leads]
-
-      const [movedLead] = sourceLeads.splice(source.index, 1)
-
-      destinationLeads.splice(destination.index, 0, movedLead)
-
-      newResults[sourceColIndex].leads = sourceLeads
-      newResults[destinationColIndex].leads = destinationLeads
-
-      updateLeadMutation.mutate({
-        leadId: movedLead.id,
-        departmentId: destinationCol.id
-      })
+    if (newResultsOrdered?.length) {
+      handleSubmit(newResultsOrdered);
     }
 
     setLocalLeadData({
       ...localLeadData,
       results: newResults
-    })
-  }
+    });
+
+    updateDepartmentOrderMutation.mutate({
+      departmentId: movedSection.id,
+      order: destination.index
+    });
+  };
+
+  const handleLeadDragDrop = (source: any, destination: any) => {
+    if (!localLeadData) return;
+
+    const sourceColIndex = localLeadData.results.findIndex(e => String(e.id) === source.droppableId);
+    const destinationColIndex = localLeadData.results.findIndex(e => String(e.id) === destination.droppableId);
+
+    if (sourceColIndex === -1 || destinationColIndex === -1) return;
+
+    const sourceCol = localLeadData.results[sourceColIndex];
+    const destinationCol = localLeadData.results[destinationColIndex];
+
+    if (!sourceCol || !destinationCol) return;
+
+    const newResults = JSON.parse(JSON.stringify(localLeadData.results));
+
+    if (sourceColIndex === destinationColIndex) {
+      const updatedLeads = [...newResults[sourceColIndex].leads];
+      const [movedLead] = updatedLeads.splice(source.index, 1);
+      updatedLeads.splice(destination.index, 0, movedLead);
+
+      newResults[sourceColIndex].leads = updatedLeads;
+    }
+    else {
+      const sourceLeads = [...newResults[sourceColIndex].leads];
+      const destinationLeads = [...newResults[destinationColIndex].leads];
+
+      const [movedLead] = sourceLeads.splice(source.index, 1);
+      destinationLeads.splice(destination.index, 0, movedLead);
+
+      newResults[sourceColIndex].leads = sourceLeads;
+      newResults[destinationColIndex].leads = destinationLeads;
+
+      setLocalLeadData({
+        ...localLeadData,
+        results: newResults
+      });
+
+      updateLeadMutation.mutate({
+        leadId: movedLead.id,
+        departmentId: destinationCol.id
+      });
+
+      return;
+    }
+
+    setLocalLeadData({
+      ...localLeadData,
+      results: newResults
+    });
+  };
+
+  const onDragEnd = async (result: any) => {
+    if (!result.destination) return;
+
+    const { source, destination, type } = result;
+
+    if (type === 'SECTION') {
+      handleSectionDragDrop(source, destination);
+      return;
+    }
+
+    handleLeadDragDrop(source, destination);
+  };
+
   const leadIds = sectionLeads?.map(item => item.id)
 
   const onDragEndAmo = async (result: any) => {
@@ -378,28 +399,21 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
     setLocalAmoLeadData(newResults)
   }
 
-  if (isLoading || amoLeadDataChildLoding) {
+  if (isLoading || amLeadDataChildCoding) {
     return (
       <Box display='flex' flexDirection='column' marginBottom={10} gap={5}>
         <Box display='flex' gap={5}>
-          <Skeleton variant='rounded' width={300} height={50} />
-          <Skeleton variant='rounded' width={300} height={50} />
-          <Skeleton variant='rounded' width={300} height={50} />
-          <Skeleton variant='rounded' width={300} height={50} />
-        </Box>
-
-        <Box display='flex' gap={5}>
-          <Skeleton variant='rounded' width={300} height={80} />
-          <Skeleton variant='rounded' width={300} height={80} />
-          <Skeleton variant='rounded' width={300} height={80} />
-          <Skeleton variant='rounded' width={300} height={80} />
+          <Skeleton variant='rounded' sx={{ width: { xs: 300, sm: 400, md: 450 } }} height={120} />
+          <Skeleton variant='rounded' sx={{ width: { xs: 300, sm: 400, md: 450 } }} height={120} />
         </Box>
       </Box>
     )
   }
 
-  const displayData = localLeadData || leadData
-  const amoLeadData = localAmoLeadData || mergedSteps
+  const displayData = localLeadData || leadData;
+  const amoLeadData = localAmoLeadData || mergedSteps;
+
+  const isDataLoading = isLoading || amLeadDataChildCoding
 
   const handleAccessModal = (section: any) => {
     if (companyInfo?.access) {
@@ -408,6 +422,14 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
     } else {
       setAccessModal(true)
     }
+  }
+
+  if (isDataLoading) {
+    return (
+      <Box display='flex' justifyContent='center' alignItems='center' height="60vh">
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (
@@ -425,7 +447,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
               gap: 20,
               overflow: 'auto',
               height: '100%',
-              width: '100%',
+              width: '100%'
             }}
           >
             {(!is_amocrm && displayData?.results.length) || (is_amocrm && amoLeadData?.length) ? (
@@ -443,19 +465,20 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                       }}
                     >
                       <Droppable key={section.id} droppableId={String(section.id)} type='LEAD'>
-                        {leadsProvided => (
+                        {(leadsProvided, leadsSnapshot) => (
                           <Box
                             {...leadsProvided.droppableProps}
                             {...sectionProvided.dragHandleProps}
                             className='kanban__section'
                             ref={leadsProvided.innerRef}
-                            style={{
+                            sx={{
                               width: '100%',
                               minWidth: 300,
                               border: '1px solid #e0e0e0e0',
-                              borderRadius: 10,
-                              padding: 20,
-                              background: 'white'
+                              borderRadius: 1,
+                              padding: 4,
+                              background: leadsSnapshot.isDraggingOver ? '#f5f5f5' : 'white',
+                              transition: 'background-color 0.2s ease'
                             }}
                           >
                             <Box
@@ -469,7 +492,7 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
                                   display: 'flex',
                                   alignItems: 'start',
                                   gap: { xs: 3, md: 5 },
-                                  background: 'white',
+                                  background: 'inherit',
                                   borderRadius: 10,
                                   fontSize: isMobile ? 18 : 25
                                 }}
