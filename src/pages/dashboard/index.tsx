@@ -5,7 +5,10 @@ import { useContext, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import { AuthContext } from 'src/context/AuthContext'
 import DashboardPage from 'src/views/apps/dashboard/DashboardPage'
-import MyGroups from 'src/views/my-groups'
+import { MentorOverview } from '@/widgets/MentorOverview'
+import { Box } from '@mui/system'
+import { MentorGroups } from '@/widgets/MentorGroups'
+import MyGroups from '@/views/my-groups'
 
 const AppCalendar = () => {
   const { user } = useContext(AuthContext)
@@ -29,9 +32,18 @@ const AppCalendar = () => {
   }, [])
 
   return user?.currentRole === 'teacher' || (user?.role.length === 1 && user.role.includes('teacher')) ? (
-    <MyGroups />
+    <Box display="grid" gridTemplateColumns="1fr 2fr" gap={4}>
+      <Box gridColumn="span 1">
+        <MentorOverview />
+      </Box>
+
+      <Box gridColumn="span 1">
+        <MentorGroups />
+      </Box>
+    </Box>
+
   ) : (
-    <DashboardPage/>
+    <DashboardPage />
   )
 }
 

@@ -3,14 +3,13 @@ import style from './MentorTable.module.scss'
 import { Box, Chip, MenuItem, Select, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { DataGridTable } from '@components/table/DataGridTable'
-import useResponsive from '@/@core/hooks/useResponsive'
 import { GroupTable, MonthlySalary } from './constants'
 import { LEADS_TEMPERATURE_MAP } from '@modules/LeadsStatement/config/constants'
 import { Download, SlidersHorizontal } from 'lucide-react';
 
 import { useAppSelector } from '@/store'
 import { useEffect, useState } from 'react'
-import { uzbekMonths } from '@/shared/constans'
+import { uzbekMonths } from '@/shared/constants'
 const cn = classnames.bind(style)
 
 export const MentorTable = () => {

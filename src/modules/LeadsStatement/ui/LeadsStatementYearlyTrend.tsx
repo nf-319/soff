@@ -2,7 +2,7 @@ import { Card, Tooltip, Typography, Box } from '@mui/material'
 import { ResponsiveLine } from '@nivo/line';
 import useResponsive from '@/@core/hooks/useResponsive';
 import { EmptyContent } from '@components/empty-content';
-import { uzbekMonths } from '@/shared/constans';
+import { uzbekMonths } from '@/shared/constants';
 import { useRouter } from 'next/router';
 import { useGet } from '@hooks/useApi';
 import { Endpoints } from '@api/endpoints';

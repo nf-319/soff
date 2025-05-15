@@ -5,7 +5,7 @@ import { EmptyContent } from '@components/empty-content'
 import { truncateLabel } from '@/shared/utils'
 import { CircleHelp } from 'lucide-react'
 import { Box } from '@mui/system'
-import { marketingSourceEmpty } from '@/shared/constans'
+import { marketingSourceEmpty } from '@/shared/constants'
 import { ComingSoon } from '@components/ComingSoon'
 
 export const LeadsStatementsMarketingSources = ({ data }: { data: ReportLeadsSourceType[] }) => {

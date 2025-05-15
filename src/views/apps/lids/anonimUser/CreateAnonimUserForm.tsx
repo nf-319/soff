@@ -36,7 +36,7 @@ import { Ellipsis } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { LeadKanbanItem } from '@/entities/lids/LeadKanbanItem'
 import { LEAD_STATEMENTS_TEMPERATURE } from '@modules/LeadsStatement'
-import { lidStatusOption } from '@/shared/constans/lid-statements'
+import { lidStatusOption } from '@/shared/constants/lid-statements'
 
 type Props = {
   source?: any
