@@ -53,8 +53,6 @@ export const GroupCard: FC<Props> = ({
         boxShadow: '0 4px 12px rgba(102, 108, 255, 0.2)'
       },
       width: '100%',
-      maxWidth: 400,
-      margin: '0 auto'
     }}
   >
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>

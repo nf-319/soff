@@ -1,1 +1,0 @@
-import { MentorTable } from './MentorTable'

@@ -6,27 +6,27 @@ type GroupTableType = {
   teacherShare: number
    }
 
-export const GroupTable  = [
+export const GroupTable = [
   {
     id: 1,
-    groupName: "FrontEnd-25",
-    courseName: "Web dasturlash",
+    groupName: 'FrontEnd-25',
+    courseName: 'Web dasturlash',
     allStudents: 24,
     teacherShare: 350000
   },
   {
- id: 2,
- groupName:"FrontEnd-26",
- courseName:"Python",
- allStudents:21,
- teacherShare:320000
+    id: 2,
+    groupName: 'FrontEnd-26',
+    courseName: 'Python',
+    allStudents: 21,
+    teacherShare: 320000
   },
-  {    
- id: 3,
- groupName:"FrontEnd-27",
- courseName:"Flutter",
- allStudents:26,
- teacherShare:380000
+  {
+    id: 3,
+    groupName: 'FrontEnd-27',
+    courseName: 'Flutter',
+    allStudents: 26,
+    teacherShare: 380000
   }
 ] satisfies GroupTableType[]
 

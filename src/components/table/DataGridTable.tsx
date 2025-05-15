@@ -28,7 +28,17 @@ function DataGridTable<T>({
   ...restProps
 }: Props<T>) {
   return (
-    <Box sx={{ width: '100%', position: 'relative' }}>
+    <Box
+      sx={{
+        width: '100%',
+        position: 'relative',
+        '& .MuiDataGrid-root': {
+          overflow: 'hidden',
+          borderRadius: 1,
+          border: '1px solid #e0e0e0'
+        }
+      }}
+    >
       <DataGrid
         autoHeight
         rows={rows}

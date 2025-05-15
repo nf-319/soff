@@ -67,7 +67,7 @@ export const addStudentToGroup = createAsyncThunk('updateGroup/addStudent', asyn
 })
 export const deleteGroup = createAsyncThunk('delete/group', async (data: any, { rejectWithValue }) => {
   try {
-    const resp = await api.post(`system/group-students/bulk-delete/`, data)
+    const resp = await api.post(`common/group-students/bulk-delete/`, data)
 
     return resp.data
   } catch (err: any) {

@@ -10,4 +10,5 @@ export const enum QueryKeys {
   LeadsDescriptionUpdate = 'leads-description-update',
   TeacherDetail = 'teacher-detail',
   Groups = 'groups',
+  EmployeeSellers = 'sellers',
 }
