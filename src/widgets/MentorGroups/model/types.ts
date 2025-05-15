@@ -3,6 +3,13 @@ type MentorGroupStatusType = {
   status: string
 }
 
+type MentorGroupStudentCountsType = {
+  active_count: number
+  archive_count: number
+  new_count: number
+  frozen_count: number
+}
+
 export type MentorGroupType = {
   id: number
   name: string
@@ -14,6 +21,7 @@ export type MentorGroupType = {
   start_at: string
   end_at: string
   student_count: number
+  student_counts: MentorGroupStudentCountsType
   week_days: string[]
   month_duration: number
   color: string

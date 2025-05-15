@@ -5,6 +5,7 @@ import { Box, Typography, Chip, Tooltip } from '@mui/material'
 import { Clock, MapPin, Users, User, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import { dayTranslations } from '@shared/constants'
+import getMonthName from '@utils/gwt-month-name'
 
 type Props = {
   title: string
@@ -37,7 +38,7 @@ export const GroupCard: FC<Props> = ({
 }) => (
   <Box
     component={Link}
-    href={`/groups/view/security/?id=${hrefId}`}
+    href={`/groups/view/security/?id=${hrefId}&month=${getMonthName(null)}`}
     sx={{
       display: 'flex',
       flexDirection: 'column',

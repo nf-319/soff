@@ -7,6 +7,7 @@ import { useGetGroups } from '@/widgets/MentorGroups/api/groups'
 import { useAuth } from '@hooks/useAuth'
 import { MentorGroupsSkeleton } from './ui/MentorGroupsSkeleton'
 import { MentorGroupType } from '@/widgets/MentorGroups/model/types'
+import { getFormatDate } from '@shared/utils/getFormatDate'
 
 export const MentorGroups = () => {
   const { user } = useAuth()
@@ -54,7 +55,7 @@ export const MentorGroups = () => {
       <Divider color="#e0e0e0" sx={{ mb: 2 }} />
 
       <Box>
-        <Typography sx={{ mb: '10px', fontWeight: 600, fontSize: 12 }}>
+        <Typography sx={{ mb: '10px', fontWeight: 600, fontSize: 14 }}>
           Hozirgi/Keyingi dars
         </Typography>
         {currentOrNextGroup ? (
@@ -66,10 +67,9 @@ export const MentorGroups = () => {
             hrefId={currentOrNextGroup.id}
             course={currentOrNextGroup.course_name}
             all_students={currentOrNextGroup.student_count}
-            active_students={0}
-            trial_students={4}
+            active_students={currentOrNextGroup.student_counts.active_count}
+            trial_students={currentOrNextGroup.student_counts.new_count}
             room={currentOrNextGroup.room_name}
-            teacher_name={currentOrNextGroup.teacher_name}
             week_days={currentOrNextGroup.week_days}
             month_duration={currentOrNextGroup.month_duration}
           />
@@ -80,7 +80,7 @@ export const MentorGroups = () => {
         )}
       </Box>
 
-      <Typography sx={{ mt: '15px', mb: '10px', fontWeight: 600, fontSize: 12 }}>
+      <Typography sx={{ mt: '15px', mb: '10px', fontWeight: 600, fontSize: 14 }}>
         Barcha guruhlar
       </Typography>
       <Box
@@ -108,14 +108,13 @@ export const MentorGroups = () => {
               key={`${item.name}-${item.id}`}
               title={item.name}
               isHighlighted={isCurrentOrNext}
-              lesson_time={item.start_end_at}
+              lesson_time={`${getFormatDate(String(item.start_date))} - ${item.start_end_at}`}
               hrefId={item.id}
               course={item.course_name}
               all_students={item.student_count}
-              active_students={0}
-              trial_students={4}
+              active_students={item.student_counts.active_count}
+              trial_students={item.student_counts.new_count}
               room={item.room_name}
-              teacher_name={item.teacher_name}
               week_days={item.week_days}
               month_duration={item.month_duration}
             />
