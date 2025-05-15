@@ -61,18 +61,7 @@ export const StudentPoints = () => {
     }&start_date=${start_date || ''}&end_date=${end_date || ''}`
   )
 
-  useEffect(() => {
-    const query = { ...router.query }
-    if (page !== 0) query.page = page.toString()
-    else delete query.page
-    if (pageSize !== 10) query.pageSize = pageSize.toString()
-    else delete query.pageSize
-
-    router.push({
-      pathname: router.pathname,
-      query
-    }, undefined, { shallow: true })
-  }, [page, pageSize])
+  
 
   const formik = useFormik({
     initialValues: {
