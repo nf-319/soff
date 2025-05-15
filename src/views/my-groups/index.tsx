@@ -20,7 +20,6 @@ export default function MyGroups() {
   const { groups, isTableLoading, myGroupParams, isLoading, teacherSalaries } = useAppSelector(state => state.groups)
   const dispatch = useAppDispatch()
   const { push } = useRouter()
-  const { soffBotStatus } = useAppSelector(state => state.page)
 
   const column: customTableDataProps[] = [
     {
@@ -72,7 +71,7 @@ export default function MyGroups() {
 
   useEffect(() => {
     if (!user?.role.includes('teacher') && !user?.role.includes('watcher')) {
-      push('/')
+      void push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
     }
     ;(async function () {

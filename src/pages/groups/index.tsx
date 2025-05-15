@@ -270,6 +270,7 @@ export default function GroupsPage() {
 
     void initializePage()
   }, [])
+
   useEffect(() => {
     void queryClient.invalidateQueries({ queryKey: [ceoConfigs.groups, 'groups-list'] })
   }, [user?.active_branch])

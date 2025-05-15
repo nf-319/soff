@@ -171,7 +171,7 @@ const ReturnCashModal = ({
     validationSchema,
     onSubmit: async values => {
       mutate(
-        'system/refund-payment/',
+        'common/refund-payment/',
         {
           ...values,
           payment: paymentData.id

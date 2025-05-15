@@ -6,7 +6,7 @@ import { useSettings } from '@/@core/hooks/useSettings'
 import { FC } from 'react'
 import { ComingSoon } from '@components/ComingSoon'
 import { CircleHelp } from 'lucide-react'
-import { coursesEmpty } from '@/shared/constans'
+import { coursesEmpty } from '@/shared/constants'
 
 const LegendItem = styled(Box)(({ theme }) => ({
   display: 'flex',

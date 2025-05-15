@@ -6,7 +6,7 @@ import { X } from 'lucide-react'
 import { EmptyContent } from '../empty-content'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
-import { uzbekMonths } from '@/shared/constans'
+import { uzbekMonths } from '@/shared/constants'
 
 const LeadsDashboardCardModal = ({ id, setOpen }: { id: string | null; setOpen: (status: any) => void }) => {
   const router = useRouter()

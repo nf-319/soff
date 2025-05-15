@@ -18,7 +18,7 @@ import { reversePhone } from '@components/phone-input/format-phone-number'
 import PhoneInput from '@components/phone-input'
 import { useQueryClient } from '@tanstack/react-query'
 import { LEAD_STATEMENTS_TEMPERATURE } from '@modules/LeadsStatement'
-import { lidStatusOption } from '@/shared/constans/lid-statements'
+import { lidStatusOption } from '@/shared/constants/lid-statements'
 
 type Props = {
   item: any

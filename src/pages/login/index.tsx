@@ -114,10 +114,10 @@ const LoginPage = () => {
       const redirectURL = isMarketable
         ? '/lid-statements'
         : paymentPage
-        ? '/crm-payments'
-        : returnUrl && returnUrl !== '/'
-        ? returnUrl
-        : '/'
+          ? '/crm-payments'
+          : returnUrl && returnUrl !== '/'
+            ? returnUrl
+            : '/'
 
       await router.push(redirectURL as string)
 
@@ -194,9 +194,8 @@ const LoginPage = () => {
                 )}
 
                 {public_settings ? (
-                  <TypographyStyled variant='h5'>{`${
-                    public_settings?.training_center_name || themeConfig.templateName
-                  }! ga Xush kelibsiz 👋🏻`}</TypographyStyled>
+                  <TypographyStyled variant='h5'>{`${public_settings?.training_center_name || themeConfig.templateName
+                    }! ga Xush kelibsiz 👋🏻`}</TypographyStyled>
                 ) : (
                   <TypographyStyled variant='h5'>Xush kelibsiz 👋🏻</TypographyStyled>
                 )}

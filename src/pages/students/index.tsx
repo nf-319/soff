@@ -12,7 +12,6 @@ import {
   DialogTitle,
   IconButton,
   Tooltip,
-  Switch
 } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import DataTable from '../../components/table'
@@ -37,10 +36,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
 import { fetchSmsList } from '@store/apps/settings'
 import { ModalTypes, SendSMSModal } from '@/views/apps/students/view/UserViewLeft'
-import { Archive, ArchiveIcon, ArchiveRestore, MessageSquareText } from 'lucide-react'
+import { Archive, ArchiveRestore, MessageSquareText } from 'lucide-react'
 import useSMS from '@hooks/useSMS'
 import Divider from '@mui/material/Divider'
-import { Toggle } from 'rsuite'
 
 export type customTableProps = {
   xs: number

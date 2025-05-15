@@ -1,3 +1,5 @@
 export { truncateLabel } from './trucateLabel'
+export { getFormatDate } from './getFormatDate'
+export { formatPrice } from './formatPrice'
 export { getFormatPhone, cleanPhone } from './getFormatPhone'
 export {getTrendDirection} from './getTrendDirection'
