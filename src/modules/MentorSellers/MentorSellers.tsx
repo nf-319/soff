@@ -129,6 +129,13 @@ export const MentorSellers = () => {
       flex: 1
     },
     {
+      field: 'salary',
+      headerName: 'Maosh',
+      minWidth: 100,
+      renderCell: (params: any) => formatPrice(params.value),
+      flex: 1
+    },
+    {
       field: 'status',
       headerName: 'Status',
       width: 200,
