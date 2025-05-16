@@ -24,6 +24,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
 import TeacherEditDialog from 'src/views/apps/mentors/TeacherEditDialog'
 import DataTable from '../../components/table'
+import { AccessDeniedModal } from '@/components/AccessDeniedModal'
 
 export type customTableProps = {
   xs: number
@@ -42,6 +43,8 @@ export default function GroupsPage() {
   const { smsTemps, getSMSTemps } = useSMS()
   const { queryParams, openSms } = useAppSelector(state => state.mentors)
 
+  const [accessModal, setAccessModal] = useState<boolean>(false)
+  const { companyInfo } = useAppSelector(item => item.user)
   const { data: teachers } = useGet(`${ceoConfigs.employee_checklist}?role=teacher`)
 
   const studentIds = teachers?.map((student: any) => student.id)
@@ -54,6 +57,15 @@ export default function GroupsPage() {
 
   const handleEditClose = () => {
     dispatch(setOpenSms(null))
+  }
+
+  const handleModalOpen = () => {
+    if (!companyInfo.access) {
+      void getSMSTemps()
+      handleEditClickOpen('sms')
+    } else {
+      setAccessModal(true)
+    }
   }
 
   useEffect(() => {
@@ -206,10 +218,7 @@ export default function GroupsPage() {
           }}
         >
           <Button
-            onClick={() => {
-              void getSMSTemps()
-              handleEditClickOpen('sms')
-            }}
+            onClick={handleModalOpen}
             variant='outlined'
             color='warning'
             fullWidth={isMobile}
@@ -246,6 +255,8 @@ export default function GroupsPage() {
           }}
         />
       )}
+      <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
+
       <TeacherCreateDialog />
       <TeacherEditDialog />
       <SendSMSModal
