@@ -108,7 +108,10 @@ export default function FormsPage() {
               size='medium'
               color='primary'
               onClick={() => {
-                router.push(`/settings/forms/update/${id}`)
+                router.push({
+                  pathname: '/settings/forms/[id]',
+                  query: { id }
+                })
               }}
             >
               <Edit color='blue' size={18} />
@@ -145,7 +148,7 @@ export default function FormsPage() {
   }
 
   const getForms = async () => {
-    const resp = await api.get('leads/application-form/list/')
+    const resp = await api.get('leads/form/list/')
     setData(resp.data)
   }
 

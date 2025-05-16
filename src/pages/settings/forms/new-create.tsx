@@ -36,8 +36,8 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 
-type FieldType = {
-  type: 'input' | 'text' | 'question' | 'phone'
+export type FieldType = {
+  input_type: 'input' | 'text' | 'question' | 'phone'
   label: string
   title: string
   value?: string
@@ -69,49 +69,61 @@ const NewCreate = () => {
   const { data: sources } = useGet('leads/source/')
   const [isLoading, setIsLoading] = useState(false)
   const [fields, setFields] = useState<FieldType[]>([
-    { type: 'input', label: 'Ism', title: 'Ism', value: '', is_required: false },
-    { type: 'phone', label: 'Telefon', title: 'Telefon', value: '', is_required: false }
+    { input_type: 'input', label: 'Ism', title: 'Ism', value: '', is_required: false },
+    { input_type: 'phone', label: 'Telefon', title: 'Telefon', value: '', is_required: false }
   ])
 
   const handleCreateForm = async () => {
-    const formData = new FormData()
-
-    if (logoImg) formData.append('logo', logoImg)
-    if (bg_img) formData.append('background_image', bg_img)
-    if (formName) formData.append('title', formName)
-    if (departmentValue) formData.append('department', String(departmentValue))
-    if (sourceValue) formData.append('source', String(sourceValue))
-    formData.append('form_questions', JSON.stringify(fields))
-    const extraData = {
-      sent_button_label: sentButtonLabel,
-      success_text: successText
-    }
-
-    formData.append('extra_data', JSON.stringify(extraData))
-
     setIsLoading(true)
+
     try {
-      await api.post('leads/form/create/', formData).then(res => {
-        push('/settings/forms')
-        toast.success('Forma yaratildi')
+      const payload = {
+        title: formName,
+        department: departmentValue,
+        source: sourceValue,
+        form_questions: fields,
+        extra_data: {
+          sent_button_label: sentButtonLabel,
+          success_text: successText
+        }
+      }
+
+      await api.post('leads/form/create/', payload).then(res => {
+        if (res.status == 201) {
+          console.log(res)
+
+          if (logoImg || bg_img) {
+            const formData = new FormData()
+            if (logoImg instanceof File) {
+              formData.append('logo', logoImg)
+            }
+
+            if (bg_img instanceof File) {
+              formData.append('background_image', bg_img)
+            }
+
+            formData.append('form', res.data.id)
+            const imageRes = api.post('leads/form/file/', formData)
+          }
+        }
       })
+      toast.success('Forma yaratildi')
+      push('/settings/forms')
     } catch (err: any) {
-      console.log(err)
-      toast.error(err.response.data.msg || "Ma'lumotlarni to'liq kiriting")
+      console.error(err)
+      toast.error(err.response?.data?.msg || "Ma'lumotlarni to'liq kiriting")
     }
 
     setIsLoading(false)
   }
 
-  console.log(fields)
-
-  const handleAddField = (type: FieldType['type']) => {
+  const handleAddField = (input_type: FieldType['input_type']) => {
     const newField: FieldType = {
-      type,
-      label: type === 'text' ? 'Yangi matn' : type === 'question' ? 'Yangi savol' : 'Yangi input',
-      title: type === 'input' ? 'Yangi input' : type === 'text' ? 'Yangi Matn' : 'Yangi savol',
+      input_type,
+      label: input_type === 'text' ? 'Yangi matn' : input_type === 'question' ? 'Yangi savol' : 'Yangi input',
+      title: input_type === 'input' ? 'Yangi input' : input_type === 'text' ? 'Yangi Matn' : 'Yangi savol',
       is_required: false,
-      ...(type === 'question'
+      ...(input_type === 'question'
         ? {
             question: 'Yangi savol',
             question_variants: [
@@ -149,8 +161,6 @@ const NewCreate = () => {
     }
     setFields(updated)
   }
-
-  console.log(fields)
 
   const addVariant = (fieldIndex: number) => {
     const updated = [...fields]
@@ -377,7 +387,7 @@ const NewCreate = () => {
                                       </AccordionSummary>
 
                                       <AccordionDetails>
-                                        {(field.type === 'input' || field.type === 'phone') && (
+                                        {(field.input_type === 'input' || field.input_type === 'phone') && (
                                           <TextField
                                             fullWidth
                                             label='Label'
@@ -397,7 +407,7 @@ const NewCreate = () => {
                                           sx={{ mt: 2 }}
                                         />
 
-                                        {field.type === 'text' && (
+                                        {field.input_type === 'text' && (
                                           <TextField
                                             fullWidth
                                             multiline
@@ -408,7 +418,7 @@ const NewCreate = () => {
                                           />
                                         )}
 
-                                        {field.type === 'question' && (
+                                        {field.input_type === 'question' && (
                                           <Box>
                                             <TextField
                                               fullWidth
@@ -698,7 +708,6 @@ const NewCreate = () => {
             </Box>
           )}
         </Card>
-        <Box></Box>
         <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 5 }}>
           <Box display={'flex'} alignItems={'center'} justifyContent={'center'}>
             <Card
@@ -724,8 +733,10 @@ const NewCreate = () => {
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: 5,
+                  overflowY: 'auto',
                   padding: 5,
                   width: 300,
+                  maxHeight: 450,
                   backgroundColor: bg_color
                 }}
               >
@@ -756,7 +767,7 @@ const NewCreate = () => {
 
                 {fields.map((field, index) => (
                   <FormControl fullWidth key={index}>
-                    {field.type === 'input' && (
+                    {field.input_type === 'input' && (
                       <TextField
                         sx={{
                           backgroundColor: 'white',
@@ -772,7 +783,7 @@ const NewCreate = () => {
                         onChange={e => handleFieldChange(index, 'value', e.target.value)}
                       />
                     )}
-                    {field.type === 'phone' && (
+                    {field.input_type === 'phone' && (
                       <>
                         <InputLabel shrink>{field.label}</InputLabel>
                         <PhoneInput
@@ -783,7 +794,7 @@ const NewCreate = () => {
                         />
                       </>
                     )}
-                    {field.type === 'text' && (
+                    {field.input_type === 'text' && (
                       <TextField
                         sx={{
                           background: 'white',
@@ -799,7 +810,7 @@ const NewCreate = () => {
                         onChange={e => handleFieldChange(index, 'value', e.target.value)}
                       />
                     )}
-                    {field.type === 'question' && (
+                    {field.input_type === 'question' && (
                       <FormControl component='fieldset' variant='standard'>
                         <FormLabel component='legend'>{field.question}</FormLabel>
                         <FormGroup>

@@ -123,7 +123,8 @@ export default function CreateForm({}: Props) {
         success_text: successText,
         source: addSource,
         type: 'lead_form',
-        form_questions: [...components]
+        form_questions: [...components],
+        branch: user?.active_branch
       })
       push('/settings/forms')
       toast.success('Forma yaratildi')

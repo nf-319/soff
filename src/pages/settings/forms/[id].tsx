@@ -1,3 +1,5 @@
+'use client'
+
 import useResponsive from '@/@core/hooks/useResponsive'
 import api from '@/@core/utils/api'
 import { revereAmount } from '@/components/amount-input'
@@ -21,6 +23,7 @@ import {
   IconButton,
   InputLabel,
   MenuItem,
+  OutlinedInput,
   Select,
   Tab,
   Tabs,
@@ -31,30 +34,19 @@ import { GridExpandMoreIcon } from '@mui/x-data-grid'
 import { LaptopMinimal, Plus, PlusCircle, Smartphone, Trash, Trash2, Upload } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-
-type FieldType = {
-  type: 'input' | 'text' | 'question' | 'phone'
-  label: string
-  title: string
-  value?: string
-  question?: string
-  variants?: string[]
-  checkedVariants?: string[]
-  question_variants?: any[]
-  is_required: boolean
-}
+import { FieldType } from './new-create'
 
 const UpdateForm = () => {
   const [isElement, setIsElement] = useState(true)
   const { t } = useTranslation()
+  const { push, query } = useRouter()
   const [departmentValue, setDepartmentValue] = useState<number | null>(null)
   const [sourceValue, setSourceValue] = useState<number | null>(null)
   const [formName, setFormName] = useState<string>('Aloqa uchun kontakt')
-  const { push, query } = useRouter()
   const [successText, setSuccessText] = useState<string>(
     "So'rovingiz muvaffaqiyatli yuborildi! Tez orada siz bilan bog'lanamiz."
   )
@@ -68,49 +60,77 @@ const UpdateForm = () => {
   const { data: departments } = useGet(`leads/department/list/`)
   const { data: sources } = useGet('leads/source/')
   const [isLoading, setIsLoading] = useState(false)
-  const { data: formDetail,refetch } = useGet(`leads/form/detail/${query.id}/`, { options: { enabled: !!query.id } })
   const [fields, setFields] = useState<FieldType[]>([
-    { type: 'input', label: 'Ism', title: 'Ism', value: '', is_required: false },
-    { type: 'phone', label: 'Telefon', title: 'Telefon', value: '', is_required: false }
+    { input_type: 'input', label: 'Ism', title: 'Ism', value: '', is_required: false },
+    { input_type: 'phone', label: 'Telefon', title: 'Telefon', value: '', is_required: false }
   ])
+  const { data: formDetail, refetch } = useGet(`leads/form/detail/${String(query?.id)}/`, {
+    options: { enabled: !!query?.id }
+  })
 
-  const handleCreateForm = async () => {
-    const formData = new FormData()
-
-    if (logoImg) formData.append('logo', logoImg)
-    if (bg_img) formData.append('background_image', bg_img)
-    if (formName) formData.append('title', formName)
-    if (departmentValue) formData.append('department', String(departmentValue))
-    if (sourceValue) formData.append('source', String(sourceValue))
-    formData.append('form_questions', JSON.stringify(fields))
-    const extraData = {
-      sent_button_label: sentButtonLabel,
-      success_text: successText
+  useEffect(() => {
+    if (formDetail) {
+      setFields(formDetail?.form_questions)
+      setDepartmentValue(formDetail?.department)
+      setSourceValue(formDetail?.source)
+      setBgImg(formDetail?.background_image)
+      setLogoImg(formDetail?.logo)
     }
+  }, [formDetail])
 
-    formData.append('extra_data', JSON.stringify(extraData))
+  useEffect(() => {
+    refetch()
+  }, [query.id])
 
+  const handleUpdateForm = async () => {
     setIsLoading(true)
+
     try {
-      await api.post('leads/form/create/', formData).then(res => {
-        push('/settings/forms')
-        toast.success('Forma yaratildi')
+      const payload = {
+        title: formName,
+        department: departmentValue,
+        source: sourceValue,
+        form_questions: fields,
+        extra_data: {
+          sent_button_label: sentButtonLabel,
+          success_text: successText
+        }
+      }
+
+      await api.patch(`leads/form/update/${query.id}/`, payload).then(res => {
+        if (res.status == 200) {
+          if (logoImg || bg_img) {
+            const formData = new FormData()
+            if (logoImg instanceof File) {
+              formData.append('logo', logoImg)
+            }
+
+            if (bg_img instanceof File) {
+              formData.append('background_image', bg_img)
+            }
+
+            formData.append('form', res.data.id)
+            const imageRes = api.post('leads/form/file/', formData)
+          }
+        }
       })
+      toast.success('Forma yaratildi')
+      push('/settings/forms')
     } catch (err: any) {
-      console.log(err)
-      toast.error(err.response.data.msg || "Ma'lumotlarni to'liq kiriting")
+      console.error(err)
+      toast.error(err.response?.data?.msg || "Ma'lumotlarni to'liq kiriting")
     }
 
     setIsLoading(false)
   }
 
-  const handleAddField = (type: FieldType['type']) => {
+  const handleAddField = (input_type: FieldType['input_type']) => {
     const newField: FieldType = {
-      type,
-      label: type === 'text' ? 'Yangi matn' : type === 'question' ? 'Yangi savol' : 'Yangi input',
-      title: type === 'input' ? 'Yangi input' : type === 'text' ? 'Yangi Matn' : 'Yangi savol',
+      input_type,
+      label: input_type === 'text' ? 'Yangi matn' : input_type === 'question' ? 'Yangi savol' : 'Yangi input',
+      title: input_type === 'input' ? 'Yangi input' : input_type === 'text' ? 'Yangi Matn' : 'Yangi savol',
       is_required: false,
-      ...(type === 'question'
+      ...(input_type === 'question'
         ? {
             question: 'Yangi savol',
             question_variants: [
@@ -182,9 +202,6 @@ const UpdateForm = () => {
     updated.splice(index, 1)
     setFields(updated)
   }
-
-  console.log(formDetail);
-  
 
 
   return (
@@ -260,16 +277,17 @@ const UpdateForm = () => {
             <Box display={'flex'} flexDirection={'column'} gap={5}>
               <Box display={'flex'} gap={5}>
                 <FormControl fullWidth>
-                  <InputLabel size='small' id='user-view-language-label'>
+                  <InputLabel shrink size='small' id='user-view-language-label'>
                     {t("Bo'lim")}
                   </InputLabel>
                   <Select
+                    input={<OutlinedInput notched label="Bo'lim" />}
                     size='small'
                     label={t("Bo'lim")}
                     id='user-view-language'
                     labelId='user-view-language-label'
                     name='department'
-                    defaultValue={''}
+                    value={departmentValue}
                     onChange={e => setDepartmentValue(Number(e.target.value))}
                   >
                     {departments?.map((item: any) => (
@@ -289,9 +307,11 @@ const UpdateForm = () => {
                     {t('Manba')}
                   </InputLabel>
                   <Select
+                    input={<OutlinedInput notched label='Manba' />}
                     size='small'
                     label={t('Manba')}
                     id='fsdgsdgsgsdfsd'
+                    value={sourceValue}
                     labelId='fsdgsdgsgsdfsd-label'
                     name='source'
                     onChange={(e: any) => setSourceValue(e?.target?.value)}
@@ -378,12 +398,12 @@ const UpdateForm = () => {
                                       </AccordionSummary>
 
                                       <AccordionDetails>
-                                        {(field.type === 'input' || field.type === 'phone') && (
+                                        {(field.input_type === 'input' || field.input_type === 'phone') && (
                                           <TextField
                                             fullWidth
                                             label='Label'
-                                            value={field.label}
-                                            onChange={e => handleFieldChange(index, 'label', e.target.value)}
+                                            value={field.title}
+                                            onChange={e => handleFieldChange(index, 'title', e.target.value)}
                                           />
                                         )}
                                         <FormControlLabel
@@ -398,24 +418,24 @@ const UpdateForm = () => {
                                           sx={{ mt: 2 }}
                                         />
 
-                                        {field.type === 'text' && (
+                                        {field.input_type === 'text' && (
                                           <TextField
                                             fullWidth
                                             multiline
                                             minRows={3}
-                                            label={field.label}
-                                            value={field.label}
-                                            onChange={e => handleFieldChange(index, 'label', e.target.value)}
+                                            label={field.title}
+                                            value={field.title}
+                                            onChange={e => handleFieldChange(index, 'title', e.target.value)}
                                           />
                                         )}
 
-                                        {field.type === 'question' && (
+                                        {field.input_type === 'question' && (
                                           <Box>
                                             <TextField
                                               fullWidth
                                               label='Savol'
-                                              value={field.question}
-                                              onChange={e => handleFieldChange(index, 'question', e.target.value)}
+                                              value={field.title}
+                                              onChange={e => handleFieldChange(index, 'title', e.target.value)}
                                               sx={{ mb: 2 }}
                                             />
                                             {field.question_variants?.map((variant, vIndex) => (
@@ -474,8 +494,8 @@ const UpdateForm = () => {
                     onChange={e => setSuccessText(e.target.value)}
                   />
                 </FormControl>
-                <LoadingButton onClick={handleCreateForm} loading={isLoading} variant='contained'>
-                  Yaratish
+                <LoadingButton onClick={handleUpdateForm} loading={isLoading} variant='contained'>
+                  Saqlash
                 </LoadingButton>
               </Box>
             </Box>
@@ -587,7 +607,11 @@ const UpdateForm = () => {
                     >
                       <Image
                         priority={false}
-                        src={bg_img ? URL.createObjectURL(bg_img) : '/images/request-form-bg.webp'}
+                        src={
+                          bg_img instanceof File || bg_img instanceof Blob
+                            ? URL.createObjectURL(bg_img)
+                            : bg_img || '/images/request-form-bg.webp'
+                        }
                         alt='Yuklangan rasm'
                         width={180}
                         height={180}
@@ -655,7 +679,7 @@ const UpdateForm = () => {
                     >
                       <Image
                         priority={false}
-                        src={logoImg ? URL.createObjectURL(logoImg) : companyInfo.logo}
+                        src={logoImg instanceof File ? URL.createObjectURL(logoImg) : logoImg || companyInfo.logo}
                         alt='Yuklangan rasm'
                         width={180}
                         height={180}
@@ -704,7 +728,11 @@ const UpdateForm = () => {
           <Box display={'flex'} alignItems={'center'} justifyContent={'center'}>
             <Card
               sx={{
-                backgroundImage: `url(${bg_img ? URL.createObjectURL(bg_img) : '/images/request-form-bg.webp'})`,
+                backgroundImage: `url(${
+                  bg_img instanceof File || bg_img instanceof Blob
+                    ? URL.createObjectURL(bg_img)
+                    : bg_img || '/images/request-form-bg.webp'
+                })`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
@@ -743,7 +771,7 @@ const UpdateForm = () => {
                 >
                   <Image
                     priority={false}
-                    src={logoImg ? URL.createObjectURL(logoImg) : companyInfo.logo}
+                    src={logoImg instanceof File ? URL.createObjectURL(logoImg) : logoImg || companyInfo.logo}
                     alt='Yuklangan rasm'
                     width={100}
                     height={100}
@@ -757,7 +785,7 @@ const UpdateForm = () => {
 
                 {fields.map((field, index) => (
                   <FormControl fullWidth key={index}>
-                    {field.type === 'input' && (
+                    {field.input_type === 'input' && (
                       <TextField
                         sx={{
                           backgroundColor: 'white',
@@ -768,23 +796,23 @@ const UpdateForm = () => {
                         }}
                         size='small'
                         type='text'
-                        label={field.label}
+                        label={field.title}
                         value={field.value}
                         onChange={e => handleFieldChange(index, 'value', e.target.value)}
                       />
                     )}
-                    {field.type === 'phone' && (
+                    {field.input_type === 'phone' && (
                       <>
-                        <InputLabel shrink>{field.label}</InputLabel>
+                        <InputLabel shrink>{field.title}</InputLabel>
                         <PhoneInput
                           sx={{ background: 'white' }}
-                          label={field.label}
+                          label={field.title}
                           value={field.value}
                           onChange={e => handleFieldChange(index, 'value', revereAmount(e.target.value))}
                         />
                       </>
                     )}
-                    {field.type === 'text' && (
+                    {field.input_type === 'text' && (
                       <TextField
                         sx={{
                           background: 'white',
@@ -793,16 +821,16 @@ const UpdateForm = () => {
                             borderRadius: '8px'
                           }
                         }}
-                        label={field.label}
+                        label={field.title}
                         multiline
                         minRows={3}
-                        value={field.value}
+                        value={field.title}
                         onChange={e => handleFieldChange(index, 'value', e.target.value)}
                       />
                     )}
-                    {field.type === 'question' && (
+                    {field?.input_type === 'question' && (
                       <FormControl component='fieldset' variant='standard'>
-                        <FormLabel component='legend'>{field.question}</FormLabel>
+                        <FormLabel component='legend'>{field.title}</FormLabel>
                         <FormGroup>
                           {field?.question_variants &&
                             field?.question_variants.map((variant, vIndex: any) => (
