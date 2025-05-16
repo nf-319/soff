@@ -21,6 +21,7 @@ import {
 import TeacherGroupsModal from 'src/views/apps/finance/TeacherGroupsModal'
 import { VscodeIconsFileTypeExcel2 } from '@components/excelButton/ExcelIcon'
 import { useQuery } from '@tanstack/react-query'
+import { Ellipsis, UserCheck } from 'lucide-react'
 
 const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) => {
   const { moderation_salaries, isGettingCalculatedSalary, isPending, is_update } = useAppSelector(
@@ -31,13 +32,20 @@ const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) 
   const [loading, setLoading] = useState<'frozen' | 'approved' | null>(null)
   const { back, push } = useRouter()
   const [open, setOpen] = useState<boolean>(false)
+  const [confirmModalOpen, setConfirmModalOpen] = useState<boolean>(false)
   const [id, setId] = useState<number | null>(null)
+  const [selectedEmployee, setSelectedEmployee] = useState<any | null>(null)
   const { user } = useContext(AuthContext)
   const router = useRouter()
 
   const handleGetSalary = async (teacherId: number) => {
     setId(teacherId)
     await dispatch(fetchCalculatedSalary({ id: teacherId, queryParams: `date=${slug}` }))
+  }
+
+  const handleOpenConfirmModal = (employee: any) => {
+    setSelectedEmployee(employee)
+    setConfirmModalOpen(true)
   }
 
   const withdrawCol: customTableDataProps[] = [
@@ -56,7 +64,7 @@ const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) 
       xs: 0.16,
       title: t("O'zgarmas oylik"),
       dataIndex: 'fixed_salary',
-      render: fixed_salary => `${formatCurrency(+fixed_salary)} so'm`
+      render: (fixed_salary: string) => `${formatCurrency(+fixed_salary)} so'm`
     },
     {
       xs: 0.08,
@@ -93,24 +101,22 @@ const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) 
       title: `${t('Bonuslar')} (so'm)`,
       dataIndex: 'bonus_amount',
       renderId: (id, bonus_amount) => (
-        (
-          <input
-            className='salary-table__input'
-            disabled={!is_update}
-            style={{ width: '80px', zIndex: 999 }}
-            type='string'
-            value={formatAmount(String(bonus_amount))}
-            onChange={e => (
-              e.stopPropagation(),
+        <input
+          className='salary-table__input'
+          disabled={!is_update}
+          style={{ width: '80px', zIndex: 999 }}
+          type='string'
+          value={formatAmount(String(bonus_amount))}
+          onChange={e => (
+            e.stopPropagation(),
               dispatch(
                 updateSalaryBonus({
                   id,
                   bonus_amount: revereAmount(e.target.value) || 0
                 })
               )
-            )}
-          />
-        )
+          )}
+        />
       )
     },
     {
@@ -126,12 +132,12 @@ const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) 
           value={formatAmount(String(fine_amount))}
           onChange={e => (
             e.stopPropagation(),
-            dispatch(
-              updateSalaryFine({
-                id,
-                fine_amount: revereAmount(e.target.value) || 0
-              })
-            )
+              dispatch(
+                updateSalaryFine({
+                  id,
+                  fine_amount: revereAmount(e.target.value) || 0
+                })
+              )
           )}
         />
       )
@@ -143,19 +149,30 @@ const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) 
       render: final_salary => `${formatCurrency(final_salary)} so'm`
     },
     {
-      xs: 0.1,
-      title: t(''),
+      xs: 0.15,
+      title: 'Harakatlar',
       dataIndex: 'employee_data',
-      render: (employee_data:any) => {
-        const teacherID = employee_data.id
+      render: (source: any) => {
+        const teacherID = source.id
+        const record = moderation_salaries.find(item => item.employee_data.id === teacherID)
         return (
-          <LoadingButton
-            loading={teacherID == id && isGettingCalculatedSalary}
-            size='small'
-            onClick={() => handleGetSalary(teacherID)}
-          >
-            {t('Batafsil')}
-          </LoadingButton>
+          <Box display='flex' gap={3}>
+            <IconButton
+              size='small'
+              onClick={() => handleGetSalary(teacherID)}
+            >
+              <Ellipsis size={20} />
+            </IconButton>
+
+            {is_update && (
+              <IconButton
+                size='small'
+                onClick={() => handleOpenConfirmModal(record)}
+              >
+                <UserCheck size={20} />
+              </IconButton>
+            )}
+          </Box>
         )
       }
     }
@@ -180,10 +197,27 @@ const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) 
     try {
       await api.patch(`finance/employee-salaries/update/`, { update_data })
       toast.success("Ma'lumotlar saqlandi")
-      // await dispatch(fetchModerationSalaries(''))
       void push('/finance')
     } catch (err) {
       console.log(err)
+    }
+    setLoading(null)
+  }
+
+  const confirmSingleSalary = async () => {
+    if (!selectedEmployee) return
+    setLoading('approved')
+    try {
+      await api.patch(`finance/employee-salaries/update/`, {
+        update_data: [{ ...selectedEmployee, status: 'approved' }]
+      })
+      toast.success("O'qituvchi ma'lumotlari tasdiqlandi")
+      dispatch(fetchModerationSalaries(`date=${slug}`))
+      setConfirmModalOpen(false)
+      setSelectedEmployee(null)
+    } catch (err) {
+      console.log(err)
+      toast.error("Xatolik yuz berdi")
     }
     setLoading(null)
   }
@@ -286,6 +320,57 @@ const UserView = ({ slug }: InferGetStaticPropsType<typeof getServerSideProps>) 
           <LoadingButton loading={loading === 'approved'} onClick={() => confirmSalary('approved')} variant='contained'>
             {t('Saqlash')}
           </LoadingButton>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={confirmModalOpen} onClose={() => setConfirmModalOpen(false)}>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '15px', minWidth: '400px' }}>
+          <Typography sx={{ fontSize: '24px', textAlign: 'center' }}>
+            {t('O`qituvchi ma`lumotlarini tasdiqlash')}
+          </Typography>
+          {selectedEmployee && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <Typography><strong>{t('Ism')}:</strong> {selectedEmployee.employee_data.name}</Typography>
+              <Typography><strong>{t("O'zgarmas oylik")}:</strong> {formatCurrency(+selectedEmployee.fixed_salary)} so'm</Typography>
+              <Typography><strong>{t('Foiz ulush')}:</strong> {+selectedEmployee.kpi} %</Typography>
+              <Typography><strong>{t("Foiz ulush (so'm)")}:</strong> {formatCurrency(selectedEmployee.kpi_salary)} so'm</Typography>
+              <Typography><strong>{t('Ish haqqi')}:</strong> {formatCurrency(selectedEmployee.salary)} so'm</Typography>
+              <Typography><strong>{t('Avanslar')}:</strong> {formatCurrency(selectedEmployee.prepayment)} so'm</Typography>
+              <Typography><strong>{t('Jarimalar soni')}:</strong> {selectedEmployee.fines_count || 0} ta</Typography>
+              <Typography><strong>{t('Bonuslar')}:</strong> {formatCurrency(selectedEmployee.bonus_amount)} so'm</Typography>
+              <Typography><strong>{t('Jarimalar')}:</strong> {formatCurrency(selectedEmployee.fine_amount)} so'm</Typography>
+              <Typography><strong>{t('Yakuniy ish haqqi')}:</strong> {formatCurrency(selectedEmployee.final_salary)} so'm</Typography>
+            </Box>
+          )}
+          <Typography
+            sx={{
+              textAlign: 'center',
+              margin: '20px 0',
+              color: 'orange'
+            }}
+          >
+            {t("Bu amaliyotni ortga qaytarib bo'lmaydi")}
+          </Typography>
+          <Box sx={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+            <Button
+              variant='outlined'
+              color='secondary'
+              onClick={() => {
+                setConfirmModalOpen(false)
+                setSelectedEmployee(null)
+              }}
+            >
+              {t('Bekor qilish')}
+            </Button>
+            <LoadingButton
+              loading={loading === 'approved'}
+              variant='contained'
+              color='primary'
+              onClick={confirmSingleSalary}
+            >
+              {t(' Tasdiqlash')}
+            </LoadingButton>
+          </Box>
         </DialogContent>
       </Dialog>
 
