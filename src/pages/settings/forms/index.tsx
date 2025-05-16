@@ -47,7 +47,7 @@ export default function FormsPage() {
   const [selectedForm, setSelectedForm] = useState<any>(null)
   const [updateOpen, setUpdateOpen] = useState<boolean>(false)
   const [addSource, setAddSource] = useState<boolean>(false)
-
+  const router = useRouter()
   const bgColors = UseBgColor()
   const { t } = useTranslation()
   const { push } = useRouter()
@@ -108,9 +108,7 @@ export default function FormsPage() {
               size='medium'
               color='primary'
               onClick={() => {
-                const form = data.find(item => item.id === id)
-                setSelectedForm(form)
-                setUpdateOpen(true)
+                router.push(`/settings/forms/update/${id}`)
               }}
             >
               <Edit color='blue' size={18} />
@@ -147,7 +145,7 @@ export default function FormsPage() {
   }
 
   const getForms = async () => {
-    const resp = await api.get('leads/form/list/')
+    const resp = await api.get('leads/application-form/list/')
     setData(resp.data)
   }
 

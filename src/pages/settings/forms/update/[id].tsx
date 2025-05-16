@@ -2,7 +2,7 @@ import useResponsive from '@/@core/hooks/useResponsive'
 import api from '@/@core/utils/api'
 import { revereAmount } from '@/components/amount-input'
 import PhoneInput from '@/components/phone-input'
-import { useGet, usePost } from '@/hooks/useApi'
+import { useGet } from '@/hooks/useApi'
 import { useAppSelector } from '@/store'
 import { VisuallyHiddenInput } from '@/views/apps/mentors/AddMentorsModal'
 import { LoadingButton } from '@mui/lab'
@@ -28,7 +28,7 @@ import {
   Typography
 } from '@mui/material'
 import { GridExpandMoreIcon } from '@mui/x-data-grid'
-import { Image as ImageIcon, LaptopMinimal, Plus, PlusCircle, Smartphone, Trash, Trash2, Upload } from 'lucide-react'
+import { LaptopMinimal, Plus, PlusCircle, Smartphone, Trash, Trash2, Upload } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -48,13 +48,13 @@ type FieldType = {
   is_required: boolean
 }
 
-const NewCreate = () => {
+const UpdateForm = () => {
   const [isElement, setIsElement] = useState(true)
   const { t } = useTranslation()
   const [departmentValue, setDepartmentValue] = useState<number | null>(null)
   const [sourceValue, setSourceValue] = useState<number | null>(null)
   const [formName, setFormName] = useState<string>('Aloqa uchun kontakt')
-  const { push } = useRouter()
+  const { push, query } = useRouter()
   const [successText, setSuccessText] = useState<string>(
     "So'rovingiz muvaffaqiyatli yuborildi! Tez orada siz bilan bog'lanamiz."
   )
@@ -68,6 +68,7 @@ const NewCreate = () => {
   const { data: departments } = useGet(`leads/department/list/`)
   const { data: sources } = useGet('leads/source/')
   const [isLoading, setIsLoading] = useState(false)
+  const { data: formDetail,refetch } = useGet(`leads/form/detail/${query.id}/`, { options: { enabled: !!query.id } })
   const [fields, setFields] = useState<FieldType[]>([
     { type: 'input', label: 'Ism', title: 'Ism', value: '', is_required: false },
     { type: 'phone', label: 'Telefon', title: 'Telefon', value: '', is_required: false }
@@ -102,8 +103,6 @@ const NewCreate = () => {
 
     setIsLoading(false)
   }
-
-  console.log(fields)
 
   const handleAddField = (type: FieldType['type']) => {
     const newField: FieldType = {
@@ -150,8 +149,6 @@ const NewCreate = () => {
     setFields(updated)
   }
 
-  console.log(fields)
-
   const addVariant = (fieldIndex: number) => {
     const updated = [...fields]
     const variants = updated[fieldIndex].question_variants || []
@@ -185,6 +182,10 @@ const NewCreate = () => {
     updated.splice(index, 1)
     setFields(updated)
   }
+
+  console.log(formDetail);
+  
+
 
   return (
     <Card sx={{ boxShadow: 'none', border: '1px solid lightgray', padding: 5 }}>
@@ -848,4 +849,4 @@ const NewCreate = () => {
   )
 }
 
-export default NewCreate
+export default UpdateForm
