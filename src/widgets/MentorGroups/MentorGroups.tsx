@@ -8,8 +8,13 @@ import { useAuth } from '@hooks/useAuth'
 import { MentorGroupsSkeleton } from './ui/MentorGroupsSkeleton'
 import { MentorGroupType } from '@/widgets/MentorGroups/model/types'
 import { getFormatDate } from '@shared/utils/getFormatDate'
+import { FC } from 'react'
 
-export const MentorGroups = () => {
+type Props = {
+  hiddenNowGroup?: boolean
+}
+
+export const MentorGroups: FC<Props> = ({ hiddenNowGroup = false }) => {
   const { user } = useAuth()
   const { data, isLoading } = useGetGroups(String(user?.id))
 
@@ -44,6 +49,7 @@ export const MentorGroups = () => {
         borderRadius: '8px',
         backgroundColor: 'white',
         border: '1px solid #e0e0e0',
+        height: '100%',
         width: '100%'
       }}
     >
@@ -53,31 +59,33 @@ export const MentorGroups = () => {
 
       <Divider color='#e0e0e0' sx={{ mb: 2 }} />
 
-      <Box>
-        <Typography sx={{ mb: '10px', fontWeight: 600, fontSize: 14 }}>Hozirgi/Keyingi dars</Typography>
-        <Box display='flex' alignItems='center' width='100%' gap='16px'>
-          {currentOrNextGroup ? (
-            <GroupCard
-              key={`${currentOrNextGroup.name}-${currentOrNextGroup.id}`}
-              title={currentOrNextGroup.name}
-              isHighlighted={true}
-              lesson_time={`${getFormatDate(String(currentOrNextGroup.start_date))} - ${
-                currentOrNextGroup.start_end_at
-              }`}
-              hrefId={currentOrNextGroup.id}
-              course={currentOrNextGroup.course_name}
-              all_students={currentOrNextGroup.student_count}
-              active_students={currentOrNextGroup.student_counts.active_count}
-              trial_students={currentOrNextGroup.student_counts.new_count}
-              room={currentOrNextGroup.room_name}
-              week_days={currentOrNextGroup.week_days}
-              month_duration={currentOrNextGroup.month_duration}
-            />
-          ) : (
-            <Typography sx={{ color: '#64748b', fontSize: 14, fontStyle: 'italic' }}>Bugun dars yo'q</Typography>
-          )}
+      {!hiddenNowGroup && (
+        <Box>
+          <Typography sx={{ mb: '10px', fontWeight: 600, fontSize: 14 }}>Hozirgi/Keyingi dars</Typography>
+          <Box display='flex' alignItems='center' width='100%' gap='16px'>
+            {currentOrNextGroup ? (
+              <GroupCard
+                key={`${currentOrNextGroup.name}-${currentOrNextGroup.id}`}
+                title={currentOrNextGroup.name}
+                isHighlighted={true}
+                lesson_time={`${getFormatDate(String(currentOrNextGroup.start_date))} - ${
+                  currentOrNextGroup.start_end_at
+                }`}
+                hrefId={currentOrNextGroup.id}
+                course={currentOrNextGroup.course_name}
+                all_students={currentOrNextGroup.student_count}
+                active_students={currentOrNextGroup.student_counts.active_count}
+                trial_students={currentOrNextGroup.student_counts.new_count}
+                room={currentOrNextGroup.room_name}
+                week_days={currentOrNextGroup.week_days}
+                month_duration={currentOrNextGroup.month_duration}
+              />
+            ) : (
+              <Typography sx={{ color: '#64748b', fontSize: 14, fontStyle: 'italic' }}>Bugun dars yo'q</Typography>
+            )}
+          </Box>
         </Box>
-      </Box>
+      )}
 
       <Typography sx={{ mt: '15px', mb: '10px', fontWeight: 600, fontSize: 14 }}>Barcha guruhlar</Typography>
       <Box

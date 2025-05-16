@@ -1,17 +1,21 @@
 'use client'
 
+import { FC } from 'react'
 import { Box, Skeleton, Typography } from '@mui/material'
 import { BookOpen, Calendar, MapPin, Phone, Users } from 'lucide-react'
 import Image from 'next/image'
 import { useGetMentor } from './api/mentor'
-import { useAuth } from '@hooks/useAuth'
 import { getFormatDate } from '@shared/utils/getFormatDate'
 import Divider from '@mui/material/Divider'
 import { getFormatPhone } from '@shared/utils'
 
-export const MentorOverview = () => {
-  const { user } = useAuth()
-  const { data, isLoading } = useGetMentor(String(user?.id))
+type Props = {
+  id: string
+  notMind?: boolean
+}
+
+export const MentorOverview: FC<Props> = ({ id, notMind }) => {
+  const { data, isLoading } = useGetMentor(id)
 
   if(isLoading) {
     return <Skeleton sx={{ width: { xs: '100%', md: '450px' }, height: '100%' }} />
@@ -38,7 +42,7 @@ export const MentorOverview = () => {
       }}
     >
       <Typography variant='h6' color='#000'>
-        Mening ma'lumotlarim
+        {notMind ? "O'qituvchi malumotlari" : "Mening ma'lumotlarim"}
       </Typography>
 
       <Divider color='#e0e0e0' />

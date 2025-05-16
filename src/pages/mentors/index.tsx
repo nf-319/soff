@@ -34,7 +34,6 @@ export type customTableProps = {
 
 export default function GroupsPage() {
   const { t } = useTranslation()
-  const { push } = useRouter()
   const dispatch = useAppDispatch()
   const { isMobile } = useResponsive()
   const { user } = useContext(AuthContext)
@@ -128,7 +127,10 @@ export default function GroupsPage() {
   ]
 
   const rowClick = (id: any) => {
-    void push(`/mentors/view/security?id=${id}`)
+    void router.push({
+      pathname: '/mentors/[id]',
+      query: { id },
+    })
   }
 
   useEffect(() => {
