@@ -16,7 +16,7 @@ import GroupDetailsMobile from './GroupDetailWrapperMobile'
 import { useMediaQuery } from '@mui/material'
 import { GroupCreateEditDrawer } from '@components/GroupDrawerModal'
 
-export default function GroupDetails() {
+export default function GroupDetails () {
   const { groupData, isGettingGroupDetails, onlineLessonLoading } = useAppSelector(state => state.groupDetails)
   const { companyInfo } = useAppSelector(state => state.user)
   const dispatch = useAppDispatch()
@@ -46,7 +46,7 @@ export default function GroupDetails() {
     await Promise.all([dispatch(getDashboardLessons(queryString)), dispatch(getGroupsDetails(id))])
   }
 
-  async function handleGetMeetLink() {
+  async function handleGetMeetLink () {
     dispatch(setOnlineLessonLoading(true))
     await api
       .get(`meets/google/login/`)

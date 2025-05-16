@@ -47,7 +47,7 @@ import { AccessDeniedModal } from "@components/AccessDeniedModal"
 import toast from "react-hot-toast"
 import { useQueryClient } from "@tanstack/react-query"
 import { QueryKeys } from "@/shared/query-hooks/queryKeys"
-import { lidStatusOption } from "@/shared/constans/lid-statements"
+import { lidStatusOption } from "@/shared/constants/lid-statements"
 import { getFormatDate } from "@/shared/utils/getFormatDate"
 import InfoItem from '@/views/apps/lids/InfoCard'
 import { temperateOptions } from './constants'

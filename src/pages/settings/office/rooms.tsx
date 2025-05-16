@@ -85,8 +85,6 @@ export default function RoomsPage() {
 
   return (
     <div>
-      <VideoHeader item={videoUrls.rooms} />
-
       <Box
         className='groups-page-header'
         sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0' }}

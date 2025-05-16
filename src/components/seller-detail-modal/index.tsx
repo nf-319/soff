@@ -15,7 +15,7 @@ import { CalendarIcon, UserIcon, X } from 'lucide-react'
 import { EmptyContent } from '../empty-content'
 import { useGet } from '@/hooks/useApi'
 import { ResponsiveLine } from '@nivo/line'
-import { uzbekMonths } from '@/shared/constans'
+import { uzbekMonths } from '@/shared/constants'
 import { LeadsStatementCourseInterest } from '@modules/LeadsStatement'
 
 const SellerDetailModal = ({

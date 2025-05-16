@@ -7,7 +7,7 @@ import { useAllBranches } from '@shared/hooks'
 import { useEffect, useState } from 'react'
 import { useAppSelector } from '@/store'
 import dayjs from 'dayjs'
-import { uzbekMonths } from '@/shared/constans'
+import { uzbekMonths } from '@/shared/constants'
 import { DateRangePicker } from '@/components/DateRangePicker'
 
 export const PaymentReport = () => {

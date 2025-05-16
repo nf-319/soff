@@ -12,7 +12,6 @@ import {
   DialogTitle,
   IconButton,
   Tooltip,
-  Switch
 } from '@mui/material'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import DataTable from '../../components/table'
@@ -37,10 +36,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
 import { fetchSmsList } from '@store/apps/settings'
 import { ModalTypes, SendSMSModal } from '@/views/apps/students/view/UserViewLeft'
-import { Archive, ArchiveIcon, ArchiveRestore, MessageSquareText } from 'lucide-react'
+import { Archive, ArchiveRestore, MessageSquareText } from 'lucide-react'
 import useSMS from '@hooks/useSMS'
 import Divider from '@mui/material/Divider'
-import { Toggle } from 'rsuite'
 
 export type customTableProps = {
   xs: number
@@ -157,10 +155,10 @@ export default function StudentsPage() {
                   item.status === 'active'
                     ? 'success'
                     : item.status === 'archive'
-                    ? 'error'
-                    : item.status === 'frozen'
-                    ? 'secondary'
-                    : 'warning'
+                      ? 'error'
+                      : item.status === 'frozen'
+                        ? 'secondary'
+                        : 'warning'
                 }
               />
             </Box>
@@ -434,14 +432,14 @@ export default function StudentsPage() {
         data={
           Array.isArray(data?.results)
             ? data.results.map((el: any) => ({
-                ...el,
-                color:
-                  Number(el.balance) < 0
-                    ? 'rgba(227, 18, 18, 0.1)'
-                    : el.payment_status <= 5 && el.payment_status
+              ...el,
+              color:
+                Number(el.balance) < 0
+                  ? 'rgba(227, 18, 18, 0.1)'
+                  : el.payment_status <= 5 && el.payment_status
                     ? 'rgba(237, 156, 64, 0.22)'
                     : ''
-              }))
+            }))
             : []
         }
         rowClick={rowClick}

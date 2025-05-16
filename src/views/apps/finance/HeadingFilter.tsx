@@ -294,9 +294,12 @@ export default function HeadingFilter() {
           ))}
         </Select>
       </FormControl>
+
       <DateRangePicker
         showOneCalendar
         placement='bottomEnd'
+        style={{ backgroundColor: 'transparent' }}
+        color="#000"
         locale={{
           last7Days: t('Oxirgi hafta'),
           sunday: t('Yak'),
@@ -315,8 +318,8 @@ export default function HeadingFilter() {
         }}
         format='yyyy-MM-dd'
         onChange={handleChangeDate}
-        translate={'yes'}
-        size='md'
+        translate='yes'
+        size='lg'
         value={date}
       />
     </Box>

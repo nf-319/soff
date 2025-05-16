@@ -22,14 +22,13 @@ export const StudentPointsFilter = () => {
   const { data } = useGet(ceoConfigs.barnchs)
 
   useEffect(() => {
-    if (router.isReady) {
-      const query = router.query
-      setSearch((query.search as string) || '')
-      setBranch((query.branch as string) || '')
-      setStartDate(query.start_date ? dayjs(query.start_date as string) : null)
-      setEndDate(query.end_date ? dayjs(query.end_date as string) : null)
-    }
-  }, [router.isReady, router.query])
+    if (!router.isReady) return
+    const query = router.query
+    setSearch((query.search as string) || '')
+    setBranch((query.branch as string) || '')
+    setStartDate(query.start_date ? dayjs(query.start_date as string) : null)
+    setEndDate(query.end_date ? dayjs(query.end_date as string) : null)
+  }, [router.isReady])
 
   const updateUrlParams = () => {
     const newQuery = {

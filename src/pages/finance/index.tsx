@@ -9,9 +9,6 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  LinearProgress,
-  Paper,
-  Skeleton,
   TextField,
   Typography
 } from '@mui/material'
@@ -19,7 +16,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import 'rsuite/DateRangePicker/styles/index.css'
 import { useContext, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { customTableDataProps } from '../../components/lid-table'
+import { customTableDataProps } from '@components/lid-table'
 import DataTable from '../../components/table'
 import api from 'src/@core/utils/api'
 import LoadingButton from '@mui/lab/LoadingButton'
@@ -264,7 +261,6 @@ const CardStatistics = () => {
         }}
       >
         <HeadingFilter />
-        <VideoHeader item={videoUrls.finance} />
       </Box>
       <KeenSliderWrapper>
         <Grid container spacing={4} columnSpacing={6}>
