@@ -350,7 +350,7 @@ const StudentsFilter = () => {
           value={date}
           onChange={onDateChange}
           format='MM/yyyy'
-          views={['month', 'year']}
+          views={['month']}
           disableFuture
           fullWidth
         />

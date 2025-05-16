@@ -21,6 +21,9 @@ import { formatCurrency } from '@utils/format-currency'
 import { useGetFinance } from '@/shared/query-hooks'
 import { DateRange, Refresh, TrendingUp, TrendingDown, Assessment } from '@mui/icons-material'
 import { useAuth } from '@hooks/useAuth'
+import { useRouter } from 'next/router'
+import { updateStudentParams } from '@store/apps/students'
+import { useAppDispatch } from '@/store'
 
 const monthMap: Record<number, string> = {
   1: 'Yanvar',
@@ -43,6 +46,8 @@ export const FinanceResults: FC = () => {
   const currentYear = now.getFullYear()
   const { user } = useAuth()
   const currentMonth = now.getMonth() + 1
+  const router = useRouter()
+  const dispatch = useAppDispatch()
 
   const [selectedYear, setSelectedYear] = useState(currentYear)
   const [selectedBranch, setSelectedBranch] = useState(user?.active_branch ?? "")
@@ -125,6 +130,26 @@ export const FinanceResults: FC = () => {
     if (percentage >= 50) return theme.palette.warning.main
     if (percentage >= 30) return theme.palette.warning.light
     return theme.palette.error.light
+  }
+
+  const handleHref = (link: string) => {
+    const newParams: { [key: string]: string } = {}
+
+    if (link === 'debtors_amount') {
+      newParams.is_debtor = 'true'
+    } else if(link === 'is_overpaid') {
+      newParams.is_overpaid = 'true'
+    }
+
+    dispatch(updateStudentParams(newParams))
+    void router.push(
+      {
+        pathname: '/students',
+        query: newParams
+      },
+      undefined,
+      { shallow: true }
+    )
   }
 
   return (
@@ -325,9 +350,11 @@ export const FinanceResults: FC = () => {
 
         <Grid item xs={12} md={4}>
           <Card
+            onClick={() => handleHref('debtors_amount')}
             sx={{
               height: '100%',
               boxShadow: 2,
+              cursor: 'pointer',
               background: `linear-gradient(145deg, ${theme.palette.warning.main}, ${theme.palette.warning.dark})`,
               color: 'white',
             }}
@@ -347,9 +374,11 @@ export const FinanceResults: FC = () => {
         </Grid>
         <Grid item xs={12} md={4}>
           <Card
+            onClick={() => handleHref('is_overpaid')}
             sx={{
               height: '100%',
               boxShadow: 2,
+              cursor: 'pointer',
               background: `linear-gradient(145deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
               color: 'white',
             }}
