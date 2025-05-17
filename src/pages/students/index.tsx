@@ -235,7 +235,6 @@ export default function StudentsPage() {
         return
       }
 
-      const query = router.query
       const newParams: Partial<StudentsQueryParamsTypes> = {
         search: queryParams.search,
         status: queryParams.status,

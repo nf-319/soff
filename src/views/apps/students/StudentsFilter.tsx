@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react'
 import {
   Autocomplete,
   Box,
@@ -10,143 +10,151 @@ import {
   Select,
   TextField,
   CircularProgress,
-  Popper,
-} from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { useAppDispatch, useAppSelector } from 'src/store';
-import { updateStudentParams } from 'src/store/apps/students';
-import useCourses from 'src/hooks/useCourses';
-import useDebounce from 'src/hooks/useDebounce';
-import api from 'src/@core/utils/api';
-import { format } from 'date-fns';
-import { fetchSchoolsList } from 'src/store/apps/settings';
-import { Search } from 'lucide-react';
-import { DatePicker } from '@components/DatePicker';
-import ceoConfigs from 'src/configs/ceo';
-import { StudentsQueryParamsTypes } from '@/types/apps/studentsTypes';
+  Popper
+} from '@mui/material'
+import { useTranslation } from 'react-i18next'
+import { useAppDispatch, useAppSelector } from 'src/store'
+import { updateStudentParams } from 'src/store/apps/students'
+import useCourses from 'src/hooks/useCourses'
+import useDebounce from 'src/hooks/useDebounce'
+import api from 'src/@core/utils/api'
+import { format } from 'date-fns'
+import { fetchSchoolsList } from 'src/store/apps/settings'
+import { Search } from 'lucide-react'
+import { DatePicker } from '@components/DatePicker'
+import ceoConfigs from 'src/configs/ceo'
+import { StudentsQueryParamsTypes } from '@/types/apps/studentsTypes'
+import { useRouter } from 'next/router'
 
 const StudentsFilter = () => {
-  const dispatch = useAppDispatch();
-  const { queryParams } = useAppSelector(state => state.students);
-  const { schools } = useAppSelector(state => state.settings);
-  const [activeFilter, setActiveFilter] = useState('');
-  const { getCourses, courses } = useCourses();
-  const [groups, setGroups] = useState<any[]>([]);
-  const [teachers, setTeachers] = useState<any[]>([]);
-  const { t } = useTranslation();
-  const [loadingGroups, setLoadingGroups] = useState(false);
-  const [loadingTeachers, setLoadingTeachers] = useState(false);
-  const [teacherId, setTeacherId] = useState(queryParams.teacher || '');
-  const [groupId, setGroupId] = useState(queryParams.group || '');
+  const dispatch = useAppDispatch()
+  const { queryParams } = useAppSelector(state => state.students)
+  const { schools } = useAppSelector(state => state.settings)
+  const [activeFilter, setActiveFilter] = useState('')
+  const { getCourses, courses } = useCourses()
+  const [groups, setGroups] = useState<any[]>([])
+  const [teachers, setTeachers] = useState<any[]>([])
+  const { t } = useTranslation()
+  const { query } = useRouter()
+  const [loadingGroups, setLoadingGroups] = useState(false)
+  const [loadingTeachers, setLoadingTeachers] = useState(false)
+  const [teacherId, setTeacherId] = useState(queryParams.teacher || '')
+  const [groupId, setGroupId] = useState(queryParams.group || '')
   const [date, setDate] = useState<Date | null>(
-    queryParams.debt_date ? new Date(queryParams.debt_date + '-01') : null
-  );
+    queryParams.debt_date
+      ? new Date(queryParams.debt_date + '-01')
+      : query.debt_date
+      ? new Date(String(query.debt_date))
+      : null
+  )
 
   const dataFetchedRef = useRef({
     courses: false,
     groups: false,
     teachers: false,
-    schools: false,
-  });
+    schools: false
+  })
 
   const getGroups = useCallback(async () => {
-    if (dataFetchedRef.current.groups) return;
+    if (dataFetchedRef.current.groups) return
 
     try {
-      setLoadingGroups(true);
-      const queryParam = teacherId ? `?teacher=${teacherId}` : '';
-      const res = await api.get(`common/group-check-list/${queryParam}`);
-      setGroups(res.data);
-      dataFetchedRef.current.groups = true;
+      setLoadingGroups(true)
+      const queryParam = teacherId ? `?teacher=${teacherId}` : ''
+      const res = await api.get(`common/group-check-list/${queryParam}`)
+      setGroups(res.data)
+      dataFetchedRef.current.groups = true
     } catch (error) {
-      console.error('Error fetching groups:', error);
+      console.error('Error fetching groups:', error)
     } finally {
-      setLoadingGroups(false);
+      setLoadingGroups(false)
     }
-  }, [teacherId]);
+  }, [teacherId])
 
   const getTeachers = useCallback(async () => {
-    if (dataFetchedRef.current.teachers) return;
+    if (dataFetchedRef.current.teachers) return
 
     try {
-      setLoadingTeachers(true);
-      const queryParam = groupId ? `?group=${groupId}` : '';
-      const res = await api.get(`${ceoConfigs.employee_checklist}?role=teacher${queryParam}`);
-      setTeachers(res.data);
-      dataFetchedRef.current.teachers = true;
+      setLoadingTeachers(true)
+      const queryParam = groupId ? `?group=${groupId}` : ''
+      const res = await api.get(`${ceoConfigs.employee_checklist}?role=teacher${queryParam}`)
+      setTeachers(res.data)
+      dataFetchedRef.current.teachers = true
     } catch (error) {
-      console.error('Error fetching teachers:', error);
+      console.error('Error fetching teachers:', error)
     } finally {
-      setLoadingTeachers(false);
+      setLoadingTeachers(false)
     }
-  }, [groupId]);
+  }, [groupId])
 
   const handleFilter = useCallback(
     (key: keyof StudentsQueryParamsTypes | 'amount', value: any) => {
-      let updatedParams: Partial<StudentsQueryParamsTypes> = { [key]: value };
+      let updatedParams: Partial<StudentsQueryParamsTypes> = { [key]: value }
 
       if (key === 'debt_date') {
-        updatedParams = { debt_date: value ? format(value, 'MM-yyyy') : '' };
+        updatedParams = { debt_date: value ? format(value, 'MM-yyyy') : '' }
       } else if (key === 'amount') {
         if (value === 'is_debtor') {
-          updatedParams = { is_debtor: true, last_payment: '', not_in_debt: '', is_overpaid: '' };
+          updatedParams = { is_debtor: true, last_payment: '', not_in_debt: '', is_overpaid: '' }
         } else if (value === 'not_in_debt') {
-          updatedParams = { is_debtor: '', last_payment: '', not_in_debt: true, is_overpaid: '' };
+          updatedParams = { is_debtor: '', last_payment: '', not_in_debt: true, is_overpaid: '' }
         } else if (value === 'last_payment') {
-          updatedParams = { last_payment: true, is_debtor: '', not_in_debt: '', is_overpaid: '' };
+          updatedParams = { last_payment: true, is_debtor: '', not_in_debt: '', is_overpaid: '' }
         } else if (value === 'is_overpaid') {
-          updatedParams = { last_payment: '', is_debtor: '', not_in_debt: '', is_overpaid: true };
+          updatedParams = { last_payment: '', is_debtor: '', not_in_debt: '', is_overpaid: true }
         } else if (value === 'all') {
-          updatedParams = { is_debtor: '', last_payment: '', not_in_debt: '', is_overpaid: '' };
+          updatedParams = { is_debtor: '', last_payment: '', not_in_debt: '', is_overpaid: '' }
         }
       } else if (value === '') {
-        updatedParams = { [key]: '' };
+        updatedParams = { [key]: '' }
       }
 
-      dispatch(updateStudentParams(updatedParams));
+      dispatch(updateStudentParams(updatedParams))
 
       if (key === 'teacher') {
-        setTeacherId(value || '');
-        dataFetchedRef.current.groups = false;
+        setTeacherId(value || '')
+        dataFetchedRef.current.groups = false
       } else if (key === 'group') {
-        setGroupId(value || '');
-        dataFetchedRef.current.teachers = false;
+        setGroupId(value || '')
+        dataFetchedRef.current.teachers = false
       }
     },
     [dispatch]
-  );
+  )
 
   const onDateChange = useCallback(
     (newDate: Date | null) => {
-      handleFilter('debt_date', newDate);
-      setDate(newDate);
+      handleFilter('debt_date', newDate)
+      setDate(newDate)
     },
     [handleFilter]
-  );
+  )
 
   useEffect(() => {
     if (activeFilter === 'course' && !dataFetchedRef.current.courses) {
-      getCourses();
-      dataFetchedRef.current.courses = true;
+      getCourses()
+      dataFetchedRef.current.courses = true
     } else if (activeFilter === 'group') {
-      getGroups();
+      getGroups()
     } else if (activeFilter === 'teacher') {
-      getTeachers();
+      getTeachers()
     } else if (activeFilter === 'school' && !dataFetchedRef.current.schools) {
-      dispatch(fetchSchoolsList());
-      dataFetchedRef.current.schools = true;
+      dispatch(fetchSchoolsList())
+      dataFetchedRef.current.schools = true
     }
-  }, [activeFilter, getCourses, getGroups, getTeachers, dispatch]);
+  }, [activeFilter, getCourses, getGroups, getTeachers, dispatch])
 
-  const groupOptions = groups?.map((item: any) => ({
-    label: item?.name,
-    value: item?.id,
-  })) || [];
+  const groupOptions =
+    groups?.map((item: any) => ({
+      label: item?.name,
+      value: item?.id
+    })) || []
 
-  const teacherOptions = teachers?.map((item: any) => ({
-    label: item?.first_name,
-    value: item?.id,
-  })) || [];
+  const teacherOptions =
+    teachers?.map((item: any) => ({
+      label: item?.first_name,
+      value: item?.id
+    })) || []
 
   return (
     <Box display='flex' flexDirection={{ xs: 'column', md: 'row' }} gap={2} width='100%'>
@@ -245,12 +253,12 @@ const StudentsFilter = () => {
             queryParams.is_debtor
               ? 'is_debtor'
               : queryParams.not_in_debt
-                ? 'not_in_debt'
-                : queryParams.last_payment
-                  ? 'last_payment'
-                  : queryParams.is_overpaid
-                    ? 'is_overpaid'
-                    : ''
+              ? 'not_in_debt'
+              : queryParams.last_payment
+              ? 'last_payment'
+              : queryParams.is_overpaid
+              ? 'is_overpaid'
+              : ''
           }
           id='payment-status-select'
           labelId='payment-status-select-label'
@@ -299,7 +307,7 @@ const StudentsFilter = () => {
                     {loadingGroups ? <CircularProgress size={20} /> : null}
                     {params.InputProps.endAdornment}
                   </>
-                ),
+                )
               }}
             />
           )}
@@ -329,14 +337,14 @@ const StudentsFilter = () => {
                     {loadingTeachers ? <CircularProgress size={20} /> : null}
                     {params.InputProps.endAdornment}
                   </>
-                ),
+                )
               }}
             />
           )}
         />
       </FormControl>
     </Box>
-  );
-};
+  )
+}
 
-export default StudentsFilter;
+export default StudentsFilter
