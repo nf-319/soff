@@ -43,7 +43,7 @@ const StudentsFilter = () => {
   const [month, year] = Array.isArray(query?.debt_date)
     ? query.debt_date[0].split('-')
     : (query?.debt_date ?? '').split('-')
-  const [date, setDate] = useState<Date | null>(new Date(`${month}/01/${year}`))
+  const [date, setDate] = useState<Date | null>(query?.debt_date ? new Date(`01/${month}/${year}`) : null)
 
   const dataFetchedRef = useRef({
     courses: false,
