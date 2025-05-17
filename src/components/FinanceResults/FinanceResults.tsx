@@ -37,7 +37,7 @@ const monthMap: Record<number, string> = {
   9: 'Sentabr',
   10: 'Oktabr',
   11: 'Noyabr',
-  12: 'Dekabr',
+  12: 'Dekabr'
 }
 
 export const FinanceResults: FC = () => {
@@ -50,9 +50,10 @@ export const FinanceResults: FC = () => {
   const dispatch = useAppDispatch()
 
   const [selectedYear, setSelectedYear] = useState(currentYear)
-  const [selectedBranch, setSelectedBranch] = useState(user?.active_branch ?? "")
+  const [selectedBranch, setSelectedBranch] = useState(user?.active_branch ?? '')
   const [selectedMonth, setSelectedMonth] = useState(currentMonth)
   const { data, isLoading, isError, refetch } = useGetFinance(selectedYear, selectedMonth, selectedBranch)
+
 
   const availableYears = Array.from({ length: 5 }, (_, i) => currentYear - i)
 
@@ -76,21 +77,21 @@ export const FinanceResults: FC = () => {
   if (isLoading)
     return (
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-        <Box mb={2} display="flex" justifyContent="space-between" alignItems="center">
+        <Box mb={2} display='flex' justifyContent='space-between' alignItems='center'>
           <Skeleton width={200} height={40} />
           <Skeleton width={250} height={40} />
         </Box>
-        <Skeleton variant="rectangular" width="100%" height={250} sx={{ borderRadius: 2 }} />
+        <Skeleton variant='rectangular' width='100%' height={250} sx={{ borderRadius: 2 }} />
         <Box mt={3}>
           <Grid container spacing={2}>
             <Grid item xs={12} md={4}>
-              <Skeleton variant="rectangular" width="100%" height={100} sx={{ borderRadius: 1 }} />
+              <Skeleton variant='rectangular' width='100%' height={100} sx={{ borderRadius: 1 }} />
             </Grid>
             <Grid item xs={12} md={4}>
-              <Skeleton variant="rectangular" width="100%" height={100} sx={{ borderRadius: 1 }} />
+              <Skeleton variant='rectangular' width='100%' height={100} sx={{ borderRadius: 1 }} />
             </Grid>
             <Grid item xs={12} md={4}>
-              <Skeleton variant="rectangular" width="100%" height={100} sx={{ borderRadius: 1 }} />
+              <Skeleton variant='rectangular' width='100%' height={100} sx={{ borderRadius: 1 }} />
             </Grid>
           </Grid>
         </Box>
@@ -100,29 +101,16 @@ export const FinanceResults: FC = () => {
   if (isError || !data)
     return (
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2, textAlign: 'center' }}>
-        <Typography variant="h6" color="error" gutterBottom>
+        <Typography variant='h6' color='error' gutterBottom>
           Ma'lumotlarni yuklashda xatolik yuz berdi
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<Refresh />}
-          onClick={() => refetch()}
-          sx={{ mt: 2 }}
-        >
+        <Button variant='contained' color='primary' startIcon={<Refresh />} onClick={() => refetch()} sx={{ mt: 2 }}>
           Qayta urinish
         </Button>
       </Paper>
     )
 
-  const {
-    percentage = 0,
-    done_amount,
-    debts_amount,
-    pending_amount,
-    out_of_limit_amount,
-    planned_amount,
-  } = data
+  const { percentage = 0, done_amount, debts_amount, pending_amount, out_of_limit_amount, planned_amount } = data
 
   const getPercentageColor = () => {
     if (percentage >= 90) return theme.palette.success.main
@@ -137,8 +125,10 @@ export const FinanceResults: FC = () => {
 
     if (link === 'debtors_amount') {
       newParams.is_debtor = 'true'
-    } else if(link === 'is_overpaid') {
+      newParams.debt_date = `${String(selectedMonth).padStart(2, '0')}-${selectedYear}`
+    } else if (link === 'is_overpaid') {
       newParams.is_overpaid = 'true'
+      newParams.debt_date = `${String(selectedMonth).padStart(2, '0')}-${selectedYear}`
     }
 
     dispatch(updateStudentParams(newParams))
@@ -331,7 +321,7 @@ export const FinanceResults: FC = () => {
               height: '100%',
               boxShadow: 2,
               background: `linear-gradient(145deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-              color: 'white',
+              color: 'white'
             }}
           >
             <CardContent>
@@ -356,7 +346,7 @@ export const FinanceResults: FC = () => {
               boxShadow: 2,
               cursor: 'pointer',
               background: `linear-gradient(145deg, ${theme.palette.warning.main}, ${theme.palette.warning.dark})`,
-              color: 'white',
+              color: 'white'
             }}
           >
             <CardContent>
@@ -380,7 +370,7 @@ export const FinanceResults: FC = () => {
               boxShadow: 2,
               cursor: 'pointer',
               background: `linear-gradient(145deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
-              color: 'white',
+              color: 'white'
             }}
           >
             <CardContent>

@@ -91,7 +91,7 @@ const initialState: IStudentState = {
     page: '',
     is_debtor: '',
     last_payment: '',
-    group_status: '',
+    group_status: 'active',
     not_in_debt: '',
     debt_date: '',
     teacher: '',
