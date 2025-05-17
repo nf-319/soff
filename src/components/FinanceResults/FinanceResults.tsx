@@ -54,7 +54,6 @@ export const FinanceResults: FC = () => {
   const [selectedMonth, setSelectedMonth] = useState(currentMonth)
   const { data, isLoading, isError, refetch } = useGetFinance(selectedYear, selectedMonth, selectedBranch)
 
-  console.log(selectedYear, selectedMonth)
 
   const availableYears = Array.from({ length: 5 }, (_, i) => currentYear - i)
 

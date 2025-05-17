@@ -40,13 +40,10 @@ const StudentsFilter = () => {
   const [loadingTeachers, setLoadingTeachers] = useState(false)
   const [teacherId, setTeacherId] = useState(queryParams.teacher || '')
   const [groupId, setGroupId] = useState(queryParams.group || '')
-  const [date, setDate] = useState<Date | null>(
-    queryParams.debt_date
-      ? new Date(queryParams.debt_date + '-01')
-      : query.debt_date
-      ? new Date(String(query.debt_date))
-      : null
-  )
+  const [month, year] = Array.isArray(query?.debt_date)
+    ? query.debt_date[0].split('-')
+    : (query?.debt_date ?? '').split('-')
+  const [date, setDate] = useState<Date | null>(new Date(`${month}/01/${year}`))
 
   const dataFetchedRef = useRef({
     courses: false,
