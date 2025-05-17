@@ -34,6 +34,7 @@ import { useFormik } from 'formik'
 import { AuthContext } from 'src/context/AuthContext'
 import { Edit, Trash2 } from 'lucide-react'
 import { FormUpdateModal } from '@/entities/FormsUpdateModal'
+import { useGet } from '@/hooks/useApi'
 
 export default function FormsPage() {
   const [open, setOpen] = useState<null | 'new' | 'integration' | 'delete' | 'edit'>(null)
@@ -42,7 +43,7 @@ export default function FormsPage() {
   const [error, setError] = useState<any>({})
   const [deleteId, setDeleteId] = useState<any>(null)
   const [loading, setLoading] = useState<boolean>(false)
-  const [data, setData] = useState<any[]>([])
+  const { data, refetch, isPending } = useGet('leads/form/list/')
   const [sourceData, setSourceData] = useState<any>([])
   const [selectedForm, setSelectedForm] = useState<any>(null)
   const [updateOpen, setUpdateOpen] = useState<boolean>(false)
@@ -132,7 +133,7 @@ export default function FormsPage() {
   const baseURL = subdomain.length < 3 ? `test` : `${subdomain[0]}`
 
   const handleClick = (id: string) => {
-    const value = data.find(el => el.id === id)
+    const value = data?.find((el: any) => el.id === id)
     const textArea = document.createElement('textarea')
     textArea.value = `https://forms.soffcrm.uz/form/${value.uuid}/${baseURL}/`
     document.body.appendChild(textArea)
@@ -147,18 +148,13 @@ export default function FormsPage() {
     toast.success('Link nusxalandi', { position: 'top-center' })
   }
 
-  const getForms = async () => {
-    const resp = await api.get('leads/form/list/')
-    setData(resp.data)
-  }
-
   async function onSubmit(values: any) {
     setLoading(true)
     try {
       await api.post('leads/application-form/create/', values)
       setOpen(null)
       setLoading(false)
-      getForms()
+      refetch()
     } catch (err: any) {
       showResponseError(err?.response.data, setError)
       setLoading(false)
@@ -171,7 +167,7 @@ export default function FormsPage() {
       await api.delete(`leads/form/delete/${deleteId}/`)
       setOpen(null)
       setLoading(false)
-      getForms()
+      refetch()
     } catch (err: any) {
       console.log(err)
       setLoading(false)
@@ -188,7 +184,6 @@ export default function FormsPage() {
       void push('/')
       toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
     }
-    getForms()
   }, [])
 
   const formik: any = useFormik({
@@ -238,13 +233,13 @@ export default function FormsPage() {
         </Alert>
       </Box>
 
-      <DataTable columns={columns} data={data} rowClick={handleClick} />
+      <DataTable loading={isPending} columns={columns} data={data || []} rowClick={handleClick} />
 
       <FormUpdateModal
         open={updateOpen}
         onClose={() => setUpdateOpen(false)}
         formData={selectedForm}
-        onSuccess={getForms}
+        onSuccess={() => refetch()}
       />
 
       <Dialog open={open === 'new'} onClose={() => setOpen(null)}>
