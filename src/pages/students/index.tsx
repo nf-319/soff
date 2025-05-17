@@ -11,83 +11,83 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  Tooltip,
-} from '@mui/material';
-import { ReactNode, useContext, useEffect, useState, useRef, useCallback } from 'react';
-import DataTable from '../../components/table';
-import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/router';
-import StudentsFilter from 'src/views/apps/students/StudentsFilter';
-import CreateStudentModal from 'src/views/apps/students/CreateStudentModal';
-import EditStudentModal from 'src/views/apps/students/EditStudentModal';
-import StudentRowOptions from 'src/views/apps/students/StudentRowOptions';
-import { useAppDispatch, useAppSelector } from 'src/store';
-import { setStudentId, updateStudentParams } from 'src/store/apps/students';
-import { formatCurrency } from 'src/@core/utils/format-currency';
-import { setOpenEdit } from 'src/store/apps/students';
-import { AuthContext } from 'src/context/AuthContext';
-import { toast } from 'react-hot-toast';
-import useResponsive from 'src/@core/hooks/useResponsive';
-import IconifyIcon from '../../components/icon';
-import ExcelStudents from '../../components/excelButton/ExcelStudents';
-import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal';
-import { useGet } from 'src/hooks/useApi';
-import { useQueryClient } from '@tanstack/react-query';
-import { AccessDeniedModal } from '@components/AccessDeniedModal';
-import { ModalTypes, SendSMSModal } from '@/views/apps/students/view/UserViewLeft';
-import { Archive, ArchiveRestore, MessageSquareText } from 'lucide-react';
-import useSMS from '@hooks/useSMS';
-import Divider from '@mui/material/Divider';
-import { StudentsQueryParamsTypes } from '@/types/apps/studentsTypes';
+  Tooltip
+} from '@mui/material'
+import { ReactNode, useContext, useEffect, useState, useRef, useCallback } from 'react'
+import DataTable from '../../components/table'
+import { useTranslation } from 'react-i18next'
+import { useRouter } from 'next/router'
+import StudentsFilter from 'src/views/apps/students/StudentsFilter'
+import CreateStudentModal from 'src/views/apps/students/CreateStudentModal'
+import EditStudentModal from 'src/views/apps/students/EditStudentModal'
+import StudentRowOptions from 'src/views/apps/students/StudentRowOptions'
+import { useAppDispatch, useAppSelector } from 'src/store'
+import { setStudentId, updateStudentParams } from 'src/store/apps/students'
+import { formatCurrency } from 'src/@core/utils/format-currency'
+import { setOpenEdit } from 'src/store/apps/students'
+import { AuthContext } from 'src/context/AuthContext'
+import { toast } from 'react-hot-toast'
+import useResponsive from 'src/@core/hooks/useResponsive'
+import IconifyIcon from '../../components/icon'
+import ExcelStudents from '../../components/excelButton/ExcelStudents'
+import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
+import { useGet } from 'src/hooks/useApi'
+import { useQueryClient } from '@tanstack/react-query'
+import { AccessDeniedModal } from '@components/AccessDeniedModal'
+import { ModalTypes, SendSMSModal } from '@/views/apps/students/view/UserViewLeft'
+import { Archive, ArchiveRestore, MessageSquareText } from 'lucide-react'
+import useSMS from '@hooks/useSMS'
+import Divider from '@mui/material/Divider'
+import { StudentsQueryParamsTypes } from '@/types/apps/studentsTypes'
 
 export type customTableProps = {
-  xs: number;
-  title: string;
-  dataIndex?: string | ReactNode;
-  render?: (source: any) => any | undefined;
-};
+  xs: number
+  title: string
+  dataIndex?: string | ReactNode
+  render?: (source: any) => any | undefined
+}
 
 export default function StudentsPage() {
-  const { t } = useTranslation();
-  const router = useRouter();
-  const { isMobile } = useResponsive();
-  const { user } = useContext(AuthContext);
-  const [open, setOpen] = useState<boolean>(false);
-  const dispatch = useAppDispatch();
-  const queryClient = useQueryClient();
+  const { t } = useTranslation()
+  const router = useRouter()
+  const { isMobile } = useResponsive()
+  const { user } = useContext(AuthContext)
+  const [open, setOpen] = useState<boolean>(false)
+  const dispatch = useAppDispatch()
+  const queryClient = useQueryClient()
 
-  const { queryParams, openEdit } = useAppSelector(state => state.students);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(Number(queryParams.limit) || 10);
-  const { smsTemps, getSMSTemps } = useSMS();
-  const [openModalEdit, setOpenModalEdit] = useState<ModalTypes | null>(null);
-  const [accessModal, setAccessModal] = useState<boolean>(false);
-  const { companyInfo } = useAppSelector(item => item.user);
-  const isInitialMount = useRef(true);
+  const { queryParams, openEdit } = useAppSelector(state => state.students)
+  const [rowsPerPage, setRowsPerPage] = useState<number>(Number(queryParams.limit) || 10)
+  const { smsTemps, getSMSTemps } = useSMS()
+  const [openModalEdit, setOpenModalEdit] = useState<ModalTypes | null>(null)
+  const [accessModal, setAccessModal] = useState<boolean>(false)
+  const { companyInfo } = useAppSelector(item => item.user)
+  const isInitialMount = useRef(true)
 
   const generateQueryString = useCallback(() => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams()
     Object.entries(queryParams).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '' && value !== false) {
-        const paramKey = key === 'search' ? 'q' : key;
-        params.set(paramKey, String(value));
+        const paramKey = key === 'search' ? 'q' : key
+        params.set(paramKey, String(value))
       }
-    });
-    return params.toString();
-  }, [queryParams]);
+    })
+    return params.toString()
+  }, [queryParams])
 
-  const queryString = generateQueryString();
+  const queryString = generateQueryString()
 
   const { data, isLoading } = useGet('student/new-list/', {
     deps: ['students-list'],
-    params: queryParams as Record<string, any>,
-  });
+    params: queryParams as Record<string, any>
+  })
 
   const columns: customTableProps[] = [
     {
       xs: 0.2,
       title: t('ID'),
       dataIndex: 'index',
-      render: index => `${Number(queryParams.offset || 0) + Number(index) + 1}`,
+      render: index => `${Number(queryParams.offset || 0) + Number(index) + 1}`
     },
     {
       xs: 0.4,
@@ -101,12 +101,12 @@ export default function StudentsPage() {
             <IconifyIcon icon={'et:profile-male'} />
           )}
         </TeacherAvatar>
-      ),
+      )
     },
     {
       xs: 1.4,
       title: t('first_name'),
-      dataIndex: 'first_name',
+      dataIndex: 'first_name'
     },
     {
       xs: 1.1,
@@ -117,7 +117,7 @@ export default function StudentsPage() {
           <Chip
             sx={{
               color: Number(gpa) >= 4 ? 'green' : Number(gpa) >= 3 ? 'orange' : 'red',
-              borderColor: Number(gpa) >= 4 ? 'green' : Number(gpa) >= 3 ? 'orange' : 'red',
+              borderColor: Number(gpa) >= 4 ? 'green' : Number(gpa) >= 3 ? 'orange' : 'red'
             }}
             variant='outlined'
             color='info'
@@ -125,12 +125,12 @@ export default function StudentsPage() {
           />
         ) : (
           "Bahosi yo'q"
-        ),
+        )
     },
     {
       xs: 1.1,
       title: t('phone'),
-      dataIndex: 'phone',
+      dataIndex: 'phone'
     },
     {
       xs: 1.5,
@@ -138,12 +138,12 @@ export default function StudentsPage() {
       dataIndex: 'student_status',
       render: (
         group: {
-          id: number;
-          group: number;
-          status: string;
-          group_name: string;
-          lesson_time: string;
-          teacher_name: string;
+          id: number
+          group: number
+          status: string
+          group_name: string
+          lesson_time: string
+          teacher_name: string
         }[]
       ) =>
         group.length > 0 ? (
@@ -158,17 +158,17 @@ export default function StudentsPage() {
                   item.status === 'active'
                     ? 'success'
                     : item.status === 'archive'
-                      ? 'error'
-                      : item.status === 'frozen'
-                        ? 'secondary'
-                        : 'warning'
+                    ? 'error'
+                    : item.status === 'frozen'
+                    ? 'secondary'
+                    : 'warning'
                 }
               />
             </Box>
           ))
         ) : (
           <Chip label='Guruhsiz' color='warning' variant='outlined' size='small' sx={{ fontWeight: 700 }} />
-        ),
+        )
     },
     {
       xs: 0.7,
@@ -191,61 +191,57 @@ export default function StudentsPage() {
             size='small'
             sx={{ fontWeight: 700 }}
           />
-        ),
+        )
     },
     {
       xs: 0.8,
       dataIndex: 'id',
       title: t('Harakatlar'),
-      render: actions => <StudentRowOptions id={actions} />,
-    },
-  ];
+      render: actions => <StudentRowOptions id={actions} />
+    }
+  ]
 
   const handleRowsPerPageChange = useCallback(
     (value: number) => {
-      setRowsPerPage(value);
-      dispatch(updateStudentParams({ limit: value.toString(), offset: '0' }));
+      setRowsPerPage(value)
+      dispatch(updateStudentParams({ limit: value.toString(), offset: '0' }))
     },
     [dispatch]
-  );
+  )
 
   const handlePagination = useCallback(
     (page: string | number) => {
-      const adjustedPage = (Number(page) - 1) * rowsPerPage;
-      dispatch(updateStudentParams({ offset: adjustedPage.toString() }));
+      const adjustedPage = (Number(page) - 1) * rowsPerPage
+      dispatch(updateStudentParams({ offset: adjustedPage.toString() }))
     },
     [dispatch, rowsPerPage]
-  );
+  )
 
   const rowClick = useCallback(
     (id: string) => {
-      dispatch(setStudentId(id));
-      router.push(`/students/view/security?student=${id}`);
+      dispatch(setStudentId(id))
+      router.push(`/students/view/security?student=${id}`)
     },
     [dispatch, router]
-  );
+  )
 
   useEffect(() => {
-    if (!router.isReady || !isInitialMount.current) return;
+    if (!router.isReady || !isInitialMount.current) return
 
     const initialize = async () => {
       if (!user?.role.includes('ceo') && !user?.role.includes('admin') && !user?.role.includes('watcher')) {
-        router.push('/');
-        toast.error("Sizda bu sahifaga kirish huquqi yo'q!");
-        return;
+        router.push('/')
+        toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
+        return
       }
 
-      const query = router.query;
+      const query = router.query
       const newParams: Partial<StudentsQueryParamsTypes> = {
         search: typeof query.q === 'string' ? query.q : '',
         status: typeof query.status === 'string' ? query.status : '',
         course: typeof query.course === 'string' ? Number(query.course) : null,
         school: typeof query.school === 'string' ? query.school : '',
-        group_status:
-          typeof query.group_status === 'string' &&
-          ['new', 'frozen', 'active', 'archive', 'not_activated', 'without_group'].includes(query.group_status)
-            ? (query.group_status as '' | 'new' | 'frozen' | 'active' | 'archive')
-            : '',
+        group_status: queryParams.group_status,
         group: typeof query.group === 'string' ? query.group : '',
         teacher: typeof query.teacher === 'string' ? query.teacher : '',
         is_debtor: typeof query.is_debtor === 'string' ? query.is_debtor : '',
@@ -253,84 +249,84 @@ export default function StudentsPage() {
         not_in_debt: typeof query.not_in_debt === 'string' ? query.not_in_debt : '',
         debt_date: typeof query.debt_date === 'string' ? query.debt_date : '',
         offset: typeof query.offset === 'string' ? query.offset : '0',
-        limit: typeof query.limit === 'string' ? query.limit : '10',
-      };
+        limit: typeof query.limit === 'string' ? query.limit : '10'
+      }
 
-      dispatch(updateStudentParams(newParams));
-      isInitialMount.current = false;
-    };
+      dispatch(updateStudentParams(newParams))
+      isInitialMount.current = false
+    }
 
-    void initialize();
+    void initialize()
     return () => {
-      dispatch(setOpenEdit(null));
-    };
-  }, [router.isReady, user, dispatch, router]);
+      dispatch(setOpenEdit(null))
+    }
+  }, [router.isReady, user, dispatch, router])
 
   useEffect(() => {
-    if (!router.isReady) return;
+    if (!router.isReady) return
 
-    const newQuery = generateQueryString();
+    const newQuery = generateQueryString()
     const currentQuery = new URLSearchParams(
       Object.entries(router.query)
         .filter(([, value]) => value !== undefined && value !== null && value !== '')
         .map(([key, value]) => [key, String(value)])
-    ).toString();
+    ).toString()
 
     if (currentQuery !== newQuery) {
       router.replace(
         {
           pathname: '/students',
-          search: newQuery,
+          search: newQuery
         },
         undefined,
         { shallow: true }
-      );
+      )
     }
-  }, [router.isReady, queryParams, router, generateQueryString]);
+  }, [router.isReady, queryParams, router, generateQueryString])
 
   const handleEditClickOpen = useCallback(
     (value: ModalTypes) => {
-      setOpenModalEdit(value);
-      setOpenEdit(value);
+      setOpenModalEdit(value)
+      setOpenEdit(value)
     },
     [setOpenEdit]
-  );
+  )
 
   const handleEditClose = useCallback(() => {
-    setOpenModalEdit(null);
-    setOpenEdit(null);
-  }, [setOpenEdit]);
+    setOpenModalEdit(null)
+    setOpenEdit(null)
+  }, [setOpenEdit])
 
   const handleModalOpen = useCallback(() => {
     if (companyInfo.access) {
-      getSMSTemps();
-      handleEditClickOpen('sms');
+      getSMSTemps()
+      handleEditClickOpen('sms')
     } else {
-      setAccessModal(true);
+      setAccessModal(true)
     }
-  }, [companyInfo.access, getSMSTemps, handleEditClickOpen]);
+  }, [companyInfo.access, getSMSTemps, handleEditClickOpen])
 
   const handleSwitch = useCallback(
     (value: 'archive' | 'active') => {
-      dispatch(updateStudentParams({ group_status: '', status: value, offset: '0' }));
+      dispatch(updateStudentParams({ group_status: '', status: value, offset: '0' }))
     },
     [dispatch]
-  );
+  )
 
   useEffect(() => {
     if (openEdit === 'create') {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = ''
     }
     return () => {
-      document.body.style.overflow = '';
-    };
-  }, [openEdit]);
+      document.body.style.overflow = ''
+    }
+  }, [openEdit])
 
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] });
-  }, [user?.active_branch, queryClient]);
+    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+  }, [user?.active_branch, queryClient])
 
   return (
     <Box display='flex' flexDirection='column' gap={3}>
