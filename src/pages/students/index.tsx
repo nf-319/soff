@@ -237,19 +237,19 @@ export default function StudentsPage() {
 
       const query = router.query
       const newParams: Partial<StudentsQueryParamsTypes> = {
-        search: typeof query.q === 'string' ? query.q : '',
-        status: typeof query.status === 'string' ? query.status : '',
-        course: typeof query.course === 'string' ? Number(query.course) : null,
-        school: typeof query.school === 'string' ? query.school : '',
+        search: queryParams.search,
+        status: queryParams.status,
+        course: queryParams.course,
+        school: queryParams.school,
         group_status: queryParams.group_status,
-        group: typeof query.group === 'string' ? query.group : '',
-        teacher: typeof query.teacher === 'string' ? query.teacher : '',
-        is_debtor: typeof query.is_debtor === 'string' ? query.is_debtor : '',
-        last_payment: typeof query.last_payment === 'string' ? query.last_payment : '',
-        not_in_debt: typeof query.not_in_debt === 'string' ? query.not_in_debt : '',
-        debt_date: typeof query.debt_date === 'string' ? query.debt_date : '',
-        offset: typeof query.offset === 'string' ? query.offset : '0',
-        limit: typeof query.limit === 'string' ? query.limit : '10'
+        group: queryParams.group,
+        teacher: queryParams.teacher,
+        is_debtor: queryParams.is_debtor,
+        last_payment: queryParams.last_payment,
+        not_in_debt: queryParams.not_in_debt,
+        debt_date: queryParams.debt_date,
+        offset: queryParams.offset,
+        limit: queryParams.limit
       }
 
       dispatch(updateStudentParams(newParams))
