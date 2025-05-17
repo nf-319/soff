@@ -126,10 +126,12 @@ export default function CreateStudentForm() {
       }
 
       const resp = await dispatch(createStudent(newValues))
-
-      console.log(resp)
       if (resp.meta.requestStatus === 'rejected') {
-        formik.setErrors(resp.payload)
+        if (resp.payload?.status === 413 || resp.payload?.response?.status === 413) {
+          toast.error("Fayl hajmi juda katta. Iltimos, kichikroq rasm yuklang.")
+        } else {
+          formik.setErrors(resp.payload)
+        }
       } else {
         toast.success("O'quvchi muvaffaqiyatli yaratildi")
         await dispatch(updateStudentParams({ status: 'active' }))
