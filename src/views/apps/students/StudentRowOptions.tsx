@@ -26,6 +26,7 @@ import { X } from 'lucide-react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { format } from 'date-fns'
+import dayjs from 'dayjs'
 
 type Props = {
   id: number
@@ -52,9 +53,16 @@ export default function StudentRowOptions({ id }: Props) {
     },
     validationSchema,
     onSubmit: values => {
-      if (values.date) {
-        console.log('Form values:', { date: format(values?.date, 'dd-MM-yyyy') })
-      }
+      setLoading(true)
+      dispatch(disablePage(true))
+      const formatted = dayjs(values.date).format('YYYY-MM-DD')
+      dispatch(updateStudent({ id, data: { status: 'active', added_at: formatted } }))
+      dispatch(disablePage(false))
+      toast.success("O'quvchi muvaffaqiyatli aktivlashtirildi")
+      dispatch(updateStudentParams({ status: 'active' }))
+      queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+      handleClose()
+      setLoading(false)
     }
   })
 
@@ -84,7 +92,6 @@ export default function StudentRowOptions({ id }: Props) {
     toast.success("O'quvchi muvaffaqiyatli aktivlashtirildi")
     dispatch(updateStudentParams({ status: 'active' }))
     queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
-
     setLoading(false)
   }
 
