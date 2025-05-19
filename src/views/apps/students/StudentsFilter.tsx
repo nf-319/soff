@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import {
   Autocomplete,
   Box,
@@ -20,32 +20,38 @@ import useDebounce from 'src/hooks/useDebounce'
 import api from 'src/@core/utils/api'
 import { format } from 'date-fns'
 import { fetchSchoolsList } from 'src/store/apps/settings'
-import ceoConfigs from 'src/configs/ceo'
-import { useRouter } from 'next/router'
 import { Search } from 'lucide-react'
 import { DatePicker } from '@components/DatePicker'
+import ceoConfigs from 'src/configs/ceo'
+import { StudentsQueryParamsTypes } from '@/types/apps/studentsTypes'
+import { useRouter } from 'next/router'
 
 const StudentsFilter = () => {
-  const router = useRouter()
   const dispatch = useAppDispatch()
   const { queryParams } = useAppSelector(state => state.students)
   const { schools } = useAppSelector(state => state.settings)
   const [activeFilter, setActiveFilter] = useState('')
   const { getCourses, courses } = useCourses()
-  const [groups, setGroups] = useState([])
-  const [teachers, setTeachers] = useState([])
+  const [groups, setGroups] = useState<any[]>([])
+  const [teachers, setTeachers] = useState<any[]>([])
   const { t } = useTranslation()
+  const { query } = useRouter()
   const [loadingGroups, setLoadingGroups] = useState(false)
   const [loadingTeachers, setLoadingTeachers] = useState(false)
-  const querySearch = new URLSearchParams(window.location.search).get('q')
-  const [search, setSearch] = useState(querySearch || '')
-  const debounceSearch = useDebounce(search, 300)
-  const [teacherId, setTeacherId] = useState('')
-  const [groupId, setGroupId] = useState('')
-  const [date, setDate] = useState<Date | null>(null)
+  const [teacherId, setTeacherId] = useState(queryParams.teacher || '')
+  const [groupId, setGroupId] = useState(queryParams.group || '')
+  const [month, year] = Array.isArray(query?.debt_date)
+    ? query.debt_date[0].split('-')
+    : (query?.debt_date ?? '').split('-')
 
-  const isInitialMount = useRef(true)
-  const isUpdating = useRef(false)
+  const parsedMonth = Number(month) - 1
+  const parsedYear = Number(year)
+
+  const [date, setDate] = useState<Date | null>(
+    query?.debt_date && !isNaN(parsedMonth) && !isNaN(parsedYear)
+      ? new Date(parsedYear, parsedMonth, 1)
+      : null
+  )
 
   const dataFetchedRef = useRef({
     courses: false,
@@ -54,7 +60,7 @@ const StudentsFilter = () => {
     schools: false
   })
 
-  const getGroups = async () => {
+  const getGroups = useCallback(async () => {
     if (dataFetchedRef.current.groups) return
 
     try {
@@ -68,9 +74,9 @@ const StudentsFilter = () => {
     } finally {
       setLoadingGroups(false)
     }
-  }
+  }, [teacherId])
 
-  const getTeachers = async () => {
+  const getTeachers = useCallback(async () => {
     if (dataFetchedRef.current.teachers) return
 
     try {
@@ -84,136 +90,64 @@ const StudentsFilter = () => {
     } finally {
       setLoadingTeachers(false)
     }
-  }
+  }, [groupId])
 
-  const handleFilter = (key: any, value: any) => {
-    isUpdating.current = true
+  const handleFilter = useCallback(
+    (key: keyof StudentsQueryParamsTypes | 'amount', value: any) => {
+      let updatedParams: Partial<StudentsQueryParamsTypes> = { [key]: value }
 
-    let updatedParams: Record<any, any> = { [key]: value }
-
-    if (key === 'debt_date') {
-      updatedParams = { debt_date: value ? `${value}` : '' }
-    } else if (key === 'amount') {
-      if (value === 'is_debtor') {
-        updatedParams = { is_debtor: true, last_payment: '', not_in_debt: '', is_overpaid: '' }
-      } else if (value === 'not_in_debt') {
-        updatedParams = { is_debtor: '', last_payment: '', not_in_debt: true, is_overpaid: '' }
-      } else if (value === 'last_payment') {
-        updatedParams = { last_payment: true, is_debtor: '', not_in_debt: '', is_overpaid: '' }
-      } else if (value === 'is_overpaid') {
-        updatedParams = { last_payment: '', is_debtor: '', not_in_debt: '', is_overpaid: true }
-      } else if (value === 'all') {
-        updatedParams = { is_debtor: '', last_payment: '', not_in_debt: '', is_overpaid: '' }
-      }
-    } else if (value === '') {
-      updatedParams = { [key]: null }
-    }
-
-    dispatch(updateStudentParams(updatedParams))
-
-    if (key === 'teacher') {
-      setTeacherId(value || '')
-      dataFetchedRef.current.groups = false
-    } else if (key === 'group') {
-      setGroupId(value || '')
-      dataFetchedRef.current.teachers = false
-    }
-  }
-
-  const onDateChange = (newDate: Date | null) => {
-    if (!newDate) {
-      handleFilter('debt_date', '')
-    } else {
-      handleFilter('debt_date', format(newDate, 'MM-yyyy'))
-    }
-    setDate(newDate)
-  }
-
-  useEffect(() => {
-    if (isInitialMount.current) {
-      const {
-        q,
-        status,
-        course,
-        school,
-        group_status,
-        group,
-        teacher,
-        is_debtor,
-        last_payment,
-        not_in_debt,
-        debt_date
-      } = router.query
-
-      const newParams = {
-        search: q || '',
-        status: status || '',
-        course: course || '',
-        school: school || '',
-        group_status: group_status || '',
-        group: group || '',
-        teacher: teacher || '',
-        is_debtor: is_debtor || '',
-        last_payment: last_payment || '',
-        not_in_debt: not_in_debt || '',
-        debt_date: debt_date || ''
+      if (key === 'debt_date') {
+        updatedParams = { debt_date: value ? format(value, 'MM-yyyy') : '' }
+      } else if (key === 'amount') {
+        if (value === 'is_debtor') {
+          updatedParams = { is_debtor: true, last_payment: '', not_in_debt: '', is_overpaid: '' }
+        } else if (value === 'not_in_debt') {
+          updatedParams = { is_debtor: '', last_payment: '', not_in_debt: true, is_overpaid: '' }
+        } else if (value === 'last_payment') {
+          updatedParams = { last_payment: true, is_debtor: '', not_in_debt: '', is_overpaid: '' }
+        } else if (value === 'is_overpaid') {
+          updatedParams = { last_payment: '', is_debtor: '', not_in_debt: '', is_overpaid: true }
+        } else if (value === 'all') {
+          updatedParams = { is_debtor: '', last_payment: '', not_in_debt: '', is_overpaid: '' }
+        }
+      } else if (value === '') {
+        updatedParams = { [key]: '' }
       }
 
-      if (JSON.stringify(newParams) !== JSON.stringify(queryParams)) {
-        isUpdating.current = true
-        dispatch(updateStudentParams(newParams))
+      dispatch(updateStudentParams(updatedParams))
 
-        if (teacher) setTeacherId(String(teacher))
-        if (group) setGroupId(String(group))
+      if (key === 'teacher') {
+        setTeacherId(value || '')
+        dataFetchedRef.current.groups = false
+      } else if (key === 'group') {
+        setGroupId(value || '')
+        dataFetchedRef.current.teachers = false
       }
+    },
+    [dispatch]
+  )
 
-      isInitialMount.current = false
-    }
-  }, [router.query, dispatch, queryParams])
-
-  useEffect(() => {
-    if (!isUpdating.current) {
-      const { q, ...restQuery } = router.query
-
-      if (debounceSearch && debounceSearch !== q) {
-        router.push(
-          {
-            pathname: '/students',
-            query: { ...restQuery, q: debounceSearch }
-          },
-          undefined,
-          { shallow: true }
-        )
-      } else if (!debounceSearch && q) {
-        router.push(
-          {
-            pathname: '/students',
-            query: restQuery
-          },
-          undefined,
-          { shallow: true }
-        )
-      }
-    }
-  }, [debounceSearch, router])
-
-  useEffect(() => {
-    isUpdating.current = false
-  }, [])
+  const onDateChange = useCallback(
+    (newDate: Date | null) => {
+      handleFilter('debt_date', newDate)
+      setDate(newDate)
+    },
+    [handleFilter]
+  )
 
   useEffect(() => {
     if (activeFilter === 'course' && !dataFetchedRef.current.courses) {
-      void getCourses()
+      getCourses()
       dataFetchedRef.current.courses = true
     } else if (activeFilter === 'group') {
-      void getGroups()
+      getGroups()
     } else if (activeFilter === 'teacher') {
-      void getTeachers()
+      getTeachers()
     } else if (activeFilter === 'school' && !dataFetchedRef.current.schools) {
       dispatch(fetchSchoolsList())
       dataFetchedRef.current.schools = true
     }
-  }, [activeFilter, getCourses, dispatch])
+  }, [activeFilter, getCourses, getGroups, getTeachers, dispatch])
 
   const groupOptions =
     groups?.map((item: any) => ({
@@ -234,8 +168,8 @@ const StudentsFilter = () => {
           {t('Qidirish')}
         </InputLabel>
         <OutlinedInput
-          onChange={e => setSearch(e.target.value)}
-          value={search}
+          onChange={e => handleFilter('search', e.target.value)}
+          value={queryParams.search || ''}
           endAdornment={
             <InputAdornment position='end'>
               <Search size={18} />
@@ -252,7 +186,6 @@ const StudentsFilter = () => {
         <InputLabel size='small' id='course-select-label'>
           {t('Kurslar')}
         </InputLabel>
-
         <Select
           size='small'
           onOpen={() => setActiveFilter('course')}
@@ -260,7 +193,7 @@ const StudentsFilter = () => {
           value={queryParams.course || ''}
           id='course-select'
           labelId='course-select-label'
-          onChange={e => handleFilter('course', e.target.value)}
+          onChange={e => handleFilter('course', e.target.value || '')}
         >
           <MenuItem value=''>{t('Barchasi')}</MenuItem>
           {courses.map(course => (
@@ -282,7 +215,7 @@ const StudentsFilter = () => {
           value={queryParams.school || ''}
           id='school-select'
           labelId='school-select-label'
-          onChange={e => handleFilter('school', e.target.value)}
+          onChange={e => handleFilter('school', e.target.value || '')}
         >
           <MenuItem value=''>{t('Barchasi')}</MenuItem>
           {schools?.map((school: any) => (
@@ -303,7 +236,7 @@ const StudentsFilter = () => {
           value={queryParams.group_status || ''}
           id='group-status-select'
           labelId='group-status-select-label'
-          onChange={e => handleFilter('group_status', e.target.value)}
+          onChange={e => handleFilter('group_status', e.target.value || '')}
         >
           <MenuItem value=''>{t('Barchasi')}</MenuItem>
           <MenuItem value='active'>{t('active')}</MenuItem>
@@ -350,7 +283,7 @@ const StudentsFilter = () => {
           value={date}
           onChange={onDateChange}
           format='MM/yyyy'
-          views={['month', 'year']}
+          views={['month']}
           disableFuture
           fullWidth
         />
@@ -364,7 +297,7 @@ const StudentsFilter = () => {
           loading={loadingGroups}
           loadingText={t('Yuklanmoqda...')}
           noOptionsText={t("Ma'lumot topilmadi")}
-          value={groupOptions.find(option => option.value === queryParams.group_status) || null}
+          value={groupOptions.find(option => option.value === queryParams.group) || null}
           onOpen={() => setActiveFilter('group')}
           onChange={(_, v) => handleFilter('group', v?.value || '')}
           PopperComponent={props => <Popper {...props} style={{ ...props.style, width: 300 }} />}

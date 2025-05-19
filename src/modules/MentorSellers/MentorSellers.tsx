@@ -104,7 +104,7 @@ export const MentorSellers = () => {
       headerName: t('Bonus'),
       minWidth: 100,
       renderCell: (params: any) => (
-        <Typography variant="body1" color={Number(params.value) > 0 ? "#16a34a" : "textSecondary"}>
+        <Typography variant='body1' color={Number(params.value) > 0 ? '#16a34a' : 'textSecondary'}>
           {Number(params.value) > 0 ? `+ ${formatPrice(params.value)}` : formatPrice(params.value)}
         </Typography>
       ),
@@ -115,7 +115,7 @@ export const MentorSellers = () => {
       headerName: 'Jarima',
       minWidth: 100,
       renderCell: (params: any) => (
-        <Typography variant="body1" color={Number(params.value) > 0 ? "#ef4444" : "textSecondary"}>
+        <Typography variant='body1' color={Number(params.value) > 0 ? '#ef4444' : 'textSecondary'}>
           {Number(params.value) > 0 ? `- ${formatPrice(params.value)}` : formatPrice(params.value)}
         </Typography>
       ),
@@ -139,16 +139,20 @@ export const MentorSellers = () => {
       field: 'status',
       headerName: 'Status',
       width: 200,
-      renderCell: () => (
-        <Chip label="To'langan" variant='outlined' color='success' />
-      )
+      renderCell: () => <Chip label="To'langan" variant='outlined' color='success' />
     }
   ]
 
   return (
     <Box component='section' display='grid' gap={4}>
       <Box display='grid' gap={3}>
-        <Box display='flex' alignItems='center' justifyContent='space-between'>
+        <Box
+          display='flex'
+          flexDirection={{ xs: 'column', sm: 'row' }}
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          justifyContent='space-between'
+          gap={2}
+        >
           <Typography gutterBottom variant='h5'>
             Oylik maoshlar
           </Typography>
@@ -161,16 +165,31 @@ export const MentorSellers = () => {
         <DataGridTable rows={data?.results || []} columns={salaryColumns} hideFooter />
       </Box>
 
-      <ComingSoon text="Guruhlar bo'yicha oylik maoshlar" title="Tez kunda">
-        <Box display='flex' flexDirection='column' alignItems='center' gap={3}>
-          <Box display='flex' alignItems='center' width='100%' justifyContent='space-between'>
+      <ComingSoon text="Guruhlar bo'yicha oylik maoshlar" title='Tez kunda'>
+        <Box display='flex' flexDirection='column' alignItems='center' gap={3} width='100%'>
+          <Box
+            display='flex'
+            flexDirection={{ xs: 'column', md: 'row' }}
+            alignItems={{ xs: 'flex-start', md: 'center' }}
+            justifyContent='space-between'
+            gap={2}
+            width='100%'
+          >
             <Typography gutterBottom variant='h5'>
               Guruhlar bo'yicha
             </Typography>
 
-            <Box display='flex' gap={3} alignItems='center'>
+            <Box
+              display='flex'
+              flexDirection={{ xs: 'column', sm: 'row' }}
+              alignItems={{ xs: 'stretch', sm: 'center' }}
+              gap={2}
+              width='100%'
+              maxWidth={{ sm: 'none', md: 'fit-content' }}
+            >
               <Select
-                sx={{ display: 'flex', alignItems: 'center' }}
+                fullWidth
+                sx={{ minWidth: 120 }}
                 size='small'
                 value={currentYears}
                 onChange={e => setCurrentYears(e.target.value as number)}
@@ -178,8 +197,14 @@ export const MentorSellers = () => {
                 <MenuItem value={currentYears}>{currentYears}</MenuItem>
               </Select>
 
-              <Select size='small' value={currentMonth} onChange={e => setCurrentMonth(e.target.value as number)}>
-                <MenuItem>Hammasi</MenuItem>
+              <Select
+                fullWidth
+                sx={{ minWidth: 120 }}
+                size='small'
+                value={currentMonth}
+                onChange={e => setCurrentMonth(e.target.value as number)}
+              >
+                <MenuItem value='all'>{t('Hammasi')}</MenuItem>
                 {uzbekMonths.map((month, index) => (
                   <MenuItem key={month} value={index}>
                     {month}
@@ -197,3 +222,4 @@ export const MentorSellers = () => {
     </Box>
   )
 }
+
