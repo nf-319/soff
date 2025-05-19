@@ -125,8 +125,10 @@ export const FinanceResults: FC = () => {
 
     if (link === 'debtors_amount') {
       newParams.is_debtor = 'true'
+      newParams.is_overpaid = ''
       newParams.debt_date = `${String(selectedMonth).padStart(2, '0')}-${selectedYear}`
     } else if (link === 'is_overpaid') {
+      newParams.is_debtor = ''
       newParams.is_overpaid = 'true'
       newParams.debt_date = `${String(selectedMonth).padStart(2, '0')}-${selectedYear}`
     }
