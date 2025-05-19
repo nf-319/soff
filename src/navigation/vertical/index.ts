@@ -66,6 +66,11 @@ const Navigation = (t: any): VerticalNavItemsType => {
       title: 'Guruhlar',
       icon: 'mdi:home-outline',
       path: '/dashboard'
+    },
+    {
+      title: 'Oylik maoshlar',
+      icon: 'mdi:cash-multiple',
+      path: '/mentor-sellers'
     }
   ]
 
