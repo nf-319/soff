@@ -90,8 +90,8 @@ const FormFields = ({
       setDepartmentValue(formDetail?.department)
       setSourceValue(formDetail?.source)
       setBgImg(formDetail?.background_image)
-        setLogoImg(formDetail?.logo)
-        setFormName(formDetail.title)
+      setLogoImg(formDetail?.logo)
+      setFormName(formDetail.title)
     }
   }, [formDetail])
 
@@ -282,7 +282,7 @@ const FormFields = ({
         <Box display={'flex'} flexDirection={'column'} gap={5}>
           <Box display={'flex'} gap={3}>
             <FormControl fullWidth>
-              <InputLabel size='small' id='user-view-language-label'>
+              <InputLabel size='small' shrink={Boolean(departmentValue)} id='user-view-language-label'>
                 {t("Bo'lim")}
               </InputLabel>
               <Select
@@ -291,7 +291,7 @@ const FormFields = ({
                 id='user-view-language'
                 labelId='user-view-language-label'
                 name='department'
-                defaultValue={''}
+                value={departmentValue}
                 onChange={e => setDepartmentValue(Number(e.target.value))}
               >
                 {departments?.map((item: any) => (
@@ -307,7 +307,7 @@ const FormFields = ({
             </FormControl>
 
             <FormControl fullWidth>
-              <InputLabel size='small' id='fsdgsdgsgsdfsd-label'>
+              <InputLabel shrink={Boolean(sourceValue)} size='small' id='fsdgsdgsgsdfsd-label'>
                 {t('Manba')}
               </InputLabel>
               <Select
@@ -316,6 +316,7 @@ const FormFields = ({
                 id='fsdgsdgsgsdfsd'
                 labelId='fsdgsdgsgsdfsd-label'
                 name='source'
+                value={sourceValue}
                 onChange={(e: any) => setSourceValue(e?.target?.value)}
                 sx={{ mb: 1 }}
               >
@@ -351,7 +352,10 @@ const FormFields = ({
               Matn
             </Button>
           </Box>
-          <Accordion sx={{ border: '1px solid #e0e0e0', borderRadius: 1, boxShadow: 'none', overflow: 'hidden' }} variant='outlined'>
+          <Accordion
+            sx={{ border: '1px solid #e0e0e0', borderRadius: 1, boxShadow: 'none', overflow: 'hidden' }}
+            variant='outlined'
+          >
             <AccordionSummary expandIcon={<GridExpandMoreIcon />} aria-controls='panel1-content' id='panel1-header'>
               <Typography>Formalar</Typography>
             </AccordionSummary>
@@ -367,7 +371,15 @@ const FormFields = ({
                           <Draggable key={index} draggableId={String(index)} index={index}>
                             {provided => (
                               <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                <Accordion sx={{ marginY: 4, border: '1px solid #e0e0e0', borderRadius: 1, boxShadow: 'none', overflow: 'hidden' }}>
+                                <Accordion
+                                  sx={{
+                                    marginY: 4,
+                                    border: '1px solid #e0e0e0',
+                                    borderRadius: 1,
+                                    boxShadow: 'none',
+                                    overflow: 'hidden'
+                                  }}
+                                >
                                   <AccordionSummary
                                     expandIcon={<GridExpandMoreIcon />}
                                     sx={{ display: 'flex', justifyContent: 'space-between' }}
@@ -492,7 +504,13 @@ const FormFields = ({
         </Box>
       ) : (
         <Box>
-          <Tabs value={value} onChange={handleChange} variant='fullWidth' aria-label='basic tabs example' sx={{ marginBottom: 3 }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            variant='fullWidth'
+            aria-label='basic tabs example'
+            sx={{ marginBottom: 3 }}
+          >
             <Tab value='one' label='Fon' />
             <Tab value='two' label='Logotip' />
           </Tabs>

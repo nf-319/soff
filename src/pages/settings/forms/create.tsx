@@ -2,10 +2,7 @@ import { useAppSelector } from '@/store'
 import FormFields from '@/widgets/Form/formFields'
 import FormHeader from '@/widgets/Form/formHeader'
 import FormUi from '@/widgets/Form/formUi'
-import {
-  Box,
-  Card,
-} from '@mui/material'
+import { Box, Card } from '@mui/material'
 import { useState } from 'react'
 
 export type FieldType = {
@@ -29,7 +26,7 @@ const CreateForm = ({ is_update }: Props) => {
   const [displayMode, setDisplayMode] = useState<'computer' | 'tablet' | 'phone'>('computer')
   const { companyInfo } = useAppSelector(state => state.user)
   const [bg_img, setBgImg] = useState<any | null>(null)
-  const [logoImg, setLogoImg] = useState<any | null>(null)
+  const [logoImg, setLogoImg] = useState<any | null>(companyInfo?.logo)
   const [bg_color, setBgColor] = useState<string>('#f9f9fb')
   const [sentButtonLabel, setSendButtonLabel] = useState<string>('Yuborish')
   const [fields, setFields] = useState<FieldType[]>([
@@ -111,7 +108,7 @@ const CreateForm = ({ is_update }: Props) => {
           sx={{
             width: getFormUiWidth(),
             transition: 'width 0.3s ease-in-out',
-            overflow: 'hidden',
+            overflow: 'hidden'
           }}
         >
           <FormUi
