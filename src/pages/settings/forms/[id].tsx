@@ -1,6 +1,6 @@
 'use client'
 
-import CreateForm from "./new-create"
+import CreateForm from "./create"
 
 const UpdateForm = () => {
   return <CreateForm is_update={true} />

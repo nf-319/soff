@@ -1,6 +1,5 @@
 import { revereAmount } from '@/components/amount-input'
 import PhoneInput from '@/components/phone-input'
-import { FieldType } from '@/pages/settings/forms/new-create'
 import {
   Box,
   Button,
@@ -15,6 +14,7 @@ import {
   Typography
 } from '@mui/material'
 import Image from 'next/image'
+import { FieldType } from '@/pages/settings/forms/create'
 
 type Props = {
   formName: string
@@ -84,6 +84,7 @@ const FormUi = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   width: 100,
+                  transition: 'height 0.3s ease-in-out',
                   height: isMobile ? 60 : 100
                 }}
               >
@@ -102,7 +103,7 @@ const FormUi = ({
                   unoptimized
                   style={{
                     width: 'auto',
-                    transition: 'height 0.4s ease-in-out',
+                    transition: 'height 0.3s ease-in-out',
                     height: isMobile ? '60px' : '100px',
                     objectFit: 'cover'
                   }}
@@ -162,7 +163,7 @@ const FormUi = ({
                       <FormLabel component='legend'>{field.question || field.title}</FormLabel>
                       <FormGroup>
                         {field?.question_variants &&
-                          field?.question_variants.map((variant, vIndex: any) => (
+                          field?.question_variants.map((variant: any, vIndex: any) => (
                             <FormControlLabel
                               key={variant.id}
                               control={

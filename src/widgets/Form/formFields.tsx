@@ -1,6 +1,5 @@
 import api from '@/@core/utils/api'
 import { useGet } from '@/hooks/useApi'
-import { FieldType } from '@/pages/settings/forms/new-create'
 import { VisuallyHiddenInput } from '@/views/apps/mentors/AddMentorsModal'
 import { LoadingButton } from '@mui/lab'
 import {
@@ -31,6 +30,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import Divider from '@mui/material/Divider'
+import { FieldType } from '@/pages/settings/forms/create'
 
 type Props = {
   is_update?: boolean
@@ -351,11 +351,11 @@ const FormFields = ({
               Matn
             </Button>
           </Box>
-          <Accordion>
+          <Accordion sx={{ border: '1px solid #e0e0e0', borderRadius: 1, boxShadow: 'none', overflow: 'hidden' }} variant='outlined'>
             <AccordionSummary expandIcon={<GridExpandMoreIcon />} aria-controls='panel1-content' id='panel1-header'>
               <Typography>Formalar</Typography>
             </AccordionSummary>
-            <AccordionDetails>
+            <AccordionDetails sx={{ borderTop: '1px solid #e0e0e0' }}>
               {!fields.length ? (
                 <Typography textAlign={'center'}>Ma'lumot yo'q</Typography>
               ) : (
@@ -367,7 +367,7 @@ const FormFields = ({
                           <Draggable key={index} draggableId={String(index)} index={index}>
                             {provided => (
                               <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                <Accordion sx={{ marginY: 4 }}>
+                                <Accordion sx={{ marginY: 4, border: '1px solid #e0e0e0', borderRadius: 1, boxShadow: 'none', overflow: 'hidden' }}>
                                   <AccordionSummary
                                     expandIcon={<GridExpandMoreIcon />}
                                     sx={{ display: 'flex', justifyContent: 'space-between' }}
@@ -427,7 +427,7 @@ const FormFields = ({
                                           onChange={e => handleFieldChange(index, 'question', e.target.value)}
                                           sx={{ mb: 2 }}
                                         />
-                                        {field.question_variants?.map((variant, vIndex) => (
+                                        {field.question_variants?.map((variant: any, vIndex: any) => (
                                           <Box display='flex' alignItems='center' gap={1} mb={3} key={vIndex}>
                                             <TextField
                                               fullWidth
