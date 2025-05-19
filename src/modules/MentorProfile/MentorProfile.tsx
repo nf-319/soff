@@ -12,20 +12,42 @@ export const MentorProfile: FC<Props> = ({ id }) => {
   const { user } = useAuth()
 
   return (
-    <Box display='grid' gridTemplateColumns='1fr 2fr' gap={4} position='relative' minHeight='calc(100vh-137px)'>
+    <Box
+      display="grid"
+      gap={4}
+      minHeight="calc(100vh - 137px)"
+      position="relative"
+      sx={{
+        gridTemplateColumns: {
+          xs: '1fr',
+          md: '1fr 2fr',
+        },
+      }}
+    >
       <Box
-        gridColumn='span 1'
-        position='sticky'
-        top={200}
+        position={{ xs: 'relative', md: 'sticky' }}
+        top={{ md: 200 }}
         bottom={0}
-        maxHeight='calc(100vh - 100px)'
-        overflow='auto'
-        sx={{ display: 'flex', flexDirection: 'column' }}
+        maxHeight={{ md: 'calc(100vh - 100px)' }}
+        overflow={{ md: 'auto' }}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gridColumn: {
+            xs: 'span 1',
+            md: 'span 1',
+          },
+        }}
       >
         <MentorOverview id={id ?? String(user?.id)} notMind={Boolean(id)} />
       </Box>
 
-      <Box gridColumn='span 1'>
+      <Box
+        gridColumn={{
+          xs: 'span 1',
+          md: 'span 1',
+        }}
+      >
         <MentorGroups hiddenNowGroup={Boolean(id)} />
       </Box>
     </Box>

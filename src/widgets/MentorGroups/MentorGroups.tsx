@@ -72,13 +72,13 @@ export const MentorGroups: FC<Props> = ({ hiddenNowGroup = false }) => {
                   currentOrNextGroup.start_end_at
                 }`}
                 hrefId={currentOrNextGroup.id}
-                course={currentOrNextGroup.course_name}
-                all_students={currentOrNextGroup.student_count}
-                active_students={currentOrNextGroup.student_counts.active_count}
-                trial_students={currentOrNextGroup.student_counts.new_count}
-                room={currentOrNextGroup.room_name}
-                week_days={currentOrNextGroup.week_days}
-                month_duration={currentOrNextGroup.month_duration}
+                course={currentOrNextGroup?.course_name}
+                all_students={currentOrNextGroup?.student_count}
+                active_students={currentOrNextGroup?.student_counts?.active_count}
+                trial_students={currentOrNextGroup?.student_counts?.new_count}
+                room={currentOrNextGroup?.room_name}
+                week_days={currentOrNextGroup?.week_days}
+                month_duration={currentOrNextGroup?.month_duration}
               />
             ) : (
               <Typography sx={{ color: '#64748b', fontSize: 14, fontStyle: 'italic' }}>Bugun dars yo'q</Typography>
@@ -102,13 +102,13 @@ export const MentorGroups: FC<Props> = ({ hiddenNowGroup = false }) => {
             isHighlighted={false}
             lesson_time={`${getFormatDate(String(item.start_date))} - ${item.start_end_at}`}
             hrefId={item.id}
-            course={item.course_name}
-            all_students={item.student_count}
-            active_students={item.student_counts.active_count}
-            trial_students={item.student_counts.new_count}
-            room={item.room_name}
-            week_days={item.week_days}
-            month_duration={item.month_duration}
+            course={item?.course_name}
+            all_students={item?.student_count}
+            active_students={item.student_counts?.active_count}
+            trial_students={item?.student_counts?.new_count}
+            room={item?.room_name}
+            week_days={item?.week_days}
+            month_duration={item?.month_duration}
           />
         ))}
       </Box>
