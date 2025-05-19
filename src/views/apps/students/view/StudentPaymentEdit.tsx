@@ -21,6 +21,7 @@ import Router, { useRouter } from 'next/router'
 import { fetchStudentDetail, fetchStudentPayment } from 'src/store/apps/students'
 import AmountInput, { revereAmount } from '../../../../components/amount-input'
 import SubLoader from '../../loaders/SubLoader'
+import IconifyIcon from '@components/icon'
 
 type Props = {
   openEdit: any
@@ -107,7 +108,7 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
   }
 
   useEffect(() => {
-    getPaymentMethod()
+    void getPaymentMethod()
 
     return () => {
       formik.resetForm()
@@ -173,7 +174,7 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
                 </Select>
                 {!!errors.group && touched.group && <FormHelperText error>{errors.group}</FormHelperText>}
               </FormControl>
-              {/* <FormControl fullWidth>
+              <FormControl fullWidth>
                 <InputLabel
                   size='small'
                   id='user-modules-language-label'
@@ -198,13 +199,13 @@ export default function StudentPaymentEditForm({ setEditSuccess, openEdit, setOp
                   ))}
                   <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router.push('/settings/ceo/all-settings')}>
                     {t('Yangi yaratish')}
-                    <IconifyIcon icon={'ion:add-sharp'} />
+                    <IconifyIcon icon='ion:add-sharp' />
                   </MenuItem>
                 </Select>
                 {!!errors.payment_type && touched.payment_type && (
                   <FormHelperText error>{errors.payment_type}</FormHelperText>
                 )}
-              </FormControl> */}
+              </FormControl>
               <FormControl fullWidth>
                 <AmountInput
                   label={t('Summa')}
