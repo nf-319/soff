@@ -84,28 +84,17 @@ export default function StudentRowOptions({ id }: Props) {
     await dispatch(fetchStudentDetail(id))
   }
 
-  const handleActive = async () => {
-    setLoading(true)
-    dispatch(disablePage(true))
-    await dispatch(updateStudent({ id, data: { status: 'active' } }))
-    dispatch(disablePage(false))
-    toast.success("O'quvchi muvaffaqiyatli aktivlashtirildi")
-    dispatch(updateStudentParams({ status: 'active' }))
-    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
-    setLoading(false)
-  }
-
-  function handleClose() {
+  const handleClose = () => {
     setRecoveModal(false)
     formik.resetForm()
   }
 
-  async function submitDelete() {
+  const submitDelete = async () => {
     setLoading(true)
     dispatch(disablePage(true))
     await api
       .delete(`student/destroy/${id}/`)
-      .then(res => {
+      .then(() => {
         toast.success("O'quvchi muvaffaqiyatli o'chirildi")
         queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
       })
@@ -169,19 +158,14 @@ export default function StudentRowOptions({ id }: Props) {
           </MenuItem>
         )}
       </Menu>
+
       <UserSuspendDialog
         loading={loading}
         handleOk={submitDelete}
         open={suspendDialogOpen}
         setOpen={setSuspendDialogOpen}
       />
-      {/* <UserSuspendDialog
-        loading={loading}
-        handleOk={() => handleActive()}
-        open={recoveModal}
-        setOpen={setRecoveModal}
-        okText='Tiklash'
-      /> */}
+
       <Dialog open={recoveModal} onClose={handleClose}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography>O'quvchini aktivlashtirish</Typography>
