@@ -1,6 +1,6 @@
 import useResponsive from '@/@core/hooks/useResponsive'
-import { Box, Button, Card, Typography } from '@mui/material'
-import { LaptopMinimal, Smartphone } from 'lucide-react'
+import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material'
+import { LaptopMinimal, Smartphone, Tablet } from 'lucide-react'
 
 type Props = {
   displayMode: 'phone' | 'tablet' | 'computer'
@@ -10,52 +10,59 @@ type Props = {
 
 const FormHeader = ({ setDisplayMode, displayMode, is_update }: Props) => {
   const { isMobile } = useResponsive()
+
+  const renderButton = (
+    mode: 'phone' | 'tablet' | 'computer',
+    icon: JSX.Element,
+    label: string,
+  ) => {
+    const isActive = displayMode === mode
+
+    if (isMobile) {
+      return (
+        <Tooltip title={label} arrow>
+          <IconButton
+            onClick={() => setDisplayMode(mode)}
+            color={isActive ? 'primary' : 'default'}
+            sx={{ border: isActive ? '1px solid' : 'none', borderRadius: 1 }}
+          >
+            {icon}
+          </IconButton>
+        </Tooltip>
+      )
+    }
+
+    return (
+      <Tooltip title={label} arrow>
+        <Button
+          onClick={() => setDisplayMode(mode)}
+          startIcon={icon}
+          size="medium"
+          variant={isActive ? 'contained' : 'outlined'}
+        >
+          {label}
+        </Button>
+      </Tooltip>
+    )
+  }
+
   return (
-    <Box
-      display={'flex'}
-      flexDirection={{ xs: 'column', md: 'row' }}
-      alignItems={'center'}
-      justifyContent={'space-between'}
-    >
-      <Typography variant='h5'>{is_update ? "Formani o'zgartirish" : 'Forma yaratish'}</Typography>
-      <Card
+    <Box display='flex' alignItems='center' justifyContent='space-between' width='100%'>
+      <Box>
+        <Typography variant='h5'>{is_update ? "Formani o'zgartirish" : 'Forma yaratish'}</Typography>
+      </Box>
+
+      <Box
         sx={{
-          boxShadow: 'none',
-          border: '1px solid lightgray',
-          width: '100%',
-          maxWidth: 650,
-          padding: 2,
           display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
           justifyContent: 'center',
           gap: 2
         }}
       >
-        <Button
-          onClick={() => setDisplayMode('phone')}
-          startIcon={<Smartphone size={20} />}
-          size='medium'
-          variant={displayMode == 'phone' ? 'contained' : 'outlined'}
-        >
-          Telefon
-        </Button>
-        <Button
-          onClick={() => setDisplayMode('tablet')}
-          startIcon={<Smartphone size={20} />}
-          size='medium'
-          variant={displayMode == 'tablet' ? 'contained' : 'outlined'}
-        >
-          Planshet
-        </Button>
-        <Button
-          onClick={() => setDisplayMode('computer')}
-          startIcon={<LaptopMinimal size={20} />}
-          size='medium'
-          variant={displayMode == 'computer' ? 'contained' : 'outlined'}
-        >
-          Kompyuter
-        </Button>
-      </Card>
+        {renderButton('phone', <Smartphone size={20} />, "Telefon ko'rinishi")}
+        {renderButton('tablet', <Tablet size={20} />, "Planshet ko'rinishi")}
+        {renderButton('computer', <LaptopMinimal size={20} />, "Kompyuter ko'rinishi")}
+      </Box>
     </Box>
   )
 }

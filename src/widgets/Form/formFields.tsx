@@ -26,10 +26,11 @@ import { GridExpandMoreIcon } from '@mui/x-data-grid'
 import { Plus, PlusCircle, Trash, Trash2, Upload } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { SyntheticEvent, useEffect, useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
+import Divider from '@mui/material/Divider'
 
 type Props = {
   is_update?: boolean
@@ -95,7 +96,7 @@ const FormFields = ({
   }, [formDetail])
 
   useEffect(() => {
-    refetch()
+    void refetch()
   }, [query.id])
 
   const handleCreateForm = async () => {
@@ -207,7 +208,7 @@ const FormFields = ({
     setFields([...fields, newField])
   }
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (event: SyntheticEvent, newValue: string) => {
     setValue(newValue)
   }
 
@@ -259,25 +260,27 @@ const FormFields = ({
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 5,
+        gap: 3,
         width: '100%',
         boxShadow: 'none',
         border: '1px solid lightgray',
         padding: 5
       }}
     >
-      <Box display={'flex'} gap={5}>
+      <Box display={'flex'} gap={3}>
         <Button fullWidth onClick={() => setIsElement(true)} variant={isElement ? 'contained' : 'outlined'}>
           Elementlar
         </Button>
         <Button fullWidth onClick={() => setIsElement(false)} variant={isElement ? 'outlined' : 'contained'}>
-          {' '}
           Dizayn
         </Button>
       </Box>
+
+      <Divider />
+
       {isElement ? (
         <Box display={'flex'} flexDirection={'column'} gap={5}>
-          <Box display={'flex'} gap={5}>
+          <Box display={'flex'} gap={3}>
             <FormControl fullWidth>
               <InputLabel size='small' id='user-view-language-label'>
                 {t("Bo'lim")}
@@ -489,22 +492,19 @@ const FormFields = ({
         </Box>
       ) : (
         <Box>
-          <Tabs value={value} onChange={handleChange} variant='fullWidth' aria-label='basic tabs example'>
+          <Tabs value={value} onChange={handleChange} variant='fullWidth' aria-label='basic tabs example' sx={{ marginBottom: 3 }}>
             <Tab value='one' label='Fon' />
             <Tab value='two' label='Logotip' />
           </Tabs>
+
           {value == 'one' ? (
             <Box>
-              <Typography variant='h6' sx={{ paddingY: 2 }}>
-                Fon
-              </Typography>
-              <Box display={'flex'} gap={3} flexDirection={{ xs: 'column', md: 'row' }}>
+              <Box display='flex' gap={3} flexDirection={{ xs: 'column', md: 'row' }}>
                 <Card
                   onClick={() => setBgColor('#f9f9fb')}
                   sx={{
                     height: 100,
                     border: `2px solid ${bg_color == '#f9f9fb' ? '#4361ee' : 'lightgray'}`,
-
                     cursor: 'pointer',
                     width: '100%',
                     boxShadow: 'none',
@@ -528,21 +528,6 @@ const FormFields = ({
                 >
                   <Typography sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     Och
-                  </Typography>
-                </Card>
-                <Card
-                  onClick={() => setBgColor('gradient1')}
-                  sx={{
-                    height: 100,
-                    border: `2px solid ${bg_color === 'gradient1' ? '#4361ee' : 'lightgray'}`,
-                    cursor: 'pointer',
-                    width: '100%',
-                    boxShadow: 'none',
-                    background: 'linear-gradient(135deg, #a1c4fd, #c2e9fb)'
-                  }}
-                >
-                  <Typography sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    Och gradient
                   </Typography>
                 </Card>
               </Box>

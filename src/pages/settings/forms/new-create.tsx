@@ -19,6 +19,7 @@ import {
 } from '@mui/material'
 import Image from 'next/image'
 import { useState } from 'react'
+import Divider from '@mui/material/Divider'
 
 export type FieldType = {
   input_type: 'input' | 'text' | 'question' | 'phone'
@@ -55,39 +56,90 @@ const CreateForm = ({ is_update }: Props) => {
     setFields(updated)
   }
 
+  const getFormUiWidth = () => {
+    switch (displayMode) {
+      case 'computer':
+        return { xs: '100%', md: '70%' }
+      case 'tablet':
+        return { xs: '100%', md: '50%' }
+      case 'phone':
+        return { xs: '100%', md: '30%' }
+      default:
+        return { xs: '100%', md: '50%' }
+    }
+  }
+
+  const getFormFieldsWidth = () => {
+    switch (displayMode) {
+      case 'computer':
+        return { xs: '100%', md: '30%' }
+      case 'tablet':
+        return { xs: '100%', md: '50%' }
+      case 'phone':
+        return { xs: '100%', md: '70%' }
+      default:
+        return { xs: '100%', md: '50%' }
+    }
+  }
+
   return (
     <Card sx={{ boxShadow: 'none', border: '1px solid lightgray', padding: 5 }}>
       <FormHeader is_update={is_update} displayMode={displayMode} setDisplayMode={setDisplayMode} />
-      <Box sx={{ marginTop: 5 }} display={'flex'} flexDirection={{ xs: 'column', md: 'row' }} gap={5}>
-        <FormFields
-          is_update={is_update}
-          bg_color={bg_color}
-          bg_img={bg_img}
-          companyInfoLogo={companyInfo.logo}
-          fields={fields}
-          formName={formName}
-          handleFieldChange={handleFieldChange}
-          logoImg={logoImg}
-          sentButtonLabel={sentButtonLabel}
-          setBgColor={setBgColor}
-          setBgImg={setBgImg}
-          setFields={setFields}
-          setFormName={setFormName}
-          setLogoImg={setLogoImg}
-          setSendButtonLabel={setSendButtonLabel}
-        />
-        <FormUi
-          bg_color={bg_color}
-          bg_img={bg_img}
-          companyInfoLogo={companyInfo.logo}
-          displayMode={displayMode}
-          logoImg={logoImg}
-          sentButtonLabel={sentButtonLabel}
-          setFields={setFields}
-          handleFieldChange={handleFieldChange}
-          fields={fields}
-          formName={formName}
-        />
+
+      <Box
+        sx={{
+          marginTop: 5,
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: 5
+        }}
+      >
+        <Box
+          sx={{
+            width: getFormFieldsWidth(),
+            transition: 'width 0.3s ease-in-out',
+            overflow: 'hidden'
+          }}
+        >
+          <FormFields
+            is_update={is_update}
+            bg_color={bg_color}
+            bg_img={bg_img}
+            companyInfoLogo={companyInfo.logo}
+            fields={fields}
+            formName={formName}
+            handleFieldChange={handleFieldChange}
+            logoImg={logoImg}
+            sentButtonLabel={sentButtonLabel}
+            setBgColor={setBgColor}
+            setBgImg={setBgImg}
+            setFields={setFields}
+            setFormName={setFormName}
+            setLogoImg={setLogoImg}
+            setSendButtonLabel={setSendButtonLabel}
+          />
+        </Box>
+
+        <Box
+          sx={{
+            width: getFormUiWidth(),
+            transition: 'width 0.3s ease-in-out',
+            overflow: 'hidden',
+          }}
+        >
+          <FormUi
+            bg_color={bg_color}
+            bg_img={bg_img}
+            companyInfoLogo={companyInfo.logo}
+            logoImg={logoImg}
+            displayMode={displayMode}
+            sentButtonLabel={sentButtonLabel}
+            setFields={setFields}
+            handleFieldChange={handleFieldChange}
+            fields={fields}
+            formName={formName}
+          />
+        </Box>
       </Box>
     </Card>
   )
