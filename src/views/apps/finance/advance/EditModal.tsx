@@ -82,87 +82,84 @@ export default function EditModal() {
   return (
     <Dialog open={!!isEditId} onClose={onClose}>
       <DialogTitle sx={{ textAlign: 'center' }}>{t('Avans berish')}</DialogTitle>
+
       <DialogContent sx={{ minWidth: '320px' }}>
-        {formik.values?.amount && (
-          <form
-            onSubmit={formik.handleSubmit}
-            style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '15px 0' }}
-          >
-            <FormControl fullWidth>
-              <InputLabel size='small' id='user-view-language-label'>
-                {t('Xodim')}
-              </InputLabel>
-              <Select
-                size='small'
-                label={t('Xodim')}
-                id='user-view-language'
-                labelId='user-view-language-label'
-                name='employee'
-                error={!!formik.errors.employee && formik.touched.employee}
-                value={formik.values.employee || null}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              >
-                {employee?.map(item => (
-                  <MenuItem key={item.id} value={item.id}>
-                    {item.first_name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {!!formik.errors.employee && formik.touched.employee && (
-                <FormHelperText error>{formik.errors.employee}</FormHelperText>
-              )}
-            </FormControl>
-            <FormControl fullWidth>
-              <AmountInput
-                size='small'
-                label='Summa'
-                name='amount'
-                error={!!formik.errors.amount && formik.touched.amount}
-                value={formik.values.amount}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
-              {!!formik.errors.amount && formik.touched.amount && (
-                <FormHelperText error>{formik.errors.amount}</FormHelperText>
-              )}
-            </FormControl>
-            <FormControl fullWidth>
-              <TextField
-                size='small'
-                label='Izoh'
-                multiline
-                rows={4}
-                name='description'
-                error={!!formik.errors.description && formik.touched.description}
-                value={formik.values.description}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
-              {!!formik.errors.description && formik.touched.description && (
-                <FormHelperText error>{formik.errors.description}</FormHelperText>
-              )}
-            </FormControl>
-            <FormControl fullWidth>
-              <TextField
-                size='small'
-                label='Sana'
-                name='date'
-                type='date'
-                error={!!formik.errors.date && formik.touched.date}
-                value={formik.values.date}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
-              {!!formik.errors.date && formik.touched.date && (
-                <FormHelperText error>{formik.errors.date}</FormHelperText>
-              )}
-            </FormControl>
-            <LoadingButton type='submit' variant='contained' loading={loading}>
-              Yangilash
-            </LoadingButton>
-          </form>
-        )}
+        <form
+          onSubmit={formik.handleSubmit}
+          style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '15px 0' }}
+        >
+          <FormControl fullWidth>
+            <InputLabel size='small' id='user-view-language-label'>
+              {t('Xodim')}
+            </InputLabel>
+            <Select
+              size='small'
+              label={t('Xodim')}
+              id='user-view-language'
+              labelId='user-view-language-label'
+              name='employee'
+              error={!!formik.errors.employee && formik.touched.employee}
+              value={formik.values.employee || null}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            >
+              {employee?.map(item => (
+                <MenuItem key={item.id} value={item.id}>
+                  {item.first_name}
+                </MenuItem>
+              ))}
+            </Select>
+            {!!formik.errors.employee && formik.touched.employee && (
+              <FormHelperText error>{formik.errors.employee}</FormHelperText>
+            )}
+          </FormControl>
+          <FormControl fullWidth>
+            <AmountInput
+              size='small'
+              label='Summa'
+              name='amount'
+              error={!!formik.errors.amount && formik.touched.amount}
+              value={formik.values.amount}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            />
+            {!!formik.errors.amount && formik.touched.amount && (
+              <FormHelperText error>{formik.errors.amount}</FormHelperText>
+            )}
+          </FormControl>
+          <FormControl fullWidth>
+            <TextField
+              size='small'
+              label='Izoh'
+              multiline
+              rows={4}
+              name='description'
+              error={!!formik.errors.description && formik.touched.description}
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            />
+            {!!formik.errors.description && formik.touched.description && (
+              <FormHelperText error>{formik.errors.description}</FormHelperText>
+            )}
+          </FormControl>
+          <FormControl fullWidth>
+            <TextField
+              size='small'
+              label='Sana'
+              name='date'
+              type='date'
+              error={!!formik.errors.date && formik.touched.date}
+              value={formik.values.date}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            />
+            {!!formik.errors.date && formik.touched.date && <FormHelperText error>{formik.errors.date}</FormHelperText>}
+          </FormControl>
+          <LoadingButton type='submit' variant='contained' loading={loading}>
+            Yangilash
+          </LoadingButton>
+        </form>
       </DialogContent>
     </Dialog>
   )
