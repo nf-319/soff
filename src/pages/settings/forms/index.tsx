@@ -32,7 +32,7 @@ import showResponseError from 'src/@core/utils/show-response-error'
 import CustomDialog from 'src/views/apps/settings/form/CustomDialog'
 import { useFormik } from 'formik'
 import { AuthContext } from 'src/context/AuthContext'
-import { Edit, Trash2 } from 'lucide-react'
+import { Edit, Plus, Trash2 } from 'lucide-react'
 import { FormUpdateModal } from '@/entities/FormsUpdateModal'
 import { useGet } from '@/hooks/useApi'
 
@@ -212,16 +212,14 @@ export default function FormsPage() {
 
   return (
     <Box>
-      <VideoHeader item={videoUrls.forms} />
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
         <Typography variant='h5'>{t('Formalar')}</Typography>
         <Button
-          size='small'
           variant='contained'
-          startIcon={<IconifyIcon icon={'ic:baseline-add'} />}
+          startIcon={<Plus size={20} />}
           onClick={() => push(`/settings/forms/create`)}
         >
-          {t('Yangi')}
+          Yangi
         </Button>
       </Box>
 

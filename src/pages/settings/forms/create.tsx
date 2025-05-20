@@ -4,6 +4,7 @@ import FormHeader from '@/widgets/Form/formHeader'
 import FormUi from '@/widgets/Form/formUi'
 import { Box, Card } from '@mui/material'
 import { useState } from 'react'
+import Divider from '@mui/material/Divider'
 
 export type FieldType = {
   input_type: 'input' | 'text' | 'question' | 'phone'
@@ -28,6 +29,9 @@ const CreateForm = ({ is_update }: Props) => {
   const [bg_img, setBgImg] = useState<any | null>(null)
   const [logoImg, setLogoImg] = useState<any | null>(companyInfo?.logo)
   const [bg_color, setBgColor] = useState<string>('#f9f9fb')
+  const [fontFamily, setFontFamily] = useState<string>('Roboto, sans-serif')
+  const [fontSize, setFontSize] = useState<string>('20px')
+  const [textColor, setTextColor] = useState<string>('#111827')
   const [sentButtonLabel, setSendButtonLabel] = useState<string>('Yuborish')
   const [fields, setFields] = useState<FieldType[]>([
     { input_type: 'input', label: 'Ism', title: 'Ism', value: '', is_required: false },
@@ -74,15 +78,14 @@ const CreateForm = ({ is_update }: Props) => {
         sx={{
           marginTop: 5,
           display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' },
-          gap: 5
+          flexDirection: { xs: 'column', md: 'row' }
         }}
       >
         <Box
           sx={{
             width: getFormFieldsWidth(),
             transition: 'width 0.3s ease-in-out',
-            overflow: 'hidden'
+            overflow: 'hidden',
           }}
         >
           <FormFields
@@ -91,7 +94,14 @@ const CreateForm = ({ is_update }: Props) => {
             bg_img={bg_img}
             companyInfoLogo={companyInfo.logo}
             fields={fields}
+            setFontFamily={setFontFamily}
+            setFontSize={setFontSize}
+            setTextColor={setTextColor}
+            fontFamily={fontFamily}
+            fontSize={fontSize}
+            textColor={textColor}
             formName={formName}
+            displayName={displayMode}
             handleFieldChange={handleFieldChange}
             logoImg={logoImg}
             sentButtonLabel={sentButtonLabel}
@@ -103,6 +113,8 @@ const CreateForm = ({ is_update }: Props) => {
             setSendButtonLabel={setSendButtonLabel}
           />
         </Box>
+
+        <Divider orientation='vertical' flexItem color='#e0e0e0' sx={{ mx: 3 }} />
 
         <Box
           sx={{
@@ -116,6 +128,9 @@ const CreateForm = ({ is_update }: Props) => {
             bg_img={bg_img}
             companyInfoLogo={companyInfo.logo}
             logoImg={logoImg}
+            fontFamily={fontFamily}
+            fontSize={fontSize}
+            textColor={textColor}
             displayMode={displayMode}
             sentButtonLabel={sentButtonLabel}
             setFields={setFields}

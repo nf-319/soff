@@ -2,6 +2,7 @@ import api from '@/@core/utils/api'
 import { useGet } from '@/hooks/useApi'
 import { VisuallyHiddenInput } from '@/views/apps/mentors/AddMentorsModal'
 import { LoadingButton } from '@mui/lab'
+import { v4 as uuidv4 } from 'uuid';
 import {
   Accordion,
   AccordionDetails,
@@ -25,11 +26,10 @@ import { GridExpandMoreIcon } from '@mui/x-data-grid'
 import { Plus, PlusCircle, Trash, Trash2, Upload } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { SyntheticEvent, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-import Divider from '@mui/material/Divider'
 import { FieldType } from '@/pages/settings/forms/create'
 
 type Props = {
@@ -44,10 +44,17 @@ type Props = {
   handleFieldChange: any
   setSendButtonLabel: (str: any) => void
   bg_color: string
+  displayName?: 'computer' | 'tablet' | 'phone'
   setBgColor: (val: string) => void
   companyInfoLogo: string
   setLogoImg: (str: string | null) => void
-  setBgImg: (str: string | null) => void
+  setBgImg: (str: string | null) => void,
+  fontFamily: string,
+  fontSize: string,
+  textColor: string
+  setFontFamily:  Dispatch<SetStateAction<string>>
+  setTextColor:  Dispatch<SetStateAction<string>>,
+  setFontSize:  Dispatch<SetStateAction<string>>
 }
 
 const FormFields = ({
@@ -59,31 +66,40 @@ const FormFields = ({
   is_update,
   bg_color,
   setBgColor,
+  displayName,
   setBgImg,
   setLogoImg,
   logoImg,
   setSendButtonLabel,
   setFields,
   setFormName,
+  fontFamily,
+  fontSize,
+  textColor,
+  setFontFamily,
+  setFontSize,
+  setTextColor,
   companyInfoLogo
 }: Props) => {
   const [isElement, setIsElement] = useState(true)
   const { data: departments } = useGet(`leads/department/list/`)
   const { data: sources } = useGet('leads/source/')
   const { t } = useTranslation()
-  const { query } = useRouter()
+  const { query, push } = useRouter()
   const [departmentValue, setDepartmentValue] = useState<number | null>(null)
   const [sourceValue, setSourceValue] = useState<number | null>(null)
   const [successText, setSuccessText] = useState<string>(
     "So'rovingiz muvaffaqiyatli yuborildi! Tez orada siz bilan bog'lanamiz."
   )
-  const { push } = useRouter()
-
   const [isLoading, setIsLoading] = useState(false)
   const [value, setValue] = useState('one')
+  const [isOuterExpanded, setIsOuterExpanded] = useState<boolean>(false)
+  const [expandedFieldIndex, setExpandedFieldIndex] = useState<number | null>(null)
+
   const { data: formDetail, refetch } = useGet(`leads/form/detail/${String(query?.id)}/`, {
     options: { enabled: !!query?.id && !!is_update }
   })
+
   useEffect(() => {
     if (is_update && formDetail) {
       setFields(formDetail?.form_questions)
@@ -101,7 +117,6 @@ const FormFields = ({
 
   const handleCreateForm = async () => {
     setIsLoading(true)
-
     try {
       const payload = {
         title: formName,
@@ -110,26 +125,24 @@ const FormFields = ({
         form_questions: fields,
         extra_data: {
           sent_button_label: sentButtonLabel,
-          success_text: successText
+          success_text: successText,
+          font_family: fontFamily,
+          font_size: fontSize,
+          text_color: textColor
         }
       }
-
       await api.post('leads/form/create/', payload).then(res => {
         if (res.status == 201) {
-          console.log(res)
-
           if (logoImg || bg_img) {
             const formData = new FormData()
             if (logoImg instanceof File) {
               formData.append('logo', logoImg)
             }
-
             if (bg_img instanceof File) {
               formData.append('background_image', bg_img)
             }
-
             formData.append('form', res.data.id)
-            const imageRes = api.post('leads/form/file/', formData)
+            api.post('leads/form/file/', formData)
           }
         }
       })
@@ -139,13 +152,11 @@ const FormFields = ({
       console.error(err)
       toast.error(err.response?.data?.msg || "Ma'lumotlarni to'liq kiriting")
     }
-
     setIsLoading(false)
   }
 
   const handleUpdateForm = async () => {
     setIsLoading(true)
-
     try {
       const payload = {
         title: formName,
@@ -154,10 +165,12 @@ const FormFields = ({
         form_questions: fields,
         extra_data: {
           sent_button_label: sentButtonLabel,
-          success_text: successText
+          success_text: successText,
+          font_family: fontFamily,
+          font_size: fontSize,
+          text_color: textColor
         }
       }
-
       await api.patch(`leads/form/update/${query.id}/`, payload).then(res => {
         if (res.status == 200) {
           if (logoImg || bg_img) {
@@ -165,13 +178,11 @@ const FormFields = ({
             if (logoImg instanceof File) {
               formData.append('logo', logoImg)
             }
-
             if (bg_img instanceof File) {
               formData.append('background_image', bg_img)
             }
-
             formData.append('form', res.data.id)
-            const imageRes = api.post('leads/form/file/', formData)
+            api.post('leads/form/file/', formData)
           }
         }
       })
@@ -181,7 +192,6 @@ const FormFields = ({
       console.error(err)
       toast.error(err.response?.data?.msg || "Ma'lumotlarni to'liq kiriting")
     }
-
     setIsLoading(false)
   }
 
@@ -196,7 +206,7 @@ const FormFields = ({
             question: 'Yangi savol',
             question_variants: [
               {
-                id: crypto.randomUUID(),
+                id: uuidv4(),
                 order: 1,
                 value: 'variant 1'
               }
@@ -204,7 +214,6 @@ const FormFields = ({
           }
         : { value: '' })
     }
-
     setFields([...fields, newField])
   }
 
@@ -225,22 +234,19 @@ const FormFields = ({
     const updated = [...fields]
     const variants = updated[fieldIndex].question_variants || []
     const newVariant = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       order: variants.length + 1,
       value: `Yangi variant ${variants.length + 1}`
     }
     updated[fieldIndex].question_variants = [...variants, newVariant]
-
     setFields(updated)
   }
 
   const handleDragEnd = (result: any) => {
     if (!result.destination) return
-
     const items = Array.from(fields)
     const [reorderedItem] = items.splice(result.source.index, 1)
     items.splice(result.destination.index, 0, reorderedItem)
-
     setFields(items)
   }
 
@@ -249,10 +255,22 @@ const FormFields = ({
     updated[fieldIndex].question_variants!.splice(variantIndex, 1)
     setFields(updated)
   }
+
   const removeField = (index: number) => {
     const updated = [...fields]
     updated.splice(index, 1)
     setFields(updated)
+    if (expandedFieldIndex === index) {
+      setExpandedFieldIndex(null)
+    }
+  }
+
+  const handleOuterAccordionChange = () => {
+    setIsOuterExpanded(!isOuterExpanded)
+  }
+
+  const handleFieldAccordionChange = (index: number) => () => {
+    setExpandedFieldIndex(expandedFieldIndex === index ? null : index)
   }
 
   return (
@@ -260,14 +278,14 @@ const FormFields = ({
       sx={{
         display: 'flex',
         flexDirection: 'column',
+        borderRadius: 'none',
         gap: 3,
         width: '100%',
-        boxShadow: 'none',
-        border: '1px solid lightgray',
-        padding: 5
+        height: '100%',
+        boxShadow: 'none'
       }}
     >
-      <Box display={'flex'} gap={3}>
+      <Box display='flex' mt={1} gap={{ xs: 2, md: displayName === 'computer' ? 2 : 3 }}>
         <Button fullWidth onClick={() => setIsElement(true)} variant={isElement ? 'contained' : 'outlined'}>
           Elementlar
         </Button>
@@ -276,19 +294,17 @@ const FormFields = ({
         </Button>
       </Box>
 
-      <Divider />
-
       {isElement ? (
         <Box display={'flex'} flexDirection={'column'} gap={5}>
           <Box display={'flex'} gap={3}>
             <FormControl fullWidth>
-              <InputLabel size='small' shrink={Boolean(departmentValue)} id='user-view-language-label'>
+              <InputLabel size='small' id='user-view-language-label'>
                 {t("Bo'lim")}
               </InputLabel>
               <Select
                 size='small'
-                label={t("Bo'lim")}
                 id='user-view-language'
+                label="Bo'lim"
                 labelId='user-view-language-label'
                 name='department'
                 value={departmentValue}
@@ -307,7 +323,7 @@ const FormFields = ({
             </FormControl>
 
             <FormControl fullWidth>
-              <InputLabel shrink={Boolean(sourceValue)} size='small' id='fsdgsdgsgsdfsd-label'>
+              <InputLabel size='small' id='fsdgsdgsgsdfsd-label'>
                 {t('Manba')}
               </InputLabel>
               <Select
@@ -352,7 +368,10 @@ const FormFields = ({
               Matn
             </Button>
           </Box>
+
           <Accordion
+            expanded={isOuterExpanded}
+            onChange={handleOuterAccordionChange}
             sx={{ border: '1px solid #e0e0e0', borderRadius: 1, boxShadow: 'none', overflow: 'hidden' }}
             variant='outlined'
           >
@@ -372,6 +391,8 @@ const FormFields = ({
                             {provided => (
                               <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                 <Accordion
+                                  expanded={expandedFieldIndex === index}
+                                  onChange={handleFieldAccordionChange(index)}
                                   sx={{
                                     marginY: 4,
                                     border: '1px solid #e0e0e0',
@@ -493,29 +514,54 @@ const FormFields = ({
                 onChange={e => setSuccessText(e.target.value)}
               />
             </FormControl>
-            <LoadingButton
-              onClick={is_update ? handleUpdateForm : handleCreateForm}
-              loading={isLoading}
-              variant='contained'
-            >
-              {is_update ? 'Saqlash' : 'Yaratish'}
-            </LoadingButton>
           </Box>
         </Box>
       ) : (
-        <Box>
+        <Box display={'flex'} flexDirection={'column'} gap={5}>
           <Tabs
             value={value}
             onChange={handleChange}
             variant='fullWidth'
             aria-label='basic tabs example'
-            sx={{ marginBottom: 3 }}
+            sx={{
+              marginBottom: 3,
+              minHeight: 40,
+              height: 40
+            }}
           >
-            <Tab value='one' label='Fon' />
-            <Tab value='two' label='Logotip' />
+            <Tab
+              value='one'
+              label='Fon'
+              sx={{
+                padding: 0,
+                minHeight: 40,
+                height: 40,
+                fontSize: 14
+              }}
+            />
+            <Tab
+              value='two'
+              label='Logotip'
+              sx={{
+                padding: 0,
+                minHeight: 40,
+                height: 40,
+                fontSize: 14
+              }}
+            />
+            <Tab
+              value='three'
+              label='Yozuv uslubi'
+              sx={{
+                padding: 0,
+                minHeight: 40,
+                height: 40,
+                fontSize: 14
+              }}
+            />
           </Tabs>
 
-          {value == 'one' ? (
+          {value === 'one' ? (
             <Box>
               <Box display='flex' gap={3} flexDirection={{ xs: 'column', md: 'row' }}>
                 <Card
@@ -632,8 +678,8 @@ const FormFields = ({
                 )}
               </Box>
             </Box>
-          ) : (
-            <>
+          ) : value === 'two' ? (
+            <Box>
               <Box
                 sx={{
                   borderRadius: 1,
@@ -705,10 +751,74 @@ const FormFields = ({
                   </Button>
                 )}
               </Box>
-            </>
+            </Box>
+          ) : (
+            <Box display='flex' flexDirection='column' gap={5}>
+              <Box display='flex' gap={3}>
+                <FormControl fullWidth>
+                  <InputLabel size='small' id='font-family-label'>
+                    Shrift
+                  </InputLabel>
+                  <Select
+                    labelId="font-family-label"
+                    id="font-family"
+                    size='small'
+                    value={fontFamily}
+                    label="Shrift"
+                    onChange={(e) => setFontFamily(e.target.value)}
+                  >
+                    <MenuItem value="Inter">Inter</MenuItem>
+                    <MenuItem value="'Poppins', sans-serif">Poppins</MenuItem>
+                    <MenuItem value="Roboto">Roboto</MenuItem>
+                    <MenuItem value="Arial">Arial</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <FormControl fullWidth>
+                  <InputLabel size='small' id='font-size-label'>
+                    O‘lcham
+                  </InputLabel>
+                  <Select
+                    size='small'
+                    label='O‘lcham'
+                    id='font-size'
+                    labelId='font-size-label'
+                    value={fontSize}
+                    onChange={e => setFontSize(e.target.value)}
+                  >
+                    <MenuItem value='16px'>Kichik</MenuItem>
+                    <MenuItem value='20px'>O‘rta</MenuItem>
+                    <MenuItem value='24px'>Katta</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+              <Typography>Matn rangi</Typography>
+              <Box display={'flex'} gap={3}>
+                <TextField
+                  size='small'
+                  value={textColor}
+                  sx={{ maxWidth: 70 }}
+                  onChange={e => setTextColor(e.target.value)}
+                  fullWidth
+                  type='color'
+                />
+                <TextField size='small' value={textColor} onChange={e => setTextColor(e.target.value)} fullWidth />
+              </Box>
+            </Box>
           )}
         </Box>
       )}
+
+      <Box mt='auto'>
+        <LoadingButton
+          onClick={is_update ? handleUpdateForm : handleCreateForm}
+          loading={isLoading}
+          variant='contained'
+          fullWidth
+        >
+          {is_update ? 'Saqlash' : 'Yaratish'}
+        </LoadingButton>
+      </Box>
     </Card>
   )
 }

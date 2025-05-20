@@ -9,12 +9,13 @@ import {
   FormControlLabel,
   FormGroup,
   FormLabel,
-  InputLabel,
-  TextField,
+  InputLabel, Switch,
+  TextField, Tooltip,
   Typography
 } from '@mui/material'
 import Image from 'next/image'
 import { FieldType } from '@/pages/settings/forms/create'
+import { useState } from 'react'
 
 type Props = {
   formName: string
@@ -26,7 +27,10 @@ type Props = {
   handleFieldChange: any
   displayMode: 'phone' | 'tablet' | 'computer'
   bg_color: string
-  companyInfoLogo: string
+  companyInfoLogo: string,
+  fontFamily: string,
+  fontSize: string,
+  textColor: string
 }
 
 const FormUi = ({
@@ -39,12 +43,16 @@ const FormUi = ({
   displayMode,
   sentButtonLabel,
   handleFieldChange,
-  setFields
+  setFields,
+  fontFamily,
+  fontSize,
+  textColor,
 }: Props) => {
+  const [end, setEnd] = useState(false)
   const isMobile = displayMode === 'phone'
 
   return (
-    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 5 }}>
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 5, position: 'relative' }}>
       <Box display='flex' alignItems='center' justifyContent='center' sx={{ height: '100%' }}>
         <Card
           sx={{
@@ -75,6 +83,7 @@ const FormUi = ({
                 transition: 'width 0.3s ease-in-out',
                 width: isMobile ? 300 : 400,
                 height: 'auto',
+                maxHeight: 500,
                 backgroundColor: bg_color
               }}
             >
@@ -109,11 +118,19 @@ const FormUi = ({
                   }}
                 />
               </Box>
-              <Typography color='black' fontWeight={600}>
+              <Typography
+                color={textColor}
+                fontWeight={600}
+                fontSize={fontSize}
+                fontFamily={fontFamily}
+                style={{
+                  transition: 'font-size 0.3s ease, font-family 0.3s ease'
+                }}
+              >
                 {formName}
               </Typography>
 
-              {fields.map((field, index) => (
+              {!end && fields.map((field, index) => (
                 <FormControl fullWidth key={index}>
                   {field.input_type === 'input' && (
                     <TextField
@@ -201,6 +218,12 @@ const FormUi = ({
             </Card>
           </Box>
         </Card>
+
+        <Box sx={{ position: 'absolute', top: 5, left: 5 }}>
+          <Tooltip title="Yakuniy natijani ko'rsatish">
+            <Switch checked={end} onChange={(e) => setEnd(e.target.checked)} />
+          </Tooltip>
+        </Box>
       </Box>
     </Box>
   )
