@@ -125,7 +125,7 @@ jobs:
               echo "Launch new version..."
               $PM2_COMMAND start ecosystem.config.js --only "$APP_NAME-new" || true
 
-              sleep 1
+              sleep 5
 
               if curl -s $HEALTH_URL/api/health > /dev/null || curl -s $HEALTH_URL > /dev/null; then
                 echo "Looks like a new version is running"

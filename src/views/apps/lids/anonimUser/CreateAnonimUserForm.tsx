@@ -37,6 +37,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { LeadKanbanItem } from '@/entities/lids/LeadKanbanItem'
 import { LEAD_STATEMENTS_TEMPERATURE } from '@modules/LeadsStatement'
 import { lidStatusOption } from '@/shared/constans/lid-statements'
+import { toast } from 'react-hot-toast'
 
 type Props = {
   source?: any
@@ -53,7 +54,6 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
   const [temperateValue, setTemperateValue] = useState('')
   const [stateValue, setStateValue] = useState('new')
   const query = window.location?.search?.split('?slug=')[1]
-
   const { id } = router.query
   const { sectionId, loading, openLid } = useAppSelector(state => state.leads)
 
@@ -127,6 +127,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
       } else {
         formik.resetForm()
         dispatch(setSectionId(null))
+        toast.success("Muvaffaqiyatli")
         await  queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
         await handleGetLealdItems()
         await dispatch(fetchDepartmentList())
