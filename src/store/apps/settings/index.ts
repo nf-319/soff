@@ -191,6 +191,7 @@ const initialState: SettingsState = {
   wekends: [],
   wekendData: null,
   employees: [],
+  
   employeeData: null,
   employees_count: 0,
   queryParams: {
