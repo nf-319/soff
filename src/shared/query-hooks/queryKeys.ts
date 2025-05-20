@@ -11,4 +11,5 @@ export const enum QueryKeys {
   TeacherDetail = 'teacher-detail',
   Groups = 'groups',
   EmployeeSellers = 'sellers',
+  EmployeeSellersRealTime = 'sellers-real-time',
 }

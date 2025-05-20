@@ -7,3 +7,11 @@ export type MentorSellersType = {
   checked_date: string,
   updated_salary: number
 }
+
+export type MentorSellersRealTimeType = {
+  id: number,
+  name: string
+  course: string
+  salary: string | number
+  students_count: string | number
+}
