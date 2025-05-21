@@ -68,7 +68,7 @@ export default function StudentRowOptions({ id }: Props) {
     setLoading(true)
     dispatch(disablePage(true))
     await api
-      .delete(`student/destroy/${id}/`)
+      .post(`student/destroy/${id}/`)
       .then(res => {
         toast.success("O'quvchi muvaffaqiyatli o'chirildi")
         queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })

@@ -53,7 +53,7 @@ export const updateStudent = createAsyncThunk(
 )
 
 export const deleteStudent = createAsyncThunk('students/deleteStudent', async (pk: number | any) => {
-  return (await api.delete(`student/destroy/${pk}/`)).data
+  return (await api.post(`student/destroy/${pk}/`)).data
 })
 
 export const fetchStudentPayment = createAsyncThunk('students/fetchStudentPayment', async (id: any) => {
