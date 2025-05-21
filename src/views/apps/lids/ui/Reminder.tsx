@@ -25,11 +25,14 @@ import {
   Edit,
   Trash
 } from 'lucide-react'
-import { DatePicker } from '@components/DatePicker'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { getFormatDate } from '@/shared/utils/getFormatDate'
 import { useDeleteLeadsDescription, usePutLeadsDescription } from '@/shared/query-hooks'
 import toast from 'react-hot-toast'
 import { LoadingButton } from '@mui/lab'
+import { truncateToMinute } from '@/views/apps/lids/anonimUser/AddNoteAnonimUser'
 
 interface NotificationItem {
   id: string
@@ -84,7 +87,7 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
 
   const handleEditSave =  async () => {
     mutate(
-      { id: item.id, anonim_user: userId, newText: editText, date: reminderDate },
+      { id: item.id, anonim_user: userId, newText: editText, date: truncateToMinute(reminderDate) },
       {
         onSuccess: () => {
           setEditDialogOpen(false)
@@ -129,17 +132,17 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
       }}
     >
       <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
+        display='flex'
+        alignItems='center'
+        justifyContent='space-between'
         mb={2}
         pb={1.5}
         sx={{ borderBottom: '1px solid #e0e0e0' }}
       >
-        <Box display="flex" alignItems="center" gap={3}>
+        <Box display='flex' alignItems='center' gap={3}>
           {item?.admin && (
-            <Tooltip title="Yaratgan Admin">
-              <Box display="flex" gap={1} alignItems="center" sx={{ userSelect: 'none' }}>
+            <Tooltip title='Yaratgan Admin'>
+              <Box display='flex' gap={1} alignItems='center' sx={{ userSelect: 'none' }}>
                 <Box
                   sx={{
                     color: 'primary.main',
@@ -150,7 +153,7 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
                 >
                   <User size={16} />
                 </Box>
-                <Typography variant="body1" fontWeight="medium">
+                <Typography variant='body1' fontWeight='medium'>
                   {item?.admin}
                 </Typography>
               </Box>
@@ -158,9 +161,9 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
           )}
         </Box>
 
-        <Box display="flex" alignItems="center" gap={1}>
+        <Box display='flex' alignItems='center' gap={1}>
           {item?.date && (
-            <Box display="flex" alignItems="center" mr={1}>
+            <Box display='flex' alignItems='center' mr={1}>
               <Box
                 sx={{
                   color: 'warning.main',
@@ -172,13 +175,13 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
                 <Bell size={16} />
               </Box>
 
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant='caption' color='text.secondary'>
                 {getFormatDate(item.date, 'dd MMMM yyyy', true)}
               </Typography>
             </Box>
           )}
 
-          <IconButton size="small" onClick={handleMenuClick} sx={{ ml: 1 }}>
+          <IconButton size='small' onClick={handleMenuClick} sx={{ ml: 1 }}>
             <MoreVertical size={16} />
           </IconButton>
 
@@ -207,9 +210,9 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
         </Box>
       </Box>
 
-      <Box display="flex" alignItems="center" justifyContent="center" gap={3}>
+      <Box display='flex' alignItems='center' justifyContent='center' gap={3}>
         {(item?.text || item?.body) && (
-          <Box display="flex" alignItems="flex-start" width="100%" gap={1}>
+          <Box display='flex' alignItems='flex-start' width='100%' gap={1}>
             <Box
               sx={{
                 color: 'primary.main',
@@ -222,9 +225,9 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
               <MessageSquare size={16} />
             </Box>
 
-            <Tooltip title="Eslatma matni">
+            <Tooltip title='Eslatma matni'>
               <Typography
-                variant="body1"
+                variant='body1'
                 sx={{
                   lineHeight: 1.6,
                   color: 'text.primary',
@@ -238,8 +241,8 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
         )}
 
         {item?.created_at && (
-          <Tooltip title="Eslatma yaratilgan sanasi">
-            <Box display="flex" alignItems="center" sx={{ userSelect: 'none' }} flexShrink={0} gap={1}>
+          <Tooltip title='Eslatma yaratilgan sanasi'>
+            <Box display='flex' alignItems='center' sx={{ userSelect: 'none' }} flexShrink={0} gap={1}>
               <Box
                 sx={{
                   color: 'text.secondary',
@@ -250,7 +253,7 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
                 <Clock size={12} />
               </Box>
 
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant='caption' color='text.secondary'>
                 {getFormatDate(String(item.created_at), 'dd MMMM yyyy', true)}
               </Typography>
             </Box>
@@ -258,19 +261,26 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
         )}
       </Box>
 
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} fullWidth maxWidth="sm">
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
         <DialogTitle>Eslatmani tahrirlash</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <FormControl fullWidth sx={{ marginTop: 4 }}>
-            <DatePicker
-              label="Eslatish vaqti"
-              views={['year', 'month', 'day']}
-              format="dd/MM/yyyy HH:mm"
-              disablePast
-              showTimeSelect
-              value={reminderDate}
-              onChange={(newValue) => setReminderDate(newValue)}
-            />
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DateTimePicker
+                label='Eslatish vaqti'
+                value={reminderDate}
+                onChange={newValue => setReminderDate(newValue)}
+                disablePast
+                format='dd/MM/yyyy HH:mm'
+                ampm={false}
+                slotProps={{
+                  textField: {
+                    size: 'small',
+                    error: false
+                  }
+                }}
+              />
+            </LocalizationProvider>
           </FormControl>
 
           <FormControl fullWidth>
@@ -278,11 +288,11 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
               fullWidth
               multiline
               rows={4}
-              label="Eslatma matni"
+              label='Eslatma matni'
               value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-              margin="normal"
-              variant="outlined"
+              onChange={e => setEditText(e.target.value)}
+              margin='normal'
+              variant='outlined'
             />
           </FormControl>
         </DialogContent>
@@ -290,7 +300,7 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
         <DialogActions>
           <Button onClick={() => setEditDialogOpen(false)}>Bekor qilish</Button>
 
-          <LoadingButton loading={isPending} onClick={handleEditSave} color="primary" variant="contained">
+          <LoadingButton loading={isPending} onClick={handleEditSave} color='primary' variant='contained'>
             Saqlash
           </LoadingButton>
         </DialogActions>
@@ -302,10 +312,15 @@ export const ReminderBox: FC<NotificationBoxProps> = ({ item, userId, refetch })
           <Typography>Siz haqiqatdan ham bu eslatmani o'chirmoqchimisiz?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
+          <Button onClick={() => setDeleteDialogOpen(false)} variant='outlined'>
             Yo'q
           </Button>
-          <LoadingButton loading={pendingDeleteDescription} onClick={handleDeleteConfirm} color="error" variant="outlined">
+          <LoadingButton
+            loading={pendingDeleteDescription}
+            onClick={handleDeleteConfirm}
+            color='error'
+            variant='outlined'
+          >
             Ha
           </LoadingButton>
         </DialogActions>

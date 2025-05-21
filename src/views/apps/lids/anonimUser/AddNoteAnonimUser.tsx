@@ -8,41 +8,52 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import api from 'src/@core/utils/api'
 import { toast } from 'react-hot-toast'
-import { DatePicker } from '@components/DatePicker'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 
 type Props = {
   user: any
   closeModal: any
 }
 
+export const truncateToMinute = (date: Date | null): Date | null => {
+  if (!date) return null
+  const newDate = new Date(date)
+  newDate.setSeconds(0)
+  newDate.setMilliseconds(0)
+  return newDate
+}
+
 export default function AddNoteAnonimUser({ user, closeModal }: Props) {
   const { t } = useTranslation()
-  const [loading, setLoading] = useState<any>(false)
-  const [reminderDate, setReminderDate] = useState<Date | null>(null);
+  const [loading, setLoading] = useState<boolean>(false)
+  const [reminderDate, setReminderDate] = useState<Date | null>(new Date())
 
   const validationSchema = Yup.object({
-    body: Yup.string().required('Eslatma matnni kiriting')
+    body: Yup.string().required(t('Eslatma matnni kiriting'))
   })
 
   const initialValues: { body: string } = { body: '' }
 
-  const formik: any = useFormik({
+  const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: async values => {
+    onSubmit: async (values, { resetForm }) => {
       setLoading(true)
       try {
         await api.post(`leads/lead-user-description/${user}/`, {
           anonim_user: user,
           body: values.body,
-          date: reminderDate,
+          date: reminderDate ? truncateToMinute(reminderDate)?.toISOString() : null,
         })
         setLoading(false)
         closeModal()
-        toast.success("Lid Node mofaqityatli yatarildi")
-        formik.resetForm()
-      } catch {
+        toast.success(t("Eslatma muvaffaqiyatli yaratildi"))
+        resetForm()
+      } catch (error) {
         setLoading(false)
+        toast.error(t('Xatolik yuz berdi'))
       }
     }
   })
@@ -59,15 +70,22 @@ export default function AddNoteAnonimUser({ user, closeModal }: Props) {
       style={{ padding: '5px 0', width: '100%', display: 'flex', flexDirection: 'column', gap: '15px' }}
     >
       <FormControl fullWidth>
-        <DatePicker
-          label="Eslatish vaqti"
-          views={['day']}
-          format='dd/MM/yyyy'
-          disablePast
-          showTimeSelect
-          value={reminderDate}
-          onChange={(newValue) => setReminderDate(newValue)}
-        />
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DateTimePicker
+            label={t('Eslatish vaqti')}
+            value={reminderDate}
+            onChange={newValue => setReminderDate(newValue)}
+            disablePast
+            format='dd/MM/yyyy HH:mm'
+            ampm={false}
+            slotProps={{
+              textField: {
+                size: 'small',
+                error: false
+              }
+            }}
+          />
+        </LocalizationProvider>
       </FormControl>
 
       <FormControl fullWidth>
