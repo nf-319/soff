@@ -5,6 +5,7 @@ import FormUi from '@/widgets/Form/formUi'
 import { Box, Card } from '@mui/material'
 import { useState } from 'react'
 import Divider from '@mui/material/Divider'
+import { ActionsModals } from '@/widgets/Form/ui/ActionsModals'
 
 export type FieldType = {
   input_type: 'input' | 'text' | 'question' | 'phone'
@@ -13,8 +14,9 @@ export type FieldType = {
   value?: string
   question?: string
   variants?: string[]
-  checkedVariants?: string[]
+  checkedVariants?: any[]
   question_variants?: any[]
+  question_type?: 'single' | 'multiple'
   is_required: boolean
 }
 
@@ -29,8 +31,12 @@ const CreateForm = ({ is_update }: Props) => {
   const [bg_img, setBgImg] = useState<any | null>(null)
   const [logoImg, setLogoImg] = useState<any | null>(companyInfo?.logo)
   const [bg_color, setBgColor] = useState<string>('#f9f9fb')
-  const [fontFamily, setFontFamily] = useState<string>('Roboto, sans-serif')
+  const [fontFamily, setFontFamily] = useState<string>('Roboto')
   const [fontSize, setFontSize] = useState<string>('20px')
+  const [open, setOpen] = useState<'input' | 'description' | 'single' | null>(null)
+  const [successText, setSuccessText] = useState<string>(
+    "So'rovingiz muvaffaqiyatli yuborildi! Tez orada siz bilan bog'lanamiz."
+  )
   const [textColor, setTextColor] = useState<string>('#111827')
   const [sentButtonLabel, setSendButtonLabel] = useState<string>('Yuborish')
   const [fields, setFields] = useState<FieldType[]>([
@@ -94,6 +100,9 @@ const CreateForm = ({ is_update }: Props) => {
             bg_img={bg_img}
             companyInfoLogo={companyInfo.logo}
             fields={fields}
+            setOpen={setOpen}
+            successText={successText}
+            setSuccessText={setSuccessText}
             setFontFamily={setFontFamily}
             setFontSize={setFontSize}
             setTextColor={setTextColor}
@@ -129,6 +138,7 @@ const CreateForm = ({ is_update }: Props) => {
             companyInfoLogo={companyInfo.logo}
             logoImg={logoImg}
             fontFamily={fontFamily}
+            successText={successText}
             fontSize={fontSize}
             textColor={textColor}
             displayMode={displayMode}
@@ -140,6 +150,8 @@ const CreateForm = ({ is_update }: Props) => {
           />
         </Box>
       </Box>
+
+      <ActionsModals setOpen={setOpen} open={open} fields={fields} setFields={setFields} />
     </Card>
   )
 }

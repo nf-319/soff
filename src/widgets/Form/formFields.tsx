@@ -48,13 +48,16 @@ type Props = {
   setBgColor: (val: string) => void
   companyInfoLogo: string
   setLogoImg: (str: string | null) => void
-  setBgImg: (str: string | null) => void,
-  fontFamily: string,
-  fontSize: string,
+  setBgImg: (str: string | null) => void
+  fontFamily: string
+  fontSize: string
   textColor: string
-  setFontFamily:  Dispatch<SetStateAction<string>>
-  setTextColor:  Dispatch<SetStateAction<string>>,
-  setFontSize:  Dispatch<SetStateAction<string>>
+  setFontFamily: Dispatch<SetStateAction<string>>
+  setTextColor: Dispatch<SetStateAction<string>>
+  setFontSize: Dispatch<SetStateAction<string>>
+  successText: string
+  setSuccessText: Dispatch<SetStateAction<string>>
+  setOpen: Dispatch<SetStateAction<'input' | 'description' | 'single' | null>>
 }
 
 const FormFields = ({
@@ -69,6 +72,7 @@ const FormFields = ({
   displayName,
   setBgImg,
   setLogoImg,
+  setOpen,
   logoImg,
   setSendButtonLabel,
   setFields,
@@ -79,6 +83,8 @@ const FormFields = ({
   setFontFamily,
   setFontSize,
   setTextColor,
+  setSuccessText,
+  successText,
   companyInfoLogo
 }: Props) => {
   const [isElement, setIsElement] = useState(true)
@@ -88,9 +94,7 @@ const FormFields = ({
   const { query, push } = useRouter()
   const [departmentValue, setDepartmentValue] = useState<number | null>(null)
   const [sourceValue, setSourceValue] = useState<number | null>(null)
-  const [successText, setSuccessText] = useState<string>(
-    "So'rovingiz muvaffaqiyatli yuborildi! Tez orada siz bilan bog'lanamiz."
-  )
+
   const [isLoading, setIsLoading] = useState(false)
   const [value, setValue] = useState('one')
   const [isOuterExpanded, setIsOuterExpanded] = useState<boolean>(false)
@@ -357,14 +361,31 @@ const FormFields = ({
               id='input-form'
             />
           </FormControl>
-          <Box display={'flex'} gap={2}>
-            <Button variant='outlined' onClick={() => handleAddField('input')} startIcon={<PlusCircle size={15} />}>
+          <Box display='flex' gap={2} width='100%'>
+            <Button
+              fullWidth
+              variant='outlined'
+              onClick={() => setOpen('input')}
+              startIcon={<PlusCircle size={15} />}
+            >
               Input
             </Button>
-            <Button variant='outlined' onClick={() => handleAddField('question')} startIcon={<PlusCircle size={15} />}>
+
+            <Button
+              fullWidth
+              variant='outlined'
+              onClick={() => setOpen('single')}
+              startIcon={<PlusCircle size={15} />}
+            >
               Savol
             </Button>
-            <Button variant='outlined' onClick={() => handleAddField('text')} startIcon={<PlusCircle size={15} />}>
+
+            <Button
+              fullWidth
+              variant='outlined'
+              onClick={() => setOpen('description')}
+              startIcon={<PlusCircle size={15} />}
+            >
               Matn
             </Button>
           </Box>
@@ -760,17 +781,17 @@ const FormFields = ({
                     Shrift
                   </InputLabel>
                   <Select
-                    labelId="font-family-label"
-                    id="font-family"
+                    labelId='font-family-label'
+                    id='font-family'
                     size='small'
                     value={fontFamily}
-                    label="Shrift"
-                    onChange={(e) => setFontFamily(e.target.value)}
+                    label='Shrift'
+                    onChange={e => setFontFamily(e.target.value)}
                   >
-                    <MenuItem value="Inter">Inter</MenuItem>
+                    <MenuItem value='Inter'>Inter</MenuItem>
                     <MenuItem value="'Poppins', sans-serif">Poppins</MenuItem>
-                    <MenuItem value="Roboto">Roboto</MenuItem>
-                    <MenuItem value="Arial">Arial</MenuItem>
+                    <MenuItem value='Roboto'>Roboto</MenuItem>
+                    <MenuItem value='Arial'>Arial</MenuItem>
                   </Select>
                 </FormControl>
 
