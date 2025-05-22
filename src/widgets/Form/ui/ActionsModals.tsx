@@ -8,31 +8,27 @@ import {
   FormControl,
   TextField,
 } from '@mui/material'
-import { Dispatch, FC, Fragment, SetStateAction, useState } from 'react'
+import { FC, Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import IconifyIcon from '../../../components/icon'
-import { FieldType } from '@/pages/settings/forms/create'
 import { v4 as uuidv4 } from 'uuid'
+import { useAppDispatch, useAppSelector } from '@/store'
+import { setFields, setOpen } from '@store/apps/form'
+import { FieldType } from '@/types'
 
-type Props = {
-  open: 'input' | 'description' | 'single' | null
-  setOpen: Dispatch<SetStateAction<'input' | 'description' | 'single' | null>>
-  setFields: (val: any) => void,
-  fields: FieldType[]
-}
-
-export const ActionsModals: FC<Props> = ({ setOpen, open, setFields, fields }) => {
+export const ActionsModals: FC = () => {
   const { t } = useTranslation()
+  const { open, fields } = useAppSelector((state) => state.form);
   const [variants, setVariants] = useState<any>([])
   const [name, setName] = useState<any>(null)
+  const dispatch = useAppDispatch()
   const [selectType, setSelectType] = useState<'single' | 'multiple'>('single')
 
   const handleClose = () => {
-    setOpen(null)
+    dispatch(setOpen(null))
     setVariants([])
     setName('')
   }
-
 
   const handleAddField = (input_type: FieldType['input_type']) => {
     const newField: FieldType = {
@@ -49,8 +45,8 @@ export const ActionsModals: FC<Props> = ({ setOpen, open, setFields, fields }) =
         : { value: '' })
     }
 
-    setFields([...fields, newField])
-    setOpen(null)
+    dispatch(setFields([...fields, newField]))
+    dispatch(setOpen(null))
     setName("")
     setVariants([])
   }
@@ -73,7 +69,7 @@ export const ActionsModals: FC<Props> = ({ setOpen, open, setFields, fields }) =
             </LoadingButton>
 
             <LoadingButton
-              disabled={name?.length == 0}
+              disabled={name ? name.length === 0 : !name}
               variant='contained'
               onClick={() => handleAddField('input')}
             >
@@ -94,7 +90,11 @@ export const ActionsModals: FC<Props> = ({ setOpen, open, setFields, fields }) =
               Bekor qilish
             </LoadingButton>
 
-            <LoadingButton variant='contained' onClick={() => handleAddField('text')}>
+            <LoadingButton
+              disabled={name ? name.length === 0 : !name}
+              variant='contained'
+              onClick={() => handleAddField('text')}
+            >
               Saqlash
             </LoadingButton>
           </Box>
@@ -122,13 +122,7 @@ export const ActionsModals: FC<Props> = ({ setOpen, open, setFields, fields }) =
           </ButtonGroup>
 
           <FormControl>
-            <TextField
-              label='Savol matni'
-              multiline
-              rows={2}
-              size='small'
-              onChange={e => setName(e.target.value)}
-            />
+            <TextField label='Savol matni' multiline rows={2} size='small' onChange={e => setName(e.target.value)} />
           </FormControl>
 
           {variants.map((el: any, index: number) => (
@@ -140,9 +134,7 @@ export const ActionsModals: FC<Props> = ({ setOpen, open, setFields, fields }) =
               value={el.value}
               onChange={e =>
                 setVariants((prev: any) =>
-                  prev.map((item: any) =>
-                    item.id === el.id ? { ...item, value: e.target.value } : item
-                  )
+                  prev.map((item: any) => (item.id === el.id ? { ...item, value: e.target.value } : item))
                 )
               }
             />
@@ -151,10 +143,7 @@ export const ActionsModals: FC<Props> = ({ setOpen, open, setFields, fields }) =
           <Button
             startIcon={<IconifyIcon icon='ic:baseline-add' />}
             onClick={() =>
-              setVariants((c: any) => [
-                ...c,
-                { id: uuidv4(), value: c.value, order: variants.length + 1 }
-              ])
+              setVariants((c: any) => [...c, { id: uuidv4(), value: c.value, order: variants.length + 1 }])
             }
             size='small'
           >
@@ -166,7 +155,11 @@ export const ActionsModals: FC<Props> = ({ setOpen, open, setFields, fields }) =
               Bekor qilish
             </LoadingButton>
 
-            <LoadingButton variant='contained' onClick={() => handleAddField('question')}>
+            <LoadingButton
+              variant='contained'
+              disabled={name ? name.length === 0 : !name}
+              onClick={() => handleAddField('question')}
+            >
               {t('Saqlash')}
             </LoadingButton>
           </Box>

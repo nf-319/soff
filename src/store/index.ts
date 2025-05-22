@@ -12,6 +12,7 @@ import dashboard from './apps/dashboard'
 import leads from 'src/store/apps/leads'
 import groups from 'src/store/apps/groups'
 import mentors from 'src/store/apps/mentors'
+import form from './apps/form'
 import students from 'src/store/apps/students'
 import cPanelSlice from 'src/store/apps/c-panel'
 import companyDetails from 'src/store/apps/c-panel/companySlice'
@@ -48,6 +49,7 @@ export const store = configureStore({
     studentPayments,
     employeeAttendance,
     logs,
+    form,
     attendance,
     investmentSlice
 

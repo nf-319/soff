@@ -69,14 +69,23 @@ export type UseGetArgs<TData = any, TQueryFnData = unknown, TError = any> = {
 }
 
 export const useGet = <TData = any, TQueryFnData = unknown, TError = any>(
-  url: string,
+  url: string | null,
   args?: UseGetArgs<TData, TQueryFnData, TError>
 ) => {
   const { deps, config, options, params } = args || {}
+
   return useQuery<TQueryFnData, TError, TData>({
-    queryKey: deps ? [url, ...deps, ...Object.values(params || {})] : [url, ...Object.values(params || {})],
-    queryFn: () => getRequest(url, { ...config, params }),
-    ...(options || {})
+    queryKey: url
+      ? deps
+        ? [url, ...deps, ...Object.values(params || {})]
+        : [url, ...Object.values(params || {})]
+      : [],
+    queryFn: () => {
+      if (!url) return Promise.reject('URL is null')
+      return getRequest(url, { ...config, params })
+    },
+    enabled: !!url && (options?.enabled ?? true),
+    ...(options || {}),
   })
 }
 
