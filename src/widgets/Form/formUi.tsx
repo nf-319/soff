@@ -241,7 +241,30 @@ const FormUi = ({ page }: Props) => {
                     const fieldName = `field_${index}`;
                     return (
                       <FormControl fullWidth key={index}>
-                        {field.input_type === 'input' || field.input_type === 'name' && (
+                        {field.input_type === 'input' && (
+                          <>
+                            <TextField
+                              sx={{
+                                backgroundColor: bg_color,
+                                borderRadius: '8px',
+                                '& .MuiOutlinedInput-root': {
+                                  borderRadius: '8px',
+                                },
+                              }}
+                              size="small"
+                              type="text"
+                              label={field.label || field.title}
+                              value={field.value}
+                              onChange={(e) =>
+                                dispatch(setFieldValue({ index, key: 'value', value: e.target.value }))
+                              }
+                              error={!!errors[fieldName]}
+                              helperText={errors[fieldName]}
+                            />
+                          </>
+                        )}
+
+                        {field.input_type === 'name' && (
                           <>
                             <TextField
                               sx={{
