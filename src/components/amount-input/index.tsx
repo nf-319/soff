@@ -1,30 +1,32 @@
-import { TextField, TextFieldProps } from '@mui/material'
-import { ChangeEvent, useState } from 'react'
+import { TextField, TextFieldProps } from '@mui/material';
+import { ChangeEvent, useEffect, useState } from 'react'
 
-export const convertToNegative = (value: string) => {
-  const numberWithoutSpaces = `${value}`.replace(/\s+/g, '')
-  return `-${numberWithoutSpaces.replace(/^-/, '')}`
-}
 export const formatAmount = (value: string) => {
-  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
-}
+  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+};
 
-export const revereAmount = (value: string) => {
-  return `${value}`.replace(/\s+/g, '')
-}
+export const revereAmount = (value: string | undefined) => {
+  if (!value || value === 'undefined') return undefined;
+  return value.replace(/\s+/g, '');
+};
 
 export default function AmountInput({ onChange, value, ...props }: TextFieldProps) {
-  const [inputValue, setInputValue] = useState<string>(formatAmount(`${value || ''}`))
+  const [inputValue, setInputValue] = useState<string>(
+    value ? formatAmount(String(value)) : ''
+  );
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
-    const rawValue = event.target.value.replace(/\D/g, '') // Faqat raqamlarni qoldiramiz
-    setInputValue(formatAmount(rawValue))
+    const rawValue = event.target.value.replace(/\D/g, '');
+    setInputValue(rawValue ? formatAmount(rawValue) : '');
 
-    // onChange orqali formikga toza raqam sifatida yuboramiz
     onChange?.({
-      target: { name: props.name, value: rawValue }
-    } as ChangeEvent<HTMLInputElement>)
+      target: { name: props.name, value: rawValue || '' },
+    } as ChangeEvent<HTMLInputElement>);
   }
 
-  return <TextField {...props} onChange={handleChange} value={inputValue} autoComplete='off' />
+  useEffect(() => {
+    setInputValue(value ? formatAmount(String(value)) : '');
+  }, [value]);
+
+  return <TextField {...props} onChange={handleChange} value={inputValue} autoComplete='off' />;
 }
