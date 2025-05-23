@@ -52,6 +52,7 @@ import {
 } from '@store/apps/form'
 import useResponsive from '@/@core/hooks/useResponsive';
 import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
 type Props = {
   is_update?: boolean;
@@ -139,10 +140,10 @@ const FormFields = ({ is_update }: Props) => {
             api.post('leads/form/file/', formData);
           }
         }
+        toast.success('Forma yaratildi');
+        dispatch(resetForm())
+        void push('/settings/forms');
       });
-      toast.success('Forma yaratildi');
-      dispatch(resetForm())
-      void push('/settings/forms');
     } catch (err: any) {
       console.error(err);
       toast.error(err.response?.data?.msg || "Ma'lumotlarni to'liq kiriting");

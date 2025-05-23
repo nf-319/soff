@@ -42,7 +42,13 @@ export default function FormsPage() {
   const [error, setError] = useState<any>({})
   const [deleteId, setDeleteId] = useState<any>(null)
   const [loading, setLoading] = useState<boolean>(false)
-  const { data, refetch, isPending } = useGet('leads/form/list/')
+  const { data, refetch, isPending } = useGet('leads/form/list/', {
+    deps: ['form-list'],
+    options: {
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
+    }
+  })
   const [sourceData, setSourceData] = useState<any>([])
   const [selectedForm, setSelectedForm] = useState<any>(null)
   const [updateOpen, setUpdateOpen] = useState<boolean>(false)

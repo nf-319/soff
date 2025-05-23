@@ -59,7 +59,7 @@ export default function StudentRowOptions({ id }: Props) {
     dispatch(disablePage(false))
     toast.success("O'quvchi muvaffaqiyatli aktivlashtirildi")
     dispatch(updateStudentParams({ status: 'active' }))
-    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+    void queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
 
     setLoading(false)
   }

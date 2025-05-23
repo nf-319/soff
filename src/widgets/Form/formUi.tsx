@@ -100,7 +100,6 @@ const FormUi = ({ page }: Props) => {
     companyInfo: state.user.companyInfo,
   }));
 
-  console.log(formName)
   const dispatch = useAppDispatch();
   const router = useRouter();
   const isMobile = displayMode === 'phone';
