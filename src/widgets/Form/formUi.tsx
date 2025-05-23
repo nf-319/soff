@@ -150,7 +150,9 @@ const FormUi = ({ page }: Props) => {
       <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: '100%' }}>
         <Card
           sx={{
-            backgroundImage: `url(${bg_img ? URL.createObjectURL(bg_img) : '/images/request-form-bg.webp'})`,
+            backgroundImage: `url(${
+              bg_img instanceof Blob ? URL.createObjectURL(bg_img) : '/images/request-form-bg.webp'
+            })`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',

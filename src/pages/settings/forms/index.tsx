@@ -34,12 +34,15 @@ import { AuthContext } from 'src/context/AuthContext'
 import { Edit, Plus, Trash2 } from 'lucide-react'
 import { FormUpdateModal } from '@/entities/FormsUpdateModal'
 import { useGet } from '@/hooks/useApi'
+import { resetForm } from '@store/apps/form'
+import { useAppDispatch } from '@/store'
 
 export default function FormsPage() {
   const [open, setOpen] = useState<null | 'new' | 'integration' | 'delete' | 'edit'>(null)
   const [departments, setDepartments] = useState<any[]>([])
   const [selectedDepartment, setSelectedDepartment] = useState<any>(null)
   const [error, setError] = useState<any>({})
+  const dispatch = useAppDispatch()
   const [deleteId, setDeleteId] = useState<any>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const { data, refetch, isPending } = useGet('leads/form/list/', {
@@ -215,6 +218,11 @@ export default function FormsPage() {
     }
   })
 
+  const handleAddClick = ()=> {
+    dispatch(resetForm())
+    void push(`/settings/forms/create`)
+  }
+
   return (
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
@@ -222,7 +230,7 @@ export default function FormsPage() {
         <Button
           variant='contained'
           startIcon={<Plus size={20} />}
-          onClick={() => push(`/settings/forms/create`)}
+          onClick={handleAddClick}
         >
           Yangi
         </Button>
