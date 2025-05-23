@@ -184,7 +184,7 @@ const FormFields = ({ is_update }: Props) => {
       });
       toast.success('Forma yangilandi');
       dispatch(resetForm());
-      // push('/settings/forms');
+      void push('/settings/forms');
     } catch (err: any) {
       console.error(err);
       toast.error(err.response?.data?.msg || "Ma'lumotlarni to'liq kiriting");
