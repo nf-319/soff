@@ -17,7 +17,7 @@ const getGroups = async (mentorId?: string) => {
 }
 
 export const useGetGroups = (mentorId?: string) => useQuery({
-  queryKey: [QueryKeys.Groups],
+  queryKey: [QueryKeys.Groups, mentorId],
   queryFn: () => getGroups(mentorId),
   enabled: !!mentorId
 })

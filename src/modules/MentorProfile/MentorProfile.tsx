@@ -48,7 +48,7 @@ export const MentorProfile: FC<Props> = ({ id }) => {
           md: 'span 1',
         }}
       >
-        <MentorGroups hiddenNowGroup={Boolean(id)} />
+        <MentorGroups id={id ?? String(user?.id)} hiddenNowGroup={Boolean(id)} />
       </Box>
     </Box>
   )

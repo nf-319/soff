@@ -176,7 +176,6 @@ export default function GroupsPage() {
 
   return (
     <div>
-      <VideoHeader item={videoUrls.teachers} />
       <Box
         className='groups-page-header'
         sx={{
@@ -184,7 +183,6 @@ export default function GroupsPage() {
           flexWrap: 'wrap',
           alignItems: isMobile ? 'start' : 'center',
           justifyContent: 'space-between',
-          margin: '10px 0',
           gap: '10px'
         }}
         py={2}

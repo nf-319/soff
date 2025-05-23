@@ -16,7 +16,7 @@ const getMentor = async (id: string) => {
 
 export const useGetMentor = (id: string) =>
   useQuery({
-    queryKey: [QueryKeys.TeacherDetail],
+    queryKey: [QueryKeys.TeacherDetail, id],
     queryFn: () => getMentor(id),
     enabled: !!id,
   })

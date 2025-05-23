@@ -44,6 +44,10 @@ import { Icon } from '@iconify/react'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { AuthContext } from 'src/context/AuthContext'
 import { Eye, EyeOff } from 'lucide-react'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { DatePicker } from '@mui/x-date-pickers'
+import dayjs from 'dayjs'
 export interface customTableProps {
   xs: number
   title: string
@@ -378,7 +382,7 @@ export default function UserViewStudentsList() {
   ]
 
   const formik = useFormik({
-    initialValues: { status: updateStatusModal?.status },
+    initialValues: { status: updateStatusModal?.status, added_at: updateStatusModal?.added_at },
     validationSchema: () =>
       Yup.object({
         status: Yup.string()
@@ -387,7 +391,7 @@ export default function UserViewStudentsList() {
       setLoading(true)
       try {
         await api
-          .patch(`common/group-student-update/status/${updateStatusModal?.id}/`, { status: values.status })
+          .patch(`common/group-student-update/status/${updateStatusModal?.id}/`, { status: values.status, added_at: dayjs(values.added_at).format('YYYY-MM-DD') })
           .then(async () => {
             toast.success("O'quvchi malumotlari o'zgartirildi", { position: 'top-center' })
             setLoading(false)
@@ -473,7 +477,7 @@ export default function UserViewStudentsList() {
           <form onSubmit={formik.handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <DialogContent sx={{ maxWidth: '350px' }}>
               <Typography sx={{ fontSize: '20px', textAlign: 'center', mb: 3 }}>
-                {t("O'quvchini statusini ozgartirish")}
+                O'quvchini statusini ozgartirish
               </Typography>
 
               <FormControl sx={{ maxWidth: '100%', marginBottom: 3 }} fullWidth>
@@ -503,6 +507,34 @@ export default function UserViewStudentsList() {
 
                 <FormHelperText error>{!!formik.errors.status ? `${formik.errors.status}` : ''}</FormHelperText>
               </FormControl>
+
+
+              {updateStatusModal?.status === 'new' && formik.values.status === 'active' && (
+                <FormControl sx={{ maxWidth: '100%', marginBottom: 3 }} fullWidth>
+                  <InputLabel size='small' id='date-label' shrink>
+                    Qo'shilgan sanasi
+                  </InputLabel>
+
+                  <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='uz'>
+                    <DatePicker
+                      label="Qo'shilgan sanasi"
+                      value={formik.values.added_at ? dayjs(formik.values.added_at) : null}
+                      format='YYYY-MM-DD'
+                      onChange={(newValue) => formik.setFieldValue('added_at', newValue)}
+                      slotProps={{
+                        textField: {
+                          size: 'small',
+                          fullWidth: true,
+                          InputLabelProps: {
+                            shrink: true,
+                          },
+                        },
+                      }}
+                    />
+                  </LocalizationProvider>
+                </FormControl>
+              )}
+
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
                 <Button
                   onClick={() => {

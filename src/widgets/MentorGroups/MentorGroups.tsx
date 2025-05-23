@@ -12,11 +12,11 @@ import { FC } from 'react'
 
 type Props = {
   hiddenNowGroup?: boolean
+  id: string
 }
 
-export const MentorGroups: FC<Props> = ({ hiddenNowGroup = false }) => {
-  const { user } = useAuth()
-  const { data, isLoading } = useGetGroups(String(user?.id))
+export const MentorGroups: FC<Props> = ({ id, hiddenNowGroup = false }) => {
+  const { data, isLoading } = useGetGroups(id)
 
   const currentDate = new Date()
   const currentDayOfWeek = currentDate.toLocaleString('en-US', { weekday: 'long' }).toLowerCase()
@@ -95,7 +95,7 @@ export const MentorGroups: FC<Props> = ({ hiddenNowGroup = false }) => {
           gap: '16px'
         }}
       >
-        {data?.results?.map((item: MentorGroupType) => (
+        {data?.results.length ? data?.results?.map((item: MentorGroupType) => (
           <GroupCard
             key={`${item.name}-${item.id}`}
             title={item.name}
@@ -110,7 +110,9 @@ export const MentorGroups: FC<Props> = ({ hiddenNowGroup = false }) => {
             week_days={item?.week_days}
             month_duration={item?.month_duration}
           />
-        ))}
+        )): (
+          <Typography variant='h6'>Guruhlar mavjuda emas</Typography>
+        )}
       </Box>
     </Box>
   )
