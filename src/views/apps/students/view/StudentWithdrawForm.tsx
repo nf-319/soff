@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { Box, Card, TextField, Typography } from '@mui/material'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import usePayment from 'src/hooks/usePayment'
-import { BanknoteIcon, Calendar, User } from 'lucide-react'
+import { BanknoteIcon, Calendar, User, UsersRound } from 'lucide-react'
 import { useGet, usePost } from '@/hooks/useApi'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
@@ -39,7 +39,7 @@ export default function StudentWithDrawForm({ openEdit, setOpenEdit }: Props) {
 
   useEffect(() => {
     if (openEdit === 'withdraw') {
-      getPaymentMethod()
+      void getPaymentMethod()
     }
   }, [openEdit])
 
@@ -55,6 +55,7 @@ export default function StudentWithDrawForm({ openEdit, setOpenEdit }: Props) {
         <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
           {t("O'quvchi to'lovlari")}
         </DialogTitle>
+
         <DialogContent>
           {data?.map((item: any, index: number) => (
             <Card
@@ -76,26 +77,6 @@ export default function StudentWithDrawForm({ openEdit, setOpenEdit }: Props) {
                 }
               }}
             >
-              {/* <Box display='flex' alignItems='center' gap={2} mb={2}>
-                <Box
-                  sx={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: '50%',
-                    backgroundColor: '#eee',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 0 8px rgba(0, 0, 0, 0.05)'
-                  }}
-                >
-                  <User size={24} />
-                </Box>
-                <Typography fontWeight={600} fontSize={18}>
-                  {item?.student_name}
-                </Typography>
-              </Box> */}
-
               <Box display='flex' justifyContent='space-between' alignItems='center' mb={1}>
                 <Box display='flex' alignItems='center' gap={1}>
                   <BanknoteIcon size={18} />
@@ -116,6 +97,16 @@ export default function StudentWithDrawForm({ openEdit, setOpenEdit }: Props) {
                   </Typography>
                 </Box>
                 <Typography fontWeight={500}>{item?.payment_date}</Typography>
+              </Box>
+
+              <Box display='flex' justifyContent='space-between' alignItems='center' mb={1}>
+                <Box display='flex' alignItems='center' gap={1}>
+                  <UsersRound size={16} />
+                  <Typography variant='body2' color='text.secondary'>
+                    Guruh
+                  </Typography>
+                </Box>
+                <Typography fontWeight={500}>{item?.group_name}</Typography>
               </Box>
 
               <Box display='flex' justifyContent='space-between' alignItems='center'>

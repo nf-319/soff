@@ -382,10 +382,19 @@ export default function UserViewStudentsList() {
   ]
 
   const formik = useFormik({
-    initialValues: { status: updateStatusModal?.status, added_at: updateStatusModal?.added_at },
+    initialValues: {
+      status: updateStatusModal?.status || '',
+      added_at: updateStatusModal?.added_at ? dayjs(updateStatusModal.added_at).format('YYYY-MM-DD') : null,
+    },
     validationSchema: () =>
       Yup.object({
-        status: Yup.string()
+        status: Yup.string().required(t('Status majburiy')),
+        added_at: Yup.string()
+          .nullable()
+          .test('is-valid-date', "Notog'ri format", (value) => {
+            if (!value) return true
+            return dayjs(value, 'YYYY-MM-DD', true).isValid();
+          }),
       }),
     onSubmit: async values => {
       setLoading(true)
@@ -428,6 +437,19 @@ export default function UserViewStudentsList() {
       }
     }
   })
+
+  useEffect(() => {
+    if (updateStatusModal) {
+      formik.setFieldValue('status', updateStatusModal.status || '');
+      formik.setFieldValue(
+        'added_at',
+        updateStatusModal.added_at ? dayjs(updateStatusModal.added_at).format('YYYY-MM-DD') : null
+      );
+    }
+  }, [updateStatusModal]);
+
+  console.log(dayjs(updateStatusModal?.added_at).format('YYYY-MM-DD'))
+  console.log(formik.values.added_at)
 
   useEffect(() => {
     if (updateStatusModal?.status) {
@@ -520,7 +542,9 @@ export default function UserViewStudentsList() {
                       label="Qo'shilgan sanasi"
                       value={formik.values.added_at ? dayjs(formik.values.added_at) : null}
                       format='YYYY-MM-DD'
-                      onChange={(newValue) => formik.setFieldValue('added_at', newValue)}
+                      onChange={(newValue) => {
+                        formik.setFieldValue('added_at', newValue ? dayjs(newValue).format('YYYY-MM-DD') : null);
+                      }}
                       slotProps={{
                         textField: {
                           size: 'small',

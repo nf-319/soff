@@ -22,6 +22,9 @@ import { useAppSelector } from '@/store'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
+
+export const isLeadNotification = (title: string) => /^Lid \(.+\) bo'yicha eslatma$/.test(title)
+
 type Props = {
   settings: Settings
 }
@@ -87,36 +90,39 @@ const NotificationDropdown = (props: Props) => {
     try {
       const notification = new Notification(title, {
         body: body.replace(/<[^>]*>?/gm, ''),
-        icon: companyInfo?.logo || '/images/default-logo.jpg'
+        icon: companyInfo?.logo || '/logo.webp',
       })
 
       notification.onclick = () => {
         window.focus()
         notification.close()
+
+        if (isLeadNotification(title)) {
+          window.location.href = '/lid'
+        } else {
+          window.location.href = '/notification'
+        }
       }
     } catch (error) {
       console.error('Error showing browser notification:', error)
     }
   }
 
+  const handleHref = (title: string, id?: string) => {
+    if(isLeadNotification(title)) {
+      void router.push({
+        pathname: `/lids`,
+        query: { id }
+      })
+    }
+  }
+
   const showToastNotification = (title: string, body: string, id: number) => {
-    toast.custom(
-      (t: any) => (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'start',
-            background: '#fff',
-            borderRadius: '8px',
-            padding: '12px',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-            width: 320,
-            gap: 10,
-            position: 'relative'
-          }}
-        >
-          <Link
-            href={`/notifications?id=${id}`}
+    toast(
+      () => (
+        <div>
+          <Box
+            onClick={() => handleHref(title)}
             style={{
               display: 'flex',
               gap: 10,
@@ -124,20 +130,16 @@ const NotificationDropdown = (props: Props) => {
               flex: 1
             }}
           >
-            {companyInfo?.logo ? (
-              <Image src={companyInfo?.logo} alt='User' width={24} height={24} style={{ borderRadius: '4px' }} />
-            ) : (
-              <Typography variant='h5'>🔔</Typography>
-            )}
-
             <div style={{ width: '100%' }}>
               <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                <strong style={{ fontWeight: 600, color: '#000' }}>{title}</strong>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'start', gap: 5 }}>
+                  <Typography variant='h5'>🔔</Typography>
+                  <strong style={{ fontWeight: 600, color: '#000' }}>{title.split(' ').slice(0, 40).join(' ')}</strong>
+                </div>
 
                 <Typography
                   fontSize={12}
                   sx={{
-                    paddingRight: 6,
                     cursor: 'pointer',
                     color: 'primary.main',
                     flexShrink: 0,
@@ -151,38 +153,9 @@ const NotificationDropdown = (props: Props) => {
                   Batafsil
                 </Typography>
               </div>
-              <div
-                style={{
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  fontSize: 14,
-                  color: '#555',
-                  marginTop: 4
-                }}
-              >
-                {body.replace(/<[^>]*>?/gm, '')}
-              </div>
+              <div>{parse(body)}</div>
             </div>
-          </Link>
-
-          <IconButton
-            size='small'
-            onClick={() => toast.dismiss(t.id)}
-            sx={{
-              position: 'absolute',
-              top: 6,
-              right: 6,
-              color: '#888',
-              '&:hover': {
-                color: '#000'
-              }
-            }}
-          >
-            <X size={16} />
-          </IconButton>
+          </Box>
         </div>
       ),
       {
