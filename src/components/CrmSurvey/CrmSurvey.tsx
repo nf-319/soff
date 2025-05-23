@@ -40,7 +40,7 @@ const CrmSurveymodal = () => {
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState('')
   const { mutate: feedBackMutate, isPending } = usePost()
-
+  const [showSuccess, setShowSuccess] = useState(false)
   const stepTitle = [
     'CRM tizimidan umumiy qoniqish darajangiz?',
     'Tizimdagi muammolar haqida yozing',
@@ -70,6 +70,7 @@ const CrmSurveymodal = () => {
   const handleClose = () => {
     dispatch(resetForm())
     setShowForm(false)
+    setShowSuccess(false)
     setShowSurvey(false)
     setError('')
   }
@@ -115,7 +116,8 @@ const CrmSurveymodal = () => {
       },
       {
         onSuccess: () => {
-          handleClose()
+          setShowForm(false)
+          setShowSuccess(true)
           toast.success("So'rovingiz yuborildi")
         },
         onError: (err: any) => {
@@ -261,6 +263,22 @@ const CrmSurveymodal = () => {
                 Yuborish
               </LoadingButton>
             )}
+          </DialogActions>
+        </>
+      )}
+      {showSuccess && (
+        <>
+          <DialogTitle>Rahmat! So‘rovnomangiz qabul qilindi.</DialogTitle>
+          <DialogContent>
+            <Typography sx={{ paddingX: 5 }} textAlign={'center'} fontSize={22} color={'black'} fontWeight={700}>
+              Yozgan fikr va muammolaringiz e’tiborsiz qolmaydi — jamoamiz ularni albatta ko‘rib chiqadi va zarur
+              choralarni ko‘radi
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button fullWidth variant='contained' onClick={() => handleClose()}>
+              Yopish
+            </Button>
           </DialogActions>
         </>
       )}
