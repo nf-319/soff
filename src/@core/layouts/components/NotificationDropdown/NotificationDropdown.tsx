@@ -54,17 +54,19 @@ const NotificationDropdown = (props: Props) => {
   useEffect(() => {
     const requestNotificationPermission = async () => {
       if (!('Notification' in window)) {
-        console.error('This browser does not support desktop notification')
-        return
+        console.error('This browser does not support desktop notification');
+        return;
       }
 
       if (Notification.permission === 'granted') {
-        notificationPermissionRef.current = true
+        notificationPermissionRef.current = true;
       } else if (Notification.permission !== 'denied') {
-        const permission = await Notification.requestPermission()
-        notificationPermissionRef.current = permission === 'granted'
+        const permission = await Notification.requestPermission();
+        notificationPermissionRef.current = permission === 'granted';
+      } else {
+        toast.error(t('Brauzer notificationlari o‘chirilgan. Iltimos, brauzer sozlamalaridan ruxsatni yoqing.'));
       }
-    }
+    };
 
     void requestNotificationPermission()
   }, [])
@@ -101,17 +103,17 @@ const NotificationDropdown = (props: Props) => {
     toast.custom(
       (t: any) => (
         <div
-        style={{
-          display: 'flex',
-          alignItems: 'start',
-          background: '#fff',
-          borderRadius: '8px',
-          padding: '12px',
-          boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-          width: 320,
-          gap: 10,
-          position: 'relative'
-        }}
+          style={{
+            display: 'flex',
+            alignItems: 'start',
+            background: '#fff',
+            borderRadius: '8px',
+            padding: '12px',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+            width: 320,
+            gap: 10,
+            position: 'relative'
+          }}
         >
           <Link
             href={`/notifications?id=${id}`}
@@ -122,23 +124,23 @@ const NotificationDropdown = (props: Props) => {
               flex: 1
             }}
           >
-            <Image
-              src={companyInfo?.logo || '/images/default-logo.jpg'}
-              alt='User'
-              width={24}
-              height={24}
-              style={{ borderRadius: '4px' }}
-            />
+            {companyInfo?.logo ? (
+              <Image src={companyInfo?.logo} alt='User' width={24} height={24} style={{ borderRadius: '4px' }} />
+            ) : (
+              <Typography variant='h5'>🔔</Typography>
+            )}
 
-            <div style={{width:'100%'}}>
-              <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ width: '100%' }}>
+              <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                 <strong style={{ fontWeight: 600, color: '#000' }}>{title}</strong>
+
                 <Typography
                   fontSize={12}
                   sx={{
                     paddingRight: 6,
                     cursor: 'pointer',
                     color: 'primary.main',
+                    flexShrink: 0,
                     transition: 'color 0.2s',
                     '&:hover': {
                       textDecoration: 'underline',
@@ -214,29 +216,23 @@ const NotificationDropdown = (props: Props) => {
 
   const handleNewNotifications = (message: NotificationSocketType) => {
     setNotificationCount(message.count)
-      console.log(message);
-      
-    if (message?.notifications?.length > 0) {
-      setNotificationData(prev => [
-        ...message.notifications,
-        ...prev.filter(item => !message.notifications.some(newItem => newItem.id === item.id))
-      ])
+
+      setNotificationData(prev => {
+        const newNotifications = message.notifications.filter(
+          newItem => !prev.some(item => item.id === newItem.id)
+        )
+        return [...newNotifications, ...prev]
+      })
 
       message.notifications.forEach(notification => {
-        if (notification.id && !shownNotificationsRef.current.has(notification.id)) {
           const title = notification.title || 'Yangi xabarnoma'
           const body = notification.body || ''
           const id = notification.id
 
           showBrowserNotification(title, body)
           showToastNotification(title, body, id)
-
-          if (notification.id) {
-            shownNotificationsRef.current.add(notification.id)
-          }
-        }
+          shownNotificationsRef.current.add(notification.id)
       })
-    }
   }
 
   useEffect(() => {
@@ -262,7 +258,7 @@ const NotificationDropdown = (props: Props) => {
 
   return (
     <Fragment>
-      <Tooltip title={t('Xabarnomalar')} arrow>
+      <Tooltip title='Xabarnomalar' arrow>
         <IconButton
           color='inherit'
           aria-label='Notifications'
@@ -329,80 +325,85 @@ const NotificationDropdown = (props: Props) => {
           {notificationData.length > 0 ? (
             notificationData.map((notification: NotificationsType, index: number) => (
               <StyledMenuItem key={notification.id || index} onClick={() => handleClickNotification(notification.id)}>
-                <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2, pl: 1.5 }}>
+                <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2, pl: 0 }}>
                   <Box width='100%' display='flex' alignItems='flex-start' gap={2}>
-                    <Avatar
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        backgroundColor: theme => theme.palette.primary.main,
-                        color: 'white',
-                        flexShrink: 0,
-                        border: theme => `1px solid ${alpha(theme.palette.primary.main, 0.1)}`
-                      }}
-                    >
-                      <BellRing size={20} />
-                    </Avatar>
+                    <Box display='flex' alignItems='start' justifyContent='space-between' width='100%'>
+                      <Box display='flex' gap={3} alignItems='center' justifyContent='start'>
+                        <Avatar
+                          sx={{
+                            width: 40,
+                            height: 40,
+                            backgroundColor: theme => theme.palette.primary.main,
+                            color: 'white',
+                            flexShrink: 0,
+                            border: theme => `1px solid ${alpha(theme.palette.primary.main, 0.1)}`
+                          }}
+                        >
+                          <BellRing size={20} />
+                        </Avatar>
 
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        width: '100%',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-                        <Typography
-                          sx={{
-                            fontWeight: 600,
-                            fontSize: '0.9rem',
-                            mb: 0.5,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            color: 'text.primary'
-                          }}
-                        >
-                          {notification?.title}
-                        </Typography>
-                        <Typography
-                          fontSize={12}
-                          sx={{
-                            paddingRight: 4,
-                            cursor: 'pointer',
-                            color: 'primary.main',
-                            transition: 'color 0.2s',
-                            '&:hover': {
-                              textDecoration: 'underline',
-                              color: 'primary.dark'
-                            }
-                          }}
-                        >
-                          Batafsil
-                        </Typography>
+                        <Box>
+                          <Typography
+                            sx={{
+                              fontWeight: 600,
+                              fontSize: '0.9rem',
+                              mb: 0.5,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              color: 'text.primary'
+                            }}
+                          >
+                            {notification?.title}
+                          </Typography>
+
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              mt: 1.5
+                            }}
+                          >
+                            <Typography
+                              variant='caption'
+                              sx={{
+                                color: 'text.disabled'
+                              }}
+                            >
+                              {getFormatTimestamp(notification?.created_at)}
+                            </Typography>
+                          </Box>
+                        </Box>
                       </Box>
 
-                      <NotificationContent>{renderHTML(notification?.body || '')}</NotificationContent>
-
-                      <Box
+                      <Typography
+                        fontSize={12}
                         sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          mt: 1.5
+                          paddingRight: 4,
+                          cursor: 'pointer',
+                          color: 'primary.main',
+                          transition: 'color 0.2s',
+                          '&:hover': {
+                            textDecoration: 'underline',
+                            color: 'primary.dark'
+                          }
                         }}
                       >
-                        <Typography
-                          variant='caption'
-                          sx={{
-                            color: 'text.disabled'
-                          }}
-                        >
-                          {getFormatTimestamp(notification?.created_at)}
-                        </Typography>
-                      </Box>
+                        Batafsil
+                      </Typography>
                     </Box>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      width: '100%',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <NotificationContent>{renderHTML(notification?.body || '')}</NotificationContent>
                   </Box>
                 </Box>
               </StyledMenuItem>

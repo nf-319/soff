@@ -5,6 +5,8 @@ import { Bell } from 'lucide-react'
 import { styled } from '@mui/material/styles'
 import { NotificationDetailProps } from '../modal/types'
 import { getFormatTimestamp } from '@utils/getFormatTimestamp'
+import { useRouter } from 'next/router'
+import { useEffect, useRef } from 'react'
 
 const NotificationContent = styled(Box)(({ theme }) => ({
   flex: 1,
@@ -31,55 +33,89 @@ const NotificationContent = styled(Box)(({ theme }) => ({
     margin: theme.spacing(1, 0),
     '& li': {
       margin: theme.spacing(0.5, 0),
-    }
-  }
-}));
+    },
+  },
+}))
 
 export const NotificationDetail = ({ selectedNotification }: NotificationDetailProps) => {
-  const theme = useTheme();
+  const theme = useTheme()
+  const router = useRouter()
+  const contentRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      const link = target.closest('a')
+      if (link) {
+        e.preventDefault()
+        const href = link.getAttribute('href')
+        if (href) {
+          const [pathname, queryString] = href.split('?')
+          const newQueryParams = new URLSearchParams(queryString || '')
+          void router.push({
+            pathname,
+            query: {
+              ...router.query,
+              ...Object.fromEntries(newQueryParams),
+            },
+          })
+        }
+      }
+    }
+
+    const content = contentRef.current
+    if (content) {
+      content.addEventListener('click', handleLinkClick)
+    }
+
+    return () => {
+      if (content) {
+        content.removeEventListener('click', handleLinkClick)
+      }
+    }
+  }, [router])
 
   if (!selectedNotification) {
     return (
       <Fade in={true} timeout={300}>
-        <Paper sx={{
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: 1,
-          border: '1px solid #eaeaea',
-          padding: 3
-        }}>
+        <Paper
+          sx={{
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 1,
+            border: '1px solid #eaeaea',
+            padding: 3,
+          }}
+        >
           <Box sx={{ textAlign: 'center' }}>
-            <Bell
-              size={50}
-              color={alpha(theme.palette.text.secondary, 0.3)}
-              strokeWidth={1.5}
-            />
+            <Bell size={50} color={alpha(theme.palette.text.secondary, 0.3)} strokeWidth={1.5} />
             <Typography variant="body1" sx={{ mt: 2, color: theme.palette.text.secondary }}>
               Xabar tanlang
             </Typography>
           </Box>
         </Paper>
       </Fade>
-    );
+    )
   }
 
   return (
     <Fade in={true} timeout={300}>
-      <Paper sx={{
-        p: 3,
-        height: '100%',
-        borderRadius: 1,
-        border: '1px solid #eaeaea',
-        display: 'flex',
-        flexDirection: 'column'
-      }}>
+      <Paper
+        sx={{
+          p: 3,
+          height: '100%',
+          borderRadius: 1,
+          border: '1px solid #eaeaea',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" sx={{ fontWeight: 500 }}>
             {selectedNotification.notification.title}
           </Typography>
-
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Chip
               label={getFormatTimestamp(selectedNotification.notification.created_at)}
@@ -91,10 +127,10 @@ export const NotificationDetail = ({ selectedNotification }: NotificationDetailP
 
         <Divider sx={{ mb: 2 }} />
 
-        <NotificationContent>
+        <NotificationContent ref={contentRef}>
           <div dangerouslySetInnerHTML={{ __html: selectedNotification.notification.body }} />
         </NotificationContent>
       </Paper>
     </Fade>
-  );
+  )
 }

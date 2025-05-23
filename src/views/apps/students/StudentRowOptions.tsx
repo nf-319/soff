@@ -25,7 +25,6 @@ import { DatePicker } from '@/components/DatePicker'
 import { X } from 'lucide-react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { format } from 'date-fns'
 import dayjs from 'dayjs'
 
 type Props = {
@@ -84,6 +83,18 @@ export default function StudentRowOptions({ id }: Props) {
     await dispatch(fetchStudentDetail(id))
   }
 
+  const handleActive = async () => {
+    setLoading(true)
+    dispatch(disablePage(true))
+    await dispatch(updateStudent({ id, data: { status: 'active' } }))
+    dispatch(disablePage(false))
+    toast.success("O'quvchi muvaffaqiyatli aktivlashtirildi")
+    dispatch(updateStudentParams({ status: 'active' }))
+    void queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+
+    setLoading(false)
+  }
+
   const handleClose = () => {
     setRecoveModal(false)
     formik.resetForm()
@@ -93,14 +104,14 @@ export default function StudentRowOptions({ id }: Props) {
     setLoading(true)
     dispatch(disablePage(true))
     await api
-      .delete(`student/destroy/${id}/`)
+      .post(`student/destroy/${id}/`)
       .then(() => {
         toast.success("O'quvchi muvaffaqiyatli o'chirildi")
         queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
       })
       .catch(err => {
         toast.error(err.response.data.msg || "O'quvchini o'chirib bo'lmadi")
-        console.log(err)
+        console.error(err)
       })
 
     dispatch(disablePage(false))
@@ -158,7 +169,6 @@ export default function StudentRowOptions({ id }: Props) {
           </MenuItem>
         )}
       </Menu>
-
       <UserSuspendDialog
         loading={loading}
         handleOk={submitDelete}

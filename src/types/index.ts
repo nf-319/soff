@@ -1,3 +1,5 @@
 export type { PlaceholdersButtonsAreaTypes } from './PlaceholdersButtonsArea'
 export type { ApiResponse } from './api'
+export type { RoleType } from './role'
+export type { FieldType } from './form'
 export type { ReportLeadsDashboardTypes } from './report'

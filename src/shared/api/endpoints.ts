@@ -6,7 +6,7 @@ export const enum Endpoints {
   ChecklistTeacher = 'employee/check-list/?role=teacher',
   ChecklistCourses = 'common/course/checklist/',
   NotificationRead = 'common/notification-read/{id}/',
-  FinancialsIncomeOverview = 'financials/income-overview/',
+  FinancialsIncomeOverview = 'finance/income-overview/',
   Branches = 'common/branches/',
   LeadsDashboard = 'leads/dashboard/',
   LeadsYearlyStats = 'leads/yearly-stats/',
@@ -14,7 +14,10 @@ export const enum Endpoints {
   ReportLeadsSellers = 'leads/sellers/',
   ReportLeadsList = 'leads/list/',
   ReportLeadsChart = 'leads/separate-leads-chart/',
-  ReportLeadsSellerDetail = 'leads/course-distribution/',
   LeadsDescriptionDetail = 'leads/description/:id/',
   LeadsExport = 'leads/export/',
+  TeacherDetails = 'employee/teachers/:id',
+  Groups = 'common/groups/',
+  EmployeeSalaries = 'employee/salaries/',
+  EmployeeSalariesRealTime = 'employee/salaries/by-group/:id/'
 }

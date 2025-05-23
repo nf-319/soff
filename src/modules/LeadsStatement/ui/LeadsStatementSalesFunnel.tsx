@@ -4,7 +4,7 @@ import { useGet } from '@hooks/useApi';
 import { EmptyContent } from '@components/empty-content';
 import { useRouter } from 'next/router';
 import { CircleHelp } from 'lucide-react';
-import { funnelsEmpty } from '@/shared/constans'
+import { funnelsEmpty } from '@/shared/constants'
 import { ComingSoon } from '@components/ComingSoon'
 import { LEADS_SELLES_FUNNEL_MAP } from '../config/constants'
 import { LeadsStatementFunnelSkeleton } from './LeadsStatementFunnelSkeleton'

@@ -2,15 +2,15 @@
 
 import { Box, Dialog, DialogContent, FormControl, TextField, Typography } from '@mui/material'
 import { Dispatch, FC, SetStateAction } from 'react'
-import { MenuOpenType } from '../LeadsKanban'
+import { MenuOpenType } from '../model/type'
 import { useTranslation } from 'react-i18next'
 import * as Yup from 'yup'
 import { LoadingButton } from '@mui/lab'
 import { useFormik } from 'formik'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from 'src/@core/utils/api'
-import { setAddSource, setOpenLid, setSectionId } from '../../../store/apps/leads'
-import { useAppDispatch } from '../../../store'
+import { setAddSource, setOpenLid, setSectionId } from '@/store/apps/leads'
+import { useAppDispatch } from '@/store'
 import { useRouter } from 'next/router'
 
 type Props = {

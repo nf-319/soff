@@ -11,10 +11,9 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  Tooltip,
-  Switch
+  Tooltip
 } from '@mui/material'
-import { ReactNode, useContext, useEffect, useState } from 'react'
+import { ReactNode, useContext, useEffect, useState, useRef, useCallback } from 'react'
 import DataTable from '../../components/table'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
@@ -35,12 +34,11 @@ import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
 import { useGet } from 'src/hooks/useApi'
 import { useQueryClient } from '@tanstack/react-query'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
-import { fetchSmsList } from '@store/apps/settings'
 import { ModalTypes, SendSMSModal } from '@/views/apps/students/view/UserViewLeft'
-import { Archive, ArchiveIcon, ArchiveRestore, MessageSquareText } from 'lucide-react'
+import { Archive, ArchiveRestore, MessageSquareText } from 'lucide-react'
 import useSMS from '@hooks/useSMS'
 import Divider from '@mui/material/Divider'
-import { Toggle } from 'rsuite'
+import { StudentsQueryParamsTypes } from '@/types/apps/studentsTypes'
 
 export type customTableProps = {
   xs: number
@@ -59,25 +57,31 @@ export default function StudentsPage() {
   const queryClient = useQueryClient()
 
   const { queryParams, openEdit } = useAppSelector(state => state.students)
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10)
-  const querySearch = new URLSearchParams(window.location.search).get('q')
-  const { search, ...filteredParams } = queryParams
-  const [openModalEdit, setOpenModalEdit] = useState<ModalTypes | null>(null)
+  const [rowsPerPage, setRowsPerPage] = useState<number>(Number(queryParams.limit) || 10)
   const { smsTemps, getSMSTemps } = useSMS()
+  const [openModalEdit, setOpenModalEdit] = useState<ModalTypes | null>(null)
   const [accessModal, setAccessModal] = useState<boolean>(false)
   const { companyInfo } = useAppSelector(item => item.user)
+  const isInitialMount = useRef(true)
 
-  const queryString = new URLSearchParams(
-    Object.fromEntries(
-      Object.entries({ ...filteredParams, ...(querySearch ? { search: querySearch } : { search: '' }) })
-        .filter(([, value]) => value !== undefined && value !== null)
-        .map(([key, value]) => [key, String(value)])
-    )
-  ).toString()
+  console.log(queryParams)
+
+  const generateQueryString = useCallback(() => {
+    const params = new URLSearchParams()
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '' && value !== false) {
+        const paramKey = key === 'search' ? 'q' : key
+        params.set(paramKey, String(value))
+      }
+    })
+    return params.toString()
+  }, [queryParams])
+
+  const queryString = generateQueryString()
 
   const { data, isLoading } = useGet('student/new-list/', {
     deps: ['students-list'],
-    params: { ...filteredParams, ...(querySearch ? { search: querySearch } : {}) } as Record<string, unknown>
+    params: queryParams as Record<string, any>
   })
 
   const columns: customTableProps[] = [
@@ -85,7 +89,7 @@ export default function StudentsPage() {
       xs: 0.2,
       title: t('ID'),
       dataIndex: 'index',
-      render: index => `${Number(queryParams?.offset || 0) + Number(index)}`
+      render: index => `${Number(queryParams.offset || 0) + Number(index) + 1}`
     },
     {
       xs: 0.4,
@@ -110,8 +114,8 @@ export default function StudentsPage() {
       xs: 1.1,
       title: t('Baho'),
       dataIndex: 'gpa',
-      render: gpa => {
-        return gpa ? (
+      render: gpa =>
+        gpa ? (
           <Chip
             sx={{
               color: Number(gpa) >= 4 ? 'green' : Number(gpa) >= 3 ? 'orange' : 'red',
@@ -124,7 +128,6 @@ export default function StudentsPage() {
         ) : (
           "Bahosi yo'q"
         )
-      }
     },
     {
       xs: 1.1,
@@ -200,61 +203,116 @@ export default function StudentsPage() {
     }
   ]
 
-  const handleRowsPerPageChange = async (value: number) => {
-    setRowsPerPage(value)
+  const handleRowsPerPageChange = useCallback(
+    (value: number) => {
+      setRowsPerPage(value)
+      dispatch(updateStudentParams({ limit: value.toString(), offset: '0' }))
+    },
+    [dispatch]
+  )
 
-    dispatch(updateStudentParams({ limit: value, offset: 0 }))
-  }
+  const handlePagination = useCallback(
+    (page: string | number) => {
+      const adjustedPage = (Number(page) - 1) * rowsPerPage
+      dispatch(updateStudentParams({ offset: adjustedPage.toString() }))
+    },
+    [dispatch, rowsPerPage]
+  )
 
-  const handlePagination = async (page: string | number) => {
-    const adjustedPage: any = (Number(page) - 1) * rowsPerPage
-    dispatch(updateStudentParams({ offset: adjustedPage }))
-  }
-
-  const rowClick = (id: any) => {
-    dispatch(setStudentId(id))
-    void router.push(`/students/view/security?student=${id}`)
-  }
+  const rowClick = useCallback(
+    (id: string) => {
+      dispatch(setStudentId(id))
+      router.push(`/students/view/security?student=${id}`)
+    },
+    [dispatch, router]
+  )
 
   useEffect(() => {
+    if (!router.isReady || !isInitialMount.current) return
+
     const initialize = async () => {
       if (!user?.role.includes('ceo') && !user?.role.includes('admin') && !user?.role.includes('watcher')) {
-        void router.push('/')
+        router.push('/')
         toast.error("Sizda bu sahifaga kirish huquqi yo'q!")
         return
       }
+
+      const newParams: Partial<StudentsQueryParamsTypes> = {
+        search: queryParams.search,
+        status: queryParams.status,
+        course: queryParams.course,
+        school: queryParams.school,
+        group_status: queryParams.group_status,
+        group: queryParams.group,
+        teacher: queryParams.teacher,
+        is_debtor: queryParams.is_debtor,
+        last_payment: queryParams.last_payment,
+        not_in_debt: queryParams.not_in_debt,
+        debt_date: queryParams.debt_date,
+        offset: queryParams.offset,
+        limit: queryParams.limit
+      }
+
+      dispatch(updateStudentParams(newParams))
+      isInitialMount.current = false
     }
 
     void initialize()
-
     return () => {
       dispatch(setOpenEdit(null))
-      dispatch(updateStudentParams({ limit: '10', offset: '0', course: '', teacher: '', group: '' }))
     }
-  }, [])
+  }, [router.isReady, user, dispatch, router])
 
-  const handleEditClickOpen = (value: ModalTypes) => {
-    setOpenModalEdit(value)
-    setOpenEdit(value)
-  }
+  useEffect(() => {
+    if (!router.isReady) return
 
-  const handleEditClose = () => {
+    const newQuery = generateQueryString()
+    const currentQuery = new URLSearchParams(
+      Object.entries(router.query)
+        .filter(([, value]) => value !== undefined && value !== null && value !== '')
+        .map(([key, value]) => [key, String(value)])
+    ).toString()
+
+    if (currentQuery !== newQuery) {
+      router.replace(
+        {
+          pathname: '/students',
+          search: newQuery
+        },
+        undefined,
+        { shallow: true }
+      )
+    }
+  }, [router.isReady, queryParams, router, generateQueryString])
+
+  const handleEditClickOpen = useCallback(
+    (value: ModalTypes) => {
+      setOpenModalEdit(value)
+      setOpenEdit(value)
+    },
+    [setOpenEdit]
+  )
+
+  const handleEditClose = useCallback(() => {
     setOpenModalEdit(null)
     setOpenEdit(null)
-  }
+  }, [setOpenEdit])
 
-  const handleModalOpen = () => {
+  const handleModalOpen = useCallback(() => {
     if (companyInfo.access) {
-      void getSMSTemps()
+      getSMSTemps()
       handleEditClickOpen('sms')
     } else {
       setAccessModal(true)
     }
-  }
+  }, [companyInfo.access, getSMSTemps, handleEditClickOpen])
 
-  const handleSwitch = (value: 'archive' | 'active') => {
-    dispatch(updateStudentParams({ group_status: '', status: value, offset: 0 }))
-  }
+  const handleSwitch = useCallback(
+    (value: 'archive' | 'active') => {
+      dispatch(updateStudentParams({ group_status: '', status: value, offset: '0' }))
+    },
+    [dispatch]
+  )
 
   useEffect(() => {
     if (openEdit === 'create') {
@@ -262,15 +320,14 @@ export default function StudentsPage() {
     } else {
       document.body.style.overflow = ''
     }
-
     return () => {
       document.body.style.overflow = ''
     }
   }, [openEdit])
 
   useEffect(() => {
-    void queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
-  }, [user?.active_branch])
+    queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+  }, [user?.active_branch, queryClient])
 
   return (
     <Box display='flex' flexDirection='column' gap={3}>
@@ -382,7 +439,6 @@ export default function StudentsPage() {
             <Button sx={{ width: '100%' }} variant='outlined' onClick={() => setOpen(true)}>
               {t('Filterlash')}
             </Button>
-
             <ExcelStudents size='small' url='student/offset-list/' queryString={queryString} />
           </Box>
           <Box hidden={!isMobile} display='flex' alignItems='center' justifyContent='end' gap={3}>
@@ -407,7 +463,6 @@ export default function StudentsPage() {
                 </Button>
               </Tooltip>
             </Box>
-
             <Button
               fullWidth
               onClick={handleModalOpen}
@@ -496,7 +551,7 @@ export default function StudentsPage() {
 
       <AccessDeniedModal open={accessModal} onClose={() => setAccessModal(false)} />
 
-      <Box sx={{ display: { xs: 'none', sm: 'block' } }} onClick={() => dispatch(fetchSmsList())}>
+      <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
         <SendSMSModal
           handleEditClose={handleEditClose}
           openEdit={openModalEdit}

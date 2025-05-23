@@ -13,7 +13,6 @@ import { fetchRoomList, setOpenCreateSms, updatePage } from 'src/store/apps/sett
 import CreateRoomDialog from 'src/views/apps/settings/rooms/CreateRoomDialog'
 import EditRoomDialog from 'src/views/apps/settings/rooms/EditRoomDialog'
 import RoomListRowOptions from 'src/views/apps/settings/rooms/RoomsRowOptions'
-import VideoHeader, { videoUrls } from '../../../components/video-header/video-header'
 import { toast } from 'react-hot-toast'
 import { AuthContext } from 'src/context/AuthContext'
 import { useRouter } from 'next/router'
@@ -85,8 +84,6 @@ export default function RoomsPage() {
 
   return (
     <div>
-      <VideoHeader item={videoUrls.rooms} />
-
       <Box
         className='groups-page-header'
         sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0' }}

@@ -1,3 +1,5 @@
+'use client'
+
 import { Button, Tooltip } from '@mui/material'
 import { VscodeIconsFileTypeExcel2 } from './ExcelIcon'
 import { useTranslation } from 'react-i18next'
@@ -12,6 +14,7 @@ interface ExcelProps {
   onClick?: VoidFunction
   baseURL?: string
   args?: any
+  disabled?: boolean
   notBlank?: boolean
   useLink?: boolean
 }
@@ -24,33 +27,36 @@ export default function Excel({
   color = 'success',
   onClick,
   size = 'medium',
+  disabled = false,
   baseURL,
   url,
   useLink = true,
   ...args
 }: ExcelProps) {
-
   const { t } = useTranslation()
 
-  const href = baseURL || (url ? `${url}${queryString ? `?${queryString}` : ''}` : '#')
+  const href = disabled ? '#' : baseURL || (url ? `${url}${queryString ? `?${queryString}` : ''}` : '#')
 
   const ButtonElement = (
     <Tooltip title={t(tooltip)}>
-      <Button
-        fullWidth
-        startIcon={<VscodeIconsFileTypeExcel2 />}
-        {...args}
-        variant={variant}
-        onClick={onClick}
-        color={color}
-        size={size}
-      >
-        Excel
-      </Button>
+      <span>
+        <Button
+          fullWidth
+          startIcon={<VscodeIconsFileTypeExcel2 />}
+          {...args}
+          variant={variant}
+          disabled={disabled}
+          onClick={onClick}
+          color={color}
+          size={size}
+        >
+          Excel
+        </Button>
+      </span>
     </Tooltip>
   )
 
-  if (useLink) {
+  if (useLink && !disabled) {
     return (
       <a href={href} download target={notBlank ? '' : '_blank'} style={{ width: '100%', textDecoration: 'none' }}>
         {ButtonElement}

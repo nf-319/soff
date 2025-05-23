@@ -9,7 +9,6 @@ import * as Yup from 'yup'
 import useBranches from 'src/hooks/useBranch'
 import { disablePage } from 'src/store/apps/page'
 import toast from 'react-hot-toast'
-import { useRouter } from 'next/router'
 
 type Props = {}
 
@@ -17,18 +16,17 @@ export default function CreateRoomForm({ }: Props) {
 
     const { t } = useTranslation()
     const dispatch = useAppDispatch()
-    const { branches, getBranches } = useBranches()
+    const { getBranches } = useBranches()
     const { active_page } = useAppSelector(state => state.settings)
 
     const [loading, setLoading] = useState<boolean>(false)
-    const { push } = useRouter()
 
     const setOpenAddGroup = () => {
         dispatch(setOpenCreateSms(null))
     }
 
     const validationSchema = Yup.object({
-        name: Yup.string().required(t("Nomini kiriting")||"Nomini kiriting"),
+        name: Yup.string().required(t("Xona nomini kiriting")||" Xona nomini kiriting"),
     });
 
     const formik: any = useFormik({
@@ -79,7 +77,7 @@ export default function CreateRoomForm({ }: Props) {
         >
             <FormControl fullWidth>
                 <TextField
-                    label={t('Nomi')}
+                    label={t('Xona nomi')}
                     size='small'
                     name='name'
                     error={!!errors.name && touched.name}

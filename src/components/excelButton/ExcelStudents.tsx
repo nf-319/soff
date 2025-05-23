@@ -28,6 +28,7 @@ export default function ExcelStudents({
   const [loading, setLoading] = useState(false)
   const [link, setLink] = useState('')
   const {t} = useTranslation()
+
   const handleDownload = async () => {
     setLoading(true)
     try {

@@ -61,7 +61,7 @@ export const updateStudent = createAsyncThunk(
 )
 
 export const deleteStudent = createAsyncThunk('students/deleteStudent', async (pk: number | any) => {
-  return (await api.delete(`student/destroy/${pk}/`)).data
+  return (await api.post(`student/destroy/${pk}/`)).data
 })
 
 export const fetchStudentPayment = createAsyncThunk('students/fetchStudentPayment', async (id: any) => {
@@ -86,7 +86,25 @@ const initialState: IStudentState = {
   studentData: null,
   isGettingStudentsGroups: false,
   isLoading: false,
-  queryParams: { status: 'active', is_debtor: '', group_status: '', offset: '0', teacher: '', limit: '10' },
+  queryParams: {
+    search: '',
+    school: '',
+    is_overpaid: '',
+    start_date: '',
+    end_date: '',
+    limit: '10',
+    offset: '0',
+    course: null,
+    status: 'active',
+    page: '',
+    is_debtor: '',
+    last_payment: '',
+    group_status: 'active',
+    not_in_debt: '',
+    debt_date: '',
+    teacher: '',
+    group: ''
+  },
   payments: [],
   global_pay: false,
   openLeadModal: null

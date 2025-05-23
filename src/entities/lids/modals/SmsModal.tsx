@@ -1,12 +1,12 @@
 import { Dispatch, FC, SetStateAction } from 'react'
-import { MenuOpenType } from '../LeadsKanban'
+import { MenuOpenType } from '../model/type'
 import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material'
 import IconifyIcon from '../../../components/icon'
 import { useTranslation } from 'react-i18next'
 import SendSmsAnonimUserForm from 'src/views/apps/lids/anonimUser/SendSmsAnonimUserForm'
 import { useGet } from 'src/hooks/useApi'
-import { useAppDispatch } from '../../../store'
-import { setAddSource, setOpenLid, setSectionId } from '../../../store/apps/leads'
+import { useAppDispatch } from '@/store'
+import { setAddSource, setOpenLid, setSectionId } from '@/store/apps/leads'
 
 type Props = {
   open: string | null

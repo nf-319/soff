@@ -21,34 +21,35 @@ export default function CreateRoomDialog({ }: Props) {
         dispatch(setOpenCreateSms(null))
     }
 
-    return (
-        <CustomeDrawer open={openCreateSms} hideBackdrop anchor='right' variant='persistent'>
-            <Box
-                className='customizer-header'
-                sx={{
-                    position: 'relative',
-                    p: theme => theme.spacing(3.5, 5),
-                    borderBottom: theme => `1px solid ${theme.palette.divider}`
-                }}
-            >
-                <Typography variant='h6' sx={{ fontWeight: 600 }}>
-                    {t("Yangi xona qo'shish")}
-                </Typography>
-                <IconButton
-                    onClick={setOpenAddGroup}
-                    sx={{
-                        right: 20,
-                        top: '50%',
-                        position: 'absolute',
-                        color: 'text.secondary',
-                        transform: 'translateY(-50%)'
-                    }}
-                >
-                    <IconifyIcon icon='mdi:close' fontSize={20} />
-                </IconButton>
-            </Box>
+  return (
+    <CustomeDrawer open={openCreateSms} hideBackdrop anchor='right' variant='persistent'>
+      <Box
+        className='customizer-header'
+        sx={{
+          position: 'relative',
+          p: theme => theme.spacing(3.5, 5),
+          borderBottom: theme => `1px solid ${theme.palette.divider}`
+        }}
+      >
+        <Typography variant='h6' sx={{ fontWeight: 600 }}>
+          {t("Yangi xona qo'shish")}
+        </Typography>
 
-            {openCreateSms && <CreateRoomForm />}
-        </CustomeDrawer>
-    )
+        <IconButton
+          onClick={setOpenAddGroup}
+          sx={{
+            right: 20,
+            top: '50%',
+            position: 'absolute',
+            color: 'text.secondary',
+            transform: 'translateY(-50%)'
+          }}
+        >
+          <IconifyIcon icon='mdi:close' fontSize={20} />
+        </IconButton>
+      </Box>
+
+      {openCreateSms && <CreateRoomForm />}
+    </CustomeDrawer>
+  )
 }

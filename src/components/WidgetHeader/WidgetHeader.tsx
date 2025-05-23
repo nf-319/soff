@@ -32,7 +32,7 @@ export const WidgetHeader: FC<Props> = ({
       case 'large':
         return { padding: '0.75rem 1rem' }
       default:
-        return { padding: '0.5rem 0.75rem' }
+        return { padding: '0.5rem 0' }
     }
   }
 
@@ -54,7 +54,7 @@ export const WidgetHeader: FC<Props> = ({
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
-        flexDirection: { xs: 'column', md: 'row' }, 
+        flexDirection: { xs: 'column', md: 'row' },
         position: 'relative',
         ...getPadding(),
         ...sx

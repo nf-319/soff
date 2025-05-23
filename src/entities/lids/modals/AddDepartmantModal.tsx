@@ -1,13 +1,12 @@
 import { Close } from '@mui/icons-material'
 import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material'
-import { QueryObserverResult, RefetchOptions, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import MergeToDepartment from 'src/views/apps/lids/anonimUser/MergeForm'
-import { LeadsType } from '../model'
-import { LeadsResult, MenuOpenType } from '../LeadsKanban'
+import { MenuOpenType } from '../model/type'
 import { Dispatch, FC, SetStateAction } from 'react'
 import { useTranslation } from 'react-i18next'
-import { setAddSource, setOpenLid, setSectionId } from '../../../store/apps/leads'
-import { useAppDispatch } from '../../../store'
+import { setAddSource, setOpenLid, setSectionId } from '@/store/apps/leads'
+import { useAppDispatch } from '@/store'
 
 type Props = {
   open: string | null

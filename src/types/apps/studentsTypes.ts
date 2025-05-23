@@ -130,19 +130,20 @@ export interface StudentDetailType {
 
 export interface StudentsQueryParamsTypes {
   search?: string
-  school?: string,
-  is_overpaid?:string,
-  start_date?: string,
-  end_date?:string,
+  school?: string
+  is_overpaid?: string | boolean
+  start_date?: string
+  end_date?: string
   limit?: string
   offset?: string
   course?: number | null
-  status?: string | any
+  status?: string
   page?: string
-  is_debtor?: any
-  last_payment?: any
-  group_status?: '' | 'new' | 'frozen' | 'active' | 'archive'
+  is_debtor?: string | boolean
+  last_payment?: string | boolean
+  group_status?: '' | 'new' | 'frozen' | 'active' | 'archive' | 'not_activated' | 'without_group'
   not_in_debt?: string | boolean
-  debt_date?: string,
-  teacher?:any
+  debt_date?: string
+  teacher?: string
+  group?: string
 }

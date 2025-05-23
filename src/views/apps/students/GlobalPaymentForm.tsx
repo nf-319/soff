@@ -1,7 +1,8 @@
+'use client'
+
 import {
   Alert,
   Box,
-  Chip,
   CircularProgress,
   FormControl,
   FormHelperText,
@@ -10,410 +11,408 @@ import {
   OutlinedInput,
   Select,
   TextField,
-  Typography
+  Typography,
 } from '@mui/material'
 import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
-import useDebounce from 'src/hooks/useDebounce'
+import { useTranslation } from 'react-i18next'
+import * as Yup from 'yup'
+import LoadingButton from '@mui/lab/LoadingButton'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchStudentDetail, searchStudent, setGlobalPay, setStudentData } from 'src/store/apps/students'
-import * as Yup from 'yup'
-import IconifyIcon from '../../../components/icon'
-import { today } from '../../../components/card-statistics/kanban-item'
-import AmountInput, { formatAmount, revereAmount } from '../../../components/amount-input'
-import LoadingButton from '@mui/lab/LoadingButton'
+import useDebounce from 'src/hooks/useDebounce'
 import usePayment from 'src/hooks/usePayment'
 import toast from 'react-hot-toast'
 import { disablePage } from 'src/store/apps/page'
+import IconifyIcon from '../../../components/icon'
+import { today } from '../../../components/card-statistics/kanban-item'
+import AmountInput, { formatAmount, revereAmount } from '../../../components/amount-input'
 import { formatPhoneNumber } from '../../../components/phone-input/format-phone-number'
-import { useTranslation } from 'react-i18next'
-import api from 'src/@core/utils/api'
 import useResponsive from '../../../@core/hooks/useResponsive'
+import api from 'src/@core/utils/api'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { handleCheckPrint } from '@/views/apps/students/view/UserViewPage'
 
+type Student = {
+  id: number
+  first_name: string
+  phone: string
+  status: string
+  student_status: { status: string; group_name: string }[]
+}
+
+type Group = {
+  id: number
+  name: string
+  last_debt: number
+  status: string
+}
+
 export default function GlobalPaymentForm() {
-  const [loading, setLoading] = useState<boolean>(false)
-  const [loadingBtn, setLoadingBtn] = useState<boolean>(false)
-  const [studentList, setStudentList] = useState<any[]>([])
-  const [step, setStep] = useState<'search' | 'pay' | 'print'>('search')
   const { t } = useTranslation()
-  const { companyInfo } = useAppSelector((state: any) => state.user)
-  const [groups, setGroups] = useState([])
-  const [groupData, setGroupData] = useState<any>(null)
   const dispatch = useAppDispatch()
   const { isMobile } = useResponsive()
-  const { studentData } = useAppSelector(state => state.students)
+  const { companyInfo } = useAppSelector((state: any) => state.user)
+  const { studentData } = useAppSelector((state) => state.students)
   const { createPayment, paymentMethods, getPaymentMethod } = usePayment()
 
-  async function getGroups(student: number) {
-    await api
-      .get(`common/group-check-list/?student=${student}`)
-      .then(res => setGroups(res.data))
-      .catch(error => console.log(error))
-  }
-
-  const userData: any = { ...studentData }
+  const [loading, setLoading] = useState<boolean>(false)
+  const [loadingBtn, setLoadingBtn] = useState<boolean>(false)
+  const [studentList, setStudentList] = useState<Student[]>([])
+  const [groups, setGroups] = useState<Group[]>([])
+  const [groupData, setGroupData] = useState<Group | null>(null)
+  const [step, setStep] = useState<'search' | 'pay' | 'print'>('search')
 
   const validationSchema = Yup.object({
-    search: Yup.string().min(4, "Qidirish uchun ma'lumot yetarli emas")
+    search: Yup.string().min(4, t("Qidirish uchun ma'lumot yetarli emas")),
+    amount: Yup.string().when('step', {
+      is: 'pay',
+      then: Yup.string().required(t('Summani aniq kiriting')),
+    }),
+    description: Yup.string().when('step', {
+      is: 'pay',
+      then: Yup.string().required(t('Izoh yozishingiz shart')),
+    }),
+    payment_date: Yup.string().when('step', {
+      is: 'pay',
+      then: Yup.string().required(t('Sana kiritish shart')),
+    }),
+    group: Yup.string().when('step', {
+      is: 'pay',
+      then: Yup.string().required(t('Guruh tanlash shart')),
+    }),
+    payment_type: Yup.string().when('step', {
+      is: 'pay',
+      then: Yup.string().required(t("To'lov turini tanlang")),
+    }),
   })
 
   const initialValues = {
-    search: ''
-  }
-
-  const validationSchemaPay = Yup.object({
-    amount: Yup.string().required(t('Summani aniq kiriting') as string),
-    description: Yup.string().required(t('Izoh yozishingiz shart') as string),
-    payment_date: Yup.string().required(t('Sana kiritish shart') as string),
-    group: Yup.string().required(t('Guruh tanlash shart') as string),
-    payment_type: Yup.string().required(t("To'lov turini tanlang") as string)
-  })
-
-  const initialValuesPay = {
+    search: '',
     amount: '',
     description: '',
-    debt_amount: groupData?.last_debt,
+    debt_amount: '',
     payment_date: today,
     group: '',
     payment_type: '',
-    bonus: '0'
+    bonus: '0',
+    step: 'search',
   }
 
-  const formik: any = useFormik({
+  const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: async () => {}
-  })
-
-  const payform = useFormik({
-    initialValues: initialValuesPay,
-    validationSchema: validationSchemaPay,
-    onSubmit: async values => {
-      setLoadingBtn(true)
-      dispatch(disablePage(true))
-      const data = {
-        ...values,
-        debt_amount: values.debt_amount,
-        student: userData?.id,
-        amount: revereAmount(values.amount)
-      }
-      try {
-        const resp = await createPayment(data)
-        await handleCheckPrint(resp.id)
-        setStep('print')
-        setLoadingBtn(false)
-        toast.success(t('Tolov amalaga oshirildi') as string, { duration: 4000 })
-      } catch (err: any) {
-        if (err?.respnse?.data) {
-          payform.setErrors(err?.respnse?.data)
+    onSubmit: async (values) => {
+      if (values.step === 'search') {
+        setLoading(true)
+        const resp = await dispatch(searchStudent(values.search))
+        if (!resp.payload?.length) {
+          formik.setFieldError('search', t("O'quvchi topilmadi"))
+        } else {
+          setStudentList(resp.payload)
         }
-        setLoadingBtn(false)
+        setLoading(false)
+      } else if (values.step === 'pay') {
+        setLoadingBtn(true)
+        dispatch(disablePage(true))
+        try {
+          const data = {
+            student: studentData?.id,
+            amount: revereAmount(values.amount),
+            description: values.description,
+            debt_amount: revereAmount(values.debt_amount),
+            payment_date: values.payment_date,
+            group: values.group,
+            payment_type: values.payment_type,
+            bonus: revereAmount(values.bonus),
+          }
+          const resp = await createPayment(data)
+          await handleCheckPrint(resp.id)
+          setStep('print')
+          toast.success(t('Tolov amalaga oshirildi'), { duration: 4000 })
+          formik.resetForm({ values: initialValues })
+        } catch (err: any) {
+          const errorMessage = err?.response?.data?.message || t('Xatolik yuz berdi')
+          formik.setErrors(err?.response?.data || { general: errorMessage })
+          toast.error(errorMessage)
+        } finally {
+          setLoadingBtn(false)
+          dispatch(disablePage(false))
+        }
       }
-      dispatch(disablePage(false))
-    }
+    },
   })
 
-  function handleClose() {
-    payform.resetForm()
-    formik.resetForm()
-    dispatch(setGlobalPay(false))
-    setStudentList([])
-    dispatch(setStudentData(null))
-  }
+  const debouncedSearch = useDebounce(formik.values.search, 500)
 
-  const search = useDebounce(formik.values.search, 1000)
-
-  const handleSearch = async () => {
-    setLoading(true)
-    const resp = await dispatch(searchStudent(search))
-    if (!resp.payload?.length) {
-      formik.setFieldError('search', t("O'quvchi topilmadi"))
+  const getGroups = async (studentId: number) => {
+    try {
+      const res = await api.get(`common/group-check-list/?student=${studentId}`)
+      setGroups(res.data)
+    } catch (error) {
+      toast.error(t('Guruhlarni olishda xatolik'))
     }
-    setStudentList(resp.payload)
-    setLoading(false)
   }
 
-  const clickStudent = async (item: any) => {
-    setStudentList([])
+  const handleStudentSelect = async (student: Student) => {
     setLoading(true)
-    getGroups(item.id)
-    await dispatch(fetchStudentDetail(item.id))
-    await getPaymentMethod()
-    setStudentList([item])
-    setStep('pay')
-    setLoading(false)
+    try {
+      await Promise.all([
+        dispatch(fetchStudentDetail(student.id)),
+        getGroups(student.id),
+        getPaymentMethod(),
+      ])
+      setStudentList([student])
+      setStep('pay')
+      formik.setFieldValue('step', 'pay')
+    } catch (error) {
+      toast.error(t('Maʼlumotlarni olishda xatolik'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleClose = () => {
+    formik.resetForm({ values: initialValues })
+    setStudentList([])
+    setGroups([])
+    setGroupData(null)
+    dispatch(setStudentData(null))
+    dispatch(setGlobalPay(false))
   }
 
   useEffect(() => {
-    setStudentList([])
-    if (!formik.errors.search && search) {
-      handleSearch()
+    if (debouncedSearch && !formik.errors.search && debouncedSearch.length >= 4) {
+      formik.handleSubmit()
     }
-  }, [search])
-  const formatNumber = (num: any) => {
-    return new Intl.NumberFormat('uz-UZ').format(num)
-  }
+  }, [debouncedSearch])
+
+  useEffect(() => {
+    if (groupData) {
+      formik.setFieldValue('debt_amount', formatAmount(String(groupData.last_debt)))
+    }
+  }, [groupData])
 
   return (
-    <Box sx={isMobile ? { width: '100%' } : { width: '450px' }}>
-      <iframe src='' id='printFrame' style={{ display: 'none' }}></iframe>
-      {step === 'search' || step === 'pay' ? (
-        <form onSubmit={e => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          {step === 'search' && (
-            <FormControl fullWidth>
-              <OutlinedInput
-                size='small'
-                placeholder={t("O'quvchini qidiring... (Ismi yoki telefon raqami)")}
-                name='search'
-                fullWidth
-                value={formik.values.search}
-                onChange={e => (setStudentList([]), formik.handleChange(e))}
-                onBlur={formik.handleBlur}
-              />
-              {!!formik.errors.search && formik.touched.search && (
-                <FormHelperText error>{formik.errors.search}</FormHelperText>
-              )}
-            </FormControl>
-          )}
-
-          {loading ? <CircularProgress sx={{ margin: '30px auto', display: 'block' }} size={30} /> : ''}
-          {studentList.length > 0 && (
-            <Box sx={{ display: 'flex', width: '100%', flexDirection: 'column', gap: '5px' }}>
-              {studentList.map(student => (
-                <Alert
-                  onClick={() => clickStudent(student)}
-                  sx={{ padding: '0 10px', cursor: 'pointer', margin: '0', fontWeight: 600 }}
-                  color='info'
-                  variant='outlined'
-                  icon={<IconifyIcon icon={'mdi:account-student'} />}
-                >
-                  {student.first_name} | {formatPhoneNumber(student.phone)} |{' '}
-                  {student.student_status?.filter((el: any) => el.status === 'active')[0]?.group_name || ''}
-                </Alert>
-              ))}
-            </Box>
-          )}
-
-          {step === 'pay' && (
-            <FormControl fullWidth>
-              <InputLabel
-                size='small'
-                id='user-view-language-label'
-                error={!!payform.errors.group && payform.touched.group}
-              >
-                {t('Qaysi guruh uchun?')}
-              </InputLabel>
-              <Select
-                size='small'
-                label={t('Qaysi guruh uchun?')}
-                id='user-view-language'
-                labelId='user-view-language-label'
-                name='group'
-                error={!!payform.errors.group && payform.touched.group}
-                value={payform.values.group}
-                onChange={payform.handleChange}
-                onBlur={payform.handleBlur}
-              >
-                {groups &&
-                  groups?.map((group: any) => (
-                    <MenuItem
-                      onClick={() => {
-                        setGroupData(group), payform.setFieldValue('debt_amount', group.last_debt)
-                      }}
-                      key={group.id}
-                      value={group.id}
-                    >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <Typography variant='subtitle1'>{group.name}</Typography>
-                        <Box fontSize={12} sx={{ display: 'inline', margin: '0 5px' }}>
-                          {/* <Chip
-                            label={`${formatAmount(String(group.group_data?.balance))} UZS`}
-                            size='small'
-                            variant='outlined'
-                            color={
-                              group.group_data?.balance > 0
-                                ? 'success'
-                                : group.group_data?.balance < 0
-                                ? 'error'
-                                : 'success'
-                            }
-                          /> */}
-                        </Box>
-                        {/* <Box fontSize={12} sx={{ display: 'inline' }}>
-                          <Chip
-                            label={t(group.status)}
-                            size='small'
-                            variant='outlined'
-                            color={
-                              group.status === 'active'
-                                ? 'success'
-                                : group.status === 'archive'
-                                ? 'error'
-                                : group.status === 'frozen'
-                                ? 'secondary'
-                                : 'warning'
-                            }
-                          />
-                        </Box> */}
-                      </Box>
-                    </MenuItem>
-                  ))}
-              </Select>
-              {!!payform.errors.group && payform.touched.group && (
-                <FormHelperText error>{payform.errors.group}</FormHelperText>
-              )}
-            </FormControl>
-          )}
-
-          {step === 'pay' && (
-            <FormControl fullWidth>
-              <InputLabel
-                size='small'
-                id='user-view-language-label'
-                error={!!payform.errors.group && payform.touched.group}
-              >
-                {t("To'lov turi")}
-              </InputLabel>
-              <Select
-                size='small'
-                label={t("To'lov turi")}
-                id='user-view-language'
-                labelId='user-view-language-label'
-                name='payment_type'
-                error={!!payform.errors.payment_type && payform.touched.payment_type}
-                value={payform.values.payment_type}
-                onChange={payform.handleChange}
-                onBlur={payform.handleBlur}
-              >
-                {paymentMethods.map((branch: any) => (
-                  <MenuItem key={branch.id} value={branch.id}>
-                    {branch.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {!!payform.errors.payment_type && payform.touched.payment_type && (
-                <FormHelperText error>{payform.errors.payment_type}</FormHelperText>
-              )}
-            </FormControl>
-          )}
-          {companyInfo.extra_settings.allow_debt_editing_on_payment == true && groupData && (
-            <FormControl fullWidth>
-              {/* <InputLabel
-                size='small'
-                id='user-modules-language-label'
-                error={!!payform.errors.debt_amount && Boolean(payform.touched.debt_amount)}
-              >
-                {t("Qarzdorlik summasi")}
-              </InputLabel> */}
-              <AmountInput
-                id='user-view-language'
-                size='small'
-                label={t('Qarzdorlik summasi')}
-                error={!!payform.errors.debt_amount && Boolean(payform.touched.debt_amount)}
-                name='debt_amount'
-                value={payform.values.debt_amount}
-                onChange={payform.handleChange}
-                onBlur={payform.handleBlur}
-              />
-              {!!payform.errors.debt_amount && payform.touched.debt_amount && (
-                <FormHelperText error>{Boolean(payform.errors.debt_amount)}</FormHelperText>
-              )}
-            </FormControl>
-          )}
-          {step === 'pay' && (
-            <>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Box sx={isMobile ? { width: '100%' } : { width: '450px' }}>
+        <iframe src="" id="printFrame" style={{ display: 'none' }} />
+        {step === 'search' || step === 'pay' ? (
+          <form
+            onSubmit={e => {
+              e.preventDefault()
+              formik.handleSubmit()
+            }}
+            style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}
+          >
+            {step === 'search' && (
               <FormControl fullWidth>
-                <AmountInput
-                  size='small'
-                  placeholder={t('Summa')}
-                  error={!!payform.errors.amount && payform.touched.amount}
-                  name='amount'
-                  value={payform.values.amount}
-                  onChange={payform.handleChange}
-                  onBlur={payform.handleBlur}
+                <OutlinedInput
+                  size="small"
+                  placeholder={t('O\'quvchini qidiring... (Ismi yoki telefon raqami)')}
+                  name="search"
+                  value={formik.values.search}
+                  onChange={e => {
+                    formik.handleChange(e)
+                    if (e.target.value.length < 4) setStudentList([])
+                  }}
+                  onBlur={formik.handleBlur}
+                  onPaste={e => {
+                    const pastedValue = e.clipboardData.getData('text')
+                    formik.setFieldValue('search', pastedValue)
+                    if (pastedValue.length >= 4) {
+                      setTimeout(() => formik.handleSubmit(), 600)
+                    }
+                  }}
                 />
-                {!!payform.errors.amount && payform.touched.amount && (
-                  <FormHelperText error>{payform.errors.amount}</FormHelperText>
+                {formik.touched.search && formik.errors.search && (
+                  <FormHelperText error>{formik.errors.search}</FormHelperText>
                 )}
               </FormControl>
-              <FormControl fullWidth>
-                <TextField
-                  rows={4}
-                  type='text'
-                  label="O'quvchiga bonus (pul miqdorida)"
-                  name='bonus'
-                  size='small'
-                  value={payform.values.bonus ? `${formatNumber(payform.values.bonus)}` : '0'}
-                  onChange={e => {
-                    const rawValue = e.target.value.replace(/\D/g, '')
-                    payform.handleChange({ target: { name: 'bonus', value: rawValue } })
-                  }}
-                  onBlur={payform.handleBlur}
-                />
-              </FormControl>
-            </>
-          )}
+            )}
 
-          {step === 'pay' && (
-            <FormControl fullWidth>
-              <TextField
-                size='small'
-                placeholder={t('Izoh')}
-                rows={4}
-                error={!!payform.errors.description && payform.touched.description}
-                multiline
-                name='description'
-                value={payform.values.description}
-                onChange={payform.handleChange}
-                onBlur={payform.handleBlur}
-              />
-              {!!payform.errors.description && payform.touched.description && (
-                <FormHelperText error>{payform.errors.description}</FormHelperText>
-              )}
-            </FormControl>
-          )}
+            {loading && <CircularProgress sx={{ margin: '30px auto', display: 'block' }} size={30} />}
 
-          {step === 'pay' && (
-            <FormControl fullWidth>
-              <TextField
-                type='date'
-                size='small'
-                placeholder={t('Sana')}
-                error={!!payform.errors.payment_date && payform.touched.payment_date}
-                name='payment_date'
-                value={payform.values.payment_date}
-                onChange={payform.handleChange}
-                onBlur={payform.handleBlur}
-              />
-              {!!payform.errors.payment_date && payform.touched.payment_date && (
-                <FormHelperText error>{payform.errors.payment_date}</FormHelperText>
-              )}
-            </FormControl>
-          )}
+            {studentList.length > 0 && (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                {studentList.map(student => (
+                  <Alert
+                    key={student.id}
+                    onClick={() => handleStudentSelect(student)}
+                    sx={{ padding: '0 10px', cursor: 'pointer', margin: '0', fontWeight: 600 }}
+                    color="info"
+                    variant="outlined"
+                    icon={<IconifyIcon icon="mdi:account-student" />}
+                  >
+                    {student.first_name} | {formatPhoneNumber(student.phone)} | {student.status === 'active' ? 'Faol' : student.status === 'archive' ? 'Arxilangan' : student.status === 'new' ? 'Yangi' : 'Muzlatilgan'}
+                  </Alert>
+                ))}
+              </Box>
+            )}
 
-          {step === 'pay' && (
-            <LoadingButton
-              loading={loadingBtn}
-              sx={{ mt: '20px' }}
-              onClick={() => payform.handleSubmit()}
-              variant='contained'
-            >
-              {t("To'lov qilish")}
+            {step === 'pay' && (
+              <>
+                <FormControl fullWidth>
+                  <InputLabel size="small" error={formik.touched.group && Boolean(formik.errors.group)}>
+                    {t('Qaysi guruh uchun?')}
+                  </InputLabel>
+                  <Select
+                    size="small"
+                    label={t('Qaysi guruh uchun?')}
+                    name="group"
+                    value={formik.values.group}
+                    onChange={e => {
+                      const selectedGroup = groups.find(g => g.id === Number(e.target.value))
+                      formik.handleChange(e)
+                      setGroupData(selectedGroup || null)
+                    }}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.group && Boolean(formik.errors.group)}
+                  >
+                    {groups.map(group => (
+                      <MenuItem key={group.id} value={group.id}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <Typography variant="subtitle1">{group.name}</Typography>
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {formik.touched.group && formik.errors.group && (
+                    <FormHelperText error>{formik.errors.group}</FormHelperText>
+                  )}
+                </FormControl>
+
+                <FormControl fullWidth>
+                  <InputLabel size="small" error={formik.touched.payment_type && Boolean(formik.errors.payment_type)}>
+                    {t('To\'lov turi')}
+                  </InputLabel>
+                  <Select
+                    size="small"
+                    label={t('To\'lov turi')}
+                    name="payment_type"
+                    value={formik.values.payment_type}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.payment_type && Boolean(formik.errors.payment_type)}
+                  >
+                    {paymentMethods.map((method: any) => (
+                      <MenuItem key={method.id} value={method.id}>
+                        {method.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {formik.touched.payment_type && formik.errors.payment_type && (
+                    <FormHelperText error>{formik.errors.payment_type}</FormHelperText>
+                  )}
+                </FormControl>
+
+                {companyInfo?.extra_settings?.allow_debt_editing_on_payment && groupData && (
+                  <FormControl fullWidth>
+                    <AmountInput
+                      size="small"
+                      label={t('Qarzdorlik summasi')}
+                      name="debt_amount"
+                      value={formik.values.debt_amount}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.debt_amount && Boolean(formik.errors.debt_amount)}
+                    />
+                    {formik.touched.debt_amount && formik.errors.debt_amount && (
+                      <FormHelperText error>{formik.errors.debt_amount}</FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+
+                <FormControl fullWidth>
+                  <AmountInput
+                    size="small"
+                    label={t('Summa')}
+                    name="amount"
+                    value={formik.values.amount}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.amount && Boolean(formik.errors.amount)}
+                  />
+                  {formik.touched.amount && formik.errors.amount && (
+                    <FormHelperText error>{formik.errors.amount}</FormHelperText>
+                  )}
+                </FormControl>
+
+                <FormControl fullWidth>
+                  <TextField
+                    size="small"
+                    label={t('O\'quvchiga bonus (pul miqdorida)')}
+                    name="bonus"
+                    value={formik.values.bonus ? formatAmount(formik.values.bonus) : '0'}
+                    onChange={e => {
+                      const rawValue = e.target.value.replace(/\D/g, '')
+                      formik.setFieldValue('bonus', rawValue)
+                    }}
+                    onBlur={formik.handleBlur}
+                  />
+                </FormControl>
+
+                <FormControl fullWidth>
+                  <TextField
+                    size="small"
+                    label={t('Izoh')}
+                    rows={4}
+                    multiline
+                    name="description"
+                    value={formik.values.description}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.description && Boolean(formik.errors.description)}
+                  />
+                  {formik.touched.description && formik.errors.description && (
+                    <FormHelperText error>{formik.errors.description}</FormHelperText>
+                  )}
+                </FormControl>
+
+                <FormControl fullWidth>
+                  <DateTimePicker
+                    label={t('Sana')}
+                    value={formik.values.payment_date ? new Date(formik.values.payment_date) : null}
+                    onChange={newValue => formik.setFieldValue('payment_date', newValue?.toISOString() || '')}
+                    disablePast
+                    format="dd/MM/yyyy HH:mm"
+                    ampm={false}
+                    slotProps={{
+                      textField: {
+                        size: 'small',
+                        error: formik.touched.payment_date && Boolean(formik.errors.payment_date)
+                      }
+                    }}
+                  />
+                  {formik.touched.payment_date && formik.errors.payment_date && (
+                    <FormHelperText error>{formik.errors.payment_date}</FormHelperText>
+                  )}
+                </FormControl>
+
+                <LoadingButton
+                  loading={loadingBtn}
+                  sx={{ mt: '20px' }}
+                  variant="contained"
+                  onClick={() => formik.handleSubmit()}
+                >
+                  {t('To\'lov qilish')}
+                </LoadingButton>
+              </>
+            )}
+          </form>
+        ) : (
+          <Box style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <Typography sx={{ fontSize: '20px', textAlign: 'center', whiteSpace: 'break-spaces' }}>
+              {t('Iltimos chekni talab qiluvchiga berishni unutmang')}
+            </Typography>
+            <LoadingButton loading={loadingBtn} sx={{ mt: '20px' }} onClick={handleClose} variant="contained">
+              {t('Yakunlash')}
             </LoadingButton>
-          )}
-        </form>
-      ) : (
-        <Box onSubmit={e => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          <Typography sx={{ fontSize: '20px', textAlign: 'center', whiteSpace: 'break-spaces' }}>
-            {t('Ilitmos chekni talab qiluvchiga berishni unutmang')}
-          </Typography>
-
-          <LoadingButton loading={loadingBtn} sx={{ mt: '20px' }} onClick={handleClose} variant='contained'>
-            {t('Yakunlash')}
-          </LoadingButton>
-        </Box>
-      )}
-    </Box>
+          </Box>
+        )}
+      </Box>
+    </LocalizationProvider>
   )
 }
