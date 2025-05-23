@@ -1,4 +1,15 @@
-import { IconButton, Menu, MenuItem } from '@mui/material'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography
+} from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import React, { MouseEvent, useState } from 'react'
@@ -8,15 +19,13 @@ import IconifyIcon from '../../../components/icon'
 import api from 'src/@core/utils/api'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { disablePage } from 'src/store/apps/page'
-import {
-  deleteStudent,
-  fetchStudentDetail,
-  fetchStudentsList,
-  setOpenEdit,
-  updateStudent,
-  updateStudentParams
-} from 'src/store/apps/students'
+import { fetchStudentDetail, setOpenEdit, updateStudent, updateStudentParams } from 'src/store/apps/students'
 import UserSuspendDialog from 'src/views/apps/mentors/view/UserSuspendDialog'
+import { DatePicker } from '@/components/DatePicker'
+import { X } from 'lucide-react'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
+import dayjs from 'dayjs'
 
 type Props = {
   id: number
@@ -31,8 +40,30 @@ export default function StudentRowOptions({ id }: Props) {
   const dispatch = useAppDispatch()
   const { queryParams } = useAppSelector(state => state.students)
   const queryClient = useQueryClient()
-
   const rowOptionsOpen = Boolean(anchorEl)
+
+  const validationSchema = Yup.object({
+    date: Yup.date().nullable().required('Sanani tanlang')
+  })
+
+  const formik = useFormik({
+    initialValues: {
+      date: null
+    },
+    validationSchema,
+    onSubmit: values => {
+      setLoading(true)
+      dispatch(disablePage(true))
+      const formatted = dayjs(values.date).format('YYYY-MM-DD')
+      dispatch(updateStudent({ id, data: { status: 'active', added_at: formatted } }))
+      dispatch(disablePage(false))
+      toast.success("O'quvchi muvaffaqiyatli aktivlashtirildi")
+      dispatch(updateStudentParams({ status: 'active' }))
+      queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
+      handleClose()
+      setLoading(false)
+    }
+  })
 
   const handleRowOptionsClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -64,18 +95,23 @@ export default function StudentRowOptions({ id }: Props) {
     setLoading(false)
   }
 
-  async function submitDelete() {
+  const handleClose = () => {
+    setRecoveModal(false)
+    formik.resetForm()
+  }
+
+  const submitDelete = async () => {
     setLoading(true)
     dispatch(disablePage(true))
     await api
       .post(`student/destroy/${id}/`)
-      .then(res => {
+      .then(() => {
         toast.success("O'quvchi muvaffaqiyatli o'chirildi")
         queryClient.invalidateQueries({ queryKey: ['student/new-list/', 'students-list'] })
       })
       .catch(err => {
         toast.error(err.response.data.msg || "O'quvchini o'chirib bo'lmadi")
-        console.log(err)
+        console.error(err)
       })
 
     dispatch(disablePage(false))
@@ -139,13 +175,35 @@ export default function StudentRowOptions({ id }: Props) {
         open={suspendDialogOpen}
         setOpen={setSuspendDialogOpen}
       />
-      <UserSuspendDialog
-        loading={loading}
-        handleOk={() => handleActive()}
-        open={recoveModal}
-        setOpen={setRecoveModal}
-        okText='Tiklash'
-      />
+
+      <Dialog open={recoveModal} onClose={handleClose}>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography>O'quvchini aktivlashtirish</Typography>
+          <IconButton onClick={handleClose}>
+            <X size={20} />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth sx={{ paddingY: 2 }}>
+            <DatePicker
+              label='Aktivlashtirish sanasi'
+              value={formik.values.date}
+              onChange={value => formik.setFieldValue('date', value)}
+              format='dd/MM/yyyy'
+              views={['day']}
+              fullWidth
+            />
+            {formik.touched.date && formik.errors.date && (
+              <div style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{formik.errors.date}</div>
+            )}
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => formik.handleSubmit()} variant='contained' size='small'>
+            Saqlash
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }

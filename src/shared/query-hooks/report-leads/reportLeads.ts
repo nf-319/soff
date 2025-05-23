@@ -51,7 +51,7 @@ export const useGetLeadsSellers = (branch?: string) =>
   })
 
 const getReportLeadsList = async (params?: {
-  page?: number
+  offset?: number
   limit?: number
   branch?: string
   temperature?: string
@@ -69,7 +69,7 @@ const getReportLeadsList = async (params?: {
 }
 
 export const useGetReportLeadsList = (params?: {
-  page?: number
+  offset?: number
   limit?: number
   branch?: string
   temperature?: string

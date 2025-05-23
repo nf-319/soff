@@ -24,9 +24,8 @@ export const LeadsStatementLeadsList = () => {
   const router = useRouter()
   const { branch } = router.query
   const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
-  const [pageSizeOffset, setPageSizeOffset] = useState(0)
+  const [offset, setOffset] = useState(0)
+  const [limit, setLimit] = useState(10)
   const [selectedLead, setSelectedLead] = useState<ReportsLeadsListItemType | null>(null)
   const [openModal, setOpenModal] = useState(false)
   const [temperateValue, setTemperateValue] = useState('')
@@ -37,8 +36,8 @@ export const LeadsStatementLeadsList = () => {
   const [adminValue, setAdminValue] = useState('')
   const tableRef = useRef<HTMLDivElement | null>(null)
   const { data, isLoading } = useGetReportLeadsList({
-    page,
-    limit: pageSize,
+    offset,
+    limit,
     branch: branchParam,
     temperature: temperateValue,
     status: stateValue,
@@ -46,8 +45,7 @@ export const LeadsStatementLeadsList = () => {
   })
 
   useEffect(() => {
-    setPage(1)
-    setPageSizeOffset(0)
+    setOffset(0)
     setTemperateValue('')
     setStateValue('')
   }, [branchParam])
@@ -59,20 +57,17 @@ export const LeadsStatementLeadsList = () => {
   }, [temperateValue, stateValue, adminValue])
 
   const handlePageChange = (direction: 'next' | 'prev') => {
-    if (direction === 'next' && data?.count && page < Math.ceil(data.count / pageSize)) {
-      setPage(prev => prev + 1)
-      setPageSizeOffset(prev => prev + pageSize)
-    } else if (direction === 'prev' && page > 1) {
-      setPage(prev => prev - 1)
-      setPageSizeOffset(prev => prev - pageSize)
+    if (direction === 'next' && data?.count && offset + limit < data.count) {
+      setOffset(prev => prev + limit)
+    } else if (direction === 'prev' && offset > 0) {
+      setOffset(prev => prev - limit)
     }
   }
 
-  const handlePageSizeChange = (event: any) => {
-    const newSize = Number(event.target.value)
-    setPageSize(newSize)
-    setPage(1)
-    setPageSizeOffset(0)
+  const handleLimitChange = (event: any) => {
+    const newLimit = Number(event.target.value)
+    setLimit(newLimit)
+    setOffset(0)
   }
 
   const columns = [
@@ -80,7 +75,7 @@ export const LeadsStatementLeadsList = () => {
       field: 'index',
       headerName: t('ID'),
       width: 70,
-      valueGetter: (params: any) => `${pageSizeOffset + params.api.getRowIndex(params.id) + 1}`
+      valueGetter: (params: any) => `${offset + params.api.getRowIndex(params.id) + 1}`
     },
     {
       field: 'first_name',
@@ -243,7 +238,7 @@ export const LeadsStatementLeadsList = () => {
       <Box display='flex' justifyContent='space-between' alignItems='center' mt={2}>
         <Box display='flex' alignItems='center' gap={1}>
           <Typography>{t('Sahifada:')}</Typography>
-          <Select value={pageSize} sx={{ height: '30px', width: '90px' }} onChange={handlePageSizeChange} size='small'>
+          <Select value={limit} sx={{ height: '30px', width: '90px' }} onChange={handleLimitChange} size='small'>
             <MenuItem value={10}>10</MenuItem>
             <MenuItem value={20}>20</MenuItem>
             <MenuItem value={30}>30</MenuItem>
@@ -256,7 +251,7 @@ export const LeadsStatementLeadsList = () => {
             size='small'
             onClick={() => handlePageChange('prev')}
             startIcon={<ChevronLeft size={18} />}
-            disabled={page === 1}
+            disabled={offset === 0}
           >
             Oldingi
           </Button>
@@ -266,7 +261,7 @@ export const LeadsStatementLeadsList = () => {
             size='small'
             onClick={() => handlePageChange('next')}
             endIcon={<ChevronRight size={18} />}
-            disabled={data?.count ? page >= Math.ceil(data.count / pageSize) : true}
+            disabled={data?.count ? offset + limit >= data.count : true}
           >
             Keyingi
           </Button>
