@@ -64,8 +64,6 @@ export default function StudentsPage() {
   const { companyInfo } = useAppSelector(item => item.user)
   const isInitialMount = useRef(true)
 
-  console.log(queryParams)
-
   const generateQueryString = useCallback(() => {
     const params = new URLSearchParams()
     Object.entries(queryParams).forEach(([key, value]) => {
