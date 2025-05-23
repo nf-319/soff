@@ -35,6 +35,12 @@ const createValidationSchema = (fields: FieldType[]) => {
     let validator;
 
     switch (field.input_type) {
+      case 'name':
+        validator = Yup.string().trim();
+        if (field.is_required) {
+          validator = validator.required(`${field.label || field.title} talab qilinadi`);
+        }
+        break;
       case 'input':
         validator = Yup.string().trim();
         if (field.is_required) {
@@ -234,7 +240,7 @@ const FormUi = ({ page }: Props) => {
                     const fieldName = `field_${index}`;
                     return (
                       <FormControl fullWidth key={index}>
-                        {field.input_type === 'input' && (
+                        {field.input_type === 'input' || field.input_type === 'name' && (
                           <>
                             <TextField
                               sx={{
