@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
-import { FormControl, FormHelperText, TextField } from '@mui/material'
+import { Checkbox, FormControl, FormControlLabel, FormHelperText, TextField } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useTranslation } from 'react-i18next'
 import api from 'src/@core/utils/api'
@@ -28,6 +28,7 @@ export const truncateToMinute = (date: Date | null): Date | null => {
 export default function AddNoteAnonimUser({ user, closeModal }: Props) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState<boolean>(false)
+  const [enableReminder, setEnableReminder] = useState<boolean>(false)
   const [reminderDate, setReminderDate] = useState<Date | null>(new Date())
 
   const validationSchema = Yup.object({
@@ -45,7 +46,7 @@ export default function AddNoteAnonimUser({ user, closeModal }: Props) {
         await api.post(`leads/lead-user-description/${user}/`, {
           anonim_user: user,
           body: values.body,
-          date: reminderDate ? truncateToMinute(reminderDate)?.toISOString() : null,
+          date: enableReminder && reminderDate ? truncateToMinute(reminderDate)?.toISOString() : null,
         })
         setLoading(false)
         closeModal()
@@ -70,23 +71,36 @@ export default function AddNoteAnonimUser({ user, closeModal }: Props) {
       style={{ padding: '5px 0', width: '100%', display: 'flex', flexDirection: 'column', gap: '15px' }}
     >
       <FormControl fullWidth>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DateTimePicker
-            label={t('Eslatish vaqti')}
-            value={reminderDate}
-            onChange={newValue => setReminderDate(newValue)}
-            disablePast
-            format='dd/MM/yyyy HH:mm'
-            ampm={false}
-            slotProps={{
-              textField: {
-                size: 'small',
-                error: false
-              }
-            }}
-          />
-        </LocalizationProvider>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={enableReminder}
+              onChange={(e) => setEnableReminder(e.target.checked)}
+            />
+          }
+          label={t('Eslatma vaqti belgilansinmi?')}
+        />
+
+        {enableReminder && (
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DateTimePicker
+              label='Eslatish vaqti'
+              value={reminderDate}
+              onChange={(newValue) => setReminderDate(newValue)}
+              disablePast
+              format='dd/MM/yyyy HH:mm'
+              ampm={false}
+              slotProps={{
+                textField: {
+                  size: 'small',
+                  error: false,
+                },
+              }}
+            />
+          </LocalizationProvider>
+        )}
       </FormControl>
+
 
       <FormControl fullWidth>
         <TextField

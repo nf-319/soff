@@ -572,6 +572,7 @@ export function LidsDragonModal({ selectedLead: initialLead, openModal, handleCl
           <Typography>{t('Yangi eslatma')}</Typography>
           <IconifyIcon onClick={() => setNodeModal(false)} icon={'material-symbols:close'} />
         </DialogTitle>
+
         <DialogContent sx={{ minWidth: '300px' }}>
           <AddNoteAnonimUser
             user={selectedLead?.id}

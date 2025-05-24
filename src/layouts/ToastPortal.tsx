@@ -26,7 +26,7 @@ const ToastPortal: FC<Props> = ({ settings }) => {
     return createPortal(
       <>
         <RHTToaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
-        <SonnerToaster richColors closeButton position="top-right" />
+        <SonnerToaster richColors closeButton position="top-right" style={{ width: '100%' }} />
       </>,
       portalRoot
     );
