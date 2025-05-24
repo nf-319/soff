@@ -16,7 +16,6 @@ export const MentorProfile: FC<Props> = ({ id }) => {
   const { user } = useAuth()
   const { data } = useGet(ceoConfigs.teachers + id)
 
-  console.log(data)
 
   return (
     <Box
@@ -31,7 +30,7 @@ export const MentorProfile: FC<Props> = ({ id }) => {
         }
       }}
     >
-      <Metadata title={`Teacher ${data?.first_name}`} />
+      <Metadata title={`O'qituvchi ${data?.first_name}`} />
       <Box
         position={{ xs: 'relative', md: 'sticky' }}
         top={{ md: 200 }}
