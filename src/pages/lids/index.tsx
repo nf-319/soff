@@ -33,6 +33,8 @@ import toast from 'react-hot-toast'
 import Excel from '@components/excelButton/Excel'
 import api from '@utils/api'
 import { Endpoints } from '@api/endpoints'
+import { LidsDragonModal } from '@/views/apps/lids/LidsDragonModal'
+import { useGetLeadDetail } from '@shared/query-hooks/leads/leads'
 
 export type DepartmentsResultType = {
   id: number
@@ -61,15 +63,16 @@ const Lids = () => {
   const { queryParams } = useSelector((state: RootState) => state.leads)
   const dispatch = useAppDispatch()
   const router = useRouter()
-  const { id, is_active, is_amocrm } = router.query
+  const { id, is_active, is_amocrm, lid } = router.query
   const [selectedTab, setSelectedTab] = useState<number>(0)
   const [selectedAmoLeadTab, setSelectedAmoLeadTab] = useState<any>(null)
   const [selectedAmoData, setSelectedAmoData] = useState<AmoLeads | null>(null)
-
   const [currentData, setCurrentData] = useState<DepartmentsResultType | undefined>()
   const [openDialog, setOpenDialog] = useState<'edit' | 'recover' | null>(null)
   const { isMobile } = useResponsive()
+  const [leadDetailOpen, setLeadDetailOpen] = useState<boolean>(false)
   const { user } = useAuth()
+  const { data } = useGetLeadDetail(String(lid || ''))
   const { t } = useTranslation()
 
   const {
@@ -278,6 +281,12 @@ const Lids = () => {
         open={openDialog}
         setOpen={setOpenDialog}
       />
+
+      {/*<LidsDragonModal*/}
+      {/*  handleClose={() => setLeadDetailOpen(false)}*/}
+      {/*  openModal={leadDetailOpen}*/}
+      {/*  selectedLead={selectedLead}*/}
+      {/*/>*/}
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import api from '@utils/api'
 import { Endpoints } from '@api/endpoints'
 import { QueryKeys } from '@/shared/query-hooks/queryKeys'
@@ -30,6 +30,16 @@ const deleteLeadDescription = async ({ id }: Pick<LeadsDescriptionUpdateType, 'i
   }
 }
 
+const getLeadDetail = async (id?: string) => {
+  try {
+    const url = Endpoints.LeadDetails.replace(':id', String(id))
+    const response = await api.get(url)
+    return response.data
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 export const usePutLeadsDescription = () => useMutation({
   mutationKey: [QueryKeys.LeadsDescriptionUpdate],
   mutationFn: ({ id, anonim_user, newText, date }: LeadsDescriptionUpdateType) => putLeadDescription({ id, anonim_user, newText, date }),
@@ -37,4 +47,10 @@ export const usePutLeadsDescription = () => useMutation({
 export const useDeleteLeadsDescription = () => useMutation({
   mutationKey: [QueryKeys.LeadsDescriptionUpdate],
   mutationFn: ({ id }: Pick<LeadsDescriptionUpdateType, 'id'>) => deleteLeadDescription({ id }),
+})
+
+export const useGetLeadDetail = (id?: string) => useQuery({
+  queryKey: [QueryKeys.LeadDetail, id],
+  queryFn: () => getLeadDetail(id),
+  enabled: !!id
 })

@@ -156,7 +156,7 @@ const NotificationDropdown = (props: Props) => {
               <NotificationContent ref={contentRef}>{parse(body)}</NotificationContent>
             </ToastContent>
 
-            <Link href={`/notifications?id=${id}`} passHref>
+            <Link href={`/notifications?id=${String(id)}`} passHref>
               <ToastLink>Batafsil</ToastLink>
             </Link>
           </ToastContainer>
@@ -166,6 +166,7 @@ const NotificationDropdown = (props: Props) => {
         duration: 3000,
         position: 'top-right',
         style: {
+          width: '400px',
           padding: 0
         }
       }
