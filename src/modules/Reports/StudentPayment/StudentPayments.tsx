@@ -23,6 +23,7 @@ import { fetchCoursesList } from 'src/store/apps/settings'
 import api from 'src/@core/utils/api'
 import ceoConfigs from 'src/configs/ceo'
 import ExcelStudents from '@components/excelButton/ExcelStudents'
+import { Metadata } from '@/components/Metada'
 
 export type customTableProps = {
   xs: number
@@ -190,6 +191,7 @@ export const StudentPayments = () => {
 
   return (
     <div>
+      <Metadata title="O'quvchilar to'lovi"/>
       <Box
         className='groups-page-header'
         sx={{

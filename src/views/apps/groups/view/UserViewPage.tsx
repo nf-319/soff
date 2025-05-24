@@ -20,11 +20,12 @@ import {
 import UserViewLeft from 'src/views/apps/groups/view/GroupViewLeft/UserViewLeft'
 import UserViewRight from 'src/views/apps/groups/view/UserViewRight'
 import useResponsive from 'src/@core/hooks/useResponsive'
+import { Metadata } from '@/components/Metada'
 
 const UserView = () => {
   const router = useRouter()
   const url = String(router.query.tab)
-  const { queryParams } = useAppSelector(state => state.groupDetails)
+  const { queryParams, groupData } = useAppSelector(state => state.groupDetails)
   const { user } = useContext(AuthContext)
   const { isMobile } = useResponsive()
   const dispatch = useAppDispatch()
@@ -67,9 +68,9 @@ const UserView = () => {
     }
   }, [])
 
-
   return (
     <Box display='flex' flexDirection='column' gap={4}>
+      <Metadata title={`Guruh ${groupData?.name || ''}`} />
       <Grid container spacing={6}>
         <Grid item xs={12} md={5}>
           <UserViewLeft />
