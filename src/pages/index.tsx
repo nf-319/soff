@@ -14,7 +14,7 @@ export const getHomeRoute = (role: string[]) => {
     return '/finance'
   }
 
-  return '/dashboard'
+  return '/c-panel'
 }
 const Home = () => {
   const auth = useAuth()

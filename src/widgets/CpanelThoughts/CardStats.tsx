@@ -1,57 +1,54 @@
 import useResponsive from '@/@core/hooks/useResponsive'
 import { TrendCard } from '@/components/TrendCard'
+import { useGet } from '@/hooks/useApi'
 import { Box } from '@mui/material'
 import { AlertTriangle, BarChart3, Bell, Lightbulb, UserCheck } from 'lucide-react'
 
 const CpanelStatsCards = () => {
-  const {isMobile} = useResponsive()
+  const { data } = useGet('owner/feedback_card/')
+
   const summaryData = [
     {
       icon: Bell,
-      iconColor: '#3b82f6', 
+      iconColor: '#3b82f6',
       title: "Tizimning o'rtacha bahosi",
-      value: '8.7 / 10',
-      change: '+3.6%',
+      value: `${data?.avg_rating} / 10`,
       trend: 'up'
     },
     {
       icon: UserCheck,
-      iconColor: '#10b981', 
+      iconColor: '#10b981',
       title: "Texnik bo'lim bahosi",
-      value: '9.1 / 10',
-      change: '+2.1%',
+      value: `${data?.avg_tech_rating} / 10`,
       trend: 'up'
     },
     {
       icon: BarChart3,
-      iconColor: '#8b5cf6', 
+      iconColor: '#8b5cf6',
       title: 'Javob berish foizi',
-      value: '65%',
-      change: '+5%',
+      value: `${data?.reply_percentage}%`,
       trend: 'up'
     },
     {
       icon: AlertTriangle,
-      iconColor: '#facc15', 
+      iconColor: '#facc15',
       title: 'Kelgan kamchiliklar soni',
-      value: '24',
-      change: '+4%',
+      value: data?.suggestions_count,
       trend: 'up',
       isIssueCard: true
     },
     {
       icon: Lightbulb,
-      iconColor: '#f97316', 
+      iconColor: '#f97316',
       title: "Qo'shimcha funksiya so'rovlari",
-      value: '15',
-      change: '+8%',
+      value: data?.weaknesses_count,
       trend: 'up'
     }
   ]
 
   return (
     <Box>
-      <Box display={'flex'} gap={3} flexDirection={{ xs: 'column',md:'row' }} >
+      <Box display={'flex'} gap={3} flexDirection={{ xs: 'column', md: 'row' }}>
         {summaryData.map((item, index) => (
           <Box key={index} flex='1 1 calc(20% - 16px)' minWidth={150}>
             <TrendCard
@@ -60,7 +57,7 @@ const CpanelStatsCards = () => {
               count={item.value}
               icon={item.icon}
               tooltip={item.title}
-              process={item.change}
+              process={null}
               trendDirection={'up'}
             />
           </Box>
