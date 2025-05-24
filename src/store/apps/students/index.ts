@@ -20,17 +20,25 @@ export const fetchStudentComments = createAsyncThunk('students/fetchStudentComme
   return (await api.get(`student/notes/?user=${id}`)).data
 })
 
-export const createStudent = createAsyncThunk('students/createStudent', async (values: any, { rejectWithValue }) => {
-  try {
-    const response = await api.post(`student/create/`, values)
-    return response.data
-  } catch (err: any) {
-    if (err.response) {
-      return rejectWithValue(err.response.data)
+export const createStudent = createAsyncThunk(
+  'students/createStudent',
+  async (values: any, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`student/create/`, values)
+      return response.data
+    } catch (err: any) {
+      if (err.response) {
+        return rejectWithValue({ ...err.response.data, status: err.response.status })
+      }
+
+      if (err.request?.status === 413) {
+        return rejectWithValue({ status: 413, message: 'Payload Too Large' })
+      }
+
+      return rejectWithValue({ status: null, message: err.message })
     }
-    return rejectWithValue(err.message)
-  }
-})
+  },
+)
 
 export const fetchGroupCheckList = createAsyncThunk('fetchGroupCheckList', async (search?: string) => {
   return (await api.get(`common/group-check-list/`, { params: { search } })).data

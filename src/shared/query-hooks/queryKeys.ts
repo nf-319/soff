@@ -8,6 +8,7 @@ export const enum QueryKeys {
   ReportLeadsChart = 'leads-card-chart',
   FinancialsIncomeOverview = 'financials_income_overview',
   LeadsDescriptionUpdate = 'leads-description-update',
+  LeadDetail = 'lead-detail',
   TeacherDetail = 'teacher-detail',
   Groups = 'groups',
   EmployeeSellers = 'sellers',

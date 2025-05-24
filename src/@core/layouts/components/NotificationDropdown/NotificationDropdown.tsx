@@ -17,10 +17,11 @@ import Badge from '@mui/material/Badge'
 import { getFormatTimestamp } from '@utils/getFormatTimestamp'
 import { NotificationContent, StyledMenu, StyledMenuItem } from './NotificationDropdown.style'
 import { useNotificationsNotRead } from '@hooks/useNotification'
-import Image from 'next/image'
 import { useAppSelector } from '@/store'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { ToastContainer, ToastHeader, ToastContent, ToastLink, ToastTitle } from './NotificationDropdown.style'
+
 
 type Props = {
   settings: Settings
@@ -43,9 +44,35 @@ const NotificationDropdown = (props: Props) => {
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const shownNotificationsRef = useRef<Set<number>>(new Set())
   const wsConnectedRef = useRef<boolean>(false)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
   const { refetch } = useNotificationsNotRead()
+
+  useEffect(() => {
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      const link = target.closest('a')
+      if (link) {
+        e.preventDefault()
+        const href = link.getAttribute('href')
+        if (href) {
+          void router.push(href)
+        }
+      }
+    }
+
+    const content = contentRef.current
+    if (content) {
+      content.addEventListener('click', handleLinkClick)
+    }
+
+    return () => {
+      if (content) {
+        content.removeEventListener('click', handleLinkClick)
+      }
+    }
+  }, [router])
 
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
 
@@ -81,18 +108,19 @@ const NotificationDropdown = (props: Props) => {
     }
   }
 
-  const showBrowserNotification = (title: string, body: string) => {
+  const showBrowserNotification = (title: string, body: string, id: number) => {
     if (!notificationPermissionRef.current) return
 
     try {
       const notification = new Notification(title, {
         body: body.replace(/<[^>]*>?/gm, ''),
-        icon: companyInfo?.logo || '/images/default-logo.jpg'
+        icon: companyInfo?.logo || '/logo.webp',
       })
 
       notification.onclick = () => {
         window.focus()
         notification.close()
+        window.location.href = `/notification?id=${id}`
       }
     } catch (error) {
       console.error('Error showing browser notification:', error)
@@ -101,93 +129,46 @@ const NotificationDropdown = (props: Props) => {
 
   const showToastNotification = (title: string, body: string, id: number) => {
     toast.custom(
-      (t: any) => (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'start',
-            background: '#fff',
-            borderRadius: '8px',
-            padding: '12px',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-            width: 320,
-            gap: 10,
-            position: 'relative'
-          }}
-        >
-          <Link
-            href={`/notifications?id=${id}`}
-            style={{
-              display: 'flex',
-              gap: 10,
-              textDecoration: 'none',
-              flex: 1
-            }}
-          >
-            {companyInfo?.logo ? (
-              <Image src={companyInfo?.logo} alt='User' width={24} height={24} style={{ borderRadius: '4px' }} />
-            ) : (
-              <Typography variant='h5'>🔔</Typography>
-            )}
+      t => (
+        <Link href={`/notifications?id=${String(id)}`} passHref style={{ textDecoration: 'none' }}>
+          <ToastContainer>
+            <ToastHeader>
+              <ToastTitle>
+                <Typography variant='h5'>🔔</Typography>
+                <strong style={{ fontWeight: 600, color: '#000', flex: 1 }}>
+                  {title.split(' ').slice(0, 40).join(' ')}
+                </strong>
+              </ToastTitle>
 
-            <div style={{ width: '100%' }}>
-              <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                <strong style={{ fontWeight: 600, color: '#000' }}>{title}</strong>
-
-                <Typography
-                  fontSize={12}
-                  sx={{
-                    paddingRight: 6,
-                    cursor: 'pointer',
-                    color: 'primary.main',
-                    flexShrink: 0,
-                    transition: 'color 0.2s',
-                    '&:hover': {
-                      textDecoration: 'underline',
-                      color: 'primary.dark'
-                    }
-                  }}
-                >
-                  Batafsil
-                </Typography>
-              </div>
-              <div
-                style={{
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  fontSize: 14,
-                  color: '#555',
-                  marginTop: 4
+              <IconButton
+                size='small'
+                onClick={() => toast.dismiss(t)}
+                sx={{
+                  color: 'text.secondary',
+                  '&:hover': { color: 'text.primary' }
                 }}
               >
-                {body.replace(/<[^>]*>?/gm, '')}
-              </div>
-            </div>
-          </Link>
+                <X size={16} />
+              </IconButton>
+            </ToastHeader>
 
-          <IconButton
-            size='small'
-            onClick={() => toast.dismiss(t.id)}
-            sx={{
-              position: 'absolute',
-              top: 6,
-              right: 6,
-              color: '#888',
-              '&:hover': {
-                color: '#000'
-              }
-            }}
-          >
-            <X size={16} />
-          </IconButton>
-        </div>
+            <ToastContent>
+              <NotificationContent ref={contentRef}>{parse(body)}</NotificationContent>
+            </ToastContent>
+
+            <Link href={`/notifications?id=${String(id)}`} passHref>
+              <ToastLink>Batafsil</ToastLink>
+            </Link>
+          </ToastContainer>
+        </Link>
       ),
       {
         duration: 3000,
-        position: 'top-right'
+        position: 'top-right',
+        style: {
+          width: '400px',
+          padding: 0
+        }
       }
     )
   }
@@ -229,7 +210,7 @@ const NotificationDropdown = (props: Props) => {
           const body = notification.body || ''
           const id = notification.id
 
-          showBrowserNotification(title, body)
+          showBrowserNotification(title, body, id)
           showToastNotification(title, body, id)
           shownNotificationsRef.current.add(notification.id)
       })

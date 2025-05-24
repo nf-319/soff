@@ -1,6 +1,8 @@
 import { alpha, styled } from '@mui/material/styles'
-import { Badge, Box, Button, Menu, Menu as MuiMenu, MenuItem, MenuItem as MuiMenuItem } from '@mui/material'
+import { Badge, Box, Button, Menu, MenuItem } from '@mui/material'
 import PerfectScrollbarComponent from 'react-perfect-scrollbar'
+import emotionStyled from '@emotion/styled'
+import Typography from '@mui/material/Typography'
 
 
 export const StyledMenu = styled(Menu)(({ theme }) => ({
@@ -76,3 +78,50 @@ export const ActionButton = styled(Button)(({ theme }) => ({
 export const NotificationScrollbar = styled(PerfectScrollbarComponent)({
   maxHeight: 380
 })
+
+export const ToastContainer = emotionStyled.div`
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  max-width: 400px;
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`
+
+export const ToastHeader = emotionStyled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+`
+
+export const ToastContent = emotionStyled.div`
+  width: 100%;
+  font-size: 0.9rem;
+  color: #181818;
+  line-height: 1.4;
+  overflow: hidden;
+`
+
+export const ToastTitle = emotionStyled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+`
+
+export const ToastLink = emotionStyled(Typography)`
+  font-size: 12px;
+  cursor: pointer;
+  color: #666CFF;
+  transition: color 0.2s;
+  flex-shrink: 0;
+  &:hover {
+    text-decoration: underline;
+  }
+`

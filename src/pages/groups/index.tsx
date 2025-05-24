@@ -36,7 +36,6 @@ import { toast } from 'react-hot-toast'
 import GroupChangeBranchModal from 'src/views/apps/groups/GroupChangeBranchModal'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import api from 'src/@core/utils/api'
 import { LoadingButton } from '@mui/lab'
 import ceoConfigs from 'src/configs/ceo'
 import { Icon } from '@iconify/react'
@@ -277,8 +276,6 @@ export default function GroupsPage() {
 
   return (
     <div>
-      {isMobile && <VideoHeader item={videoUrls.groups} />}
-
       <Box
         className='groups-page-header'
         sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0' }}
@@ -295,8 +292,6 @@ export default function GroupsPage() {
         </Box>
 
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          {!isMobile && <VideoHeader item={videoUrls.groups} />}
-
           <Button onClick={handleOpenModal} variant='contained' startIcon={<Plus size={18} />}>
             <Tooltip title={t('Yangi guruh qo‘shish.')}>
               <span>{t("Yangi qo'shish")}</span>
@@ -403,7 +398,9 @@ export default function GroupsPage() {
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
                 <Button
                   onClick={() => {
-                    setUpdateStatusModal(false), formik.resetForm(), setGroupStatus(null)
+                    setUpdateStatusModal(false)
+                    formik.resetForm()
+                    setGroupStatus(null)
                   }}
                   size='small'
                   variant='outlined'

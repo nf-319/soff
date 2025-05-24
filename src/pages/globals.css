@@ -226,3 +226,8 @@ code[class*='language-'] {
 	height: 100%;
 }
 
+.custom-toast:hover .toast-hover-actions {
+  opacity: 1;
+  visibility: visible;
+}
+
