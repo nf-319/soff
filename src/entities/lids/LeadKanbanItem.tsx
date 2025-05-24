@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { Box, IconButton, Tooltip, Typography } from '@mui/material'
 import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd'
-import { FC, memo, useState } from 'react'
+import { FC, memo, useEffect, useState } from 'react'
 import { LeadsMenu } from './Menu'
 import { MenuOpenType } from './model/type'
 import { LidsDragonModal } from '@/views/apps/lids/LidsDragonModal'

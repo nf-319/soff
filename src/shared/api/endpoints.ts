@@ -19,5 +19,6 @@ export const enum Endpoints {
   TeacherDetails = 'employee/teachers/:id',
   Groups = 'common/groups/',
   EmployeeSalaries = 'employee/salaries/',
+  LeadDetails = 'leads/list/:id',
   EmployeeSalariesRealTime = 'employee/salaries/by-group/:id/'
 }
