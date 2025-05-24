@@ -30,6 +30,7 @@ import { AuthContext } from 'src/context/AuthContext'
 import { toast } from 'react-hot-toast'
 import SourceStatsVertical from '../../components/card-statistics/card-source-vertical'
 import { EmptyContent } from '../../components/empty-content'
+import { Metadata } from '@/components/Metada'
 
 const CustomeDrawer = dynamic(() => import('../settings/office/courses').then(mod => mod.CustomeDrawer))
 
@@ -96,6 +97,8 @@ const Stats = () => {
 
   return (
     <div>
+      <Metadata title='Manba' />
+
       <Box>
         <Box sx={{ display: 'flex', gap: '10px', flexGrow: 1, alignItems: 'center' }}>
           <Typography sx={{ fontSize: '20px', flexGrow: 1 }}>{t('Manbalar hisoboti')}</Typography>
@@ -109,9 +112,7 @@ const Stats = () => {
             {t('Yangi Manba')}
           </Button>
         </Box>
-        <Box
-          sx={{ alignItems: 'center', paddingBottom: '20px', flexWrap: 'nowrap', width: '100%', display: 'flex' }}
-        >
+        <Box sx={{ alignItems: 'center', paddingBottom: '20px', flexWrap: 'nowrap', width: '100%', display: 'flex' }}>
           <DateRangePicker
             format='yyyy-MM-dd'
             onChange={handleChangeDate}

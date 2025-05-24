@@ -2,7 +2,11 @@ import { Box } from '@mui/system'
 import { MentorOverview } from '@/widgets/MentorOverview'
 import { MentorGroups } from '@/widgets/MentorGroups'
 import { useAuth } from '@hooks/useAuth'
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useGet } from '@/hooks/useApi'
+import ceoConfigs from '@/configs/ceo'
+import { Metadata } from '@/components/Metada'
 
 type Props = {
   id?: string
@@ -10,20 +14,24 @@ type Props = {
 
 export const MentorProfile: FC<Props> = ({ id }) => {
   const { user } = useAuth()
+  const { data } = useGet(ceoConfigs.teachers + id)
+
+  console.log(data)
 
   return (
     <Box
-      display="grid"
+      display='grid'
       gap={4}
-      minHeight="calc(100vh - 137px)"
-      position="relative"
+      minHeight='calc(100vh - 137px)'
+      position='relative'
       sx={{
         gridTemplateColumns: {
           xs: '1fr',
-          md: '1fr 2fr',
-        },
+          md: '1fr 2fr'
+        }
       }}
     >
+      <Metadata title={`O'qituvchi ${data?.first_name}`} />
       <Box
         position={{ xs: 'relative', md: 'sticky' }}
         top={{ md: 200 }}
@@ -35,8 +43,8 @@ export const MentorProfile: FC<Props> = ({ id }) => {
           flexDirection: 'column',
           gridColumn: {
             xs: 'span 1',
-            md: 'span 1',
-          },
+            md: 'span 1'
+          }
         }}
       >
         <MentorOverview id={id ?? String(user?.id)} notMind={Boolean(id)} />
@@ -45,7 +53,7 @@ export const MentorProfile: FC<Props> = ({ id }) => {
       <Box
         gridColumn={{
           xs: 'span 1',
-          md: 'span 1',
+          md: 'span 1'
         }}
       >
         <MentorGroups id={id ?? String(user?.id)} hiddenNowGroup={Boolean(id)} />

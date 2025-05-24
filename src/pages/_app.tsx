@@ -29,6 +29,7 @@ import 'src/configs/i18n';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import 'src/iconify-bundle/icons-bundle-react';
 import './globals.css';
+import { Metadata } from '@/components/Metada';
 
 const ToastPortal = dynamic(
   () => import('@/layouts/ToastPortal'),
@@ -70,20 +71,13 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
   const guestGuard = Component.guestGuard ?? false
   const aclAbilities = Component.acl ?? defaultACLObj
 
-  const MyHead = () => {
-    const { companyInfo } = useAppSelector(state => state.user)
 
-    return <Head>
-      <meta name="robots" content="noindex, nofollow" />
-      <title>{`${companyInfo.training_center_name} - Taʼlim tizimini nazorat qilish platformasi`}</title>
-      <link rel='shortcut icon' href={companyInfo.logo} />
-    </Head>
-  }
+
 
   return (
     <Providers>
         <CacheProvider value={emotionCache}>
-          <MyHead />
+          <Metadata />
 
           <AuthProvider>
             <DisabledProvider>

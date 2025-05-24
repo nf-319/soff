@@ -25,6 +25,7 @@ import { TeacherAvatar } from 'src/views/apps/mentors/AddMentorsModal'
 import TeacherEditDialog from 'src/views/apps/mentors/TeacherEditDialog'
 import DataTable from '../../components/table'
 import { AccessDeniedModal } from '@/components/AccessDeniedModal'
+import { Metadata } from '@/components/Metada'
 
 export type customTableProps = {
   xs: number
@@ -45,7 +46,7 @@ export default function GroupsPage() {
 
   const [accessModal, setAccessModal] = useState<boolean>(false)
   const { companyInfo } = useAppSelector(item => item.user)
-  const { data: teachers } = useGet(`${ceoConfigs.employee_checklist}?role=teacher`)
+  const { data: teachers } = useGet(`${ceoConfigs.employee_checklist}?role=teacher`,{deps:['mentors-list']})
 
   const studentIds = teachers?.map((student: any) => student.id)
 
@@ -141,7 +142,7 @@ export default function GroupsPage() {
   const rowClick = (id: any) => {
     void router.push({
       pathname: '/mentors/[id]',
-      query: { id },
+      query: { id }
     })
   }
 
@@ -176,6 +177,7 @@ export default function GroupsPage() {
 
   return (
     <div>
+      <Metadata title="O'qituvchilar" />
       <Box
         className='groups-page-header'
         sx={{
