@@ -25,7 +25,6 @@ import usePayment from 'src/hooks/usePayment'
 import toast from 'react-hot-toast'
 import { disablePage } from 'src/store/apps/page'
 import IconifyIcon from '../../../components/icon'
-import { today } from '../../../components/card-statistics/kanban-item'
 import AmountInput, { formatAmount, revereAmount } from '../../../components/amount-input'
 import { formatPhoneNumber } from '../../../components/phone-input/format-phone-number'
 import useResponsive from '../../../@core/hooks/useResponsive'
@@ -33,7 +32,10 @@ import api from 'src/@core/utils/api'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
-import { handleCheckPrint } from '@/views/apps/students/view/UserViewPage'
+import dayjs from 'dayjs'
+
+// Define today as an ISO string with current date and time
+export const today = new Date().toISOString()
 
 type Student = {
   id: number
@@ -87,6 +89,10 @@ export default function GlobalPaymentForm() {
       is: 'pay',
       then: Yup.string().required(t("To'lov turini tanlang")),
     }),
+    bonus: Yup.string().when('step', {
+      is: 'pay',
+      then: Yup.string().optional(),
+    }),
   })
 
   const initialValues = {
@@ -94,16 +100,17 @@ export default function GlobalPaymentForm() {
     amount: '',
     description: '',
     debt_amount: '',
-    payment_date: today,
+    payment_date: today, // Initialize with ISO string
     group: '',
     payment_type: '',
-    bonus: '0',
+    bonus: '',
     step: 'search',
   }
 
   const formik = useFormik({
     initialValues,
     validationSchema,
+    initialTouched: {}, // Ensure no fields are touched initially
     onSubmit: async (values) => {
       if (values.step === 'search') {
         setLoading(true)
@@ -123,13 +130,12 @@ export default function GlobalPaymentForm() {
             amount: revereAmount(values.amount),
             description: values.description,
             debt_amount: revereAmount(values.debt_amount),
-            payment_date: values.payment_date,
+            payment_date: dayjs(values.payment_date).format("YYYY-MM-DD"),
             group: values.group,
             payment_type: values.payment_type,
-            bonus: revereAmount(values.bonus),
+            bonus: revereAmount(values.bonus || '0'),
           }
           const resp = await createPayment(data)
-          await handleCheckPrint(resp.id)
           setStep('print')
           toast.success(t('Tolov amalaga oshirildi'), { duration: 4000 })
           formik.resetForm({ values: initialValues })
@@ -159,14 +165,23 @@ export default function GlobalPaymentForm() {
   const handleStudentSelect = async (student: Student) => {
     setLoading(true)
     try {
-      await Promise.all([
-        dispatch(fetchStudentDetail(student.id)),
-        getGroups(student.id),
-        getPaymentMethod(),
-      ])
+      await Promise.all([dispatch(fetchStudentDetail(student.id)), getGroups(student.id), getPaymentMethod()])
       setStudentList([student])
       setStep('pay')
-      formik.setFieldValue('step', 'pay')
+      await formik.setFieldValue('step', 'pay')
+      await formik.setTouched({ search: formik.touched.search, payment_date: false }, false) // Explicitly set payment_date as untouched
+      await formik.setValues({
+        ...formik.values,
+        search: '',
+        amount: '',
+        description: '',
+        debt_amount: '',
+        payment_date: today,
+        group: '',
+        payment_type: '',
+        bonus: '',
+        step: 'pay',
+      })
     } catch (error) {
       toast.error(t('Maʼlumotlarni olishda xatolik'))
     } finally {
@@ -211,7 +226,7 @@ export default function GlobalPaymentForm() {
               <FormControl fullWidth>
                 <OutlinedInput
                   size="small"
-                  placeholder={t('O\'quvchini qidiring... (Ismi yoki telefon raqami)')}
+                  placeholder={t("O'quvchini qidiring... (Ismi yoki telefon raqami)")}
                   name="search"
                   value={formik.values.search}
                   onChange={e => {
@@ -246,7 +261,14 @@ export default function GlobalPaymentForm() {
                     variant="outlined"
                     icon={<IconifyIcon icon="mdi:account-student" />}
                   >
-                    {student.first_name} | {formatPhoneNumber(student.phone)} | {student.status === 'active' ? 'Faol' : student.status === 'archive' ? 'Arxilangan' : student.status === 'new' ? 'Yangi' : 'Muzlatilgan'}
+                    {student.first_name} | {formatPhoneNumber(student.phone)} |{' '}
+                    {student.status === 'active'
+                      ? 'Faol'
+                      : student.status === 'archive'
+                        ? 'Arxilangan'
+                        : student.status === 'new'
+                          ? 'Yangi'
+                          : 'Muzlatilgan'}
                   </Alert>
                 ))}
               </Box>
@@ -343,15 +365,19 @@ export default function GlobalPaymentForm() {
                 <FormControl fullWidth>
                   <TextField
                     size="small"
-                    label={t('O\'quvchiga bonus (pul miqdorida)')}
+                    label={t("O'quvchiga bonus (pul miqdorida)")}
                     name="bonus"
-                    value={formik.values.bonus ? formatAmount(formik.values.bonus) : '0'}
+                    value={formik.values.bonus ? formatAmount(formik.values.bonus) : ''}
                     onChange={e => {
                       const rawValue = e.target.value.replace(/\D/g, '')
-                      formik.setFieldValue('bonus', rawValue)
+                      formik.setFieldValue('bonus', rawValue || '')
                     }}
                     onBlur={formik.handleBlur}
+                    error={formik.touched.bonus && Boolean(formik.errors.bonus)}
                   />
+                  {formik.touched.bonus && formik.errors.bonus && (
+                    <FormHelperText error>{formik.errors.bonus}</FormHelperText>
+                  )}
                 </FormControl>
 
                 <FormControl fullWidth>
@@ -375,15 +401,18 @@ export default function GlobalPaymentForm() {
                   <DateTimePicker
                     label={t('Sana')}
                     value={formik.values.payment_date ? new Date(formik.values.payment_date) : null}
-                    onChange={newValue => formik.setFieldValue('payment_date', newValue?.toISOString() || '')}
+                    onChange={newValue => {
+                      formik.setFieldValue('payment_date', newValue ? new Date(newValue).toISOString() : '')
+                      formik.setFieldTouched('payment_date', true, false)
+                    }}
                     disablePast
                     format="dd/MM/yyyy HH:mm"
                     ampm={false}
                     slotProps={{
                       textField: {
                         size: 'small',
-                        error: formik.touched.payment_date && Boolean(formik.errors.payment_date)
-                      }
+                        error: formik.touched.payment_date && Boolean(formik.errors.payment_date),
+                      },
                     }}
                   />
                   {formik.touched.payment_date && formik.errors.payment_date && (
