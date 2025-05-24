@@ -5,8 +5,6 @@ import Grid from '@mui/material/Grid'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
-import ExcelGrades from 'src/components/excelButton/ExcelGrades'
-import VideoHeader, { videoUrls } from 'src/components/video-header/video-header'
 import { getMontNumber } from 'src/@core/utils/gwt-month-name'
 import { AuthContext } from 'src/context/AuthContext'
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -69,14 +67,9 @@ const UserView = () => {
     }
   }, [])
 
-  
+
   return (
     <Box display='flex' flexDirection='column' gap={4}>
-      <Box mb={isMobile ? 3 : 0} display={isMobile ? 'block' : 'flex'} justifyContent='end' gap={isMobile ? 3 : 5}>
-
-        {!isMobile && <VideoHeader item={videoUrls.group} />}
-      </Box>
-
       <Grid container spacing={6}>
         <Grid item xs={12} md={5}>
           <UserViewLeft />

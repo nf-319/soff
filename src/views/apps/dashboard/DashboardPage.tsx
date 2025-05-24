@@ -2,7 +2,6 @@
 
 import { useContext } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
-import VideoHeader, { videoUrls } from 'src/components/video-header/video-header'
 import { Icon } from '@iconify/react'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { updateEyeVisible } from 'src/store/apps/dashboard'
@@ -40,8 +39,6 @@ export default function DashboardPage() {
             {eyeVisible ? 'Raqamlarni yopish' : "Raqamlarni ko'rish"}
           </Button>
         </Box>
-
-        <VideoHeader item={videoUrls.dashboard} />
       </Box>
 
       <DashboardStats />
