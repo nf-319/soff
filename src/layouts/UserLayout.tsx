@@ -47,6 +47,8 @@ const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed
     void fetchCompanyInfo()
   }, [dispatch])
 
+  console.log(user)
+
   return (
     <Layout
       hidden={hidden}
@@ -96,7 +98,7 @@ const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed
       })}
     >
       {children}
-      <CrmSurveymodal />
+      {user?.currentRole !== 'student' && <CrmSurveymodal />}
       {user?.currentRole !== 'student' && <QRCodeScanner />}
     </Layout>
   )
