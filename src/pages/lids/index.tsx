@@ -33,8 +33,9 @@ import toast from 'react-hot-toast'
 import Excel from '@components/excelButton/Excel'
 import api from '@utils/api'
 import { Endpoints } from '@api/endpoints'
+import { Metadata } from '@/components/Metada'
+import { useGetLeadDetail } from '@/shared/query-hooks/leads/leads'
 import { LidsDragonModal } from '@/views/apps/lids/LidsDragonModal'
-import { useGetLeadDetail } from '@shared/query-hooks/leads/leads'
 
 export type DepartmentsResultType = {
   id: number
@@ -156,7 +157,7 @@ const Lids = () => {
   const handleExportExcel = async () => {
     try {
       const response = await api.get(Endpoints.LeadsExport, {
-        params: { is_active: Boolean(!is_active) },
+        params: { is_active: Boolean(!is_active) }
       })
 
       const url = response.data.file_url
@@ -174,6 +175,7 @@ const Lids = () => {
 
   return (
     <div>
+      <Metadata title='Lidlar' />
       <LidsHeader />
       <Box display={{ sx: '', md: 'flex' }} justifyContent='space-between' marginY={5} alignItems='center'>
         {isLoading || amoCrmLoading ? (
@@ -227,7 +229,7 @@ const Lids = () => {
             </Button>
 
             <Box>
-              <Excel onClick={handleExportExcel} useLink={false}/>
+              <Excel onClick={handleExportExcel} useLink={false} />
             </Box>
 
             {queryParams.is_active && (

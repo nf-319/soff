@@ -1,31 +1,33 @@
-'use client';
+'use client'
 
-import { Box } from '@mui/material';
-import { LeadsStatementHeader } from './ui/LeadsStatementHeader';
-import { LeadsStatementCard } from './ui/LeadsStatementCard';
-import { LeadsStatementSalesFunnel } from './ui/LeadsStatementSalesFunnel';
-import { LeadsStatementYearlyTrend } from './ui/LeadsStatementYearlyTrend';
-import { LeadsStatementCourseInterest } from './ui/LeadsStatementCourseInterest';
-import { LeadsStatementsMarketingSources } from './ui/LeadsStatementsMarketingSources';
-import { LeadsStatementsSellers } from './ui/LeadsStatementsSellers';
-import { LeadsStatementLeadsList } from './ui/LeadsStatementLeadsList';
-import { useRouter } from 'next/router';
-import { useGet } from '@hooks/useApi';
-import { Endpoints } from '@api/endpoints';
+import { Box } from '@mui/material'
+import { LeadsStatementHeader } from './ui/LeadsStatementHeader'
+import { LeadsStatementCard } from './ui/LeadsStatementCard'
+import { LeadsStatementSalesFunnel } from './ui/LeadsStatementSalesFunnel'
+import { LeadsStatementYearlyTrend } from './ui/LeadsStatementYearlyTrend'
+import { LeadsStatementCourseInterest } from './ui/LeadsStatementCourseInterest'
+import { LeadsStatementsMarketingSources } from './ui/LeadsStatementsMarketingSources'
+import { LeadsStatementsSellers } from './ui/LeadsStatementsSellers'
+import { LeadsStatementLeadsList } from './ui/LeadsStatementLeadsList'
+import { useRouter } from 'next/router'
+import { useGet } from '@hooks/useApi'
+import { Endpoints } from '@api/endpoints'
+import { Metadata } from '@/components/Metada'
 
 export const LeadsStatement = () => {
-  const router = useRouter();
-  const { branch } = router.query;
+  const router = useRouter()
+  const { branch } = router.query
 
-  const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined;
+  const branchParam = branch && branch !== 'undefined' ? String(branch) : undefined
 
   const { data } = useGet(Endpoints.LeadsSourceStats, {
     params: { branch: branchParam },
-    options: { enabled: !!branchParam },
-  });
+    options: { enabled: !!branchParam }
+  })
 
   return (
     <Box sx={{ paddingY: 4, display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <Metadata title='Lidlar hisoboti' />
       <LeadsStatementHeader />
 
       <LeadsStatementCard />
@@ -61,6 +63,6 @@ export const LeadsStatement = () => {
       <LeadsStatementLeadsList />
     </Box>
   )
-};
+}
 
 LeadsStatement.displayName = 'LeadsStatement'

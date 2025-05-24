@@ -21,6 +21,7 @@ import useResponsive from 'src/@core/hooks/useResponsive'
 import { AttandanceFilters } from 'src/views/apps/attandances/AttandanceFilters'
 import AttandanceDataTable from '../../../components/table/attandanceTable'
 import IconifyIcon from '../../../components/icon'
+import { Metadata } from '@/components/Metada'
 export default function Attandences() {
   const { t } = useTranslation()
   const { isMobile } = useResponsive()
@@ -93,12 +94,10 @@ export default function Attandences() {
 
   return (
     <div>
+      <Metadata title='Davomatlar' />
       <VideoHeader item={videoUrls.groups} />
-      <Box
-        className='groups-page-header'
-        py={2}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px',mb:3 }}>
+      <Box className='groups-page-header' py={2}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px', mb: 3 }}>
           <Typography variant='h5'>{t('Davomatlar')}</Typography>
         </Box>
         {isMobile && (

@@ -21,10 +21,7 @@ import { ReactNode, useContext, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useAppDispatch, useAppSelector } from 'src/store'
-import {
-  getDashboardLessons,
-  updateParams
-} from 'src/store/apps/groups'
+import { getDashboardLessons, updateParams } from 'src/store/apps/groups'
 import { useRouter } from 'next/router'
 import VideoHeader, { videoUrls } from '../../components/video-header/video-header'
 import { GroupsFilter } from 'src/views/apps/groups/GroupsFilter'
@@ -49,6 +46,7 @@ import Delete from '@/views/apps/groups/view/GroupViewLeft/Delete'
 import { GroupCreateEditDrawer } from '@/components/GroupDrawerModal'
 import { Plus } from 'lucide-react'
 import RowOptions from '@/views/apps/groups/RowOptions'
+import { Metadata } from '@/components/Metada'
 
 const IconifyIcon = dynamic(() => import('../../components/icon'))
 
@@ -242,7 +240,6 @@ export default function GroupsPage() {
     }
   })
 
-
   useEffect(() => {
     const group = data?.results?.find((item: any) => item.id == group_id)
     if (group) {
@@ -276,6 +273,7 @@ export default function GroupsPage() {
 
   return (
     <div>
+      <Metadata title='Guruhlar' />
       <Box
         className='groups-page-header'
         sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0' }}

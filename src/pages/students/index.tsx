@@ -39,6 +39,7 @@ import { Archive, ArchiveRestore, MessageSquareText } from 'lucide-react'
 import useSMS from '@hooks/useSMS'
 import Divider from '@mui/material/Divider'
 import { StudentsQueryParamsTypes } from '@/types/apps/studentsTypes'
+import { Metadata } from '@/components/Metada'
 
 export type customTableProps = {
   xs: number
@@ -55,7 +56,6 @@ export default function StudentsPage() {
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
-
   const { queryParams, openEdit } = useAppSelector(state => state.students)
   const [rowsPerPage, setRowsPerPage] = useState<number>(Number(queryParams.limit) || 10)
   const { smsTemps, getSMSTemps } = useSMS()
@@ -329,6 +329,7 @@ export default function StudentsPage() {
 
   return (
     <Box display='flex' flexDirection='column' gap={3}>
+      <Metadata title="O'quvchilar" />
       <Box
         className='students-page-header'
         sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 2 }}

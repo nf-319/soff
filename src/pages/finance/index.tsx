@@ -38,6 +38,7 @@ import { Close } from '@mui/icons-material'
 import { VscodeIconsFileTypeExcel2 } from '../../components/excelButton/ExcelIcon'
 import { useQuery } from '@tanstack/react-query'
 import { FinanceResults } from '@components/FinanceResults'
+import { Metadata } from '@/components/Metada'
 
 export function formatDateString(date: Date) {
   const day = String(date.getDate()).padStart(2, '0')
@@ -251,6 +252,8 @@ const CardStatistics = () => {
 
   return (
     <ApexChartWrapper>
+            <Metadata title='Moliya' />
+  
       <Box
         sx={{
           display: 'flex',

@@ -19,6 +19,7 @@ import useResponsive from 'src/@core/hooks/useResponsive'
 import StudentPaymentEditForm from './StudentPaymentEdit'
 import { LoadingButton } from '@mui/lab'
 import usePayment from 'src/hooks/usePayment'
+import { Metadata } from '@/components/Metada'
 
 export const handleCheckPrint = async (id: number | string) => {
   try {
@@ -282,6 +283,7 @@ const UserView = ({ tab, student }: any) => {
 
   return (
     <div>
+      <Metadata title={`O'quvchi ${studentData?.first_name || ''}`} />
       <VideoHeader item={videoUrls.students} />
       <Grid container spacing={6}>
         <Grid item xs={12} md={5} lg={4}>

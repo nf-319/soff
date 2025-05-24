@@ -36,6 +36,7 @@ import { FormUpdateModal } from '@/entities/FormsUpdateModal'
 import { useGet } from '@/hooks/useApi'
 import { resetForm } from '@store/apps/form'
 import { useAppDispatch } from '@/store'
+import { Metadata } from '@/components/Metada'
 
 export default function FormsPage() {
   const [open, setOpen] = useState<null | 'new' | 'integration' | 'delete' | 'edit'>(null)
@@ -225,6 +226,7 @@ export default function FormsPage() {
 
   return (
     <Box>
+      <Metadata title='Formalar'/>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
         <Typography variant='h5'>{t('Formalar')}</Typography>
         <Button
