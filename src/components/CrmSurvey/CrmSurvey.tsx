@@ -116,7 +116,6 @@ const CrmSurveymodal = () => {
       },
       {
         onSuccess: () => {
-          setShowForm(false)
           setShowSuccess(true)
           toast.success("So'rovingiz yuborildi")
         },
@@ -130,142 +129,143 @@ const CrmSurveymodal = () => {
 
   return (
     <Dialog open={showSurvey} fullWidth maxWidth='sm'>
-      {!showForm ? (
-        <>
-          <DialogTitle>So‘rovnoma</DialogTitle>
-          <DialogContent>
-            <Typography fontWeight={700} sx={{ paddingBottom: 3 }} fontSize={24} color={'black'}>
-              Salom! Mening ismim Zufarbek. SOFF CRM asoschisiman.
-            </Typography>
-            <Typography variant='h6' gutterBottom>
-              Har oy oxirida sizdan fikr so'raymiz. Ushbu so'rovnomani men shaxsan o'qiyman. Siz bildirgan fikr va
-              muammolar asosida tizimni yaxshilaymiz. So'rov so'ngida siz uchun maxsus taklifimiz ham bor.
-            </Typography>
-          </DialogContent>
-          <Box sx={{ padding: 5 }} display={'flex'} flexDirection={'column'} gap={3}>
-            <Button fullWidth variant='contained' onClick={() => setShowForm(true)}>
-              So'rovnomani boshlash
-            </Button>
-            <Button variant='outlined' fullWidth onClick={handleClose}>
-              Keyinroq
-            </Button>
-          </Box>
-        </>
-      ) : (
-        <>
-          <DialogTitle>{stepTitle[activeStep]}</DialogTitle>
-          <DialogContent>
-            <Stepper activeStep={activeStep} sx={{ mb: 2 }}>
-              {[...Array(5)].map((_, index) => (
-                <Step key={index}>
-                  <StepLabel>{index + 1}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-
-            {activeStep === 4 && (
-              <FormControl margin='normal' error={!!error && helpUsed == null} component='fieldset'>
-                <FormLabel component='legend'>Texnik yordam olganmisiz?</FormLabel>
-                <RadioGroup row value={helpUsed ?? ''} onChange={e => dispatch(setHelpUsed(e.target.value))}>
-                  <FormControlLabel value={true} control={<Radio />} label='Ha' />
-                  <FormControlLabel value={false} control={<Radio />} label='Yo‘q' />
-                </RadioGroup>
-                {helpUsed == null && <FormHelperText>Tanlang</FormHelperText>}
-              </FormControl>
-            )}
-
-            <Box display={'flex'} justifyContent={'center'} alignItems={'center'} paddingTop={4}>
-              {activeStep === 0 && grades[0] != null && (
-                <>
-                  {grades[0] <= 4 ? (
-                    <SentimentVeryDissatisfied color='error' sx={{ fontSize: 40 }} />
-                  ) : grades[0] <= 6 ? (
-                    <SentimentDissatisfied color='warning' sx={{ fontSize: 40 }} />
-                  ) : grades[0] <= 8 ? (
-                    <SentimentNeutral color='info' sx={{ fontSize: 40 }} />
-                  ) : grades[0] <= 9 ? (
-                    <SentimentSatisfied color='success' sx={{ fontSize: 40 }} />
-                  ) : (
-                    <SentimentVerySatisfied color='success' sx={{ fontSize: 40 }} />
-                  )}
-                </>
-              )}
-            </Box>
-            <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
-              {activeStep === 4 && grades[4] != null && (
-                <>
-                  {grades[4] <= 4 ? (
-                    <SentimentVeryDissatisfied color='error' sx={{ fontSize: 40 }} />
-                  ) : grades[4] <= 6 ? (
-                    <SentimentDissatisfied color='warning' sx={{ fontSize: 40 }} />
-                  ) : grades[4] <= 8 ? (
-                    <SentimentNeutral color='info' sx={{ fontSize: 40 }} />
-                  ) : grades[4] <= 9 ? (
-                    <SentimentSatisfied color='success' sx={{ fontSize: 40 }} />
-                  ) : (
-                    <SentimentVerySatisfied color='success' sx={{ fontSize: 40 }} />
-                  )}
-                </>
-              )}
-            </Box>
-
-            {(activeStep === 0 || activeStep === 4) && (
-              <FormControl fullWidth margin='normal' error={!!error && grades[activeStep] == null}>
-                <Typography gutterBottom>
-                  {activeStep == 0 ? 'Bahoni tanlang (1 - 10)' : 'Texnik yordam sifatini baholang (1-10)'}
-                </Typography>
-                <Slider
-                  value={grades[activeStep] ?? 0}
-                  onChange={(_, value) => dispatch(setGrade({ stepIndex: activeStep, value: value as number }))}
-                  step={1}
-                  marks
-                  min={1}
-                  max={10}
-                  valueLabelDisplay='auto'
-                />
-                {grades[activeStep] == null && <FormHelperText>Bahoni tanlang</FormHelperText>}
-              </FormControl>
-            )}
-
-            <TextField
-              multiline
-              fullWidth
-              margin='normal'
-              minRows={4}
-              label={stepLabel[activeStep]}
-              value={steps[activeStep]}
-              onChange={e => dispatch(setStepText({ stepIndex: activeStep, text: e.target.value }))}
-              error={!!error && !steps[activeStep].trim()}
-              helperText={!steps[activeStep].trim() && error ? error : ''}
-            />
-          </DialogContent>
-          <DialogActions>
-            {/* <Button onClick={handleClose}>Bekor qilish</Button> */}
-            <Button
-              variant='outlined'
-              onClick={() => {
-                if (activeStep === 0) {
-                  setShowForm(false)
-                } else {
-                  setError('')
-                }
-                dispatch(prevStep())
-              }}
-            >
-              Orqaga
-            </Button>
-            {activeStep < 4 ? (
-              <Button variant='contained' onClick={handleNext}>
-                Keyingi
+      {!showSuccess &&
+        (!showForm ? (
+          <>
+            <DialogTitle>So‘rovnoma</DialogTitle>
+            <DialogContent>
+              <Typography fontWeight={700} sx={{ paddingBottom: 3 }} fontSize={24} color={'black'}>
+                Salom! Mening ismim Zufarbek. SOFF CRM asoschisiman.
+              </Typography>
+              <Typography variant='h6' gutterBottom>
+                Har oy oxirida sizdan fikr so'raymiz. Ushbu so'rovnomani men shaxsan o'qiyman. Siz bildirgan fikr va
+                muammolar asosida tizimni yaxshilaymiz. So'rov so'ngida siz uchun maxsus taklifimiz ham bor.
+              </Typography>
+            </DialogContent>
+            <Box sx={{ padding: 5 }} display={'flex'} flexDirection={'column'} gap={3}>
+              <Button fullWidth variant='contained' onClick={() => setShowForm(true)}>
+                So'rovnomani boshlash
               </Button>
-            ) : (
-              <LoadingButton loading={isPending} variant='contained' onClick={handleSubmit}>
-                Yuborish
-              </LoadingButton>
-            )}
-          </DialogActions>
-        </>
-      )}
+              <Button variant='outlined' fullWidth onClick={handleClose}>
+                Keyinroq
+              </Button>
+            </Box>
+          </>
+        ) : (
+          <>
+            <DialogTitle>{stepTitle[activeStep]}</DialogTitle>
+            <DialogContent>
+              <Stepper activeStep={activeStep} sx={{ mb: 2 }}>
+                {[...Array(5)].map((_, index) => (
+                  <Step key={index}>
+                    <StepLabel>{index + 1}</StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+
+              {activeStep === 4 && (
+                <FormControl margin='normal' error={!!error && helpUsed == null} component='fieldset'>
+                  <FormLabel component='legend'>Texnik yordam olganmisiz?</FormLabel>
+                  <RadioGroup row value={helpUsed ?? ''} onChange={e => dispatch(setHelpUsed(e.target.value))}>
+                    <FormControlLabel value={true} control={<Radio />} label='Ha' />
+                    <FormControlLabel value={false} control={<Radio />} label='Yo‘q' />
+                  </RadioGroup>
+                  {helpUsed == null && <FormHelperText>Tanlang</FormHelperText>}
+                </FormControl>
+              )}
+
+              <Box display={'flex'} justifyContent={'center'} alignItems={'center'} paddingTop={4}>
+                {activeStep === 0 && grades[0] != null && (
+                  <>
+                    {grades[0] <= 4 ? (
+                      <SentimentVeryDissatisfied color='error' sx={{ fontSize: 40 }} />
+                    ) : grades[0] <= 6 ? (
+                      <SentimentDissatisfied color='warning' sx={{ fontSize: 40 }} />
+                    ) : grades[0] <= 8 ? (
+                      <SentimentNeutral color='info' sx={{ fontSize: 40 }} />
+                    ) : grades[0] <= 9 ? (
+                      <SentimentSatisfied color='success' sx={{ fontSize: 40 }} />
+                    ) : (
+                      <SentimentVerySatisfied color='success' sx={{ fontSize: 40 }} />
+                    )}
+                  </>
+                )}
+              </Box>
+              <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                {activeStep === 4 && grades[4] != null && (
+                  <>
+                    {grades[4] <= 4 ? (
+                      <SentimentVeryDissatisfied color='error' sx={{ fontSize: 40 }} />
+                    ) : grades[4] <= 6 ? (
+                      <SentimentDissatisfied color='warning' sx={{ fontSize: 40 }} />
+                    ) : grades[4] <= 8 ? (
+                      <SentimentNeutral color='info' sx={{ fontSize: 40 }} />
+                    ) : grades[4] <= 9 ? (
+                      <SentimentSatisfied color='success' sx={{ fontSize: 40 }} />
+                    ) : (
+                      <SentimentVerySatisfied color='success' sx={{ fontSize: 40 }} />
+                    )}
+                  </>
+                )}
+              </Box>
+
+              {(activeStep === 0 || activeStep === 4) && (
+                <FormControl fullWidth margin='normal' error={!!error && grades[activeStep] == null}>
+                  <Typography gutterBottom>
+                    {activeStep == 0 ? 'Bahoni tanlang (1 - 10)' : 'Texnik yordam sifatini baholang (1-10)'}
+                  </Typography>
+                  <Slider
+                    value={grades[activeStep] ?? 0}
+                    onChange={(_, value) => dispatch(setGrade({ stepIndex: activeStep, value: value as number }))}
+                    step={1}
+                    marks
+                    min={1}
+                    max={10}
+                    valueLabelDisplay='auto'
+                  />
+                  {grades[activeStep] == null && <FormHelperText>Bahoni tanlang</FormHelperText>}
+                </FormControl>
+              )}
+
+              <TextField
+                multiline
+                fullWidth
+                margin='normal'
+                minRows={4}
+                label={stepLabel[activeStep]}
+                value={steps[activeStep]}
+                onChange={e => dispatch(setStepText({ stepIndex: activeStep, text: e.target.value }))}
+                error={!!error && !steps[activeStep].trim()}
+                helperText={!steps[activeStep].trim() && error ? error : ''}
+              />
+            </DialogContent>
+            <DialogActions>
+              {/* <Button onClick={handleClose}>Bekor qilish</Button> */}
+              <Button
+                variant='outlined'
+                onClick={() => {
+                  if (activeStep === 0) {
+                    setShowForm(false)
+                  } else {
+                    setError('')
+                  }
+                  dispatch(prevStep())
+                }}
+              >
+                Orqaga
+              </Button>
+              {activeStep < 4 ? (
+                <Button variant='contained' onClick={handleNext}>
+                  Keyingi
+                </Button>
+              ) : (
+                <LoadingButton loading={isPending} variant='contained' onClick={handleSubmit}>
+                  Yuborish
+                </LoadingButton>
+              )}
+            </DialogActions>
+          </>
+        ))}
       {showSuccess && (
         <>
           <DialogTitle>Rahmat! So‘rovnomangiz qabul qilindi.</DialogTitle>
