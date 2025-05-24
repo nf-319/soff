@@ -7,6 +7,7 @@ import VideoHeader, { videoUrls } from '../../../components/video-header/video-h
 import api from 'src/@core/utils/api'
 import { Loader } from 'rsuite'
 import SubLoader from 'src/views/apps/loaders/SubLoader'
+import { Metadata } from '@/components/Metada'
 
 const AmoCrmPage = () => {
   const [loading, setLoading] = useState(false)
@@ -71,7 +72,8 @@ const AmoCrmPage = () => {
     <SubLoader />
   ) : (
     <>
-      <VideoHeader item={videoUrls.amocrm} />
+        <VideoHeader item={videoUrls.amocrm} />
+        <Metadata title='Amo crm'/>
       <Box
         display='flex'
         flexDirection='column'

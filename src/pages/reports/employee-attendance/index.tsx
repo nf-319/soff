@@ -20,6 +20,7 @@ import api from 'src/@core/utils/api'
 import ceoConfigs from 'src/configs/ceo'
 import SubLoader from 'src/views/apps/loaders/SubLoader'
 import Excel from '@components/excelButton/Excel'
+import { Metadata } from '@/components/Metada'
 
 const EmployeesAttendanceTable = () => {
   const [dates, setDates] = useState<any>([])
@@ -87,6 +88,7 @@ const EmployeesAttendanceTable = () => {
 
   return (
     <Box display='flex' flexDirection='column' alignItems='center' gap={4}>
+      <Metadata title="Xodimlar davomati"/>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
         <Typography variant='h5'>{t('Xodimlar Davomati')}</Typography>
 

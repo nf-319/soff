@@ -36,6 +36,7 @@ import { ChipProps } from '@mui/material/Chip'
 import { PLACEHOLDERS } from '@/views/apps/sms-settings/constants'
 import { AccessDeniedModal } from '@components/AccessDeniedModal'
 import { useRouter } from 'next/router'
+import { Metadata } from '@/components/Metada';
 
 interface SmsCategory {
   id: number;
@@ -178,6 +179,7 @@ const RoomsPage: React.FC = () => {
         overflow: 'hidden',
       }}
     >
+      <Metadata title='Sms shablonlari'/>
       <Box
         sx={{
           display: 'flex',

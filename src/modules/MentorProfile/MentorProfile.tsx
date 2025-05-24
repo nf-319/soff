@@ -31,7 +31,7 @@ export const MentorProfile: FC<Props> = ({ id }) => {
         }
       }}
     >
-      <Metadata title={`O'qituvchi ${data?.first_name}`} />
+      <Metadata title={`Teacher ${data?.first_name}`} />
       <Box
         position={{ xs: 'relative', md: 'sticky' }}
         top={{ md: 200 }}

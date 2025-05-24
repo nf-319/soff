@@ -14,6 +14,7 @@ import DataTable from '../../../components/table'
 import api from 'src/@core/utils/api'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { fetchGroupChecklist } from 'src/store/apps/groups'
+import { Metadata } from '@/components/Metada'
 
 export interface customTableProps {
   xs: number
@@ -99,6 +100,7 @@ export default function GraduatesPage() {
 
   return (
     <div>
+      <Metadata title='Bitiruvchilar' />
       <Box
         className='groups-page-header'
         sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0' }}
