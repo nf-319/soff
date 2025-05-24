@@ -1,10 +1,12 @@
 import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
 import SearchInput from '../../../components/SearchInput'
 import { useState } from 'react'
+import useResponsive from '@/@core/hooks/useResponsive'
 
 const HeadingFilter = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [branch, setBranch] = useState('')
+  const { isMobile } = useResponsive()
   const [status, setStatus] = useState('')
   const [selectVal, setSelectedValue] = useState('problems')
   const handleBranchChange = (event: SelectChangeEvent) => {
@@ -16,8 +18,8 @@ const HeadingFilter = () => {
   }
 
   return (
-    <Box display='flex' gap={3}>
-      <FormControl sx={{ maxWidth: 200 }} fullWidth size='small'>
+    <Box display='flex' flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
+      <FormControl sx={{ width: isMobile ? 'auto' : 200 }} fullWidth size='small'>
         <InputLabel id='branch-label'>Filial</InputLabel>
         <Select labelId='branch-label' value={branch} label='Filial' onChange={handleBranchChange}>
           <MenuItem value=''>Barcha Markazlar</MenuItem>
@@ -26,7 +28,7 @@ const HeadingFilter = () => {
         </Select>
       </FormControl>
 
-      <FormControl sx={{ maxWidth: 200 }} fullWidth size='small'>
+      <FormControl sx={{ width: isMobile ? 'auto' : 200 }} fullWidth size='small'>
         <InputLabel id='status-label'>Status</InputLabel>
         <Select labelId='status-label' value={status} label='Status' onChange={handleStatusChange}>
           <MenuItem value=''>Barcha Statuslar</MenuItem>
@@ -35,10 +37,11 @@ const HeadingFilter = () => {
           <MenuItem value='rad-etildi'>Rad etildi</MenuItem>
         </Select>
       </FormControl>
-      <FormControl sx={{ maxWidth: 200 }} fullWidth size='small'>
-        <InputLabel id='status-label'>Filter</InputLabel>
+
+      <FormControl sx={{ width: isMobile ? 'auto' : 200 }} fullWidth size='small'>
+        <InputLabel id='filter-label'>Filter</InputLabel>
         <Select
-          labelId='status-label'
+          labelId='filter-label'
           value={selectVal}
           label='Filter'
           onChange={e => setSelectedValue(e.target.value)}

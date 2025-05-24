@@ -1,8 +1,10 @@
+import useResponsive from '@/@core/hooks/useResponsive'
 import { TrendCard } from '@/components/TrendCard'
 import { Box } from '@mui/material'
 import { AlertTriangle, BarChart3, Bell, Lightbulb, UserCheck } from 'lucide-react'
 
 const CpanelStatsCards = () => {
+  const {isMobile} = useResponsive()
   const summaryData = [
     {
       icon: Bell,
@@ -49,7 +51,7 @@ const CpanelStatsCards = () => {
 
   return (
     <Box>
-      <Box display={'flex'} gap={3}>
+      <Box display={'flex'} gap={3} flexDirection={{ xs: 'column',md:'row' }} >
         {summaryData.map((item, index) => (
           <Box key={index} flex='1 1 calc(20% - 16px)' minWidth={150}>
             <TrendCard

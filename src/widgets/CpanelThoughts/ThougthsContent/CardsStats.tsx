@@ -10,10 +10,12 @@ const CardStats = () => {
   ]
 
   return (
-    <Box display={'flex'} gap={3}>
+    <Box display={'flex'} flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
       {data.map(item => (
         <Card sx={{ width: '100%', padding: 4, boxShadow: 'none', bgcolor: item.color }}>
-          <Typography fontWeight={600} color={item.text_color}>{item.value}</Typography>
+          <Typography fontWeight={600} color={item.text_color}>
+            {item.value}
+          </Typography>
           <Typography color={item.text_color}>{item.status}</Typography>
         </Card>
       ))}

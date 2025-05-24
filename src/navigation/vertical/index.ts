@@ -58,7 +58,7 @@ export const CPanelNavigation = (t: any): any => {
     {
       title: t('Mijoz fikirlari'),
       icon: 'mdi:message-outline',
-      path: '/c-panel/thoughts'
+      path: '/c-panel/feedbacks'
     }
   ]
 }
