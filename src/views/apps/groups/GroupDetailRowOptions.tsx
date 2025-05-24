@@ -73,6 +73,8 @@ export default function GroupDetailRowOptions({ id }: Props) {
     setStudent(students?.find(item => item.id == id))
   }, [])
 
+  console.log(student)
+
   const dispatch = useAppDispatch()
 
   const rowOptionsOpen = Boolean(anchorEl)
@@ -102,7 +104,7 @@ export default function GroupDetailRowOptions({ id }: Props) {
 
   const handleLeft = async () => {
     try {
-      await api.delete(`common/group-student-delete/${student?.id}/`)
+      await api.delete(`common/group-student-delete/${student?.id}/?close_debt=true`)
       toast.success("O'quvchi guruhdan chetlatildi", { position: 'top-center' })
       setLoading(false)
       const queryString = new URLSearchParams(studentsQueryParams).toString()
@@ -204,6 +206,11 @@ export default function GroupDetailRowOptions({ id }: Props) {
           <Typography sx={{ fontSize: '20px', textAlign: 'center', mb: 3 }}>
             {t("O'quvchini guruhdan chetlatishni tasdiqlang")}
           </Typography>
+          {student?.student_group_balance < 0 && (
+            <Typography color={'red'} textAlign={'center'} sx={{ paddingBottom: 5 }}>
+              O'quvchi balansi 0 ga tushadi
+            </Typography>
+          )}
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
             <Button onClick={() => setOpenLeft(false)} size='small' variant='outlined' color='error'>
               {t('Bekor qilish')}

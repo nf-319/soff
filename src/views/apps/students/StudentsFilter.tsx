@@ -48,9 +48,7 @@ const StudentsFilter = () => {
   const parsedYear = Number(year)
 
   const [date, setDate] = useState<Date | null>(
-    query?.debt_date && !isNaN(parsedMonth) && !isNaN(parsedYear)
-      ? new Date(parsedYear, parsedMonth, 1)
-      : null
+    query?.debt_date && !isNaN(parsedMonth) && !isNaN(parsedYear) ? new Date(parsedYear, parsedMonth, 1) : null
   )
 
   const dataFetchedRef = useRef({
@@ -277,17 +275,19 @@ const StudentsFilter = () => {
         </Select>
       </FormControl>
 
-      <FormControl fullWidth>
-        <DatePicker
-          label='Oy kesimida balans'
-          value={date}
-          onChange={onDateChange}
-          format='MM/yyyy'
-          views={['month']}
-          disableFuture
-          fullWidth
-        />
-      </FormControl>
+      {queryParams.is_debtor && (
+        <FormControl fullWidth>
+          <DatePicker
+            label='Oy kesimida balans'
+            value={date}
+            onChange={onDateChange}
+            format='MM/yyyy'
+            views={['month']}
+            disableFuture
+            fullWidth
+          />
+        </FormControl>
+      )}
 
       <FormControl fullWidth>
         <Autocomplete
