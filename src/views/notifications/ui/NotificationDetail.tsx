@@ -8,7 +8,7 @@ import { getFormatTimestamp } from '@utils/getFormatTimestamp'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 
-const NotificationContent = styled(Box)(({ theme }) => ({
+export const NotificationContent = styled(Box)(({ theme }) => ({
   flex: 1,
   overflow: 'auto',
   padding: theme.spacing(2.5),
@@ -50,15 +50,7 @@ export const NotificationDetail = ({ selectedNotification }: NotificationDetailP
         e.preventDefault()
         const href = link.getAttribute('href')
         if (href) {
-          const [pathname, queryString] = href.split('?')
-          const newQueryParams = new URLSearchParams(queryString || '')
-          void router.push({
-            pathname,
-            query: {
-              ...router.query,
-              ...Object.fromEntries(newQueryParams),
-            },
-          })
+          void router.push(href)
         }
       }
     }
