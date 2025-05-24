@@ -26,7 +26,7 @@ import toast from 'react-hot-toast'
 import { disablePage } from 'src/store/apps/page'
 import IconifyIcon from '../../../components/icon'
 import AmountInput, { formatAmount, revereAmount } from '../../../components/amount-input'
-import { formatPhoneNumber } from '../../../components/phone-input/format-phone-number'
+import { formatPhoneNumber } from '@components/phone-input/format-phone-number'
 import useResponsive from '../../../@core/hooks/useResponsive'
 import api from 'src/@core/utils/api'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
@@ -34,7 +34,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import dayjs from 'dayjs'
 
-// Define today as an ISO string with current date and time
 export const today = new Date().toISOString()
 
 type Student = {
@@ -52,6 +51,32 @@ type Group = {
   status: string
 }
 
+export const handleCheckPrint = async (id: number | string, iframeId: string = 'printFrame') => {
+  try {
+    const response = await api.get(`common/generate-check/${id}/`, {
+      responseType: 'blob',
+    })
+
+    const blobUrl = URL.createObjectURL(response.data)
+    const printFrame = document.getElementById(iframeId) as HTMLIFrameElement
+    if (printFrame) {
+      printFrame.src = blobUrl
+      printFrame.onload = () => {
+        printFrame.contentWindow?.focus()
+        printFrame.contentWindow?.print()
+      }
+    } else {
+      console.error('Iframe not found')
+      toast.error('Chekni chop etishda xatolik yuz berdi')
+    }
+    return blobUrl
+  } catch (error) {
+    console.error('Print error:', error)
+    toast.error('Chekni chop etishda xatolik yuz berdi')
+    return null
+  }
+}
+
 export default function GlobalPaymentForm() {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
@@ -59,13 +84,14 @@ export default function GlobalPaymentForm() {
   const { companyInfo } = useAppSelector((state: any) => state.user)
   const { studentData } = useAppSelector((state) => state.students)
   const { createPayment, paymentMethods, getPaymentMethod } = usePayment()
-
   const [loading, setLoading] = useState<boolean>(false)
   const [loadingBtn, setLoadingBtn] = useState<boolean>(false)
   const [studentList, setStudentList] = useState<Student[]>([])
   const [groups, setGroups] = useState<Group[]>([])
   const [groupData, setGroupData] = useState<Group | null>(null)
   const [step, setStep] = useState<'search' | 'pay' | 'print'>('search')
+  const [receiptBlobUrl, setReceiptBlobUrl] = useState<string | null>(null)
+  const [paymentId, setPaymentId] = useState<number | string | null>(null)
 
   const validationSchema = Yup.object({
     search: Yup.string().min(4, t("Qidirish uchun ma'lumot yetarli emas")),
@@ -100,7 +126,7 @@ export default function GlobalPaymentForm() {
     amount: '',
     description: '',
     debt_amount: '',
-    payment_date: today, // Initialize with ISO string
+    payment_date: today,
     group: '',
     payment_type: '',
     bonus: '',
@@ -110,7 +136,7 @@ export default function GlobalPaymentForm() {
   const formik = useFormik({
     initialValues,
     validationSchema,
-    initialTouched: {}, // Ensure no fields are touched initially
+    initialTouched: {},
     onSubmit: async (values) => {
       if (values.step === 'search') {
         setLoading(true)
@@ -135,7 +161,10 @@ export default function GlobalPaymentForm() {
             payment_type: values.payment_type,
             bonus: revereAmount(values.bonus || '0'),
           }
-          const resp = await createPayment(data)
+          const rep = await createPayment(data)
+          setPaymentId(rep.id)
+          const blobUrl = await handleCheckPrint(rep.id)
+          setReceiptBlobUrl(blobUrl)
           setStep('print')
           toast.success(t('Tolov amalaga oshirildi'), { duration: 4000 })
           formik.resetForm({ values: initialValues })
@@ -169,7 +198,7 @@ export default function GlobalPaymentForm() {
       setStudentList([student])
       setStep('pay')
       await formik.setFieldValue('step', 'pay')
-      await formik.setTouched({ search: formik.touched.search, payment_date: false }, false) // Explicitly set payment_date as untouched
+      await formik.setTouched({ search: formik.touched.search, payment_date: false }, false)
       await formik.setValues({
         ...formik.values,
         search: '',
@@ -194,8 +223,21 @@ export default function GlobalPaymentForm() {
     setStudentList([])
     setGroups([])
     setGroupData(null)
+    setReceiptBlobUrl(null)
+    setPaymentId(null)
+    const printFrame = document.getElementById('printFrame') as HTMLIFrameElement
+    if (printFrame) printFrame.src = ''
     dispatch(setStudentData(null))
     dispatch(setGlobalPay(false))
+  }
+
+  const handleReprint = async () => {
+    if (paymentId) {
+      const blobUrl = await handleCheckPrint(paymentId)
+      setReceiptBlobUrl(blobUrl)
+    } else {
+      toast.error(t('Chekni qayta chop etish uchun to\'lov ID topilmadi'))
+    }
   }
 
   useEffect(() => {
@@ -213,7 +255,10 @@ export default function GlobalPaymentForm() {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box sx={isMobile ? { width: '100%' } : { width: '450px' }}>
-        <iframe src="" id="printFrame" style={{ display: 'none' }} />
+        <iframe
+          id="printFrame"
+          style={{ display: step === 'print' ? 'block' : 'none', width: '100%', height: '500px' }}
+        />
         {step === 'search' || step === 'pay' ? (
           <form
             onSubmit={e => {
@@ -436,8 +481,22 @@ export default function GlobalPaymentForm() {
             <Typography sx={{ fontSize: '20px', textAlign: 'center', whiteSpace: 'break-spaces' }}>
               {t('Iltimos chekni talab qiluvchiga berishni unutmang')}
             </Typography>
-            <LoadingButton loading={loadingBtn} sx={{ mt: '20px' }} onClick={handleClose} variant="contained">
+
+            <LoadingButton
+              loading={loadingBtn}
+              sx={{ mt: '20px' }}
+              onClick={handleClose}
+              variant="contained"
+            >
               {t('Yakunlash')}
+            </LoadingButton>
+
+            <LoadingButton
+              sx={{ mt: '10px' }}
+              variant="outlined"
+              onClick={handleReprint}
+            >
+              {t('Chekni qayta chop etish')}
             </LoadingButton>
           </Box>
         )}
