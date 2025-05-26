@@ -11,24 +11,25 @@ const ThoughtsPage = () => {
   const router = useRouter()
   const searchParams = new URLSearchParams(window.location.search)
   const paramsObject = Object.fromEntries(searchParams.entries());
-  const [selectedYear, setSelectedYear] = useState(searchParams.get('year')||'2023')
-  const [selectedMonth, setSelectedMonth] = useState(searchParams.get('month')||'may')
+  const [selectedYear, setSelectedYear] = useState(searchParams.get('year')||'2025')
+  const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0') 
+  const [selectedMonth, setSelectedMonth] = useState(searchParams.get('month')||currentMonth)
   const [role, setRole] = useState(searchParams.get('role')||'')
   
 
   const months = [
-  { value: 'january', label: 'Yanvar' },
-  { value: 'february', label: 'Fevral' },
-  { value: 'march', label: 'Mart' },
-  { value: 'april', label: 'Aprel' },
-  { value: 'may', label: 'May' },
-  { value: 'june', label: 'Iyun' },
-  { value: 'july', label: 'Iyul' },
-  { value: 'august', label: 'Avgust' },
-  { value: 'september', label: 'Sentabr' },
-  { value: 'october', label: 'Oktabr' },
-  { value: 'november', label: 'Noyabr' },
-  { value: 'december', label: 'Dekabr' }
+  { value: '01', label: 'Yanvar' },
+  { value: '02', label: 'Fevral' },
+  { value: '03', label: 'Mart' },
+  { value: '04', label: 'Aprel' },
+  { value: '05', label: 'May' },
+  { value: '06', label: 'Iyun' },
+  { value: '07', label: 'Iyul' },
+  { value: '08', label: 'Avgust' },
+  { value: '09', label: 'Sentabr' },
+  { value: '10', label: 'Oktabr' },
+  { value: '11', label: 'Noyabr' },
+  { value: '12', label: 'Dekabr' }
 ]
 
 
@@ -68,12 +69,12 @@ const ThoughtsPage = () => {
  const handleClearFilters = () => {
   const clearedQuery = {
     ...paramsObject,
-    year: '2023',
-    month: 'May',
+    year: '2025',
+    month: currentMonth,
   }
 
-  setSelectedYear('2023')
-  setSelectedMonth('May')
+  setSelectedYear('2025')
+  setSelectedMonth(currentMonth)
   setRole('')
 
   router.replace({

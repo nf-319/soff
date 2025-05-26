@@ -5,10 +5,12 @@ import { Box } from '@mui/material'
 import { AlertTriangle, BarChart3, Bell, Lightbulb, UserCheck } from 'lucide-react'
 
 const CpanelStatsCards = () => {
-   const searchParams = new URLSearchParams(window.location.search)
-  const paramsObject = Object.fromEntries(searchParams.entries());
+  const searchParams = new URLSearchParams(window.location.search)
+  const paramsObject = Object.fromEntries(searchParams.entries())
 
-  const { data } = useGet('owner/feedback_card/',{params:paramsObject})
+  const { data } = useGet('owner/feedback_card/', {
+    params: { year: paramsObject.year, month: paramsObject.month, role: paramsObject.role }
+  })
 
   const summaryData = [
     {
