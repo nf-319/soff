@@ -5,13 +5,21 @@ import { Box } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 const FeedBacksList = () => {
-  const { t } = useTranslation()
-  const { data, isPending } = useGet('owner/feedback/list/')
-  const columns = [
+    const searchParams = new URLSearchParams(window.location.search)
+  const paramsObject = Object.fromEntries(searchParams.entries());
+
+    const { t } = useTranslation()
+    const { data, isPending } = useGet('owner/feedback/list/',{params:paramsObject})
+    const columns = [
     {
       field: 'id',
       headerName: t('ID'),
       width: 70
+    },
+      {
+      field: 'client',
+      headerName: t("O'quv markaz nomi"),
+      width: 170
     },
     {
       field: 'reviewer_info',
@@ -19,23 +27,19 @@ const FeedBacksList = () => {
       width: 150
     },
     {
-      field: 'phone',
-      headerName: t('Telefon raqam'),
-      width: 250
+      field:'role',
+      headerName:t('Role'),
+      width:120
     },
     {
-      field: 'worked_lead_count',
-      headerName: t('Lidlar soni'),
+      field: `${searchParams.get('description')||'weaknesses'}`,
+      headerName: t('Izoh'),
       width: 150
     },
+   
     {
-      field: 'enrolled_leads',
-      headerName: 'Sotuvlar soni',
-      width: 150
-    },
-    {
-      field: 'lost_leads',
-      headerName: t('Yoqotilgan lidlar soni'),
+      field: 'status',
+      headerName: t('status'),
       width: 250
     }
   ]

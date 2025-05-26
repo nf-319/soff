@@ -5,35 +5,38 @@ import { Box } from '@mui/material'
 import { AlertTriangle, BarChart3, Bell, Lightbulb, UserCheck } from 'lucide-react'
 
 const CpanelStatsCards = () => {
-  const { data } = useGet('owner/feedback_card/')
+   const searchParams = new URLSearchParams(window.location.search)
+  const paramsObject = Object.fromEntries(searchParams.entries());
+
+  const { data } = useGet('owner/feedback_card/',{params:paramsObject})
 
   const summaryData = [
     {
       icon: Bell,
       iconColor: '#3b82f6',
       title: "Tizimning o'rtacha bahosi",
-      value: `${data?.avg_rating} / 10`,
+      value: `${data?.avg_rating || 0} / 10`,
       trend: 'up'
     },
     {
       icon: UserCheck,
       iconColor: '#10b981',
       title: "Texnik bo'lim bahosi",
-      value: `${data?.avg_tech_rating} / 10`,
+      value: `${data?.avg_tech_rating || 0} / 10`,
       trend: 'up'
     },
     {
       icon: BarChart3,
       iconColor: '#8b5cf6',
       title: 'Javob berish foizi',
-      value: `${data?.reply_percentage}%`,
+      value: `${data?.reply_percentage || 0}%`,
       trend: 'up'
     },
     {
       icon: AlertTriangle,
       iconColor: '#facc15',
       title: 'Kelgan kamchiliklar soni',
-      value: data?.suggestions_count,
+      value: data?.suggestions_count || 0,
       trend: 'up',
       isIssueCard: true
     },
@@ -41,7 +44,7 @@ const CpanelStatsCards = () => {
       icon: Lightbulb,
       iconColor: '#f97316',
       title: "Qo'shimcha funksiya so'rovlari",
-      value: data?.weaknesses_count,
+      value: data?.weaknesses_count || 0,
       trend: 'up'
     }
   ]

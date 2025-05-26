@@ -69,13 +69,7 @@ function DataGridTable<T>({
         {...restProps}
       />
 
-      {!loading && rows.length === 0 && (
-        <Box sx={{ position: 'absolute', top: 64, left: 0, right: 0, textAlign: 'center', py: 4 }}>
-          <Typography variant='body1' color='textSecondary'>
-            {emptyText}
-          </Typography>
-        </Box>
-      )}
+    
 
       {loading && (
         <Box
