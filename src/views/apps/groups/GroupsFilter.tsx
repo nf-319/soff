@@ -111,7 +111,7 @@ export const GroupsFilter = () => {
   if (isMobile) {
     return (
       <form id='mobile-filter-form'>
-        <Box display={'flex'} gap={2} flexDirection={'column'} paddingTop={isMobile ? 3 : 0} rowGap={isMobile ? 4 : 0}>
+        <Box display='flex' gap={2} flexDirection='column' paddingTop={isMobile ? 3 : 0} rowGap={isMobile ? 4 : 0}>
           <FormControl sx={{ width: '100%', maxWidth: 260 }}>
             <InputLabel size='small' id='search-input'>
               {t('Qidirish')}
@@ -313,6 +313,23 @@ export const GroupsFilter = () => {
             tooltip='Ko‘rinib turgan jadvalni Excel fayliga yuklab oling.'
             url='common/groups/export/'
             queryString={queryString}
+            useLink={false}
+            onClick={async () => {
+              try {
+                const response = await api.get(`common/groups/export/?${queryString}`, {
+                  responseType: 'blob',
+                });
+                const blob = response.data;
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Guruhlar.xlsx';
+                a.click();
+                window.URL.revokeObjectURL(url);
+              } catch (error) {
+                console.error('Download failed:', error);
+              }
+            }}
           />
 
           <Tooltip title={t('Online darsni boshlash uchun bosing.')}>
