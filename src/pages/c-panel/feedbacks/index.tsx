@@ -10,28 +10,26 @@ import { useRouter } from 'next/router'
 const ThoughtsPage = () => {
   const router = useRouter()
   const searchParams = new URLSearchParams(window.location.search)
-  const paramsObject = Object.fromEntries(searchParams.entries());
-  const [selectedYear, setSelectedYear] = useState(searchParams.get('year')||'2025')
-  const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0') 
-  const [selectedMonth, setSelectedMonth] = useState(searchParams.get('month')||currentMonth)
-  const [role, setRole] = useState(searchParams.get('role')||'')
-  
+  const paramsObject = Object.fromEntries(searchParams.entries())
+  const [selectedYear, setSelectedYear] = useState(searchParams.get('year') || '2025')
+  const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0')
+  const [selectedMonth, setSelectedMonth] = useState(searchParams.get('month') || currentMonth)
+  const [role, setRole] = useState(searchParams.get('role') || '')
 
   const months = [
-  { value: '01', label: 'Yanvar' },
-  { value: '02', label: 'Fevral' },
-  { value: '03', label: 'Mart' },
-  { value: '04', label: 'Aprel' },
-  { value: '05', label: 'May' },
-  { value: '06', label: 'Iyun' },
-  { value: '07', label: 'Iyul' },
-  { value: '08', label: 'Avgust' },
-  { value: '09', label: 'Sentabr' },
-  { value: '10', label: 'Oktabr' },
-  { value: '11', label: 'Noyabr' },
-  { value: '12', label: 'Dekabr' }
-]
-
+    { value: '01', label: 'Yanvar' },
+    { value: '02', label: 'Fevral' },
+    { value: '03', label: 'Mart' },
+    { value: '04', label: 'Aprel' },
+    { value: '05', label: 'May' },
+    { value: '06', label: 'Iyun' },
+    { value: '07', label: 'Iyul' },
+    { value: '08', label: 'Avgust' },
+    { value: '09', label: 'Sentabr' },
+    { value: '10', label: 'Oktabr' },
+    { value: '11', label: 'Noyabr' },
+    { value: '12', label: 'Dekabr' }
+  ]
 
   useEffect(() => {
     const { year, month, role } = router.query
@@ -42,46 +40,45 @@ const ThoughtsPage = () => {
   }, [router.query])
 
   useEffect(() => {
-  const currentQuery = router.query
+    const currentQuery = router.query
 
-  if (
-    currentQuery.year !== selectedYear ||
-    currentQuery.month !== selectedMonth ||
-    currentQuery.role !== role
-  ) {
-    router.push(
+    if (currentQuery.year !== selectedYear || currentQuery.month !== selectedMonth || currentQuery.role !== role) {
+      router.push(
+        {
+          pathname: router.pathname,
+          query: {
+            ...paramsObject,
+            year: selectedYear,
+            month: selectedMonth,
+            ...(role ? { role } : {})
+          }
+        },
+        undefined,
+        { shallow: true }
+      )
+    }
+  }, [selectedYear, selectedMonth, role])
+
+  const handleClearFilters = () => {
+    const clearedQuery = {
+      ...paramsObject,
+      year: '2025',
+      role: '',
+      month: currentMonth
+    }
+
+    setSelectedYear('2025')
+    setSelectedMonth(currentMonth)
+
+    router.replace(
       {
         pathname: router.pathname,
-        query: {
-          ...paramsObject,
-          year: selectedYear,
-          month: selectedMonth,
-          role: role ?? '', 
-        },
+        query: clearedQuery
       },
       undefined,
       { shallow: true }
     )
   }
-}, [selectedYear, selectedMonth, role])
-
-
- const handleClearFilters = () => {
-  const clearedQuery = {
-    ...paramsObject,
-    year: '2025',
-    month: currentMonth,
-  }
-
-  setSelectedYear('2025')
-  setSelectedMonth(currentMonth)
-  setRole('')
-
-  router.replace({
-    pathname: router.pathname,
-    query: clearedQuery,
-  }, undefined, { shallow: true })
-}
 
   return (
     <Box display='flex' flexDirection='column' gap={5}>
@@ -96,9 +93,9 @@ const ThoughtsPage = () => {
           </FormControl>
           <FormControl fullWidth>
             <Select size='small' value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)}>
-             {months.map((item)=>(
-              <MenuItem value={item.value}>{item.label}</MenuItem>
-             ))}
+              {months.map(item => (
+                <MenuItem value={item.value}>{item.label}</MenuItem>
+              ))}
             </Select>
           </FormControl>
           <FormControl fullWidth>

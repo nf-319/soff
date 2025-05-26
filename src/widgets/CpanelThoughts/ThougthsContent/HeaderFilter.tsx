@@ -41,7 +41,7 @@ const HeadingFilter = () => {
             ...paramsObject,
             ...(status && { status }),
             ...(description && { description}),
-            ...(searchTerm && { search: searchTerm }),
+            search:searchTerm,
           },
         },
         undefined,
