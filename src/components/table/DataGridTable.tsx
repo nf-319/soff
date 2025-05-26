@@ -68,20 +68,9 @@ function DataGridTable<T>({
         }}
         {...restProps}
       />
-
-    
-
-      {loading && (
-        <Box
-          sx={{ position: 'absolute', top: 64, left: 0, right: 0, display: 'flex', justifyContent: 'center', py: 4 }}
-        >
-          <CircularProgress size={24} />
-        </Box>
-      )}
     </Box>
   )
 }
 
 DataGridTable.display = 'DataGridTable'
 export { DataGridTable }
-
