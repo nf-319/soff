@@ -15,6 +15,18 @@ export type DepartmentType = {
   transfer: boolean
 }
 
+export type LeadDetailType = {
+  admin: string,
+  course: string,
+  created_at: string,
+  first_name: string,
+  id: number,
+  phone: string,
+  source: string,
+  status: string,
+  temperature: string
+}
+
 export type DepartmentListType = DepartmentType[]
 
 export interface LeadsQueryParamsTypes {
@@ -25,7 +37,7 @@ export interface LeadsQueryParamsTypes {
 export interface DepartmentItemsType {
   id: number
   name: string
-  leads: 
+  leads:
     {
       created_at: string
       first_name: string
@@ -33,7 +45,7 @@ export interface DepartmentItemsType {
       last_activity: string
       phone: string
     }[]
-  
+
 }
 
 export interface ILeadsState {

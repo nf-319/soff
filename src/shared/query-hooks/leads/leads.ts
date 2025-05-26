@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import api from '@utils/api'
 import { Endpoints } from '@api/endpoints'
 import { QueryKeys } from '@/shared/query-hooks/queryKeys'
+import { LeadDetailType } from '@/types/apps/leadsTypes'
 
 type LeadsDescriptionUpdateType = {
   id: string,
@@ -33,7 +34,7 @@ const deleteLeadDescription = async ({ id }: Pick<LeadsDescriptionUpdateType, 'i
 const getLeadDetail = async (id?: string) => {
   try {
     const url = Endpoints.LeadDetails.replace(':id', String(id))
-    const response = await api.get(url)
+    const response = await api.get<LeadDetailType>(url)
     return response.data
   } catch (error) {
     console.error(error)

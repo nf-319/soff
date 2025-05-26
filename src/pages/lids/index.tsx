@@ -36,6 +36,7 @@ import { Endpoints } from '@api/endpoints'
 import { Metadata } from '@/components/Metada'
 import { useGetLeadDetail } from '@/shared/query-hooks/leads/leads'
 import { LidsDragonModal } from '@/views/apps/lids/LidsDragonModal'
+import { router } from 'next/client'
 
 export type DepartmentsResultType = {
   id: number
@@ -94,6 +95,12 @@ const Lids = () => {
     options: { enabled: !!is_amocrm },
     deps: ['amo-leads']
   })
+
+  useEffect(() => {
+    if(lid) {
+      setLeadDetailOpen(true)
+    }
+  }, [lid])
 
   useEffect(() => {
     if (amoCrmError?.response?.data) {
@@ -284,11 +291,11 @@ const Lids = () => {
         setOpen={setOpenDialog}
       />
 
-      {/*<LidsDragonModal*/}
-      {/*  handleClose={() => setLeadDetailOpen(false)}*/}
-      {/*  openModal={leadDetailOpen}*/}
-      {/*  selectedLead={selectedLead}*/}
-      {/*/>*/}
+      <LidsDragonModal
+        handleClose={() => setLeadDetailOpen(false)}
+        openModal={leadDetailOpen}
+        selectedLead={data!}
+      />
     </div>
   )
 }
