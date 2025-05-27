@@ -11,7 +11,8 @@ function getHomeRoute(role: string[], hostname: string): string {
 }
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const url = new URL(request.url)
+  const pathname: string = url.pathname
 
   if (pathname === '/') {
     const userCookie = request.cookies.get('user')?.value
@@ -22,12 +23,14 @@ export function middleware(request: NextRequest) {
         const hostname = request.headers.get('host') || ''
 
         if (user?.payment_page) {
-          return NextResponse.redirect(new URL('/crm-payments', request.url))
+          const redirectUrl = new URL('/crm-payments', request.url)
+          return NextResponse.redirect(redirectUrl, 302)
         }
 
         if (user?.role?.length) {
           const redirectPath = getHomeRoute(user.role, hostname)
-          return NextResponse.redirect(new URL(redirectPath, request.url))
+          const redirectUrl = new URL(redirectPath, request.url)
+          return NextResponse.redirect(redirectUrl, 302)
         }
       } catch (error) {
         console.error('Failed to parse user cookie:', error)
@@ -39,5 +42,15 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: '/'
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - dashboard, student-profile, finance, c-panel, crm-payments (redirect targets)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|dashboard|student-profile|finance|c-panel|crm-payments).*)',
+  ],
 }
