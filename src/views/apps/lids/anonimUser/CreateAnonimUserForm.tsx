@@ -92,6 +92,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
     phone: '',
     user: null
   }
+
   async function handleGetLealdItems() {
     if (!query) return
     dispatch(setDragonLoading(true))
@@ -102,7 +103,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
     } catch (err) {
       console.error('Error fetching leads:', err)
     } finally {
-      await  queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
+      await queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
       dispatch(setDragonLoading(false))
     }
   }
@@ -128,7 +129,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
         formik.resetForm()
         dispatch(setSectionId(null))
         toast.success("Muvaffaqiyatli")
-        await  queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
+        await queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
         await handleGetLealdItems()
         await dispatch(fetchDepartmentList())
       }
@@ -147,173 +148,181 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
   const newState = { value: '', label: '----' }
 
   return (
-    <form
-      onSubmit={formik.handleSubmit}
-      style={{ padding: '5px 0', width: '100%', display: 'flex', flexDirection: 'column', gap: '15px' }}
-    >
-      <FormControl fullWidth>
-        <InputLabel error={!!errors.department && touched.department} size='small' id='user-view-language-label'>
-          {t("Bo'lim")}
-        </InputLabel>
-
-        <Select
-          size='small'
-          label={t("Bo'lim")}
-          id='user-view-language'
-          labelId='user-view-language-label'
-          name='department'
-          sx={{ mb: 1 }}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          value={values.department}
-          error={!!errors.department && touched.department}
-        >
-          {leadData?.results.map((lead: any) => (
-            <MenuItem key={lead.id} value={Number(lead.id)}>
-              {lead.name}
-            </MenuItem>
-          ))}
-          <MenuItem sx={{ fontWeight: 600 }} onClick={() => dispatch(setOpenItem(openLid))}>
-            {t('Yangi yaratish')}
-
-            <IconButton>
-              <Ellipsis />
-            </IconButton>
-          </MenuItem>
-        </Select>
-        {!!errors.department && touched.department && (
-          <FormHelperText error={true}>{formik.errors.department}</FormHelperText>
-        )}
-      </FormControl>
-
-      <FormControl fullWidth>
-        <InputLabel size='small' id='sourse-label'>
-          {t('Manba')}
-        </InputLabel>
-
-        <Select
-          size='small'
-          label={t('Manba')}
-          labelId='sourse-label'
-          name='source'
-          sx={{ mb: 1 }}
-          onChange={(e: any) => {
-            handleChange(e)
-            dispatch(setAddSource(e?.target?.value === 0))
-          }}
-          error={!!errors.source && touched.source}
-          onBlur={handleBlur}
-          value={values.source}
-        >
-          {sourceData &&
-            sourceData.result.map((lead: any) => (
-              <MenuItem key={lead.id} value={lead.id}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
+      <form
+        onSubmit={formik.handleSubmit}
+        style={{
+          padding: '5px 0',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '15px',
+          overflowY: 'auto',
+          flex: '1 1 auto'
+        }}
+      >
+        <FormControl fullWidth>
+          <InputLabel error={!!errors.department && touched.department} size='small' id='user-view-language-label'>
+            {t("Bo'lim")}
+          </InputLabel>
+          <Select
+            size='small'
+            label={t("Bo'lim")}
+            id='user-view-language'
+            labelId='user-view-language-label'
+            name='department'
+            sx={{ mb: 1 }}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            value={values.department}
+            error={!!errors.department && touched.department}
+          >
+            {leadData?.results.map((lead: any) => (
+              <MenuItem key={lead.id} value={Number(lead.id)}>
                 {lead.name}
               </MenuItem>
             ))}
-          <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router.push('/lids/stats')}>
-            {t('Yangi yaratish')}
-            <IconifyIcon icon={'ion:add-sharp'} />
-          </MenuItem>
-        </Select>
-        {!!errors.source && touched.source && <FormHelperText error>{formik.errors.source}</FormHelperText>}
-      </FormControl>
-
-      <FormControl fullWidth>
-        <TextField
-          fullWidth
-          size='small'
-          label={t('first_name')}
-          name='first_name'
-          error={!!errors.first_name && touched.first_name}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          value={values.first_name}
-        />
-        {!!errors.first_name && touched.first_name && <FormHelperText error>{formik.errors.first_name}</FormHelperText>}
-      </FormControl>
-
-      <FormControl fullWidth>
-        <InputLabel error={!!errors.phone && touched.phone} htmlFor='login-input'>
-          {t('phone')}
-        </InputLabel>
-        <PhoneInput
-          fullWidth
-          id='login-input'
-          label={t('phone')}
-          error={!!errors.phone && touched.phone}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          value={values.phone}
-        />
-        {!!errors.phone && touched.phone && <FormHelperText error>{formik.errors.phone}</FormHelperText>}
-      </FormControl>
-
-      {errors?.user && <LeadKanbanItem onClose lead={newErrors.user} />}
-
-      <FormControl fullWidth>
-        <InputLabel size='small'>Holat</InputLabel>
-        <Select
-          label='Holat'
-          placeholder='Holatni tanlang'
-          size='small'
-          fullWidth
-          value={stateValue}
-          onChange={e => setStateValue(e.target.value as string)}
-          displayEmpty
-        >
-          {lidStatusOption.map(option => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
+            <MenuItem sx={{ fontWeight: 600 }} onClick={() => dispatch(setOpenItem(openLid))}>
+              {t('Yangi yaratish')}
+              <IconButton>
+                <Ellipsis />
+              </IconButton>
             </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+          </Select>
+          {!!errors.department && touched.department && (
+            <FormHelperText error={true}>{formik.errors.department}</FormHelperText>
+          )}
+        </FormControl>
 
-      <FormControl fullWidth size='small' variant='outlined'>
-        <InputLabel id='temperature-label' shrink>
-          Harorat
-        </InputLabel>
-        <Select
-          labelId='temperature-label'
-          value={temperateValue}
-          onChange={e => setTemperateValue(e.target.value)}
-          input={<OutlinedInput notched label='Harorat' />}
-          displayEmpty
-          renderValue={selected => {
-            if (selected === '') {
-              return <span style={{ color: '#aaa' }}>{newState.label}</span>
-            }
-
-            const selectedOption = LEAD_STATEMENTS_TEMPERATURE.find(option => option.value === selected)
-            return selectedOption?.label ?? ''
-          }}
-        >
-          {[newState, ...LEAD_STATEMENTS_TEMPERATURE.slice(1, 4)].map(option => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
+        <FormControl fullWidth>
+          <InputLabel size='small' id='sourse-label'>
+            {t('Manba')}
+          </InputLabel>
+          <Select
+            size='small'
+            label={t('Manba')}
+            labelId='sourse-label'
+            name='source'
+            sx={{ mb: 1 }}
+            onChange={(e: any) => {
+              handleChange(e)
+              dispatch(setAddSource(e?.target?.value === 0))
+            }}
+            error={!!errors.source && touched.source}
+            onBlur={handleBlur}
+            value={values.source}
+          >
+            {sourceData &&
+              sourceData.result.map((lead: any) => (
+                <MenuItem key={lead.id} value={lead.id}>
+                  {lead.name}
+                </MenuItem>
+              ))}
+            <MenuItem sx={{ fontWeight: 600 }} onClick={() => Router.push('/lids/stats')}>
+              {t('Yangi yaratish')}
+              <IconifyIcon icon={'ion:add-sharp'} />
             </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+          </Select>
+          {!!errors.source && touched.source && <FormHelperText error>{formik.errors.source}</FormHelperText>}
+        </FormControl>
 
-      <FormControl fullWidth>
-        <TextField
-          fullWidth
-          multiline
-          rows={4}
-          size='small'
-          label={t('Izoh')}
-          name='body'
-          onChange={handleChange}
-          value={values.body}
-        />
-        <FormHelperText error={!!errors.body}>{formik.errors.body}</FormHelperText>
-      </FormControl>
+        <FormControl fullWidth>
+          <TextField
+            fullWidth
+            size='small'
+            label={t('first_name')}
+            name='first_name'
+            error={!!errors.first_name && touched.first_name}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            value={values.first_name}
+          />
+          {!!errors.first_name && touched.first_name && <FormHelperText error>{formik.errors.first_name}</FormHelperText>}
+        </FormControl>
 
-      <LoadingButton loading={loading} type='submit' variant='outlined'>
-        {skipLid ? 'Qayta yaratish' : 'Yaratish'}
-      </LoadingButton>
-    </form>
+        <FormControl fullWidth>
+          <InputLabel error={!!errors.phone && touched.phone} htmlFor='login-input'>
+            {t('phone')}
+          </InputLabel>
+          <PhoneInput
+            fullWidth
+            id='login-input'
+            label={t('phone')}
+            error={!!errors.phone && touched.phone}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            value={values.phone}
+          />
+          {!!errors.phone && touched.phone && <FormHelperText error>{formik.errors.phone}</FormHelperText>}
+        </FormControl>
+
+        {errors?.user && <LeadKanbanItem onClose lead={newErrors.user} />}
+
+        <FormControl fullWidth>
+          <InputLabel size='small'>Holat</InputLabel>
+          <Select
+            label='Holat'
+            placeholder='Holatni tanlang'
+            size='small'
+            fullWidth
+            value={stateValue}
+            onChange={e => setStateValue(e.target.value as string)}
+            displayEmpty
+          >
+            {lidStatusOption.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth size='small' variant='outlined'>
+          <InputLabel id='temperature-label' shrink>
+            Harorat
+          </InputLabel>
+          <Select
+            labelId='temperature-label'
+            value={temperateValue}
+            onChange={e => setTemperateValue(e.target.value)}
+            input={<OutlinedInput notched label='Harorat' />}
+            displayEmpty
+            renderValue={selected => {
+              if (selected === '') {
+                return <span style={{ color: '#aaa' }}>{newState.label}</span>
+              }
+              const selectedOption = LEAD_STATEMENTS_TEMPERATURE.find(option => option.value === selected)
+              return selectedOption?.label ?? ''
+            }}
+          >
+            {[newState, ...LEAD_STATEMENTS_TEMPERATURE.slice(1, 4)].map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth>
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            size='small'
+            label={t('Izoh')}
+            name='body'
+            onChange={handleChange}
+            value={values.body}
+          />
+          <FormHelperText error={!!errors.body}>{formik.errors.body}</FormHelperText>
+        </FormControl>
+
+        <div style={{ padding: '10px 0', width: '100%', position: 'sticky', bottom: 0, background: '#fff', zIndex: 1 }}>
+          <LoadingButton loading={loading} type='submit' variant='outlined' fullWidth>
+            {skipLid ? 'Qayta yaratish' : 'Yaratish'}
+          </LoadingButton>
+        </div>
+      </form>
+    </div>
   )
 }

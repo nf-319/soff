@@ -615,8 +615,9 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
         PaperProps={{
           sx: {
             width: '100%',
-            minHeight: 400,
-            overflow: 'visible'
+            height: '80vh',
+            display: 'flex',
+            flexDirection: 'column'
           }
         }}
       >
@@ -633,7 +634,11 @@ export const LeadsKanban: FC<Props> = ({ defaultId, selectedData }) => {
         <DialogContent
           sx={{
             px: 3,
-            pb: 3
+            pb: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            flex: '1 1 auto',
+            overflow: 'hidden'
           }}
         >
           <CreateAnonimUserForm defaultId={String(defaultId)} source={source} />
