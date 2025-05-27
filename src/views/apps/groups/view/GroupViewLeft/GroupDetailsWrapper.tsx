@@ -296,7 +296,7 @@ export default function GroupDetails ({
                       {t("O'qituvchi")}:
                     </Typography>
                     <Link
-                      href={`/mentors/view/security/?id=${groupData?.teacher_data?.id}`}
+                      href={`/mentors/${groupData?.teacher_data?.id}`}
                       style={{ textDecoration: 'none', color: '#1976d2', fontWeight: 500 }}
                     >
                       {groupData?.teacher_data?.first_name}

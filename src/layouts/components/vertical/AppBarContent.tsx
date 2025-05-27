@@ -50,7 +50,7 @@ const AppBarContent = (props: Props) => {
       case 'STUDENT':
         return `/students/view/security?student=${option.id}`
       case 'TEACHER':
-        return `/mentors/view/security?id=${option.id}`
+        return `/mentors/${option.id}`
       case 'ADMIN':
         return `/settings/ceo/users`
       case 'CEO':
