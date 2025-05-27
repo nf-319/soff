@@ -62,7 +62,7 @@ const CrmSurveymodal = () => {
     const isFirstOfMonth = now.getDate() === 1
     const hasSeenSurvey = localStorage.getItem('crm_survey_shown') === now.toDateString()
 
-    if (!isFirstOfMonth && hasSeenSurvey) {
+    if (isFirstOfMonth && !hasSeenSurvey) {
       setShowSurvey(true)
       localStorage.setItem('crm_survey_shown', now.toDateString())
     }
