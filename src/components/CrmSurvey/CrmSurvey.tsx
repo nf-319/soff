@@ -16,7 +16,8 @@ import {
   FormLabel,
   RadioGroup,
   FormControlLabel,
-  Radio
+  Radio,
+  LinearProgress
 } from '@mui/material'
 import { nextStep, prevStep, setStepText, resetForm, setGrade, setHelpUsed } from '../../store/apps/crm-survey'
 import { RootState, useAppDispatch, useAppSelector } from '@/store'
@@ -50,8 +51,8 @@ const CrmSurveymodal = () => {
   ]
   const stepLabel = [
     'Nega bu bahoni berdingiz?',
-    'Tizimdagi muammolaringizni batafsil yozing....',
-    'AI hisobotlar,ota-onalar paneli,avtomatik SMS,mobil ilova....',
+    'Tizimdagi muammolaringizni batafsil yozing',
+    'AI hisobotlar,ota-onalar paneli,avtomatik SMS,mobil ilova',
     'Afzalliklarni yozing',
     "Qo'shimcha izohlaringiz bo'lsa yozing"
   ]
@@ -61,7 +62,7 @@ const CrmSurveymodal = () => {
     const isFirstOfMonth = now.getDate() === 1
     const hasSeenSurvey = localStorage.getItem('crm_survey_shown') === now.toDateString()
 
-    if (isFirstOfMonth && !hasSeenSurvey) {
+    if (!isFirstOfMonth && hasSeenSurvey) {
       setShowSurvey(true)
       localStorage.setItem('crm_survey_shown', now.toDateString())
     }
@@ -128,16 +129,18 @@ const CrmSurveymodal = () => {
   }
 
   return (
-    <Dialog open={showSurvey} fullWidth maxWidth='sm'>
+    <Dialog open={showSurvey} fullWidth maxWidth='sm' sx={{ height: '100%', transition: 'heigth 0.3s ease-in-out' }}>
       {!showSuccess &&
         (!showForm ? (
           <>
-            <DialogTitle>So‘rovnoma</DialogTitle>
+            <DialogTitle>
+              <Typography variant='h5'>So‘rovnoma</Typography>
+            </DialogTitle>
             <DialogContent>
-              <Typography fontWeight={700} sx={{ paddingBottom: 3 }} fontSize={24} color={'black'}>
+              <Typography fontWeight={700} sx={{ paddingBottom: 3 }} fontSize={22} color={'black'}>
                 Salom! Mening ismim Zufarbek. SOFF CRM asoschisiman.
               </Typography>
-              <Typography variant='h6' gutterBottom>
+              <Typography fontWeight={600} fontSize={20} gutterBottom>
                 Har oy oxirida sizdan fikr so'raymiz. Ushbu so'rovnomani men shaxsan o'qiyman. Siz bildirgan fikr va
                 muammolar asosida tizimni yaxshilaymiz. So'rov so'ngida siz uchun maxsus taklifimiz ham bor.
               </Typography>
@@ -153,13 +156,14 @@ const CrmSurveymodal = () => {
           </>
         ) : (
           <>
-            <Stepper activeStep={activeStep} sx={{ mt: 5, px: 5 }}>
-              {[...Array(5)].map((_, index) => (
-                <Step key={index}>
-                  <StepLabel>{index + 1}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
+            <Box sx={{ position: 'relative' }}>
+              <LinearProgress
+                variant='determinate'
+                value={((activeStep + 1) / 5) * 100}
+                sx={{ height: 5, borderRadius: 2 }}
+              />
+            </Box>
+
             <DialogTitle>{stepTitle[activeStep]}</DialogTitle>
             <DialogContent>
               {activeStep === 4 && (
@@ -209,7 +213,7 @@ const CrmSurveymodal = () => {
               </Box>
 
               {(activeStep === 0 || activeStep === 4) && (
-                <FormControl fullWidth margin='normal' error={!!error && grades[activeStep] == null}>
+                <FormControl fullWidth sx={{paddingX:2}} error={!!error && grades[activeStep] == null}>
                   <Typography gutterBottom>
                     {activeStep == 0 ? 'Bahoni tanlang (1 - 10)' : 'Texnik yordam sifatini baholang (1-10)'}
                   </Typography>
