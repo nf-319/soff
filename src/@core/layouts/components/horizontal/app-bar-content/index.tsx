@@ -4,6 +4,8 @@ import Typography from '@mui/material/Typography'
 import { styled, useTheme } from '@mui/material/styles'
 import { LayoutProps } from 'src/@core/layouts/types'
 import { useAppSelector } from 'src/store'
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
 
 interface Props {
   hidden: LayoutProps['hidden']
@@ -24,13 +26,32 @@ const AppBarContent = (props: Props) => {
   const { appBarContent: userAppBarContent, appBarBranding: userAppBarBranding } = props
   const { companyInfo } = useAppSelector((state: any) => state.user)
 
+
+  const [logoSrc, setLogoSrc] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (companyInfo?.logo) {
+      setLogoSrc(companyInfo.logo)
+    }
+  }, [companyInfo])
+
   return (
     <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       {userAppBarBranding ? (
         userAppBarBranding(props)
       ) : (
         <StyledLink href='/'>
-          <img src={companyInfo?.logo || '/images/default-logo.jpg'} height={35} />
+          {/* <img src={companyInfo?.logo || '/images/default-logo.jpg'} height={35} /> */}
+          {logoSrc && (
+            <Image
+              src={logoSrc}
+              alt='Brand logo'
+              height={35}
+              width={100}
+              style={{ objectFit: 'scale-down', width:'auto' }}
+              onError={() => setLogoSrc('/images/default-logo.jpg')}
+            />
+          )}
 
           <Typography variant='h6' sx={{ ml: 2, fontWeight: 700, lineHeight: 1.2 }}>
             {companyInfo.training_center_name || 'SOFF CRM'}

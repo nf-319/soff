@@ -231,7 +231,7 @@ const LoginPage = () => {
                     width={100}
                     height={80}
                     style={{ objectFit: 'scale-down' }}
-                    onError={() => setLogoSrc('/images/soff-logo.png')}
+                    onError={() => setLogoSrc('/images/default-logo.jpg')}
                   />
                 )}
 
