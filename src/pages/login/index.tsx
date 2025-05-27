@@ -19,7 +19,7 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import toast from 'react-hot-toast'
 import PhoneInput from '../../components/phone-input'
 import { useTranslation } from 'react-i18next'
-import { reversePhone } from '../../components/phone-input/format-phone-number'
+import { reversePhone } from '@components/phone-input/format-phone-number'
 import api from 'src/@core/utils/api'
 import { RootState, useAppDispatch } from 'src/store'
 import Image from 'next/image'
@@ -73,10 +73,8 @@ const LoginPage = () => {
 
   const {
     control,
-    reset,
     setError,
     handleSubmit,
-    setValue,
     formState: { errors }
   } = useForm({
     defaultValues,
@@ -182,15 +180,6 @@ const LoginPage = () => {
             message: err.response.data[key]
           })
         })
-        if (err.response.data.msg === "Xavfli urunishlar amalga oshirdingiz, 1 soatdan so'ng qayta urunib ko'ring.") {
-          toast.error(err.response.data.msg)
-          reset()
-          setValue('phone', '')
-          Cookies.set('user_blocked', 'true', {
-            expires: new Date(Date.now() + 60 * 60 * 1000),
-            path: '/'
-          })
-        }
       } else {
         toast.error('Network Error!', { position: 'top-center' })
       }
@@ -206,7 +195,6 @@ const LoginPage = () => {
       password: data.password
     })
   }
-  const user_blocked = Cookies.get('user_blocked')
 
 
   const [logoSrc, setLogoSrc] = useState<string | null>(null)
@@ -254,10 +242,8 @@ const LoginPage = () => {
                 ) : (
                   <TypographyStyled variant='h5'>Xush kelibsiz 👋🏻</TypographyStyled>
                 )}
-                <Typography color={user_blocked ? 'red' : ''} variant='body2'>
-                  {user_blocked
-                    ? "Birozdan so'ng harakat qiling"
-                    : 'Iltimos tizimga kirish uchun shaxsiy malumotlaringizni kiriting'}
+                <Typography variant='body2'>
+                  Iltimos tizimga kirish uchun shaxsiy malumotlaringizni kiriting
                 </Typography>
               </Box>
 
@@ -268,7 +254,7 @@ const LoginPage = () => {
                 onSubmit={handleSubmit(onSubmit)}
               >
                 <Box display='grid' gap={5}>
-                  <FormControl disabled={Boolean(user_blocked)} fullWidth>
+                  <FormControl fullWidth>
                     <InputLabel error={Boolean(errors.phone)} htmlFor='login-input'>
                       {t('phone')}
                     </InputLabel>
@@ -292,7 +278,7 @@ const LoginPage = () => {
                     {errors.phone && <FormHelperText error>{errors.phone.message}</FormHelperText>}
                   </FormControl>
 
-                  <FormControl disabled={Boolean(user_blocked)} fullWidth>
+                  <FormControl fullWidth>
                     <InputLabel htmlFor='auth-login-v2-password' error={Boolean(errors.password)}>
                       Parol
                     </InputLabel>
@@ -313,7 +299,6 @@ const LoginPage = () => {
                           endAdornment={
                             <InputAdornment position='end'>
                               <IconButton
-                                disabled={Boolean(user_blocked)}
                                 onClick={() => setShowPassword(!showPassword)}
                               >
                                 <Eye />
@@ -328,7 +313,6 @@ const LoginPage = () => {
                 </Box>
 
                 <LoadingButton
-                  disabled={Boolean(user_blocked)}
                   loading={loading}
                   fullWidth
                   size='large'
