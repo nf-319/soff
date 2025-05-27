@@ -32,6 +32,8 @@ import { useRouter } from 'next/router'
 import { useSelector } from 'react-redux'
 import { Eye } from 'lucide-react'
 import { setPublicSettings } from 'src/store/apps/page'
+import Cookies from 'js-cookie'
+import { jwtDecode } from 'jwt-decode'
 
 const schema = yup.object().shape({
   phone: yup.string().required('Telefon raqam kiriting'),
@@ -55,6 +57,11 @@ type FormData = {
   password: string
 }
 
+interface JwtPayload {
+  exp: number
+  [key: string]: any
+}
+
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
@@ -66,8 +73,10 @@ const LoginPage = () => {
 
   const {
     control,
+    reset,
     setError,
     handleSubmit,
+    setValue,
     formState: { errors }
   } = useForm({
     defaultValues,
@@ -95,10 +104,33 @@ const LoginPage = () => {
     try {
       setLoading(true)
       const response = await api.post(authConfig.loginEndpoint, params)
-      window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.tokens.access)
-      window.localStorage.setItem('userData', JSON.stringify({ ...response.data }))
+
+      const accessToken = response.data.tokens.access
+      const decoded = jwtDecode<JwtPayload>(accessToken)
+
+      if (decoded?.exp) {
+        Cookies.set(authConfig.storageTokenKeyName, accessToken, {
+          expires: new Date(decoded.exp * 1000),
+          secure: true,
+          sameSite: 'Lax'
+        })
+      } else {
+        console.error('Invalid JWT: Missing exp field')
+      }
+
       const userRoles = response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase())
       dispatch(setRoles(userRoles))
+
+      Cookies.set(
+        'user',
+        JSON.stringify({
+          role: userRoles
+        }),
+        {
+          expires: new Date(decoded.exp * 1000),
+          path: '/'
+        }
+      )
 
       if (
         !window.location.hostname.split('.').includes('c-panel') &&
@@ -114,10 +146,10 @@ const LoginPage = () => {
       const redirectURL = isMarketable
         ? '/lid-statements'
         : paymentPage
-          ? '/crm-payments'
-          : returnUrl && returnUrl !== '/'
-            ? returnUrl
-            : '/'
+        ? '/crm-payments'
+        : returnUrl && returnUrl !== '/'
+        ? returnUrl
+        : '/'
 
       await router.push(redirectURL as string)
 
@@ -138,7 +170,9 @@ const LoginPage = () => {
         branches: response.data?.branches,
         active_branch: response.data.active_branch
       })
+
       setLoading(false)
+      window.localStorage.setItem('userData', JSON.stringify({ ...response.data }))
       auth.initAuth()
     } catch (err: any) {
       if (err?.response?.data) {
@@ -148,6 +182,15 @@ const LoginPage = () => {
             message: err.response.data[key]
           })
         })
+        if (err.response.data.msg === "Xavfli urunishlar amalga oshirdingiz, 1 soatdan so'ng qayta urunib ko'ring.") {
+          toast.error(err.response.data.msg)
+          reset()
+          setValue('phone', '')
+          Cookies.set('user_blocked', 'true', {
+            expires: new Date(Date.now() + 60 * 60 * 1000),
+            path: '/'
+          })
+        }
       } else {
         toast.error('Network Error!', { position: 'top-center' })
       }
@@ -163,6 +206,7 @@ const LoginPage = () => {
       password: data.password
     })
   }
+  const user_blocked = Cookies.get('user_blocked')
 
   return (
     <Box sx={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden' }}>
@@ -194,12 +238,17 @@ const LoginPage = () => {
                 )}
 
                 {public_settings ? (
-                  <TypographyStyled variant='h5'>{`${public_settings?.training_center_name || themeConfig.templateName
-                    }! ga Xush kelibsiz 👋🏻`}</TypographyStyled>
+                  <TypographyStyled variant='h5'>{`${
+                    public_settings?.training_center_name || themeConfig.templateName
+                  }! ga Xush kelibsiz 👋🏻`}</TypographyStyled>
                 ) : (
                   <TypographyStyled variant='h5'>Xush kelibsiz 👋🏻</TypographyStyled>
                 )}
-                <Typography variant='body2'>Iltimos tizimga kirish uchun shaxsiy malumotlaringizni kiriting</Typography>
+                <Typography color={user_blocked ? 'red' : ''} variant='body2'>
+                  {user_blocked
+                    ? "Birozdan so'ng harakat qiling"
+                    : 'Iltimos tizimga kirish uchun shaxsiy malumotlaringizni kiriting'}
+                </Typography>
               </Box>
 
               <form
@@ -209,7 +258,7 @@ const LoginPage = () => {
                 onSubmit={handleSubmit(onSubmit)}
               >
                 <Box display='grid' gap={5}>
-                  <FormControl fullWidth>
+                  <FormControl disabled={Boolean(user_blocked)} fullWidth>
                     <InputLabel error={Boolean(errors.phone)} htmlFor='login-input'>
                       {t('phone')}
                     </InputLabel>
@@ -233,7 +282,7 @@ const LoginPage = () => {
                     {errors.phone && <FormHelperText error>{errors.phone.message}</FormHelperText>}
                   </FormControl>
 
-                  <FormControl fullWidth>
+                  <FormControl disabled={Boolean(user_blocked)} fullWidth>
                     <InputLabel htmlFor='auth-login-v2-password' error={Boolean(errors.password)}>
                       Parol
                     </InputLabel>
@@ -253,7 +302,10 @@ const LoginPage = () => {
                           type={showPassword ? 'text' : 'password'}
                           endAdornment={
                             <InputAdornment position='end'>
-                              <IconButton onClick={() => setShowPassword(!showPassword)}>
+                              <IconButton
+                                disabled={Boolean(user_blocked)}
+                                onClick={() => setShowPassword(!showPassword)}
+                              >
                                 <Eye />
                               </IconButton>
                             </InputAdornment>
@@ -265,7 +317,14 @@ const LoginPage = () => {
                   </FormControl>
                 </Box>
 
-                <LoadingButton loading={loading} fullWidth size='large' type='submit' variant='contained'>
+                <LoadingButton
+                  disabled={Boolean(user_blocked)}
+                  loading={loading}
+                  fullWidth
+                  size='large'
+                  type='submit'
+                  variant='contained'
+                >
                   Kirish
                 </LoadingButton>
               </form>

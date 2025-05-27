@@ -1,4 +1,5 @@
 import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import Cookies from 'js-cookie'
 import Router from 'next/router'
 import authConfig from 'src/configs/auth'
 
@@ -6,10 +7,6 @@ const api = axios.create()
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    const storedToken = typeof window !== 'undefined'
-      ? localStorage.getItem(authConfig.storageTokenKeyName)
-      : null
-
     let baseURL: string
 
     if (typeof window !== 'undefined') {
@@ -29,15 +26,16 @@ api.interceptors.request.use(
     config.baseURL = baseURL
 
     const version = config.headers?.['x-api-version'] === 'v2' ? 'v2' : 'v1'
+    const token = Cookies.get(authConfig.storageTokenKeyName)
 
     const url = config.url || ''
     if (!url.startsWith('/v1') && !url.startsWith('/v2')) {
       config.url = `/${version}/${url}`
     }
 
-    if (storedToken) {
+    if (token) {
       config.headers = config.headers || {}
-      config.headers['Authorization'] = `Bearer ${storedToken}`
+      config.headers['Authorization'] = `Bearer ${token}`
     }
 
     if (typeof window !== 'undefined') {
@@ -50,15 +48,20 @@ api.interceptors.request.use(
 
     return config
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error)
 )
 
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
-  (error) => {
+  error => {
     if (error.response && [401, 403].includes(error.response.status)) {
       if (typeof window !== 'undefined') {
+        const allCookies = Cookies.get()
+        Object.keys(allCookies).forEach(cookieName => {
+          Cookies.remove(cookieName)
+        })
         localStorage.clear()
+        
         void Router.push('/login')
       }
       return Promise.reject({ message: error.response?.data || 'Authentication error' })

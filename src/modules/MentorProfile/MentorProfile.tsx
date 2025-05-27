@@ -14,8 +14,7 @@ type Props = {
 
 export const MentorProfile: FC<Props> = ({ id }) => {
   const { user } = useAuth()
-  const { data } = useGet(ceoConfigs.teachers + id)
-
+  const { data } = useGet(ceoConfigs.teachers + (id || user?.id))
 
   return (
     <Box

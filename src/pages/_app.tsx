@@ -71,9 +71,6 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: Ex
   const guestGuard = Component.guestGuard ?? false
   const aclAbilities = Component.acl ?? defaultACLObj
 
-
-
-
   return (
     <Providers>
         <CacheProvider value={emotionCache}>
