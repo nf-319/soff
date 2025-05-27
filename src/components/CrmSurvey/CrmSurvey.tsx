@@ -3,9 +3,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Stepper,
-  Step,
-  StepLabel,
   TextField,
   Button,
   Typography,
@@ -17,9 +14,10 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  LinearProgress
+  LinearProgress,
+  Grow
 } from '@mui/material'
-import { nextStep, prevStep, setStepText, resetForm, setGrade, setHelpUsed } from '../../store/apps/crm-survey'
+import { nextStep, prevStep, setStepText, resetForm, setGrade, setHelpUsed } from '@store/apps/crm-survey'
 import { RootState, useAppDispatch, useAppSelector } from '@/store'
 import { useEffect, useState } from 'react'
 import { usePost } from '@/hooks/useApi'
@@ -42,6 +40,7 @@ const CrmSurveymodal = () => {
   const [error, setError] = useState('')
   const { mutate: feedBackMutate, isPending } = usePost()
   const [showSuccess, setShowSuccess] = useState(false)
+
   const stepTitle = [
     'CRM tizimidan umumiy qoniqish darajangiz?',
     'Tizimdagi muammolar haqida yozing',
@@ -49,6 +48,7 @@ const CrmSurveymodal = () => {
     'SOFF CRM siz uchun boshqa tizimlardan nimasi bilan afzal?',
     'Texnik yordam xizmatimizni baholang'
   ]
+
   const stepLabel = [
     'Nega bu bahoni berdingiz?',
     'Tizimdagi muammolaringizni batafsil yozing',
@@ -129,7 +129,7 @@ const CrmSurveymodal = () => {
   }
 
   return (
-    <Dialog open={showSurvey} fullWidth maxWidth='sm' sx={{ height: '100%', transition: 'heigth 0.3s ease-in-out' }}>
+    <Dialog TransitionComponent={Grow} open={showSurvey} fullWidth maxWidth='sm'>
       {!showSuccess &&
         (!showForm ? (
           <>
