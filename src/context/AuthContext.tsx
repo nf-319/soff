@@ -40,7 +40,7 @@ const AuthProvider = ({ children }: Props) => {
 
     if (token) {
       const settings: any = window.localStorage.getItem('settings')
-      i18n.changeLanguage(JSON.parse(settings)?.locale || 'uz')
+      void i18n.changeLanguage(JSON.parse(settings)?.locale || 'uz')
 
       setLoading(true)
 
@@ -85,7 +85,6 @@ const AuthProvider = ({ children }: Props) => {
           setLoading(false)
           router.replace('/login')
         })
-
       if (
         !window.location.hostname.split('.').includes('c-panel') &&
         !window.location.hostname.split('.').includes('localhost')
@@ -162,20 +161,17 @@ const AuthProvider = ({ children }: Props) => {
   //     })
   // }
 
-  console.log(Cookies.get());
-  
-
   const handleLogout = () => {
     setUser(null)
     localStorage.clear()
-  
+
     const allCookies = Cookies.get()
     Object.keys(allCookies).forEach(cookieName => {
       if (cookieName !== 'user_blocked') {
         Cookies.remove(cookieName)
       }
     })
-  
+
     router.push('/login')
   }
 
