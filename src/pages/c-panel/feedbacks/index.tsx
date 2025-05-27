@@ -6,6 +6,7 @@ import ThoughtsPageContent from '@/widgets/CpanelThoughts/ThougthsContent'
 import { Box, Button, FormControl, MenuItem, Select } from '@mui/material'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { MONTH_VALUES } from '@shared/config'
 
 const ThoughtsPage = () => {
   const router = useRouter()
@@ -15,21 +16,6 @@ const ThoughtsPage = () => {
   const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0')
   const [selectedMonth, setSelectedMonth] = useState(searchParams.get('month') || currentMonth)
   const [role, setRole] = useState(searchParams.get('role') || '')
-
-  const months = [
-    { value: '01', label: 'Yanvar' },
-    { value: '02', label: 'Fevral' },
-    { value: '03', label: 'Mart' },
-    { value: '04', label: 'Aprel' },
-    { value: '05', label: 'May' },
-    { value: '06', label: 'Iyun' },
-    { value: '07', label: 'Iyul' },
-    { value: '08', label: 'Avgust' },
-    { value: '09', label: 'Sentabr' },
-    { value: '10', label: 'Oktabr' },
-    { value: '11', label: 'Noyabr' },
-    { value: '12', label: 'Dekabr' }
-  ]
 
   useEffect(() => {
     const { year, month, role } = router.query
@@ -93,7 +79,7 @@ const ThoughtsPage = () => {
           </FormControl>
           <FormControl fullWidth>
             <Select size='small' value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)}>
-              {months.map(item => (
+              {MONTH_VALUES.map(item => (
                 <MenuItem value={item.value}>{item.label}</MenuItem>
               ))}
             </Select>
@@ -106,7 +92,7 @@ const ThoughtsPage = () => {
               <MenuItem value='teacher'>Teacher</MenuItem>
             </Select>
           </FormControl>
-          <Button fullWidth variant='outlined' size='medium' onClick={handleClearFilters}>
+          <Button sx={{ flexShrink: 0 }} variant='outlined' size='medium' onClick={handleClearFilters}>
             Filterni tozalash
           </Button>
         </Box>
