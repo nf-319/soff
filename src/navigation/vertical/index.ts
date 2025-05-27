@@ -54,6 +54,11 @@ export const CPanelNavigation = (t: any): any => {
       title: t('Xabarnoma'),
       icon: 'mdi:bell-outline',
       path: '/c-panel/notifications'
+    },
+    {
+      title: t('Mijoz fikirlari'),
+      icon: 'mdi:comment-text-multiple-outline',
+      path: '/c-panel/feedbacks'
     }
   ]
 }
