@@ -153,16 +153,15 @@ const CrmSurveymodal = () => {
           </>
         ) : (
           <>
+            <Stepper activeStep={activeStep} sx={{ mt: 5, px: 5 }}>
+              {[...Array(5)].map((_, index) => (
+                <Step key={index}>
+                  <StepLabel>{index + 1}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
             <DialogTitle>{stepTitle[activeStep]}</DialogTitle>
             <DialogContent>
-              <Stepper activeStep={activeStep} sx={{ mb: 2 }}>
-                {[...Array(5)].map((_, index) => (
-                  <Step key={index}>
-                    <StepLabel>{index + 1}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
-
               {activeStep === 4 && (
                 <FormControl margin='normal' error={!!error && helpUsed == null} component='fieldset'>
                   <FormLabel component='legend'>Texnik yordam olganmisiz?</FormLabel>
@@ -242,6 +241,7 @@ const CrmSurveymodal = () => {
             <DialogActions>
               {/* <Button onClick={handleClose}>Bekor qilish</Button> */}
               <Button
+                fullWidth
                 variant='outlined'
                 onClick={() => {
                   if (activeStep === 0) {
@@ -255,11 +255,11 @@ const CrmSurveymodal = () => {
                 Orqaga
               </Button>
               {activeStep < 4 ? (
-                <Button variant='contained' onClick={handleNext}>
+                <Button fullWidth variant='contained' onClick={handleNext}>
                   Keyingi
                 </Button>
               ) : (
-                <LoadingButton loading={isPending} variant='contained' onClick={handleSubmit}>
+                <LoadingButton fullWidth loading={isPending} variant='contained' onClick={handleSubmit}>
                   Yuborish
                 </LoadingButton>
               )}
