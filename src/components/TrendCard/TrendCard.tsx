@@ -7,7 +7,7 @@ export type TrendCardProps = {
   count: string | number
   icon: LucideIcon
   iconColor?: string
-  process?: string | number
+  process?: string | number | null
   trendDirection?: 'up' | 'down'
   onClick?: () => void
   tooltip?: string
