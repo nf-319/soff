@@ -146,10 +146,10 @@ const LoginPage = () => {
       const redirectURL = isMarketable
         ? '/lid-statements'
         : paymentPage
-        ? '/crm-payments'
-        : returnUrl && returnUrl !== '/'
-        ? returnUrl
-        : '/'
+          ? '/crm-payments'
+          : returnUrl && returnUrl !== '/'
+            ? returnUrl
+            : '/'
 
       await router.push(redirectURL as string)
 
@@ -208,6 +208,15 @@ const LoginPage = () => {
   }
   const user_blocked = Cookies.get('user_blocked')
 
+
+  const [logoSrc, setLogoSrc] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (public_settings?.logo) {
+      setLogoSrc(public_settings.logo)
+    }
+  }, [public_settings])
+
   return (
     <Box sx={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden' }}>
       <Image src='/images/request-form-bg.webp' alt='Login Background' fill style={{ objectFit: 'cover' }} priority />
@@ -227,20 +236,21 @@ const LoginPage = () => {
           {public_settings && (
             <div className='login-card'>
               <Box sx={{ mb: 6, textAlign: 'center' }}>
-                {public_settings?.logo && (
+                {logoSrc && (
                   <Image
-                    src={public_settings?.logo}
+                    src={logoSrc}
                     alt='Brand logo'
                     width={100}
                     height={80}
                     style={{ objectFit: 'scale-down' }}
+                    onError={() => setLogoSrc('/images/soff-logo.png')}
                   />
                 )}
 
+
                 {public_settings ? (
-                  <TypographyStyled variant='h5'>{`${
-                    public_settings?.training_center_name || themeConfig.templateName
-                  }! ga Xush kelibsiz 👋🏻`}</TypographyStyled>
+                  <TypographyStyled variant='h5'>{`${public_settings?.training_center_name || themeConfig.templateName
+                    }! ga Xush kelibsiz 👋🏻`}</TypographyStyled>
                 ) : (
                   <TypographyStyled variant='h5'>Xush kelibsiz 👋🏻</TypographyStyled>
                 )}
