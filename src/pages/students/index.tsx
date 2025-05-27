@@ -87,7 +87,7 @@ export default function StudentsPage() {
       xs: 0.2,
       title: t('ID'),
       dataIndex: 'index',
-      render: index => `${Number(queryParams.offset || 0) + Number(index) + 1}`
+      render: index => `${Number(queryParams.offset || 0) + Number(index)}`
     },
     {
       xs: 0.4,
