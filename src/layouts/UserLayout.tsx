@@ -47,7 +47,6 @@ const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed
     void fetchCompanyInfo()
   }, [dispatch])
 
-  console.log(user)
 
   return (
     <Layout

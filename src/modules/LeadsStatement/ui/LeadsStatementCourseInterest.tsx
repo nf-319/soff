@@ -6,6 +6,7 @@ import { ComingSoon } from '@components/ComingSoon'
 import { CircleHelp } from 'lucide-react'
 import { coursesEmpty } from '@/shared/constants'
 import { PieChart } from '@components/PieChart'
+import { colorSchemes } from '@nivo/colors'
 
 const LegendItem = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -41,7 +42,7 @@ export const LeadsStatementCourseInterest: FC<Props> = ({ data, isCard = false, 
   const courseInterestData = (() => {
     const nameCounts: Record<string, number> = {}
 
-    return (isActive ? aggregatedData : coursesEmpty).map(item => {
+    return (isActive ? aggregatedData : coursesEmpty).map((item, index) => {
       nameCounts[item.name] = (nameCounts[item.name] || 0) + 1
 
       const label = nameCounts[item.name] === 1 ? item.name : `${item.name}-${nameCounts[item.name]}`
@@ -50,12 +51,14 @@ export const LeadsStatementCourseInterest: FC<Props> = ({ data, isCard = false, 
         id: item.name,
         label,
         value: item.count,
-        color: `hsl(${
-          ((Object.keys(nameCounts).indexOf(item.name) * 360) / Object.keys(nameCounts).length) % 360
-        }, 50%, 60%)`
+        color: colorSchemes.nivo[index % colorSchemes.nivo.length],
+
       }
     })
+
   })()
+
+  console.log('courseInterestData  =>', courseInterestData);
 
   return (
     <ComingSoon
@@ -94,7 +97,8 @@ export const LeadsStatementCourseInterest: FC<Props> = ({ data, isCard = false, 
         ) : (
           <Box sx={{ flexGrow: 1, width: '100%', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ flexGrow: 1, height: '100%' }}>
-            <PieChart data={courseInterestData} legend={[]} />
+              <PieChart 
+              data={courseInterestData} legend={[]} />
             </Box>
             <Box sx={{ px: 6, pb: 4 }}>
               <Grid container spacing={1}>
