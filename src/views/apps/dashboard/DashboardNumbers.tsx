@@ -16,10 +16,10 @@ const DashboardNumbers = () => {
           <Grid item xs={12}>
             <FinanceAllNumber />
           </Grid>
-          <Grid item xs={12} sm={12} md={4}>
+          <Grid item xs={12} sm={12} md={6}>
             <StatsPaymentMethods />
           </Grid>
-          <Grid item xs={12} md={8} mb={10}>
+          <Grid item xs={12} md={6}>
             <CardStatisticsLiveVisitors />
           </Grid>
         </Grid>
