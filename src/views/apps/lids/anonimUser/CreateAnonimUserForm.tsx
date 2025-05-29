@@ -62,7 +62,13 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
     deps: ['departments-leads']
   })
 
-  const { data: sourceData } = useGet('leads/statistic/')
+  const { data: sourceData } = useGet(`leads/statistic/`, {
+    deps: ['leads-statistic'],
+    options: {
+      refetchOnMount: true,
+      refetchOnWindowFocus: true
+    }
+  })
 
   const validationSchema = Yup.object({
     department: Yup.string().required("Bo'lim tanlang"),
@@ -128,7 +134,7 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
       } else {
         formik.resetForm()
         dispatch(setSectionId(null))
-        toast.success("Muvaffaqiyatli")
+        toast.success('Muvaffaqiyatli')
         await queryClient.invalidateQueries({ queryKey: ['leads/departments/leads/', 'departments-leads'] })
         await handleGetLealdItems()
         await dispatch(fetchDepartmentList())
@@ -237,7 +243,9 @@ export default function CreateAnonimUserForm({ source, defaultId }: Props) {
             onBlur={handleBlur}
             value={values.first_name}
           />
-          {!!errors.first_name && touched.first_name && <FormHelperText error>{formik.errors.first_name}</FormHelperText>}
+          {!!errors.first_name && touched.first_name && (
+            <FormHelperText error>{formik.errors.first_name}</FormHelperText>
+          )}
         </FormControl>
 
         <FormControl fullWidth>

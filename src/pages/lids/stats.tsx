@@ -31,6 +31,7 @@ import { toast } from 'react-hot-toast'
 import SourceStatsVertical from '../../components/card-statistics/card-source-vertical'
 import { EmptyContent } from '../../components/empty-content'
 import { Metadata } from '@/components/Metada'
+import { useQueryClient } from '@tanstack/react-query'
 
 const CustomeDrawer = dynamic(() => import('../settings/office/courses').then(mod => mod.CustomeDrawer))
 
@@ -63,6 +64,8 @@ const Stats = () => {
 
   const initialValues = { name: '' }
 
+  const queryClient = useQueryClient()
+
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -71,6 +74,7 @@ const Stats = () => {
       try {
         await api.post(`leads/source/`, valuess)
         await getSources()
+        queryClient.invalidateQueries({ queryKey: ['leads-statistic'] })
         formik.resetForm()
         setOpen(false)
       } catch (err: any) {
