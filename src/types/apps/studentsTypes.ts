@@ -58,8 +58,7 @@ export interface CreateStudentDto extends StudentItemType {
   group?: number | string
   start_at?: string
   discount_amount: number
-  is_discount: boolean,
-  skip_error:boolean
+  is_discount: boolean
 }
 
 export interface UpdateStudentDto extends StudentItemType {

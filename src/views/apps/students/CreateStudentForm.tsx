@@ -7,7 +7,6 @@ import {
   AccordionSummary,
   Box,
   Button,
-  Checkbox,
   debounce,
   FormControl,
   FormControlLabel,
@@ -61,7 +60,7 @@ export default function CreateStudentForm() {
   const [isDiscount, setIsDiscount] = useState<boolean>(false)
   const queryClient = useQueryClient()
   const school_type = localStorage.getItem('school_type')
-  const [skip_error,setSkipError] = useState(false)
+
   const getGroups = async () => {
     await dispatch(fetchGroupCheckList(''))
   }
@@ -96,8 +95,7 @@ export default function CreateStudentForm() {
     source: '',
     start_at: today,
     is_discount: false,
-    discount_amount: 0,
-    skip_error:false,
+    discount_amount: 0
   }
 
   const formik = useFormik({
@@ -118,8 +116,6 @@ export default function CreateStudentForm() {
           newValues.append(key, value as any)
         }
       }
-        newValues.append('skip_error', String(skip_error))
-
 
       if (isDiscount) {
         newValues.append('discount_amount', String(values.discount_amount))
@@ -157,7 +153,6 @@ export default function CreateStudentForm() {
     return () => {
       formik.resetForm()
     }
-    setSkipError(false)
   }, [])
 
   const handleSearch = useCallback(
@@ -166,8 +161,6 @@ export default function CreateStudentForm() {
     }, 500),
     []
   )
-
-  
 
   return (
     <form
@@ -235,18 +228,6 @@ export default function CreateStudentForm() {
         />
         {errors.phone && touched.phone && <FormHelperText error={true}>{errors.phone}</FormHelperText>}
       </FormControl>
-      {errors.phone == 'Bunday raqam tizimga kiritilgan!' &&
-        <FormControlLabel
-      control={
-        <Checkbox
-          checked={skip_error}
-          onChange={(e:any)=>setSkipError(e.target.checked)}
-          color="primary"
-        />
-      }
-      label="Qayta qo'shish"
-    />
-      }
 
       {school_type == 'private_school' && (
         <FormControl sx={{ width: '100%' }}>

@@ -19,7 +19,7 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import toast from 'react-hot-toast'
 import PhoneInput from '../../components/phone-input'
 import { useTranslation } from 'react-i18next'
-import { reversePhone } from '@components/phone-input/format-phone-number'
+import { reversePhone } from '../../components/phone-input/format-phone-number'
 import api from 'src/@core/utils/api'
 import { RootState, useAppDispatch } from 'src/store'
 import Image from 'next/image'
@@ -32,8 +32,6 @@ import { useRouter } from 'next/router'
 import { useSelector } from 'react-redux'
 import { Eye } from 'lucide-react'
 import { setPublicSettings } from 'src/store/apps/page'
-import Cookies from 'js-cookie'
-import { jwtDecode } from 'jwt-decode'
 
 const schema = yup.object().shape({
   phone: yup.string().required('Telefon raqam kiriting'),
@@ -55,11 +53,6 @@ const defaultValues = {
 type FormData = {
   phone: string
   password: string
-}
-
-interface JwtPayload {
-  exp: number
-  [key: string]: any
 }
 
 const LoginPage = () => {
@@ -102,33 +95,10 @@ const LoginPage = () => {
     try {
       setLoading(true)
       const response = await api.post(authConfig.loginEndpoint, params)
-
-      const accessToken = response.data.tokens.access
-      const decoded = jwtDecode<JwtPayload>(accessToken)
-
-      if (decoded?.exp) {
-        Cookies.set(authConfig.storageTokenKeyName, accessToken, {
-          expires: new Date(decoded.exp * 1000),
-          secure: true,
-          sameSite: 'Lax'
-        })
-      } else {
-        console.error('Invalid JWT: Missing exp field')
-      }
-
+      window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.tokens.access)
+      window.localStorage.setItem('userData', JSON.stringify({ ...response.data }))
       const userRoles = response.data.roles.filter((el: any) => el.exists).map((el: any) => el.name?.toLowerCase())
       dispatch(setRoles(userRoles))
-
-      Cookies.set(
-        'user',
-        JSON.stringify({
-          role: userRoles
-        }),
-        {
-          expires: new Date(decoded.exp * 1000),
-          path: '/'
-        }
-      )
 
       if (
         !window.location.hostname.split('.').includes('c-panel') &&
@@ -168,9 +138,7 @@ const LoginPage = () => {
         branches: response.data?.branches,
         active_branch: response.data.active_branch
       })
-
       setLoading(false)
-      window.localStorage.setItem('userData', JSON.stringify({ ...response.data }))
       auth.initAuth()
     } catch (err: any) {
       if (err?.response?.data) {
@@ -196,15 +164,6 @@ const LoginPage = () => {
     })
   }
 
-
-  const [logoSrc, setLogoSrc] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (public_settings?.logo) {
-      setLogoSrc(public_settings.logo)
-    }
-  }, [public_settings])
-
   return (
     <Box sx={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden' }}>
       <Image src='/images/request-form-bg.webp' alt='Login Background' fill style={{ objectFit: 'cover' }} priority />
@@ -224,17 +183,15 @@ const LoginPage = () => {
           {public_settings && (
             <div className='login-card'>
               <Box sx={{ mb: 6, textAlign: 'center' }}>
-                {logoSrc && (
+                {public_settings?.logo && (
                   <Image
-                    src={logoSrc}
+                    src={public_settings?.logo}
                     alt='Brand logo'
                     width={100}
                     height={80}
                     style={{ objectFit: 'scale-down' }}
-                    onError={() => setLogoSrc('/images/default-logo.jpg')}
                   />
                 )}
-
 
                 {public_settings ? (
                   <TypographyStyled variant='h5'>{`${public_settings?.training_center_name || themeConfig.templateName
@@ -242,9 +199,7 @@ const LoginPage = () => {
                 ) : (
                   <TypographyStyled variant='h5'>Xush kelibsiz 👋🏻</TypographyStyled>
                 )}
-                <Typography variant='body2'>
-                  Iltimos tizimga kirish uchun shaxsiy malumotlaringizni kiriting
-                </Typography>
+                <Typography variant='body2'>Iltimos tizimga kirish uchun shaxsiy malumotlaringizni kiriting</Typography>
               </Box>
 
               <form
@@ -298,9 +253,7 @@ const LoginPage = () => {
                           type={showPassword ? 'text' : 'password'}
                           endAdornment={
                             <InputAdornment position='end'>
-                              <IconButton
-                                onClick={() => setShowPassword(!showPassword)}
-                              >
+                              <IconButton onClick={() => setShowPassword(!showPassword)}>
                                 <Eye />
                               </IconButton>
                             </InputAdornment>
@@ -312,13 +265,7 @@ const LoginPage = () => {
                   </FormControl>
                 </Box>
 
-                <LoadingButton
-                  loading={loading}
-                  fullWidth
-                  size='large'
-                  type='submit'
-                  variant='contained'
-                >
+                <LoadingButton loading={loading} fullWidth size='large' type='submit' variant='contained'>
                   Kirish
                 </LoadingButton>
               </form>

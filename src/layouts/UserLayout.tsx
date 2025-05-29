@@ -16,7 +16,6 @@ import QRCodeScanner from '../components/qrCodeScanner'
 import { useAppDispatch, useAppSelector } from '@/store'
 import { setCompanyInfo } from '@store/apps/user'
 import api from '@utils/api'
-import CrmSurveymodal from '@/components/CrmSurvey/CrmSurvey'
 
 type Props = {
   contentHeightFixed?: boolean
@@ -47,7 +46,6 @@ const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed
     void fetchCompanyInfo()
   }, [dispatch])
 
-
   return (
     <Layout
       hidden={hidden}
@@ -57,23 +55,23 @@ const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed
       verticalLayoutProps={{
         navMenu: {
           navItems:
-            router.pathname.split('/')?.[1] === 'c-panel'
-              ? CPanelNavigation(t)
-              : user?.role.length === 1 && user?.role.includes('teacher')
-              ? TeacherNavigation(t)
-              : user?.role.includes('student')
-              ? StudentNavigation(t)
-              : user?.role.includes('teacher')
-              ? VerticalNavItems(t)
-              : VerticalNavItems(t)
+          router.pathname.split('/')?.[1] === 'c-panel'
+          ? CPanelNavigation(t)
+          : user?.role.length === 1 && user?.role.includes('teacher')
+          ? TeacherNavigation(t)
+          : user?.role.includes('student')
+          ? StudentNavigation(t)
+          : user?.role.includes('teacher')
+          ? VerticalNavItems(t)
+          : VerticalNavItems(t)
         },
         appBar: {
           content: props => (
             <VerticalAppBarContent
-              hidden={hidden}
-              settings={settings}
-              saveSettings={saveSettings}
-              toggleNavVisibility={props.toggleNavVisibility}
+            hidden={hidden}
+            settings={settings}
+            saveSettings={saveSettings}
+            toggleNavVisibility={props.toggleNavVisibility}
             />
           )
         }
@@ -82,13 +80,13 @@ const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed
         horizontalLayoutProps: {
           navMenu: {
             navItems:
-              router.pathname.split('/')?.[1] === 'c-panel'
-                ? CPanelNavigation(t)
-                : user?.currentRole === 'teacher' || (user?.role.length === 1 && user?.role.includes('teacher'))
-                ? TeacherNavigation(t)
-                : user?.role.includes('student')
-                ? StudentNavigation(t)
-                : HorizontalNavItems(t)
+            router.pathname.split('/')?.[1] === 'c-panel'
+            ? CPanelNavigation(t)
+            : user?.currentRole === 'teacher' || user?.role.length === 1 && user?.role.includes('teacher')
+            ? TeacherNavigation(t)
+            : user?.role.includes('student')
+            ? StudentNavigation(t)
+            : HorizontalNavItems(t)
           },
           appBar: {
             content: () => <HorizontalAppBarContent hidden={hidden} settings={settings} saveSettings={saveSettings} />
@@ -97,8 +95,8 @@ const UserLayout: FC<PropsWithChildren<Props>> = ({ children, contentHeightFixed
       })}
     >
       {children}
-      {user?.currentRole !== 'student' && <CrmSurveymodal />}
-      {user?.currentRole !== 'student' && <QRCodeScanner />}
+
+      {user?.currentRole !== "student" && <QRCodeScanner />}
     </Layout>
   )
 }

@@ -252,8 +252,8 @@ const CardStatistics = () => {
 
   return (
     <ApexChartWrapper>
-      <Metadata title='Moliya' />
-
+            <Metadata title='Moliya' />
+  
       <Box
         sx={{
           display: 'flex',
@@ -271,11 +271,11 @@ const CardStatistics = () => {
             <FinanceAllNumber />
           </Grid>
 
-          <Grid item xs={12} sm={12} md={6}>
+          <Grid item xs={12} sm={12} md={4}>
             <StatsPaymentMethods />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={8} mb={10}>
             <CardStatisticsLiveVisitors />
             <Box mt={4}>
               <FinanceResults />

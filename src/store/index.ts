@@ -25,7 +25,6 @@ import finance from './apps/finance'
 import page from './apps/page'
 import logs from './apps/logs'
 import investmentSlice from 'src/store/apps/finance/investments';
-import crmSurveySlice from './apps/crm-survey'
 
 export const store = configureStore({
   reducer: {
@@ -52,8 +51,7 @@ export const store = configureStore({
     logs,
     form,
     attendance,
-    investmentSlice,
-    crmSurveySlice
+    investmentSlice
 
   },
   middleware: getDefaultMiddleware =>

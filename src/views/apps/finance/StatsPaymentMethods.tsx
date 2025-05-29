@@ -1,32 +1,55 @@
-import { Box, Skeleton, Typography } from '@mui/material'
-import { Wallet } from 'lucide-react'
+import { Box, Chip, Grid, Skeleton, Typography } from '@mui/material'
+import { Briefcase, Wallet } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { EmptyContent } from '../../../components/empty-content'
+import ReactApexcharts from '../../../components/react-apexcharts'
 import useResponsive from 'src/@core/hooks/useResponsive'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import { formatCurrency } from 'src/@core/utils/format-currency'
 import { useAppSelector } from 'src/store'
-import { PieChart } from '@components/PieChart'
-import { colorSchemes } from '@nivo/colors'
-import { formatPrice } from '@shared/utils'
 
 export default function StatsPaymentMethods() {
   const { all_numbers, numbersLoad: loading } = useAppSelector(state => state.finance)
   const { isMobile } = useResponsive()
   const { settings } = useSettings()
+
   const { t } = useTranslation()
-  const total = all_numbers?.payment_types.reduce((acc, curr) => acc + curr.amount, 0) || 0
-  const fullPercent = 100
-  const chartData = all_numbers?.payment_types.map((el, index) => {
-    const percentage = total === 0 ? 0 : (el.amount / total) * fullPercent;
-    return {
-      id: el.name,
-      label: el.name,
-      value: `${+percentage.toFixed(2)}`,
-      color: colorSchemes.nivo[index % colorSchemes.nivo.length],
-      amount: el.amount
-    };
-  });
+  const props: any = {
+    series: all_numbers?.payment_types.map(el => el.amount),
+    options: {
+      chart: {
+        width: isMobile ? '100%' : 380,
+        type: 'pie'
+      },
+      labels: all_numbers?.payment_types.map(el => el.name),
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: '100%'
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      ],
+      title: {
+        text: t('Tushumlar'),
+        style: {
+          fontSize: '20px',
+          fontWeight: 500,
+          opacity: 0.6
+        }
+      },
+      tooltip: {
+        y: {
+          formatter: (value: number) => `${formatCurrency(value)} so'm`
+        }
+      }
+    }
+  }
 
   return (
     <div>
@@ -43,75 +66,60 @@ export default function StatsPaymentMethods() {
               </Box>
             </Box>
           </Box>
-        ) : chartData ? (
-          <Box sx={{
-            width: '100%', height: '100%', zIndex: '100', bgcolor: '#fff', border: '1px solid #e0e0e0;', padding: '16px', borderRadius: '10px'
-          }}>
-            <h5>To'lov turlari bo'yicha taqsimot
-            </h5>
-            <p>To'lov usullari bo'yicha tushumlar
-            </p>
-            <Box>
-              <Box sx={{ flexGrow: 1, height: '300px' }}>
-                <PieChart
-                  margin={{ top: 20, right: 20, bottom: 30, left: 20 }}
-                  data={chartData}
-                  legend={[]}
-                />
+        ) : props?.series?.some((el: number) => el > 0) && all_numbers ? (
+          <Box>
+            <ReactApexcharts options={props.options} series={props.series} type='pie' width={isMobile ? '100%' : 380} />
 
-              </Box>
-
-              <Box sx={{ marginTop: 5, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px' }}>
-                {chartData.map(item => (
-                  <Box key={item.id} sx={{ width: '100%' }}>
-                    {settings.mode === 'light' ? (
-                      <div style={{ border: '1px solid #e0e0e0e0', padding: '10px', borderRadius: '5px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <Box sx={{ marginTop: 5 }}>
+              {all_numbers?.payment_types.map(item => (
+                <Box key={item.id} sx={{ marginBottom: 5 }}>
+                  {settings.mode === 'light' ? (
+                    <div className='d-flex align-items-center justify-content-between p-2 bg-success bg-opacity-10 rounded px-3'>
+                      <div className='d-flex align-items-center gap-2'>
+                        <div
+                          className='d-flex align-items-center justify-content-center rounded-circle bg-success'
+                          style={{ width: '1.5rem', height: '1.5rem' }}
+                        >
+                          <Wallet className='text-white' style={{ width: '0.75rem', height: '0.75rem' }} />
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <div className='fw-medium small'>{item?.name} : </div>
+                        </div>
+                        <div className='text-muted small'>{item?.count + " to'lov" || "1 to'lov"}</div>
+                      </div>
+                      <div className='text-end fw-medium text-success small'>
+                        {formatCurrency(item?.amount) + " so'm"}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className='d-flex align-items-center justify-content-between p-2 bg-dark bg-opacity-50 rounded px-3'>
+                      <div className='d-flex align-items-center gap-2'>
+                        <div
+                          className='d-flex align-items-center justify-content-center rounded-circle bg-success'
+                          style={{ width: '1.5rem', height: '1.5rem' }}
+                        >
+                          <Wallet className='text-white' style={{ width: '0.75rem', height: '0.75rem' }} />
+                        </div>
                         <div>
-
-                          <div className='d-flex justify-content-between align-item-center w-100'>
-                            <div className='fw-medium small text-capitalize d-flex gap-2 align-items-center'>
-                              <div className='d-flex align-items-center justify-content-center rounded-circle' style={{ width: '0.8rem', height: '0.8rem', backgroundColor: `${item?.color}` }}>
-                              </div>
-                              {item?.label} : </div>
-                            <span className='text-muted small'>{item?.value}%</span>
+                          <Typography fontSize={15}>{item?.name}</Typography>
+                          <div className='small text-light'>
+                            <Typography fontSize={12}>{item?.count + " to'lov" || "1 to'lov"}</Typography>
                           </div>
-                        </div>
-                        <div style={{ fontSize: '12px' }}>
-                          {formatPrice(item?.amount)}
-
                         </div>
                       </div>
-                    ) : (
-                      <div className='d-flex align-items-center justify-content-between p-2 bg-dark bg-opacity-50 rounded px-3'>
-                        <div className='d-flex align-items-center gap-2'>
-                          <div
-                            className='d-flex align-items-center justify-content-center rounded-circle bg-success'
-                            style={{ width: '1.5rem', height: '1.5rem' }}
-                          >
-                            <Wallet className='text-white' style={{ width: '0.75rem', height: '0.75rem' }} />
-                          </div>
-                          <div>
-                            <Typography sx={{ fontSize: '15px' }}>{item?.label}</Typography>
-                            <div className='small text-light'>
-                              <Typography sx={{ fontSize: '12px' }}>{item?.amount + " to'lov" || "1 to'lov"}</Typography>
-                            </div>
-                          </div>
-                        </div>
-                        <div className='text-end fw-medium text-light small'>
-                          {formatPrice(item?.amount)}
-                        </div>
+                      <div className='text-end fw-medium text-light small'>
+                        {formatCurrency(item?.amount) + " so'm"}
                       </div>
-                    )}
-                  </Box>
-                ))}
-              </Box>
+                    </div>
+                  )}
+                </Box>
+              ))}
             </Box>
           </Box>
         ) : (
           <EmptyContent title="To'lovlar mavjud emas" />
-        )
-        }
-      </div >
-    </div >
+        )}
+      </div>
+    </div>
   )
 }

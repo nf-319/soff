@@ -1,14 +1,11 @@
 import {
   Box,
-  FormControl,
-  FormControlLabel,
+  FormControl, FormControlLabel,
   FormHelperText,
   FormLabel,
   Input,
   InputLabel,
-  MenuItem,
-  Radio,
-  RadioGroup,
+  MenuItem, Radio, RadioGroup,
   Select,
   TextField,
   Typography
@@ -21,7 +18,7 @@ import IconifyIcon from '../icon'
 import useResponsive from '../../@core/hooks/useResponsive'
 import { useTranslation } from 'react-i18next'
 import api from '../../@core/utils/api'
-import  { useRouter } from 'next/router'
+import Router from 'next/router'
 import showResponseError from '../../@core/utils/show-response-error'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { today } from '../card-statistics/kanban-item'
@@ -44,7 +41,7 @@ export default function CreateCompany() {
   const { t } = useTranslation()
   const [loading, setLoading] = useState<boolean>(false)
   const [selectVal, setSelectVal] = useState<any>(null)
-  const router = useRouter()
+
   async function handleSubmit(values: FormData) {
     setLoading(true)
     try {
@@ -54,22 +51,23 @@ export default function CreateCompany() {
       const formattedValues = {
         ...Object.fromEntries(values.entries()),
         show_students,
-        file
+        file,
       }
 
       await api.post(`owner/create/client/`, formattedValues, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       })
 
-      router.push('/c-panel')
+      void Router.push('/c-panel')
     } catch (err: any) {
       showResponseError(err?.response?.data, setError)
     } finally {
       setLoading(false)
     }
   }
+
 
   return (
     <Box>
@@ -127,7 +125,6 @@ export default function CreateCompany() {
                 name='reference_phone'
                 defaultValue={'+998'}
               />
-
               <FormHelperText error={error?.reference_phone?.error}>{error?.reference_phone?.message}</FormHelperText>
             </FormControl>
 
@@ -230,9 +227,9 @@ export default function CreateCompany() {
             <FormControl fullWidth>
               <FormLabel>O'quvchi qarzdorligi o'qtuvchiga ko'rinsinmi?</FormLabel>
 
-              <RadioGroup defaultValue='false' row name='show_students'>
-                <FormControlLabel control={<Radio />} value='true' label='Ha' />
-                <FormControlLabel control={<Radio />} value='false' label="Yo'q" />
+              <RadioGroup defaultValue="false" row name="show_students">
+                <FormControlLabel control={<Radio />} value="true" label="Ha" />
+                <FormControlLabel control={<Radio />} value="false" label="Yo'q" />
               </RadioGroup>
             </FormControl>
 
