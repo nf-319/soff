@@ -1,12 +1,12 @@
 import { EmptyContent } from '@components/empty-content'
 import { ReportLeadsCourseType } from '@/types/report'
 import { Card, Box, Typography, Grid, styled, SxProps, Tooltip } from '@mui/material'
-import { ResponsivePie } from '@nivo/pie'
-import { useSettings } from '@/@core/hooks/useSettings'
 import { FC } from 'react'
 import { ComingSoon } from '@components/ComingSoon'
 import { CircleHelp } from 'lucide-react'
 import { coursesEmpty } from '@/shared/constants'
+import { PieChart } from '@components/PieChart'
+import { colorSchemes } from '@nivo/colors'
 
 const LegendItem = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -42,7 +42,7 @@ export const LeadsStatementCourseInterest: FC<Props> = ({ data, isCard = false, 
   const courseInterestData = (() => {
     const nameCounts: Record<string, number> = {}
 
-    return (isActive ? aggregatedData : coursesEmpty).map(item => {
+    return (isActive ? aggregatedData : coursesEmpty).map((item, index) => {
       nameCounts[item.name] = (nameCounts[item.name] || 0) + 1
 
       const label = nameCounts[item.name] === 1 ? item.name : `${item.name}-${nameCounts[item.name]}`
@@ -51,12 +51,14 @@ export const LeadsStatementCourseInterest: FC<Props> = ({ data, isCard = false, 
         id: item.name,
         label,
         value: item.count,
-        color: `hsl(${
-          ((Object.keys(nameCounts).indexOf(item.name) * 360) / Object.keys(nameCounts).length) % 360
-        }, 50%, 60%)`
+        color: colorSchemes.nivo[index % colorSchemes.nivo.length],
+
       }
     })
+
   })()
+
+  console.log('courseInterestData  =>', courseInterestData);
 
   return (
     <ComingSoon
@@ -95,60 +97,8 @@ export const LeadsStatementCourseInterest: FC<Props> = ({ data, isCard = false, 
         ) : (
           <Box sx={{ flexGrow: 1, width: '100%', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ flexGrow: 1, height: '100%' }}>
-              <ResponsivePie
-                data={courseInterestData}
-                margin={{ top: 40, right: 80, bottom: 40, left: 80 }}
-                innerRadius={0.5}
-                padAngle={0.7}
-                cornerRadius={3}
-                activeOuterRadiusOffset={8}
-                borderWidth={1}
-                borderColor={{
-                  from: 'color',
-                  modifiers: [['darker', 0.2]]
-                }}
-                colors={{ scheme: 'nivo' }}
-                arcLinkLabelsSkipAngle={12}
-                arcLinkLabelsTextColor='#181818'
-                arcLinkLabelsThickness={2}
-                arcLinkLabelsColor={{ from: 'color' }}
-                arcLabelsSkipAngle={12}
-                arcLabelsTextColor={{
-                  from: 'color',
-                  modifiers: [['darker', 2]]
-                }}
-                arcLinkLabel='label'
-                arcLabel='value'
-                defs={[
-                  {
-                    id: 'dots',
-                    type: 'patternDots',
-                    background: 'inherit',
-                    color: 'rgba(255, 255, 255, 0.3)',
-                    size: 4,
-                    padding: 1,
-                    stagger: true
-                  },
-                  {
-                    id: 'lines',
-                    type: 'patternLines',
-                    background: 'inherit',
-                    color: 'rgba(255, 255, 255, 0.3)',
-                    rotation: -45,
-                    lineWidth: 6,
-                    spacing: 10
-                  }
-                ]}
-                legends={[]}
-                theme={{
-                  tooltip: {
-                    container: {
-                      background: '#ffffff',
-                      color: '#181818'
-                    }
-                  }
-                }}
-              />
+              <PieChart 
+              data={courseInterestData} legend={[]} />
             </Box>
             <Box sx={{ px: 6, pb: 4 }}>
               <Grid container spacing={1}>

@@ -99,14 +99,14 @@ export const PaymentReport = () => {
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth>
+          {/* <FormControl fullWidth>
             <DateRangePicker
               placement='bottomEnd'
               value={range as [Date, Date]}
               onChange={val => setRange(val ?? [null, null])}
               label='Sanani tanlang'
             />
-          </FormControl>
+          </FormControl> */}
         </Box>
       </WidgetHeader>
       <PaymentReportCards />

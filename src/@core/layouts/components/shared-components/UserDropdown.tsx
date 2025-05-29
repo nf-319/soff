@@ -63,6 +63,7 @@ const UserDropdown = (props: Props) => {
   const { user, setUser } = useContext(AuthContext)
   const [role, setRole] = useState('')
 
+
   const { direction } = settings
 
   const dispatch = useAppDispatch()
@@ -151,7 +152,6 @@ const UserDropdown = (props: Props) => {
   const handleLogout = () => {
     logout()
     dispatch(setRoles([]))
-    localStorage.clear()
     handleDropdownClose()
   }
 
