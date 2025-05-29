@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import { styled, useTheme } from '@mui/material/styles'
+import { styled } from '@mui/material/styles'
 import { LayoutProps } from 'src/@core/layouts/types'
 import { useAppSelector } from 'src/store'
 import Image from 'next/image'
@@ -41,14 +41,13 @@ const AppBarContent = (props: Props) => {
         userAppBarBranding(props)
       ) : (
         <StyledLink href='/'>
-          {/* <img src={companyInfo?.logo || '/images/default-logo.jpg'} height={35} /> */}
           {logoSrc && (
             <Image
               src={logoSrc}
               alt='Brand logo'
               height={35}
               width={100}
-              style={{ objectFit: 'scale-down', width:'auto' }}
+              style={{ objectFit: 'scale-down', width: 'auto' }}
               onError={() => setLogoSrc('/images/default-logo.jpg')}
             />
           )}
