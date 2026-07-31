@@ -1,1 +1,0 @@
-export { AllSettings } from './AllSettings'

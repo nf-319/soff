@@ -1,1 +1,0 @@
-export { useGetSettings } from './useSettings'

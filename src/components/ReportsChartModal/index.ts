@@ -1,2 +1,0 @@
-
-export {ReportsChartModal} from './ReportsChartModal'

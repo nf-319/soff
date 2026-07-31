@@ -1,1 +1,0 @@
-export { MentorProfile } from './MentorProfile'

@@ -1,1 +1,0 @@
-export { StudentPayments } from './StudentPayments'
