@@ -1,4 +1,4 @@
-let api = "https://6a755b9f32ae114127834ba4.mockapi.io/user";
+let api = "https://697c787c889a1aecfeb28431.mockapi.io/user/data";
 let main = document.querySelector("main");
 let newUser = {
   email: "faxriddin@gmail.com",
